@@ -33,6 +33,7 @@ build() {
 package() {    
     cd "$builddir/python/diag/dist"
     mkdir -p $psec_bindir    
+    mkdir $pkgdir
     tar xvzf *.tar.gz -C $psec_bindir    
     cd $psec_bindir
     ln -s "psec-$psec_branch" diag
