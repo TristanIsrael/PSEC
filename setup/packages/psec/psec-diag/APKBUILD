@@ -1,0 +1,24 @@
+# Contributor:
+# Maintainer: Tristan Israël <tristan.israel@alefbet.net>
+pkgname=psec-diag
+pkgver=1.0
+pkgrel=1
+pkgdesc="PSEC - Diagnostic tool"
+url="https://www.alefbet.net/"
+arch="noarch"
+license="MIT"
+depends=""
+makedepends=""
+checkdepends=""
+install="$pkgname.pre-install $pkgname.post-install $pkgname.post-deinstall"
+subpackages=""
+replaces=""
+builddir="$srcdir/"
+options="!check"  # no tests provided
+
+source=""
+
+package() {
+	install -D -m644 "$srcdir"/repositories "$pkgdir"/etc/apk/repositories	
+}
+
