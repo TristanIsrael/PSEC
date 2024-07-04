@@ -23,12 +23,12 @@ prepare() {
 }
 
 build() {
-    cd "$builddir"
+    cd "$builddir/setup/packages/psec/$pkgname"
     python3 -m build
 }
 
 package() {
-    cd "$builddir"
+    cd "$builddir/setup/packages/psec/$pkgname"
     python3 -m pip install --prefix=/usr --root="$pkgdir" .
 }
 
