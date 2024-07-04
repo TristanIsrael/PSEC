@@ -14,7 +14,6 @@ checkdepends=""
 install=""
 subpackages=""
 replaces=""
-psec_bindir="$pkgdir/python/diag/dist"
 options="!check"  # no tests provided
 psec_branch="1.0"
 giturl="https://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@github.com/tibsys/psec"
@@ -30,10 +29,10 @@ build() {
     python3 -m build
 }
 
-package() {    
+package() {        
     cd "$builddir/python/diag/dist"
-    mkdir -p $psec_bindir    
-    tar xvzf *.tar.gz -C $psec_bindir    
-    cd $psec_bindir
+    mkdir -p "$pkgdir/python/diag/dist"
+    tar xvzf *.tar.gz -C "$pkgdir/python/diag/dist"
+    cd "$pkgdir/python/diag/dist"
     ln -s "psec-$psec_branch" diag
 }
