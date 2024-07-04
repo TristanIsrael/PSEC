@@ -33,5 +33,5 @@ package() {
     mkdir -p $pkgdir/usr/local/psec
     tar xvzf *.tar.gz -C $pkgdir/usr/local/psec
     cd $pkgdir
-    ln -s `find . -name "psec_diag*" -type d` psec-diag
+    ln -s `find . -name "diag*" -type d` diag
 }
