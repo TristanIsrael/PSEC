@@ -31,6 +31,7 @@ build() {
 }
 
 package() {
+    mkdir -p "$builddir/python/diag/dist"
     cd "$builddir/python/diag/dist"
     mkdir -p $pkgdir
     tar xvzf *.tar.gz -C $psec_bindir
