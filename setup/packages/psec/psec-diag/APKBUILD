@@ -34,5 +34,5 @@ package() {
     mkdir -p "$pkgdir/usr/lib/psec"
     tar xvzf *.tar.gz -C "$pkgdir/usr/lib/psec"
     cd "$pkgdir/usr/lib/psec"
-    ln -s "psec-$psec_branch" diag
+    ln -s "diag-$psec_branch" diag
 }
