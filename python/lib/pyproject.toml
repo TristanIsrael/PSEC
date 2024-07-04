@@ -1,0 +1,22 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "psec"
+version = "0.10"
+authors = [ 
+    { name="Tristan Israël", email="tristan.israel@alefbet.net" }, 
+]
+description = "PSEC python library"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "Operating System :: POSIX :: Linux",
+]
+
+[project.urls]
+Homepage = "https://github.com/tibsys/psec"
+Issues = "https://github.com/tibsys/psec/issues"

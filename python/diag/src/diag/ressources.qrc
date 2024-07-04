@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/images">
+        <file alias="icon_cursor">images/cursor.png</file>        
+    </qresource>    
+</RCC>
