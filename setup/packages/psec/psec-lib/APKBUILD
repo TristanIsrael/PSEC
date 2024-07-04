@@ -30,5 +30,5 @@ build() {
 
 package() {
     cd "$builddir/python/lib/dist"
-    python3 -m installer --destdir=$pkgdir psec-0.10-py3-none-any.whl
+    python3 -m installer --destdir=$pkgdir psec-*-py3-none-any.whl
 }

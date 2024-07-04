@@ -8,27 +8,27 @@ url="https://www.alefbet.net/"
 arch="noarch"
 license="MIT"
 depends="python3"
-makedepends="python3-dev py3-pip git"
+makedepends="python3-dev py3-build py3-installer git"
 builddir="$srcdir/$pkgname-$pkgver"
 checkdepends=""
-install="$pkgname.pre-install $pkgname.post-install $pkgname.post-deinstall"
+install=""
 subpackages=""
 replaces=""
 options="!check"  # no tests provided
 giturl="https://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@github.com/tibsys/psec"
 
 prepare() {
+    mkdir -p "$builddir"
     cd "$builddir"
-    git clone --depth 1 --branch v${pkgver} ${giturl} .
+    git clone "$giturl" .
 }
 
 build() {
-    cd "$builddir/setup/packages/psec/$pkgname"
+    cd "$builddir/python/lib"
     python3 -m build
 }
 
 package() {
-    cd "$builddir/setup/packages/psec/$pkgname"
-    python3 -m pip install --prefix=/usr --root="$pkgdir" .
+    cd "$builddir/python/lib/dist"
+    python3 -m installer . --prefix=/usr --root="$pkgdir" .
 }
-
