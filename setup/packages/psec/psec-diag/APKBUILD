@@ -7,18 +7,28 @@ pkgdesc="PSEC - Diagnostic tool"
 url="https://www.alefbet.net/"
 arch="noarch"
 license="MIT"
-depends=""
-makedepends=""
+depends="python3"
+makedepends="python3-dev py3-pip git"
+builddir="$srcdir/$pkgname-$pkgver"
 checkdepends=""
 install="$pkgname.pre-install $pkgname.post-install $pkgname.post-deinstall"
 subpackages=""
 replaces=""
-builddir="$srcdir/"
 options="!check"  # no tests provided
+giturl="https://github.com/tibsys/psec"
 
-source=""
+prepare() {
+    cd "$builddir"
+    git clone --depth 1 --branch v${pkgver} ${giturl} .
+}
+
+build() {
+    cd "$builddir"
+    python3 -m build
+}
 
 package() {
-	install -D -m644 "$srcdir"/repositories "$pkgdir"/etc/apk/repositories	
+    cd "$builddir"
+    python3 -m pip install --prefix=/usr --root="$pkgdir" .
 }
 
