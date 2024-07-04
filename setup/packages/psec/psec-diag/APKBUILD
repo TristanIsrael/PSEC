@@ -16,6 +16,7 @@ subpackages=""
 replaces=""
 psec_bindir="$pkgdir/usr/lib/psec"
 options="!check"  # no tests provided
+psec_branch="1.0"
 giturl="https://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@github.com/tibsys/psec"
 
 prepare() {
@@ -34,5 +35,5 @@ package() {
     mkdir -p $pkgdir
     tar xvzf *.tar.gz -C $psec_bindir
     cd $psec_bindir
-    ln -s `find . -name "diag*" -type d` diag
+    ln -s "psec-$psec_branch" diag
 }
