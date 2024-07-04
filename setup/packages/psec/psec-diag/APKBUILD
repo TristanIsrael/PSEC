@@ -14,6 +14,7 @@ checkdepends=""
 install=""
 subpackages=""
 replaces=""
+psec_bindir="$pkgdir/usr/lib/psec"
 options="!check"  # no tests provided
 giturl="https://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@github.com/tibsys/psec"
 
@@ -30,8 +31,8 @@ build() {
 
 package() {
     cd "$builddir/python/diag/dist"
-    mkdir -p $pkgdir/usr/lib/psec
-    tar xvzf *.tar.gz -C $pkgdir/usr/lib/psec
-    cd $pkgdir
+    mkdir -p $pkgdir
+    tar xvzf *.tar.gz -C $psec_bindir
+    cd $psec_bindir
     ln -s `find . -name "diag*" -type d` diag
 }
