@@ -1,0 +1,12 @@
+#!/bin/sh
+
+echo
+echo --------------------------------------------
+echo -------      PSEC Installation       -------
+echo ---        script post-install.sh        ---
+echo --------------------------------------------
+echo
+
+echo Setup default Alpine repositories
+setup-apkrepos -cf
+apk update

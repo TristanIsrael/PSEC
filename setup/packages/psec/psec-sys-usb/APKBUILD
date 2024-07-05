@@ -1,13 +1,13 @@
 # Contributor:
 # Maintainer: Tristan Israël <tristan.israel@alefbet.net>
-pkgname=psec-diag
+pkgname=psec-sys-usb
 pkgver=1.0
 pkgrel=1
-pkgdesc="PSEC - Diagnostic tool"
+pkgdesc="PSEC - USB proxy virtual machine"
 url="https://www.alefbet.net/"
 arch="noarch"
 license="MIT"
-depends="python3 psec-lib py3-pyside6 py3-psutil py3-humanize fontconfig freetype terminus-font psec-sys-usb psec-sys-gui psec-core"
+depends="psec-lib"
 makedepends="python3-dev py3-build py3-installer git"
 builddir="$srcdir/$pkgname-$pkgver"
 checkdepends=""
@@ -24,15 +24,6 @@ prepare() {
     git clone "$giturl" .
 }
 
-build() {
-    cd "$builddir/python/diag"
-    python3 -m build
-}
-
 package() {        
-    cd "$builddir/python/diag/dist"
-    mkdir -p "$pkgdir/usr/lib/psec"
-    tar xvzf *.tar.gz -C "$pkgdir/usr/lib/psec"
-    cd "$pkgdir/usr/lib/psec"
-    ln -s "diag-$psec_branch" diag
+    
 }
