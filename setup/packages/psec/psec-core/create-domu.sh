@@ -44,6 +44,7 @@ cd $WORKDIR/apkovl
 
 echo ... Configure main package
 echo "
+psec-lib
 $MAIN_PACKAGE" >> $WORKDIR/apkovl/etc/apk/world
 
 echo ... Configure PSEC library

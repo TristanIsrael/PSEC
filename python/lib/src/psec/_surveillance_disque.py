@@ -1,7 +1,7 @@
 import os
 from watchdog.observers.polling import PollingObserver
 from watchdog.events import LoggingEventHandler, FileSystemEventHandler, FileSystemEvent
-from panoptiscan_lib import Journal, NotificationFactory, EtatDisque, Parametres, MessagerieDomu
+from . import Journal, NotificationFactory, EtatDisque, Parametres, MessagerieDomu
 
 class EvenementDisqueHandler(FileSystemEventHandler):
     """ Gère les changements sur le point de montage des supports de stockage"""

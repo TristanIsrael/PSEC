@@ -69,14 +69,14 @@ class Constantes(metaclass=SingletonMeta):
     """Classe définissant des constantes pour le système"""    
 
     constantes = {
-        Cles.CHEMIN_FICHIER_CONFIG_GLOBAL: "/etc/panoptiscan/global.conf",        
+        Cles.CHEMIN_FICHIER_CONFIG_GLOBAL: "/etc/psec/global.conf",        
         # Sockets pv channel entre Dom0 et DomU
         Cles.CHEMIN_SOCKET_MSG: "/dev/hvc1",
         Cles.CHEMIN_SOCKET_INPUT_DOMU: "/dev/hvc3",
         #Cles.CHEMIN_SOCKET_API: "/run/panoptiscan.sock",
         Cles.TAILLE_TRAME: 1024,
         # Journalisations
-        Cles.CHEMIN_JOURNAL_LOCAL: "/var/log/panoptiscan.log",
+        Cles.CHEMIN_JOURNAL_LOCAL: "/var/log/psec.log",
         "format_chaine_log_prod": '%(asctime)s %(levelname)-8s %(domaine)-10s [%(name)-20s] %(message)s',
         "format_chaine_log_debug": '%(asctime)s %(levelname)-8s %(domaine)-10s [%(name)-20s] %(message)s',
         Cles.CHEMIN_PORT_JOURNAL_DOMU: "/dev/hvc2",
@@ -88,11 +88,11 @@ class Constantes(metaclass=SingletonMeta):
         Cles.CHEMIN_MONTAGE_USB: "/media/usb", #/mnt
         Cles.DEPOT_LOCAL: "depot_local",
         Cles.ACTIVE_JOURNAL_LOCAL: True,
-        "chemin_fichier_config_global": "/etc/panoptiscan/global.conf",
+        "chemin_fichier_config_global": "/etc/psec/global.conf",
         Cles.NOM_DOMAINE_GUI: "gui",
         Cles.BENCHMARK_INPUTS_ITERATIONS: 1000,
-        Cles.CHEMIN_DEPOT_DOM0: "/usr/local/panoptiscan/depot",
-        Cles.CHEMIN_DEPOT_DOMU: "/mnt/depot"
+        Cles.CHEMIN_DEPOT_DOM0: "/usr/local/psec/storage",
+        Cles.CHEMIN_DEPOT_DOMU: "/mnt/storage"
     }                
 
     def constante(self, cle):

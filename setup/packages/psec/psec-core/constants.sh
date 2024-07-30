@@ -2,7 +2,7 @@
 
 export ALPINE_VERSION="3.20"
 
-export ALPINE_LOCAL_ROOT=/usr/local/psec/repository/
+export ALPINE_LOCAL_ROOT=/usr/local/psec/packages
 export ALPINE_LOCAL_REPOSITORY=$ALPINE_LOCAL_ROOT/alpine
 export PSEC_LOCAL_REPOSITORY=$ALPINE_LOCAL_ROOT/psec
 
