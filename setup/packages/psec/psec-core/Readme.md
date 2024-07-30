@@ -26,3 +26,9 @@ The `repositories` file is documented [here](https://wiki.alpinelinux.org/wiki/R
 In case you boot with PXE, you need to provide the configuration on the command line in order to let Alpine download the packages during the boot.
 
 The command line is configured this way : `[A compléter]`.
+
+- initialisation of the DomU template
+
+### Scripts provided
+
+This package provides scripts for

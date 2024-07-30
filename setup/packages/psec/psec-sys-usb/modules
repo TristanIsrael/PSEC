@@ -1,0 +1,5 @@
+exfat
+vfat
+usbcore
+usb-storage
+ehci_hcd

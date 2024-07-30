@@ -7,23 +7,53 @@ pkgdesc="PSEC - Core of the system"
 url="https://www.alefbet.net/"
 arch="noarch"
 license="MIT"
-depends="psec-lib"
-makedepends="python3-dev py3-build py3-installer git"
+depends="cdrkit psec-lib"
+makedepends=""
 builddir="$srcdir/$pkgname-$pkgver"
 install="$pkgname.post-install"
 checkdepends=""
 install=""
 subpackages=""
-replaces=""
+replaces="alpine-baselayout-data"
 options="!check"  # no tests provided
-psec_branch="1.0"
-giturl="https://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@github.com/tibsys/psec"
 
-prepare() {
+sources="constants.sh
+setup-alpine-repositories.sh
+setup-domu-template.sh
+create-local-alpine-repository.sh
+generate-pgp-keys.sh
+fstab"
+
+PSEC_CONFDIR="/etc/psec"
+PSEC_BINDIR="/usr/local/psec/bin"
+
+build() {
+    echo "Create default overlay for DomUs"
+    cd "$startdir"/domu_apkovl.tmpl
     mkdir -p "$builddir"
-    cd "$builddir"
-    git clone "$giturl" .
+    tar czf "$builddir"/domu.apkovl.tar.gz --exclude '.DS_Store' etc/ 
+}
+
+check() {
+    nb_fichiers=`tar tvzf $builddir/domu.apkovl.tar.gz | wc -l`
+    if [ $nb_fichiers != 32 ]; then 
+        echo "Le nombre de fichiers dans l'overlay domU est incorrect."
+        echo "trouvés=$nb_fichiers, attendus=32"
+        echo "Vérifiez le dossier domu_apkvol.tmpl"
+        return 1
+    fi
 }
 
 package() {
+    # Alpine overlay for DomUs
+    install -D -m644 "$builddir"/domu.apkovl.tar.gz "$pkgdir"/usr/local/psec/domu.apkovl.tar.gz
+
+    install -D -m644 "$srcdir"/constants.sh "$PSEC_CONFDIR"/constants.sh
+    install -D -m644 "$srcdir"/setup-alpine-repositories.sh "$PSEC_BINDIR"/setup-alpine-repositories.sh
+    install -D -m644 "$srcdir"/setup-domu-template.sh "$PSEC_BINDIR"/setup-domu-template.sh
+    install -D -m644 "$srcdir"/create-local-alpine-repository.sh "$PSEC_BINDIR"/create-local-alpine-repository.sh
+    install -D -m644 "$srcdir"/generate-pgp-keys.sh "$PSEC_BINDIR"/generate-pgp-keys.sh
+
+    install -D -m644 "$srcdir"/fstab /etc/fstab
+    install -D -m644 "$srcdir"/modules /etc/modules
 }

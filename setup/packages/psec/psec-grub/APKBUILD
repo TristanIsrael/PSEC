@@ -1,26 +1,23 @@
 # Contributor:
 # Maintainer: Tristan Israël <tristan.israel@alefbet.net>
-pkgname=psec-sys-usb
+pkgname=psec-grub
 pkgver=1.0
 pkgrel=1
-pkgdesc="PSEC - USB proxy virtual machine"
+pkgdesc="PSEC - Boot configuration"
 url="https://www.alefbet.net/"
 arch="noarch"
 license="MIT"
-depends="psec-lib"
-makedepends="python3-dev py3-build py3-installer git"
+depends="grub"
+makedepends=""
 builddir="$srcdir/$pkgname-$pkgver"
 checkdepends=""
-install=""
+install="$pkgname.pre-install $pkgname.post-install $pkgname.post-deinstall"
 subpackages=""
-replaces="psec-core"
+replaces=""
 options="!check"  # no tests provided
-sources="modules"
 
-prepare() {
-    default_prepare
-}
+source="Splash.png"
 
 package() {        
-    install -D -m644 "$srcdir"/modules /etc/modules
+    install -D -m644 "$srcdir"/Splash.png "$pkgdir"/boot/Splash.png
 }

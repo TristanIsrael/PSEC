@@ -7,6 +7,8 @@ echo ---        script post-install.sh        ---
 echo --------------------------------------------
 echo
 
-echo Setup default Alpine repositories
-setup-apkrepos -cf
-apk update
+. /etc/psec/constants.sh
+
+/usr/local/psec/bin/generate-pgp-keys.sh
+/usr/local/psec/bin/setup-alpine-repo.sh
+/usr/local/psec/bin/setup-domu-template.sh
