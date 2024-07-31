@@ -4,7 +4,7 @@ LABEL=$ID_FS_LABEL_ENC
 FS=$ID_FS_TYPE
 MOUNT_POINT=/media/usb/$LABEL
 DEVICE=$DEVNAME
-SCRIPTS_PATH=/usr/local/psec/bin
+SCRIPTS_PATH=/usr/lib/psec/bin
 LOG_FILENAME=/var/log/psec/udev.log
 
 mkdir -p dirname($LOG_FILENAME)

@@ -27,7 +27,7 @@ reindex-and-sign-repository.sh
 create-domu.sh"
 
 PSEC_CONFDIR="$pkgdir/etc/psec"
-PSEC_ROOTDIR="$pkgdir/usr/local/psec"
+PSEC_ROOTDIR="$pkgdir/usr/lib/psec"
 PSEC_BINDIR="$PSEC_ROOTDIR/bin"
 
 build() {
@@ -49,7 +49,7 @@ check() {
 
 package() {
     # Alpine overlay for DomUs
-    install -D -m644 "$builddir"/domu.apkovl.tar.gz "$pkgdir"/usr/local/psec/system/domu.apkovl.tar.gz
+    install -D -m644 "$builddir"/domu.apkovl.tar.gz "$pkgdir"/usr/lib/psec/system/domu.apkovl.tar.gz
 
     install -D -m644 "$srcdir"/constants.sh "$PSEC_CONFDIR"/constants.sh
     install -D -m644 "$srcdir"/setup-alpine-repositories.sh "$PSEC_BINDIR"/setup-alpine-repositories.sh

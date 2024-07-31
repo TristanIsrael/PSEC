@@ -9,11 +9,11 @@ echo
 
 . /etc/psec/constants.sh
 
-/usr/local/psec/bin/generate-pgp-keys.sh
-/usr/local/psec/bin/setup-alpine-repo.sh
-/usr/local/psec/bin/setup-xen-environment.sh
+/usr/lib/psec/bin/generate-pgp-keys.sh
+/usr/lib/psec/bin/setup-alpine-repo.sh
+/usr/lib/psec/bin/setup-xen-environment.sh
 
 echo Create system User Domains
 
 echo ... sys-usb
-/usr/local/psec/bin/create-domu.sh sys-usb 
+/usr/lib/psec/bin/create-domu.sh sys-usb 

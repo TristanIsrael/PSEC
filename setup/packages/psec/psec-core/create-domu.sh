@@ -3,7 +3,7 @@
 ### A Déplacer dans constants.sh
 export BOOTISO_ROOT="/var/lib/xen/images/"
 export BOOTISO_TEMPLATE="$BOOTISO_ROOT/alpine-virt.iso"
-export APKOVL_TEMPLATE="/usr/local/psec/system/domu.apkovl.tar.gz"
+export APKOVL_TEMPLATE="/usr/lib/psec/system/domu.apkovl.tar.gz"
 export LOCAL_PGP_PUBKEY="/etc/apk/keys/local.rsa.pub"
 
 ## Local variables
@@ -72,7 +72,7 @@ tar czf $WORKDIR/iso/domu.apkovl.tar.gz .
 
 echo ... Create new ISO
 mkisofs -r -V "BOOT" -cache-inodes -J -l -b boot/syslinux/isolinux.bin -c boot/syslinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o /tmp/$BOOTISO_FILENAME $WORKDIR/iso
-mv /tmp/$BOOTISO_FILENAME /usr/local/psec/system/
+mv /tmp/$BOOTISO_FILENAME /usr/lib/psec/system/
 
 echo ... Clean
 umount /mnt/bootiso
