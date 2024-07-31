@@ -23,7 +23,7 @@ mdev-usb-storage
 99-usbdisks.rules"
 
 PSEC_CONFDIR="/etc/psec"
-PSEC_ROOTDIR="/usr/local/psec"
+PSEC_ROOTDIR="/usr/lib/psec"
 PSEC_BINDIR="$PSEC_ROOTDIR/bin"
 
 package() {
