@@ -13,28 +13,23 @@ builddir="$srcdir/$pkgname-$pkgver"
 checkdepends=""
 install="$pkgname.post-install"
 subpackages=""
-replaces="mdev-conf"
+replaces="mdev-conf alpine-baselayout-data"
 options="!check"  # no tests provided
-sources="modules
+source="modules
 psec-sys-usb-controller.initd
-mdev-usb-storage
 notify-disk-added.py
 notify-disk-removed.py
 mdev-usb-storage
 99-usbdisks.rules"
 
-PSEC_CONFDIR="$pkgdir/etc/psec"
-PSEC_ROOTDIR="$pkgdir/usr/local/psec"
+PSEC_CONFDIR="/etc/psec"
+PSEC_ROOTDIR="/usr/local/psec"
 PSEC_BINDIR="$PSEC_ROOTDIR/bin"
-
-prepare() {
-    default_prepare
-}
 
 package() {
     install -D -m644 "$srcdir"/modules "$pkgdir/etc/modules"
-    install -D -m644 "$srcdir"/notify-disk-added.py "$PSEC_BINDIR/notify-disk-added.py"
-    install -D -m644 "$srcdir"/notify-disk-removed.py "$PSEC_BINDIR/notify-disk-removed.py"
-    install -D -m755 "$srcdir"/mdev-usb-storage "$PSEC_BINDIR"/mdev-usb-storage
+    install -D -m644 "$srcdir"/notify-disk-added.py "$pkgdir/$PSEC_BINDIR/notify-disk-added.py"
+    install -D -m644 "$srcdir"/notify-disk-removed.py "$pkgdir/$PSEC_BINDIR/notify-disk-removed.py"
+    install -D -m755 "$srcdir"/mdev-usb-storage "$pkgdir/$PSEC_BINDIR"/mdev-usb-storage
     install -D -m755 "$srcdir"/99-usbdisks.rules "$pkgdir"/etc/udev/rules.d/99-usbdisks.rules
 }

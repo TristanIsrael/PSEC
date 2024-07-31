@@ -17,7 +17,7 @@ subpackages=""
 replaces="alpine-baselayout-data"
 options="!check"  # no tests provided
 
-sources="constants.sh
+source="constants.sh
 setup-alpine-repositories.sh
 setup-domu-template.sh
 setup-xen-environment.sh
