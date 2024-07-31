@@ -2,7 +2,7 @@
 # Maintainer: Tristan Israël <tristan.israel@alefbet.net>
 pkgname=psec-sys-usb
 pkgver=1.0
-pkgrel=3
+pkgrel=5
 pkgdesc="PSEC - USB proxy virtual machine"
 url="https://www.alefbet.net/"
 arch="noarch"
@@ -20,7 +20,8 @@ psec-sys-usb-controller.initd
 notify-disk-added.py
 notify-disk-removed.py
 mdev-usb-storage
-99-usbdisks.rules"
+99-usbdisks.rules
+psec-sys-usb-controller.py"
 
 PSEC_CONFDIR="/etc/psec"
 PSEC_ROOTDIR="/usr/lib/psec"
@@ -33,4 +34,5 @@ package() {
     install -D -m755 "$srcdir"/mdev-usb-storage "$pkgdir/$PSEC_BINDIR"/mdev-usb-storage
     install -D -m755 "$srcdir"/99-usbdisks.rules "$pkgdir"/etc/udev/rules.d/99-usbdisks.rules
     install -D -m755 "$srcdir"/psec-sys-usb-controller.initd "$pkgdir"/etc/init.d/psec-sys-usb-controller
+    install -D -m644 "$srcdir"/psec-sys-usb-controller.py "$pkgdir/$PSEC_BINDIR/psec-sys-usb-controller.py
 }

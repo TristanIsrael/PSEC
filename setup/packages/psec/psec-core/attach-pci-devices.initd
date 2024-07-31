@@ -1,0 +1,26 @@
+#!/sbin/openrc-run
+
+name="attach-pci-devices"
+command_background="no"
+
+depend() {    
+    after syslog
+    after setup-pci
+}
+
+start() {
+    ebegin "Attaching PCI USB devices to sys-usb"
+    source /etc/conf.d/xen-pci
+    printf "pci = ['%s']" $(echo $DEVICES | sed "s/ /','/g") >> /etc/psec/xen/sys-usb.conf
+    eend 0
+    
+    #echo "Attaching PCI VGA devices to sys-gui"
+    #printf "pci = ['%s']" $(echo $VGA_DEVICES | sed "s/ /','/g") >> /etc/psec/xen/sys-gui.conf    
+    #eend 0
+}
+
+stop() {
+    ebegin "Nothing"
+    
+    eend $?
+}

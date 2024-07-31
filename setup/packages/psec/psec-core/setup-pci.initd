@@ -1,0 +1,23 @@
+#!/sbin/openrc-run
+
+name="setup-pci"
+
+depend() {
+    before xen-pci
+}
+
+start() {
+    ebegin "Identify PCI USB devices"
+    /usr/lib/psec/bin/setup-pci-usb-controllers.sh
+    eend $?
+
+    ebegin "Identify PCI VGA devices"
+    /usr/lib/psec/bin/setup-pci-vga-controllers.sh 
+    eend $?
+}
+
+stop() {
+    ebegin "Nothing to do"
+
+    eend $?
+}

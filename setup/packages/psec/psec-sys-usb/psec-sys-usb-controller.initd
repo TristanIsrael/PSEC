@@ -3,24 +3,13 @@
 name="psec-sys-usb-controller"
 
 depend() {
-    after syslog
+    after psec-core-init
 }
 
 start() {
     ebegin "Starting PSEC sys-usb controller"
-    
-    cmd=`cat <<EOF
-from psec import ControleurVmSysUsb
-c=ControleurVmSysUsb()
-c.demarre()
-EOF`
 
-    start-stop-daemon --start \
-        --exec /usr/bin/python3 \
-        --pidfile /var/run/$name.pid \
-        --background 
-        -- \
-        -c "$cmd"
+    start-stop-daemon --start --make-pidfile --exec /usr/bin/python3 --pidfile /var/run/$name.pid --background -- /usr/lib/psec/bin/psec-sys-usb-controller.py
 
     eend $?
 }

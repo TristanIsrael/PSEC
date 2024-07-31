@@ -24,7 +24,11 @@ setup-xen-environment.sh
 create-local-alpine-repository.sh
 generate-pgp-keys.sh
 reindex-and-sign-repository.sh
-create-domu.sh"
+create-domu.sh
+start-domains.initd
+attach-pci-devices.initd
+setup-pci-usb-controllers.sh 
+setup-pci-vga-controller.sh"
 
 PSEC_CONFDIR="$pkgdir/etc/psec"
 PSEC_ROOTDIR="$pkgdir/usr/lib/psec"
@@ -59,6 +63,12 @@ package() {
     install -D -m644 "$srcdir"/create-domu.sh "$PSEC_BINDIR"/create-domu.sh
     install -D -m644 "$srcdir"/reindex-and-sign-repository.sh "$PSEC_BINDIR"/reindex-and-sign-repository.sh
     install -D -m644 "$srcdir"/setup-xen-environment.sh "$PSEC_BINDIR"/setup-xen-environment.sh
+    install -D -m644 "$srcdir"/setup-pci-usb-controllers.sh "$PSEC_BINDIR"/setup-pci-usb-controllers.sh 
+    install -D -m644 "$srcdir"/setup-pci-vga-controller.sh "$PSEC_BINDIR"/setup-pci-vga-controller.sh
+    
+    install -D -m644 "$srcdir"/start-domains.initd "$pkgdir"/etc/init.d/start-domains
+    install -D -m644 "$srcdir"/attach-pci-devices.initd "$pkgdir"/etc/init.d/attach-pci-devices
+    install -D -m644 "$srcdir"/setup-pci.initd "$pkgdir"/etc/init.d/setup-pci
 
     install -D -m644 "$srcdir"/fstab "$pkgdir/etc/fstab"
     install -D -m644 "$srcdir"/modules "$pkgdir/etc/modules"

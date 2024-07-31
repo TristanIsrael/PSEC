@@ -51,9 +51,9 @@ echo ... Configure PSEC library
 mkdir -p $WORKDIR/apkovl/etc/psec
 echo "{
     \"identifiant_domaine\": \"$DOMAIN\",
-    \"chemin_journal\": \"/var/log/psec.log\",
+    \"chemin_journal\": \"/var/log/psec/psec-lib.log\",
     \"niveau_debug\": \"DEBUG\",
-    \"chemin_journal_local\": \"/var/log/psec.log\",
+    \"chemin_journal_local\": \"/var/log/psec/psec-lib.log\",
     \"chemin_socket_messagerie_locale\": \"/var/run/psec-api.sock\",
     \"nom_domaine_gui\": \"sys-gui\"
 }

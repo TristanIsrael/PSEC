@@ -17,3 +17,8 @@ echo Create system User Domains
 
 echo ... sys-usb
 /usr/lib/psec/bin/create-domu.sh sys-usb 
+
+rc-udpate add start-domains boot
+rc-udpate add setup-pci boot
+rc-update add attach-pci-devices boot
+rc-update add xen-pci boot
