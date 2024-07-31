@@ -30,3 +30,4 @@ apk fetch -R libtirpc-conf krb5-conf
 # Separate PSEC packages from Alpine official
 mv psec* $PSEC_ARCH_DIR
 
+/usr/local/psec/scripts/reindex-and-sign-repository.sh

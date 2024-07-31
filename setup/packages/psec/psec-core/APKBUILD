@@ -20,15 +20,18 @@ options="!check"  # no tests provided
 sources="constants.sh
 setup-alpine-repositories.sh
 setup-domu-template.sh
+setup-xen-environment.sh
 create-local-alpine-repository.sh
 generate-pgp-keys.sh
-fstab"
+reindex-and-sign-repository.sh
+create-domu.sh"
 
-PSEC_CONFDIR="/etc/psec"
-PSEC_BINDIR="/usr/local/psec/bin"
+PSEC_CONFDIR="$pkgdir/etc/psec"
+PSEC_ROOTDIR="$pkgdir/usr/local/psec"
+PSEC_BINDIR="$PSEC_ROOTDIR/bin"
 
 build() {
-    echo "Create default overlay for DomUs"
+    echo "Create default overlay for User Domains"
     cd "$startdir"/domu_apkovl.tmpl
     mkdir -p "$builddir"
     tar czf "$builddir"/domu.apkovl.tar.gz --exclude '.DS_Store' etc/ 
@@ -46,14 +49,19 @@ check() {
 
 package() {
     # Alpine overlay for DomUs
-    install -D -m644 "$builddir"/domu.apkovl.tar.gz "$pkgdir"/usr/local/psec/domu.apkovl.tar.gz
+    install -D -m644 "$builddir"/domu.apkovl.tar.gz "$pkgdir"/usr/local/psec/system/domu.apkovl.tar.gz
 
     install -D -m644 "$srcdir"/constants.sh "$PSEC_CONFDIR"/constants.sh
     install -D -m644 "$srcdir"/setup-alpine-repositories.sh "$PSEC_BINDIR"/setup-alpine-repositories.sh
     install -D -m644 "$srcdir"/setup-domu-template.sh "$PSEC_BINDIR"/setup-domu-template.sh
     install -D -m644 "$srcdir"/create-local-alpine-repository.sh "$PSEC_BINDIR"/create-local-alpine-repository.sh
     install -D -m644 "$srcdir"/generate-pgp-keys.sh "$PSEC_BINDIR"/generate-pgp-keys.sh
+    install -D -m644 "$srcdir"/create-domu.sh "$PSEC_BINDIR"/create-domu.sh
+    install -D -m644 "$srcdir"/reindex-and-sign-repository.sh "$PSEC_BINDIR"/reindex-and-sign-repository.sh
+    install -D -m644 "$srcdir"/setup-xen-environment.sh "$PSEC_BINDIR"/setup-xen-environment.sh
 
-    install -D -m644 "$srcdir"/fstab /etc/fstab
-    install -D -m644 "$srcdir"/modules /etc/modules
+    install -D -m644 "$srcdir"/fstab "$pkgdir/etc/fstab"
+    install -D -m644 "$srcdir"/modules "$pkgdir/etc/modules"
+
+    install -D -m644 "$srcdir"/sys-usb.conf "$PSEC_CONFDIR/xen"
 }

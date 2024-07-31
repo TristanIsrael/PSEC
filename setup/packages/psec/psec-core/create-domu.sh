@@ -50,12 +50,12 @@ $MAIN_PACKAGE" >> $WORKDIR/apkovl/etc/apk/world
 echo ... Configure PSEC library
 mkdir -p $WORKDIR/apkovl/etc/psec
 echo "{
-    "identifiant_domaine": "$DOMAIN",
-    "chemin_journal": "/var/log/psec.log",
-    "niveau_debug": "DEBUG",
-    "chemin_journal_local": "/var/log/psec.log",
-    "chemin_socket_messagerie_locale": "/var/run/psec-api.sock",
-    "nom_domaine_gui": "sys-gui"
+    \"identifiant_domaine\": \"$DOMAIN\",
+    \"chemin_journal\": \"/var/log/psec.log\",
+    \"niveau_debug\": \"DEBUG\",
+    \"chemin_journal_local\": \"/var/log/psec.log\",
+    \"chemin_socket_messagerie_locale\": \"/var/run/psec-api.sock\",
+    \"nom_domaine_gui\": \"sys-gui\"
 }
 " > $WORKDIR/apkovl/etc/psec/global.conf
 

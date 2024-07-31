@@ -1,0 +1,1 @@
+ENV{ID_FS_USAGE}=="filesystem|other|crypto", ENV{ID_FS_LABEL_ENC}=="?*", RUN+="/usr/local/psec/bin/mdev-usb-storage"

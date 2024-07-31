@@ -1,0 +1,11 @@
+import sys
+from psec import Api
+
+if len(sys.argv) < 2:
+    print("Argument missing : {} disk_name".format(sys.argv[0]))
+    exit(-1)
+
+api = Api()
+if api.connecte_socket():    
+    nom = sys.argv[1]
+    api.notifie_ajout_disque(nom)

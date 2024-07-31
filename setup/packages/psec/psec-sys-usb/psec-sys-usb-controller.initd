@@ -1,0 +1,34 @@
+#!/sbin/openrc-run
+
+name="psec-sys-usb-controller"
+
+depend() {
+    after syslog
+}
+
+start() {
+    ebegin "Starting PSEC sys-usb controller"
+    
+    cmd=`cat <<EOF
+from psec import ControleurVmSysUsb
+c=ControleurVmSysUsb()
+c.demarre()
+EOF`
+
+    start-stop-daemon --start \
+        --exec /usr/bin/python3 \
+        --pidfile /var/run/$name.pid \
+        --background 
+        -- \
+        -c "$cmd"
+
+    eend $?
+}
+
+stop() {
+    ebegin "Stopping PSEC sys-usb controller"
+
+    kill -9 $(cat /var/run/$name.pid)
+
+    eend $?
+}

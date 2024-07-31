@@ -2,25 +2,39 @@
 # Maintainer: Tristan Israël <tristan.israel@alefbet.net>
 pkgname=psec-sys-usb
 pkgver=1.0
-pkgrel=1
+pkgrel=2
 pkgdesc="PSEC - USB proxy virtual machine"
 url="https://www.alefbet.net/"
 arch="noarch"
 license="MIT"
-depends="psec-lib"
+depends="psec-lib ntfs-3g eudev"
 makedepends="python3-dev py3-build py3-installer git"
 builddir="$srcdir/$pkgname-$pkgver"
 checkdepends=""
-install=""
+install="$pkgname.post-install"
 subpackages=""
-replaces="psec-core"
+replaces="mdev-conf"
 options="!check"  # no tests provided
-sources="modules"
+sources="modules
+psec-sys-usb-controller.initd
+mdev-usb-storage
+notify-disk-added.py
+notify-disk-removed.py
+mdev-usb-storage
+99-usbdisks.rules"
+
+PSEC_CONFDIR="$pkgdir/etc/psec"
+PSEC_ROOTDIR="$pkgdir/usr/local/psec"
+PSEC_BINDIR="$PSEC_ROOTDIR/bin"
 
 prepare() {
     default_prepare
 }
 
-package() {        
-    install -D -m644 "$srcdir"/modules /etc/modules
+package() {
+    install -D -m644 "$srcdir"/modules "$pkgdir/etc/modules"
+    install -D -m644 "$srcdir"/notify-disk-added.py "$PSEC_BINDIR/notify-disk-added.py"
+    install -D -m644 "$srcdir"/notify-disk-removed.py "$PSEC_BINDIR/notify-disk-removed.py"
+    install -D -m755 "$srcdir"/mdev-usb-storage "$PSEC_BINDIR"/mdev-usb-storage
+    install -D -m755 "$srcdir"/99-usbdisks.rules "$pkgdir"/etc/udev/rules.d/99-usbdisks.rules
 }

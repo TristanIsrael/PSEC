@@ -1,0 +1,38 @@
+#!/bin/sh
+
+LABEL=$ID_FS_LABEL_ENC
+FS=$ID_FS_TYPE
+MOUNT_POINT=/media/usb/$LABEL
+DEVICE=$DEVNAME
+SCRIPTS_PATH=/usr/local/psec/bin
+LOG_FILENAME=/var/log/psec/udev.log
+
+mkdir -p dirname($LOG_FILENAME)
+
+echo "Action : $ACTION" >> $LOG_FILENAME
+
+if [ "$ACTION" == "add" ]
+then
+	echo "Mouting disk $LABEL with filesystem $FS in $MOUNT_POINT" >> $LOG_FILENAME
+	echo mount $DEVICE $MOUNT_POINT >> $LOG_FILENAME
+	mkdir -p $MOUNT_POINT
+	mount $DEVICE $MOUNT_POINT
+
+    if [ $? -eq 0 ]
+        echo "... Success, notify PSEC controller"
+        python3 $SCRIPTS_PATH/notify-disk-added.py "$LABEL"
+    fi
+fi
+
+if [ "$ACTION" == "remove" ]
+then
+	echo "Demontage de $MOUNT_POINT" >> $LOG_FILENAME
+	umount $MOUNT_POINT
+
+    if [ $? -eq 0 ]
+        echo "... Success, notify PSEC controller"
+        python3 $SCRIPTS_PATH/notify-disk-removed.py "$LABEL"
+    fi
+
+	rmdir $MOUNT_POINT
+fi
