@@ -6,6 +6,6 @@ if len(sys.argv) < 2:
     exit(-1)
 
 api = Api()
-if api.connecte_socket():    
+if api.demarre():    
     nom = sys.argv[1]
     api.notifie_ajout_disque(nom)

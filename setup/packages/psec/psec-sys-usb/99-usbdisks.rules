@@ -1,2 +1,1 @@
-#SUBSYSTEM=="block", ENV{DEVTYPE}=="partition", ENV{ID_FS_USAGE}=="filesystem", RUN+="/usr/lib/psec/bin/mdev-usb-storage"
-SUBSYSTEM=="block", KERNEL=="sd?", ENV{DEVTYPE}=="partition", RUN+="/usr/lib/psec/bin/mdev-usb-storage.sh"
+SUBSYSTEM=="block", ENV{DEVTYPE}=="partition", ENV{ID_FS_USAGE}=="filesystem", RUN+="/usr/lib/psec/bin/mdev-usb-storage.sh"

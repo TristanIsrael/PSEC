@@ -14,26 +14,26 @@ echo "Action : $ACTION" >> $LOG_FILENAME
 if [ "$ACTION" == "add" ]
 then
 	echo "Mouting disk $LABEL with filesystem $FS in $MOUNT_POINT" >> $LOG_FILENAME
-	echo mount $DEVICE $MOUNT_POINT >> $LOG_FILENAME
+	echo mount $DEVICE $MOUNT_POINT >> $LOG_FILENAME >> $LOG_FILENAME
 	mkdir -p $MOUNT_POINT
-	mount $DEVICE $MOUNT_POINT
+	mount $DEVICE $MOUNT_POINT >> $LOG_FILENAME 2>&1
 
     if [ $? -eq 0 ]
     then
-        echo "... Success, notify PSEC controller"
-        /usr/bin/python3 $SCRIPTS_PATH/notify-disk-added.py "$LABEL"
+        echo "... Success, notify PSEC controller" >> $LOG_FILENAME
+        /usr/bin/python3 $SCRIPTS_PATH/notify-disk-added.py "$LABEL" >> $LOG_FILENAME 2>&1
     fi
 fi
 
 if [ "$ACTION" == "remove" ]
 then
-	echo "Demontage de $MOUNT_POINT" >> $LOG_FILENAME
-	umount $MOUNT_POINT
+	echo "Demontage de $MOUNT_POINT" >> $LOG_FILENAME >> $LOG_FILENAME
+	umount $MOUNT_POINT >> $LOG_FILENAME 2>&1
 
     if [ $? -eq 0 ]
     then
-        echo "... Success, notify PSEC controller"
-        /usr/bin/python3 $SCRIPTS_PATH/notify-disk-removed.py "$LABEL"
+        echo "... Success, notify PSEC controller" >> $LOG_FILENAME
+        /usr/bin/python3 $SCRIPTS_PATH/notify-disk-removed.py "$LABEL" >> $LOG_FILENAME 2>&1
     fi
 
 	rmdir $MOUNT_POINT
