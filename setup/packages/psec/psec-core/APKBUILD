@@ -22,6 +22,7 @@ constants.sh
 create-domu.sh
 create-local-alpine-repository.sh
 generate-pgp-keys.sh
+modules
 reindex-and-sign-repository.sh
 setup-alpine-repositories.sh
 setup-pci-usb-controllers.sh 
