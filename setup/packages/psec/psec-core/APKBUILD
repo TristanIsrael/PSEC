@@ -60,19 +60,19 @@ package() {
     install -D -m644 "$builddir"/domu.apkovl.tar.gz "$pkgdir"/usr/lib/psec/system/domu.apkovl.tar.gz
 
     install -D -m644 "$srcdir"/constants.sh "$pkgdir/$PSEC_CONFDIR"/constants.sh
-    install -D -m644 "$srcdir"/create-domu.sh "$pkgdir/$PSEC_BINDIR"/create-domu.sh
-    install -D -m644 "$srcdir"/create-local-alpine-repository.sh "$pkgdir/$PSEC_BINDIR"/create-local-alpine-repository.sh
-    install -D -m644 "$srcdir"/generate-pgp-keys.sh "$pkgdir/$PSEC_BINDIR"/generate-pgp-keys.sh    
-    install -D -m644 "$srcdir"/reindex-and-sign-repository.sh "$pkgdir/$PSEC_BINDIR"/reindex-and-sign-repository.sh
-    install -D -m644 "$srcdir"/setup-alpine-repositories.sh "$pkgdir/$PSEC_BINDIR"/setup-alpine-repositories.sh        
-    install -D -m644 "$srcdir"/setup-pci-usb-controllers.sh "$pkgdir/$PSEC_BINDIR"/setup-pci-usb-controllers.sh 
-    install -D -m644 "$srcdir"/setup-pci-vga-controller.sh "$pkgdir/$PSEC_BINDIR"/setup-pci-vga-controller.sh
-    install -D -m644 "$srcdir"/setup-xen-environment.sh "$pkgdir/$PSEC_BINDIR"/setup-xen-environment.sh
+    install -D -m755 "$srcdir"/create-domu.sh "$pkgdir/$PSEC_BINDIR"/create-domu.sh
+    install -D -m755 "$srcdir"/create-local-alpine-repository.sh "$pkgdir/$PSEC_BINDIR"/create-local-alpine-repository.sh
+    install -D -m755 "$srcdir"/generate-pgp-keys.sh "$pkgdir/$PSEC_BINDIR"/generate-pgp-keys.sh    
+    install -D -m755 "$srcdir"/reindex-and-sign-repository.sh "$pkgdir/$PSEC_BINDIR"/reindex-and-sign-repository.sh
+    install -D -m755 "$srcdir"/setup-alpine-repositories.sh "$pkgdir/$PSEC_BINDIR"/setup-alpine-repositories.sh        
+    install -D -m755 "$srcdir"/setup-pci-usb-controllers.sh "$pkgdir/$PSEC_BINDIR"/setup-pci-usb-controllers.sh 
+    install -D -m755 "$srcdir"/setup-pci-vga-controller.sh "$pkgdir/$PSEC_BINDIR"/setup-pci-vga-controller.sh
+    install -D -m755 "$srcdir"/setup-xen-environment.sh "$pkgdir/$PSEC_BINDIR"/setup-xen-environment.sh
     
-    install -D -m644 "$srcdir"/attach-pci-devices.initd "$pkgdir"/etc/init.d/attach-pci-devices
-    install -D -m644 "$srcdir"/setup-pci.initd "$pkgdir"/etc/init.d/setup-pci
-    install -D -m644 "$srcdir"/splash.initd "$pkgdir"/etc/init.d/splash
-    install -D -m644 "$srcdir"/start-domains.initd "$pkgdir"/etc/init.d/start-domains
+    install -D -m755 "$srcdir"/attach-pci-devices.initd "$pkgdir"/etc/init.d/attach-pci-devices
+    install -D -m755 "$srcdir"/setup-pci.initd "$pkgdir"/etc/init.d/setup-pci
+    install -D -m755 "$srcdir"/splash.initd "$pkgdir"/etc/init.d/splash
+    install -D -m755 "$srcdir"/start-domains.initd "$pkgdir"/etc/init.d/start-domains
 
     install -D -m644 "$srcdir"/modules "$pkgdir/etc/modules"
 
