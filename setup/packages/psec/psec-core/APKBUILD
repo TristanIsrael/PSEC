@@ -7,7 +7,7 @@ pkgdesc="PSEC - Core of the system"
 url="https://www.alefbet.net/"
 arch="noarch"
 license="MIT"
-depends="cdrkit psec-lib"
+depends="cdrkit psec-lib xen xen-hypervisor xen-qemu xen-qemu-openrc"
 makedepends=""
 builddir="$srcdir/$pkgname-$pkgver"
 install="$pkgname.post-install"
@@ -17,18 +17,21 @@ subpackages=""
 replaces="alpine-baselayout-data"
 options="!check"  # no tests provided
 
-source="constants.sh
-setup-alpine-repositories.sh
-setup-domu-template.sh
-setup-xen-environment.sh
+source="attach-pci-devices.initd
+constants.sh
+create-domu.sh
 create-local-alpine-repository.sh
 generate-pgp-keys.sh
 reindex-and-sign-repository.sh
-create-domu.sh
-start-domains.initd
-attach-pci-devices.initd
+setup-alpine-repositories.sh
 setup-pci-usb-controllers.sh 
-setup-pci-vga-controller.sh"
+setup-pci-vga-controller.sh
+setup-pci.initd
+setup-xen-environment.sh
+splash.initd
+start-domains.initd
+sys-usb.conf
+"
 
 PSEC_CONFDIR="$pkgdir/etc/psec"
 PSEC_ROOTDIR="$pkgdir/usr/lib/psec"
@@ -56,21 +59,20 @@ package() {
     install -D -m644 "$builddir"/domu.apkovl.tar.gz "$pkgdir"/usr/lib/psec/system/domu.apkovl.tar.gz
 
     install -D -m644 "$srcdir"/constants.sh "$PSEC_CONFDIR"/constants.sh
-    install -D -m644 "$srcdir"/setup-alpine-repositories.sh "$PSEC_BINDIR"/setup-alpine-repositories.sh
-    install -D -m644 "$srcdir"/setup-domu-template.sh "$PSEC_BINDIR"/setup-domu-template.sh
-    install -D -m644 "$srcdir"/create-local-alpine-repository.sh "$PSEC_BINDIR"/create-local-alpine-repository.sh
-    install -D -m644 "$srcdir"/generate-pgp-keys.sh "$PSEC_BINDIR"/generate-pgp-keys.sh
     install -D -m644 "$srcdir"/create-domu.sh "$PSEC_BINDIR"/create-domu.sh
+    install -D -m644 "$srcdir"/create-local-alpine-repository.sh "$PSEC_BINDIR"/create-local-alpine-repository.sh
+    install -D -m644 "$srcdir"/generate-pgp-keys.sh "$PSEC_BINDIR"/generate-pgp-keys.sh    
     install -D -m644 "$srcdir"/reindex-and-sign-repository.sh "$PSEC_BINDIR"/reindex-and-sign-repository.sh
-    install -D -m644 "$srcdir"/setup-xen-environment.sh "$PSEC_BINDIR"/setup-xen-environment.sh
+    install -D -m644 "$srcdir"/setup-alpine-repositories.sh "$PSEC_BINDIR"/setup-alpine-repositories.sh        
     install -D -m644 "$srcdir"/setup-pci-usb-controllers.sh "$PSEC_BINDIR"/setup-pci-usb-controllers.sh 
     install -D -m644 "$srcdir"/setup-pci-vga-controller.sh "$PSEC_BINDIR"/setup-pci-vga-controller.sh
+    install -D -m644 "$srcdir"/setup-xen-environment.sh "$PSEC_BINDIR"/setup-xen-environment.sh
     
-    install -D -m644 "$srcdir"/start-domains.initd "$pkgdir"/etc/init.d/start-domains
     install -D -m644 "$srcdir"/attach-pci-devices.initd "$pkgdir"/etc/init.d/attach-pci-devices
     install -D -m644 "$srcdir"/setup-pci.initd "$pkgdir"/etc/init.d/setup-pci
+    install -D -m644 "$srcdir"/splash.initd "$pkgdir"/etc/init.d/splash
+    install -D -m644 "$srcdir"/start-domains.initd "$pkgdir"/etc/init.d/start-domains
 
-    install -D -m644 "$srcdir"/fstab "$pkgdir/etc/fstab"
     install -D -m644 "$srcdir"/modules "$pkgdir/etc/modules"
 
     install -D -m644 "$srcdir"/sys-usb.conf "$PSEC_CONFDIR/xen"
