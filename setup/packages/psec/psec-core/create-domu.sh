@@ -1,8 +1,10 @@
 #!/bin/sh
 
+. /etc/psec/constants.sh
+
 ### A Déplacer dans constants.sh
-export BOOTISO_ROOT="/var/lib/xen/images/"
-export BOOTISO_TEMPLATE="$BOOTISO_ROOT/alpine-virt.iso"
+#export BOOTISO_ROOT="/var/lib/xen/images/"
+#export BOOTISO_TEMPLATE="$BOOTISO_ROOT/alpine-virt.iso"
 export APKOVL_TEMPLATE="/usr/lib/psec/system/domu.apkovl.tar.gz"
 export LOCAL_PGP_PUBKEY="/etc/apk/keys/local.rsa.pub"
 
@@ -32,7 +34,7 @@ umount /mnt/bootiso
 mkdir -p /mnt/bootiso
 
 echo ... Mount original ISO
-mount -o loop $BOOTISO_TEMPLATE /mnt/bootiso
+mount -o loop $ALPINE_ISO_LOCAL /mnt/bootiso
 
 echo ... Copy original ISO
 cp -r /mnt/bootiso/* $WORKDIR/iso

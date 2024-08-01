@@ -76,6 +76,6 @@ package() {
 
     install -D -m644 "$srcdir"/modules "$pkgdir/etc/modules"
 
-    install -D -m644 "$srcdir"/sys-usb.conf "$pkgdir/$PSEC_CONFDIR/xen"
+    install -D -m644 "$srcdir"/sys-usb.conf "$pkgdir/$PSEC_CONFDIR/xen/sys-usb.conf"
 }
 

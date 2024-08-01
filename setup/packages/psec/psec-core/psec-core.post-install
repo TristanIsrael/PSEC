@@ -10,13 +10,13 @@ echo
 . /etc/psec/constants.sh
 
 /usr/lib/psec/bin/generate-pgp-keys.sh
-/usr/lib/psec/bin/setup-alpine-repo.sh
+/usr/lib/psec/bin/setup-alpine-repositories.sh
 /usr/lib/psec/bin/setup-xen-environment.sh
 
 echo Create system User Domains
 
 echo ... sys-usb
-/usr/lib/psec/bin/create-domu.sh sys-usb 
+/usr/lib/psec/bin/create-domu.sh sys-usb psec-sys-usb
 
 rc-udpate add start-domains boot
 rc-udpate add setup-pci boot
