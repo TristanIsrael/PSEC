@@ -1,9 +1,9 @@
 #!/bin/sh
 
-if [ -n "$OPENRC_RUNLEVEL" ]
-then
-    echo "Started from initd, ignored"
-else
+#if [ -n "$OPENRC_RUNLEVEL" ]
+#then
+#    echo "Started from initd, ignored"
+#else
     mkdir -p /usr/lib/psec/storage
     mkdir -p /usr/lib/psec/packages
 
@@ -22,4 +22,4 @@ else
     rc-service xen-pci start
     rc-service attach-pci-devices start    
     #rc-service start-domains start
-fi
+#fi
