@@ -19,7 +19,7 @@ source="modules
 psec-sys-usb-controller.initd
 notify-disk-added.py
 notify-disk-removed.py
-mdev-usb-storage
+mdev-usb-storage.sh
 99-usbdisks.rules
 psec-sys-usb-controller.py"
 
@@ -31,8 +31,8 @@ package() {
     install -D -m644 "$srcdir"/modules "$pkgdir/etc/modules"
     install -D -m644 "$srcdir"/notify-disk-added.py "$pkgdir/$PSEC_BINDIR/notify-disk-added.py"
     install -D -m644 "$srcdir"/notify-disk-removed.py "$pkgdir/$PSEC_BINDIR/notify-disk-removed.py"
-    install -D -m755 "$srcdir"/mdev-usb-storage "$pkgdir/$PSEC_BINDIR/mdev-usb-storage"
-    install -D -m755 "$srcdir"/99-usbdisks.rules "$pkgdir"/etc/udev/rules.d/99-usbdisks.rules
+    install -D -m755 "$srcdir"/mdev-usb-storage.sh "$pkgdir/$PSEC_BINDIR/mdev-usb-storage.sh"
+    install -D -m644 "$srcdir"/99-usbdisks.rules "$pkgdir"/etc/udev/rules.d/99-usbdisks.rules
     install -D -m755 "$srcdir"/psec-sys-usb-controller.initd "$pkgdir"/etc/init.d/psec-sys-usb-controller
     install -D -m644 "$srcdir"/psec-sys-usb-controller.py "$pkgdir/$PSEC_BINDIR/psec-sys-usb-controller.py"
 }
