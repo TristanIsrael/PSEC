@@ -77,3 +77,4 @@ package() {
 
     install -D -m644 "$srcdir"/sys-usb.conf "$PSEC_CONFDIR/xen"
 }
+
