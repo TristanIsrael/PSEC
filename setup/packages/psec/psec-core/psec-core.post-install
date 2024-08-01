@@ -7,17 +7,6 @@ echo ---        script post-install.sh        ---
 echo --------------------------------------------
 echo
 
-. /etc/psec/constants.sh
-
-/usr/lib/psec/bin/generate-pgp-keys.sh
-/usr/lib/psec/bin/setup-alpine-repositories.sh
-/usr/lib/psec/bin/setup-xen-environment.sh
-
-echo Create system User Domains
-
-echo ... sys-usb
-/usr/lib/psec/bin/create-domu.sh sys-usb psec-sys-usb
-
 rc-udpate add start-domains boot
 rc-udpate add setup-pci boot
 rc-update add attach-pci-devices boot
@@ -25,3 +14,5 @@ rc-update add xen-pci boot
 rc-udpate add xenconsoled default
 rc-update add xenstored default
 rc-update add splash sysinit
+
+/usr/lib/psec/bin/finish-core-init.sh

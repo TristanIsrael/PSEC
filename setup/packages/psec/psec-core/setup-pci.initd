@@ -12,7 +12,7 @@ start() {
     eend $?
 
     ebegin "Identify PCI VGA devices"
-    /usr/lib/psec/bin/setup-pci-vga-controllers.sh 
+    /usr/lib/psec/bin/setup-pci-vga-controller.sh 
     eend $?
 }
 

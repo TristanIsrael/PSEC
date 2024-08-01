@@ -7,7 +7,7 @@ DEVICE=$DEVNAME
 SCRIPTS_PATH=/usr/lib/psec/bin
 LOG_FILENAME=/var/log/psec/udev.log
 
-mkdir -p dirname($LOG_FILENAME)
+mkdir -p `dirname $LOG_FILENAME`
 
 echo "Action : $ACTION" >> $LOG_FILENAME
 
@@ -19,8 +19,9 @@ then
 	mount $DEVICE $MOUNT_POINT
 
     if [ $? -eq 0 ]
+    then
         echo "... Success, notify PSEC controller"
-        python3 $SCRIPTS_PATH/notify-disk-added.py "$LABEL"
+        /usr/bin/python3 $SCRIPTS_PATH/notify-disk-added.py "$LABEL"
     fi
 fi
 
@@ -30,8 +31,9 @@ then
 	umount $MOUNT_POINT
 
     if [ $? -eq 0 ]
+    then
         echo "... Success, notify PSEC controller"
-        python3 $SCRIPTS_PATH/notify-disk-removed.py "$LABEL"
+        /usr/bin/python3 $SCRIPTS_PATH/notify-disk-removed.py "$LABEL"
     fi
 
 	rmdir $MOUNT_POINT
