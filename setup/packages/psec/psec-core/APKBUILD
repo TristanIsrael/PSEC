@@ -33,8 +33,8 @@ start-domains.initd
 sys-usb.conf
 "
 
-PSEC_CONFDIR="$pkgdir/etc/psec"
-PSEC_ROOTDIR="$pkgdir/usr/lib/psec"
+PSEC_CONFDIR="etc/psec"
+PSEC_ROOTDIR="usr/lib/psec"
 PSEC_BINDIR="$PSEC_ROOTDIR/bin"
 
 build() {
@@ -58,15 +58,15 @@ package() {
     # Alpine overlay for DomUs
     install -D -m644 "$builddir"/domu.apkovl.tar.gz "$pkgdir"/usr/lib/psec/system/domu.apkovl.tar.gz
 
-    install -D -m644 "$srcdir"/constants.sh "$PSEC_CONFDIR"/constants.sh
-    install -D -m644 "$srcdir"/create-domu.sh "$PSEC_BINDIR"/create-domu.sh
-    install -D -m644 "$srcdir"/create-local-alpine-repository.sh "$PSEC_BINDIR"/create-local-alpine-repository.sh
-    install -D -m644 "$srcdir"/generate-pgp-keys.sh "$PSEC_BINDIR"/generate-pgp-keys.sh    
-    install -D -m644 "$srcdir"/reindex-and-sign-repository.sh "$PSEC_BINDIR"/reindex-and-sign-repository.sh
-    install -D -m644 "$srcdir"/setup-alpine-repositories.sh "$PSEC_BINDIR"/setup-alpine-repositories.sh        
-    install -D -m644 "$srcdir"/setup-pci-usb-controllers.sh "$PSEC_BINDIR"/setup-pci-usb-controllers.sh 
-    install -D -m644 "$srcdir"/setup-pci-vga-controller.sh "$PSEC_BINDIR"/setup-pci-vga-controller.sh
-    install -D -m644 "$srcdir"/setup-xen-environment.sh "$PSEC_BINDIR"/setup-xen-environment.sh
+    install -D -m644 "$srcdir"/constants.sh "$pkgdir/$PSEC_CONFDIR"/constants.sh
+    install -D -m644 "$srcdir"/create-domu.sh "$pkgdir/$PSEC_BINDIR"/create-domu.sh
+    install -D -m644 "$srcdir"/create-local-alpine-repository.sh "$pkgdir/$PSEC_BINDIR"/create-local-alpine-repository.sh
+    install -D -m644 "$srcdir"/generate-pgp-keys.sh "$pkgdir/$PSEC_BINDIR"/generate-pgp-keys.sh    
+    install -D -m644 "$srcdir"/reindex-and-sign-repository.sh "$pkgdir/$PSEC_BINDIR"/reindex-and-sign-repository.sh
+    install -D -m644 "$srcdir"/setup-alpine-repositories.sh "$pkgdir/$PSEC_BINDIR"/setup-alpine-repositories.sh        
+    install -D -m644 "$srcdir"/setup-pci-usb-controllers.sh "$pkgdir/$PSEC_BINDIR"/setup-pci-usb-controllers.sh 
+    install -D -m644 "$srcdir"/setup-pci-vga-controller.sh "$pkgdir/$PSEC_BINDIR"/setup-pci-vga-controller.sh
+    install -D -m644 "$srcdir"/setup-xen-environment.sh "$pkgdir/$PSEC_BINDIR"/setup-xen-environment.sh
     
     install -D -m644 "$srcdir"/attach-pci-devices.initd "$pkgdir"/etc/init.d/attach-pci-devices
     install -D -m644 "$srcdir"/setup-pci.initd "$pkgdir"/etc/init.d/setup-pci
@@ -75,6 +75,6 @@ package() {
 
     install -D -m644 "$srcdir"/modules "$pkgdir/etc/modules"
 
-    install -D -m644 "$srcdir"/sys-usb.conf "$PSEC_CONFDIR/xen"
+    install -D -m644 "$srcdir"/sys-usb.conf "$pkgdir/$PSEC_CONFDIR/xen"
 }
 
