@@ -21,7 +21,7 @@ then
     if [ $? -eq 0 ]
     then
         echo "... Success, notify PSEC controller" >> $LOG_FILENAME
-        /usr/bin/python3 $SCRIPTS_PATH/notify-disk-added.py "$LABEL" >> $LOG_FILENAME 2>&1
+        /usr/bin/python3 $SCRIPTS_PATH/notify-disk-added.py "$LABEL"
     fi
 fi
 
@@ -33,7 +33,7 @@ then
     if [ $? -eq 0 ]
     then
         echo "... Success, notify PSEC controller" >> $LOG_FILENAME
-        /usr/bin/python3 $SCRIPTS_PATH/notify-disk-removed.py "$LABEL" >> $LOG_FILENAME 2>&1
+        /usr/bin/python3 $SCRIPTS_PATH/notify-disk-removed.py "$LABEL"
     fi
 
 	rmdir $MOUNT_POINT
