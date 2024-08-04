@@ -13,6 +13,7 @@ rc-update add attach-pci-devices boot
 rc-update add xen-pci boot
 rc-udpate add xenconsoled default
 rc-update add xenstored default
+rc-update add virtxend
 rc-update add splash sysinit
 
 /usr/lib/psec/bin/finish-core-init.sh

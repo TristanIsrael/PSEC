@@ -12,10 +12,8 @@
     /usr/lib/psec/bin/create-local-alpine-repository.sh
     /usr/lib/psec/bin/setup-xen-environment.sh
 
-    echo Create system User Domains
-
-    echo ... sys-usb
-    /usr/lib/psec/bin/create-domu.sh sys-usb psec-sys-usb
+    echo Create XEN Domains
+    /usr/lib/psec/bin/create-domains.sh
 
     echo ... Start initd scripts
     rc-service setup-pci start
