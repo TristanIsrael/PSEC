@@ -4,12 +4,14 @@ mkdir -p /var/log/psec
 
 modprobe exfat
 modprobe vfat
+modprobe ntfs
 
+rc-update add psec-sys-usb-controller
 rc-service psec-sys-usb-controller start
 
 echo Start/stop mdev/udev services
-rc-service mdev stop
-rc-update del mdev sysinit
+#rc-service mdev stop
+#rc-update del mdev sysinit
 rc-update add udev boot
 rc-service udev start
 
