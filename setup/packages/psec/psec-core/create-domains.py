@@ -132,13 +132,13 @@ disk = [
 def read_topology_file() -> str:
     try:
         with open('/etc/psec/topology.json', 'r') as f:
-            return f.read()
+            topo = f.read()
+            f.close()
+            return topo
     except Exception as e:
         print("An error occured while reading the file /etc/psec/topology.json")
         print(e)
         return ""
-    finally:
-        f.close()     
 
 def decode_topology_data(data:str) -> dict:
     try:

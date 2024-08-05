@@ -7,11 +7,11 @@ echo ---        script post-install.sh        ---
 echo --------------------------------------------
 echo
 
-rc-udpate add start-domains boot
-rc-udpate add setup-pci boot
+rc-update add start-domains boot
+rc-update add setup-pci boot
 rc-update add attach-pci-devices boot
 rc-update add xen-pci boot
-rc-udpate add xenconsoled default
+rc-update add xenconsoled default
 rc-update add xenstored default
 rc-update add virtxend
 rc-update add splash sysinit
