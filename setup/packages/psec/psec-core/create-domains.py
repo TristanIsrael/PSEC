@@ -1,5 +1,6 @@
 import json 
 from configparser import ConfigParser
+import subprocess
 
 class DomainsFactory:
     topology:dict = None
@@ -13,10 +14,12 @@ class DomainsFactory:
 
         usb = self.topology.get("usb")
         if usb != None and usb.get("use") == 1:
+            self.__provision_domain("sys-usb", "psec-sys-usb")
             self.create_domd_usb()
 
         gui = self.topology.get("gui")
         if gui != None and gui.get("use") == 1:
+            self.__provision_domain("sys-gui", "psec-sys-gui")
             self.create_domd_gui()
             
 
@@ -114,6 +117,15 @@ disk = [
                     txt += "pci = [{}]\n".format(devs.replace(' ', '", "'))
 
         return txt
+
+    def __provision_domain(self, domain_name:str, main_package:str):
+        cmd = "/usr/lib/psec/bin/provision-domain.sh"
+
+        try:
+            subprocess.run([cmd, domain_name, main_package], check=True)
+        except Exception as e:
+            print("An error occured during domain provisioning")
+            print(e)
 
 ### Functions
 def read_topology_file() -> str:

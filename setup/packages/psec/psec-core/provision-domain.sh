@@ -2,7 +2,6 @@
 
 . /etc/psec/constants.sh
 
-### A Déplacer dans constants.sh
 export APKOVL_TEMPLATE="/usr/lib/psec/system/domu.apkovl.tar.gz"
 export LOCAL_PGP_PUBKEY="/etc/apk/keys/local.rsa.pub"
 
@@ -76,7 +75,3 @@ mv /tmp/$BOOTISO_FILENAME /usr/lib/psec/system/
 
 echo ... Clean
 umount /mnt/bootiso
-
-echo ""
-echo Creating domains from topology file located at /etc/psec/topology.json
-/usr/bin/python3 /usr/lib/psec/bin/create-domains.py
