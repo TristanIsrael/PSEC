@@ -13,7 +13,7 @@
     /usr/lib/psec/bin/setup-xen-environment.sh
 
     echo Create XEN Domains
-    /usr/lib/psec/bin/create-domains.sh
+    /usr/bin/python3 /usr/lib/psec/bin/create-domains.py
 
     echo ... Start initd scripts
     rc-service setup-pci start

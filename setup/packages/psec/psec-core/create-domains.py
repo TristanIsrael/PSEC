@@ -127,7 +127,8 @@ disk = [
             print("An error occured during domain provisioning")
             print(e)
 
-### Functions
+###
+### Local functions
 def read_topology_file() -> str:
     try:
         with open('/etc/psec/topology.json', 'r') as f:
@@ -148,6 +149,8 @@ def decode_topology_data(data:str) -> dict:
         print(e)
         return None    
 
+###
+### Entry point
 if __name__ == "__main__":
     print("Starting Domains creation process")
 
