@@ -19,11 +19,12 @@ options="!check"  # no tests provided
 
 source="attach-pci-devices.initd
 constants.sh
-create-domu.sh
+create-domains.py
 create-local-alpine-repository.sh
 finish-core-init.sh
 generate-pgp-keys.sh
 modules
+provision-domain.sh
 reindex-and-sign-repository.sh
 setup-alpine-repositories.sh
 setup-pci-usb-controllers.sh 
@@ -61,7 +62,8 @@ package() {
     install -D -m644 "$builddir"/domu.apkovl.tar.gz "$pkgdir"/usr/lib/psec/system/domu.apkovl.tar.gz
 
     install -D -m644 "$srcdir"/constants.sh "$pkgdir/$PSEC_CONFDIR"/constants.sh
-    install -D -m755 "$srcdir"/create-domu.sh "$pkgdir/$PSEC_BINDIR"/create-domu.sh
+    install -D -m644 "$srcdir"/create-domains.py "$pkgdir/$PSEC_BINDIR"/create-domains.py
+    install -D -m755 "$srcdir"/provision-domain.sh "$pkgdir/$PSEC_BINDIR"/provision-domain.sh
     install -D -m755 "$srcdir"/create-local-alpine-repository.sh "$pkgdir/$PSEC_BINDIR"/create-local-alpine-repository.sh
     install -D -m755 "$srcdir"/generate-pgp-keys.sh "$pkgdir/$PSEC_BINDIR"/generate-pgp-keys.sh    
     install -D -m755 "$srcdir"/reindex-and-sign-repository.sh "$pkgdir/$PSEC_BINDIR"/reindex-and-sign-repository.sh
