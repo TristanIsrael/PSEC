@@ -1,13 +1,14 @@
-import json 
+import json, sys, subprocess, multiprocessing
 from configparser import ConfigParser
-import subprocess
 
 class DomainsFactory:
     topology:dict = None
     xen_conn = None
+    alpine_repo = ""
 
-    def __init__(self, topology:dict):
+    def __init__(self, topology:dict, alpine_repo:str):
         self.topology = topology    
+        self.alpine_repo = alpine_repo
 
     def create_domains(self):
         print("Start creating domains from topology")
@@ -15,15 +16,24 @@ class DomainsFactory:
         usb = self.topology.get("usb")
         if usb != None and usb.get("use") == 1:
             self.__provision_domain("sys-usb", "psec-sys-usb")
-            self.create_domd_usb()
+            self.__create_domd_usb()
 
         gui = self.topology.get("gui")
         if gui != None and gui.get("use") == 1:
-            self.__provision_domain("sys-gui", "psec-sys-gui")
-            self.create_domd_gui()
+            package = gui.get("app-package")            
+            self.__provision_domain("sys-gui", "psec-sys-gui" if package is None else package)
+            self.__create_domd_gui()
+            self.__fetch_alpine_packages(package)
+
+        business = self.topology.get("business")
+        if business != None:
+            self.__parse_business_domains(business)
             
 
-    def create_domd_usb(self):
+    ###
+    # Private functions
+    #
+    def __create_domd_usb(self):
         print("Create Driver Domain USB")
 
         conf = self.__create_new_domain(
@@ -41,7 +51,7 @@ class DomainsFactory:
         with open('/etc/psec/xen/sys-usb.conf', 'w') as f:
             f.write(conf)
 
-    def create_domd_gui(self):
+    def __create_domd_gui(self):
         print("Create Driver Domain GUI")
 
         conf = self.__create_new_domain(
@@ -59,9 +69,44 @@ class DomainsFactory:
 
         with open('/etc/psec/xen/sys-gui.conf', 'w') as f:
             f.write(conf)
+    
+    def __parse_business_domains(self, json:dict):
+        repository = json.get("repository")
+        if repository != None:
+            pass # Todo
 
-    # Private functions
-    def __create_new_domain(self, domain_name:str, memory_in_mb:int, nb_cpus:int, boot_iso_location:str, share_packages:bool, share_storage:bool, share_system:bool=False, rxtx_inputs:bool=False, pci_passthrough:bool=False, vga_passthrough:bool=False):
+        domains = json.get("domains")
+        if domains != None:
+            for domain in domains:
+                name = domain.get("name")
+                package = domain.get("package")
+                memory = domain.get("memory")
+                
+                cpus = 1
+                cpu_rate = domain.get("cpu")
+                cpu_count = multiprocessing.cpu_count()
+                cpus = round(cpu_count*cpu_rate)
+
+                self.__provision_domain(name, package)
+                conf = self.__create_new_domain(
+                    domain_name= name,
+                    memory_in_mb= memory,
+                    nb_cpus= 1 if cpus == 0 else cpus,
+                    boot_iso_location= "bootiso-{}.iso".format(name),
+                    share_packages= True,
+                    share_storage= True,
+                    share_system= False,
+                    rxtx_inputs= False,
+                    pci_passthrough= False,
+                    vga_passthrough= False
+                )
+
+                with open("/etc/psec/xen/{}.conf".format(name), 'w') as f:
+                    f.write(conf)
+
+                self.__fetch_alpine_packages(package)     
+
+    def __create_new_domain(self, domain_name:str, memory_in_mb:int, nb_cpus:int, boot_iso_location:str, share_packages:bool=True, share_storage:bool=True, share_system:bool=False, rxtx_inputs:bool=False, pci_passthrough:bool=False, vga_passthrough:bool=False):
         txt = '''
 type = "pv"
 name = "{}"
@@ -98,23 +143,24 @@ disk = [
         if len(channels) > 0:
             txt += "channel = [\n{}\n]\n".format(",\n".join(channels))        
         
-        parser=ConfigParser()
-        with open("/etc/conf.d/xen-pci") as stream:
-            parser.read_string("[none]\n" +stream.read())
+        if pci_passthrough is not None and vga_passthrough is not None:
+            parser=ConfigParser()
+            with open("/etc/conf.d/xen-pci") as stream:
+                parser.read_string("[none]\n" +stream.read())
 
-            # Add PCI passthrough
-            if pci_passthrough and parser["none"]["DEVICES"] != None:
-                devs = parser["none"]["DEVICES"]
+                # Add PCI passthrough
+                if pci_passthrough and parser["none"]["DEVICES"] != None:
+                    devs = parser["none"]["DEVICES"]
 
-                if devs != "" and devs != None:
-                    txt += "pci = [{}]\n".format(devs.replace(' ', '","'))
+                    if devs != "" and devs != None:
+                        txt += "pci = [{}]\n".format(devs.replace(' ', '","'))
 
-            # Add VGA passthrough
-            if vga_passthrough and parser["none"]["VGA_DEVICES"] != None:
-                devs = parser["none"]["VGA_DEVICES"]
+                # Add VGA passthrough
+                if vga_passthrough and parser["none"]["VGA_DEVICES"] != None:
+                    devs = parser["none"]["VGA_DEVICES"]
 
-                if devs != "" and devs != None:
-                    txt += "pci = [{}]\n".format(devs.replace(' ', '", "'))
+                    if devs != "" and devs != None:
+                        txt += "pci = [{}]\n".format(devs.replace(' ', '", "'))
 
         return txt
 
@@ -125,7 +171,20 @@ disk = [
             subprocess.run([cmd, domain_name, main_package], check=True)
         except Exception as e:
             print("An error occured during domain provisioning")
-            print(e)
+            print(e)    
+
+    def __fetch_alpine_packages(self, package):
+        # Fetch Alpine packages                
+        subprocess.run(
+            args= ["apk", "fetch", "-R", package], 
+            cwd= alpine_repo,
+            check= True
+        )
+
+        subprocess.run(
+            args= ["/usr/lib/psec/bin/reindex-and-sign-repository.sh"], 
+            check= True
+        )  
 
 ###
 ### Local functions
@@ -154,6 +213,10 @@ def decode_topology_data(data:str) -> dict:
 if __name__ == "__main__":
     print("Starting Domains creation process")
 
+    if len(sys.argv) < 2:
+        print("Error: missing argument alpine_repository_location")
+        exit(2)
+
     print("Open topology file")
     f = read_topology_file()
 
@@ -161,5 +224,6 @@ if __name__ == "__main__":
     topology = decode_topology_data(f)
 
     print("Start topology factory")
-    factory = DomainsFactory(topology)
+    alpine_repo = sys.argv[1]
+    factory = DomainsFactory(topology, alpine_repo)
     factory.create_domains()

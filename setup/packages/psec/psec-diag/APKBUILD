@@ -18,6 +18,6 @@ options="!check"  # no tests provided
 source="topology.json"
 
 package() {        
-    install -D -m644 "$srcdir"/topology.json "$pkgdir/$PSEC_CONFDIR/topology.json"
+    install -D -m644 "$srcdir"/topology.json "$pkgdir/etc/psec/topology.json"
 }
 
