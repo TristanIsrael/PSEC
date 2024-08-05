@@ -32,7 +32,6 @@ setup-pci.initd
 setup-xen-environment.sh
 splash.initd
 start-domains.initd
-sys-usb.conf
 topology.json
 "
 
@@ -81,6 +80,6 @@ package() {
     install -D -m644 "$srcdir"/modules "$pkgdir/etc/modules"
 
     install -D -m644 "$srcdir"/sys-usb.conf "$pkgdir/$PSEC_CONFDIR/xen/sys-usb.conf"
-    install -D -m644 "$srcdir"/topology.json "$pkgdir/$PSEC_CONFDIR/xen/topology.json"
+    install -D -m644 "$srcdir"/topology.json "$pkgdir/$PSEC_CONFDIR/topology.json"
 }
 
