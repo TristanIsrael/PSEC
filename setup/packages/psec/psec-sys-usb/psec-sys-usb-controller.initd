@@ -3,7 +3,7 @@
 name="psec-sys-usb-controller"
 
 depend() {
-    after psec-core-init
+    before udev
 }
 
 start() {
