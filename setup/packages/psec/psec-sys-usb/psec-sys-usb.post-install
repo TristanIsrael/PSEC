@@ -1,5 +1,7 @@
 #!/bin/sh
 
+mkdir -p /var/log/psec
+
 rc-service mdev stop
 rc-service udev start
 rc-service psec-sys-usb-controller start

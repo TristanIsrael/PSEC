@@ -96,7 +96,7 @@ disk = [
             channels.append("'name={}-input, connection=socket, path=/var/run/{}-input.sock'".format(domain_name, domain_name))
         
         if len(channels) > 0:
-            txt += "channels = [\n{}\n]\n".format(",\n".join(channels))        
+            txt += "channel = [\n{}\n]\n".format(",\n".join(channels))        
         
         parser=ConfigParser()
         with open("/etc/conf.d/xen-pci") as stream:

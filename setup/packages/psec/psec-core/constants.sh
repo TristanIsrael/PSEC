@@ -4,7 +4,7 @@ export ALPINE_VERSION="3.20"
 
 export ALPINE_LOCAL_ROOT=/usr/lib/psec/packages
 export ALPINE_LOCAL_REPOSITORY=$ALPINE_LOCAL_ROOT/alpine
-export PSEC_LOCAL_REPOSITORY=$ALPINE_LOCAL_ROOT/psec
+#export PSEC_LOCAL_REPOSITORY=$ALPINE_LOCAL_ROOT/psec
 
 export PSEC_PUBLIC_REPOSITORY="https://alefbet.net/wp-content/uploads/repositories/PSEC"
 
