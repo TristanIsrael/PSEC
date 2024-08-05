@@ -7,14 +7,10 @@ echo ---        script post-install.sh        ---
 echo --------------------------------------------
 echo
 
-rc-update add start-domains boot
-rc-update add setup-pci boot
-rc-update add attach-pci-devices boot
-rc-update add xen-pci boot
-rc-update add xenconsoled default
-rc-update add xenstored default
-rc-update add virtxend
-rc-update add splash sysinit
+rc-service splash start
+rc-service xenconsoled start
+rc-service xenstored start
+rc-service virtxend start
 
 /usr/lib/psec/bin/finish-core-init.sh
 
