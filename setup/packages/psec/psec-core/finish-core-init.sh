@@ -4,7 +4,7 @@
 #then
 #    echo "Started from initd, ignored"
 #else
-    . /etc/psec/constants
+    . /etc/psec/constants.sh
 
     mkdir -p /usr/lib/psec/storage
     mkdir -p /usr/lib/psec/packages
