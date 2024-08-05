@@ -4,6 +4,8 @@
 #then
 #    echo "Started from initd, ignored"
 #else
+    . /etc/psec/constants
+
     mkdir -p /usr/lib/psec/storage
     mkdir -p /usr/lib/psec/packages
     mkdir -p /etc/psec/xen
@@ -15,7 +17,7 @@
     /usr/lib/psec/bin/setup-xen-environment.sh
 
     echo Create XEN Domains
-    /usr/bin/python3 /usr/lib/psec/bin/create-domains.py
+    /usr/bin/python3 /usr/lib/psec/bin/create-domains.py $ALPINE_LOCAL_REPOSITORY/`uname -m`
 
     echo ... Start initd scripts
     rc-service setup-pci start
