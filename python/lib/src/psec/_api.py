@@ -23,20 +23,25 @@ class Api():
     callback est la suivante : callback(message : Message) -> None
     """
 
-    callback_fn = None
+    ready_callback = None
+    message_callback = None
     sock = None
     journal = Journal("API")
 
     def __init__(self, callback_fn = None):
-        self.callback_fn = callback_fn                
+        self.message_callback = callback_fn                
 
     def demarre(self):
         self.journal.debug("Démarrage de la messagerie")
-        MessagerieDomu().set_message_callback(self.callback_fn)
+        MessagerieDomu().set_message_callback(self.message_callback)
+        MessagerieDomu().set_demarrage_callback(self.ready_callback)
         threading.Thread(target= MessagerieDomu().demarre, args= (False, )).start()
 
-    def set_callback_function(self, callback_fn):
-        self.callback_fn = callback_fn
+    def set_message_callback(self, callback_fn):
+        self.message_callback = callback_fn
+
+    def set_ready_callback(self, callback_fn):
+        self.ready_callback = callback_fn
 
     ####
     # Fonctions de journalisation
@@ -106,3 +111,7 @@ class Api():
     #
     def __envoie_message(self, message : Message):        
         MessagerieDomu().envoie_message_xenbus(message)
+
+    def __on_messagerie_ready(self):
+        if self.ready_callback != None:
+            self.ready_callback()

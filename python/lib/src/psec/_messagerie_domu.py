@@ -47,9 +47,10 @@ class MessagerieDomu(metaclass=SingletonMeta):
         
         self.chemin_socket_xenbus = Parametres().parametre(Cles.CHEMIN_SOCKET_MSG)
         th = threading.Thread(target=self.__connecte_interface_xenbus)
+        th.daemon = demon
         th.start()
-        if demon:
-            th.join()
+        #if demon:
+        #    th.join()
 
     def arrete(self):
         if not self.messagerie_demarree:

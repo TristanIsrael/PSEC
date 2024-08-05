@@ -9,10 +9,11 @@ modprobe ntfs
 rc-update add psec-sys-usb-controller
 rc-service psec-sys-usb-controller start
 
-echo Start/stop mdev/udev services
+echo Start udev service
 #rc-service mdev stop
 #rc-update del mdev sysinit
 rc-update add udev boot
 rc-service udev start
+udevadm control --reload-rules
 
 exit 0
