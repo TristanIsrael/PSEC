@@ -13,7 +13,7 @@ builddir="$srcdir/$pkgname-$pkgver"
 install="$pkgname.post-install"
 checkdepends=""
 install=""
-subpackages=""
+subpackages="$pkgname-openrc"
 replaces="alpine-baselayout-data"
 options="!check"  # no tests provided
 
