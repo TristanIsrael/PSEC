@@ -6,6 +6,7 @@
 #else
     mkdir -p /usr/lib/psec/storage
     mkdir -p /usr/lib/psec/packages
+    mkdir -p /etc/psec/xen
 
     /usr/lib/psec/bin/generate-pgp-keys.sh
     /usr/lib/psec/bin/setup-alpine-repositories.sh
