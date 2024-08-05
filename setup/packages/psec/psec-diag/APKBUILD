@@ -7,16 +7,17 @@ pkgdesc="PSEC - Diagnostic tool"
 url="https://www.alefbet.net/"
 arch="noarch"
 license="MIT"
-depends="python3 psec-lib py3-pyside6 py3-psutil py3-humanize fontconfig freetype terminus-font psec-sys-usb psec-sys-gui psec-core"
+depends="python3 psec-lib psec-core py3-pyside6 py3-psutil py3-humanize fontconfig freetype terminus-font"
 makedepends="python3-dev py3-build py3-installer git"
 builddir="$srcdir/$pkgname-$pkgver"
 checkdepends=""
 install=""
-subpackages=""
+subpackages="$pkgname-gui"
 replaces=""
 options="!check"  # no tests provided
 psec_branch="1.0"
 giturl="https://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@github.com/tibsys/psec"
+source="topology.json"
 
 prepare() {
     mkdir -p "$builddir"
@@ -30,6 +31,10 @@ build() {
 }
 
 package() {        
+    install -D -m644 "$srcdir"/topology.json "$pkgdir/$PSEC_CONFDIR/topology.json"
+}
+
+gui() {
     cd "$builddir/python/diag/dist"
     mkdir -p "$pkgdir/usr/lib/psec"
     tar xvzf *.tar.gz -C "$pkgdir/usr/lib/psec"
