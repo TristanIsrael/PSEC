@@ -3,3 +3,5 @@
 echo Clean system
 rm -rf /etc/psec
 rm -rf /usr/lib/psec
+
+exit 0

@@ -28,7 +28,7 @@ echo Fetch packages
 cd $ALPINE_ARCH_DIR
 apk fetch -R psec-lib psec-sys-usb 
 # Récupération de dépendances supplémentaires
-apk fetch -R libtirpc-conf krb5-conf eudev-openrc
+apk fetch -R libtirpc-conf krb5-conf eudev-openrc udev-init-scripts udev-init-scripts-openrc
 # Separate PSEC packages from Alpine official
 #mv psec* $PSEC_ARCH_DIR
 

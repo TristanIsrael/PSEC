@@ -2,6 +2,11 @@
 
 mkdir -p /var/log/psec
 
+modprobe exfat
+modprobe vfat
+
 rc-service mdev stop
 rc-service udev start
 rc-service psec-sys-usb-controller start
+
+exit 0
