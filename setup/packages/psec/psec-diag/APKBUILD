@@ -36,8 +36,8 @@ package() {
 
 gui() {
     cd "$builddir/python/diag/dist"
-    mkdir -p "$pkgdir/usr/lib/psec"
-    tar xvzf *.tar.gz -C "$pkgdir/usr/lib/psec"
-    cd "$pkgdir/usr/lib/psec"
+    mkdir -p "$subpkgdir/usr/lib/psec"
+    tar xvzf *.tar.gz -C "$subpkgdir/usr/lib/psec"
+    cd "$subpkgdir/usr/lib/psec"
     ln -s "diag-$psec_branch" diag
 }
