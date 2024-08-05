@@ -11,7 +11,7 @@
 
 while true
 do
-        /usr/bin/python3 /usr/local/panoptiscan/gui/main.py -platform linuxfb 
+        /usr/bin/python3 /usr/lib/psec/diag/src/diag/main.py -platform linuxfb 
         #-plugin evdevtouch
 done
 

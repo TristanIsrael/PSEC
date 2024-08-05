@@ -1,0 +1,19 @@
+#!/sbin/openrc-run
+
+name="start-gui"
+command_background="yes"
+
+depend() {    
+    after syslog
+}
+
+start() {
+    ebegin "Starting GUI"
+    /usr/lib/psec/diag/src/diag/start.sh &
+}
+
+stop() {
+    ebegin "Nothing"
+    
+    eend $?
+}

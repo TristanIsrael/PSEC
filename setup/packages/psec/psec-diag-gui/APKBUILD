@@ -11,12 +11,13 @@ depends="python3 psec-lib py3-pyside6 py3-psutil py3-humanize fontconfig freetyp
 makedepends="python3-dev py3-build py3-installer git"
 builddir="$srcdir/$pkgname-$pkgver"
 checkdepends=""
-install=""
+install="$pkgdir.post-install"
 subpackages=""
 replaces=""
 options="!check"  # no tests provided
 psec_branch="1.0"
 giturl="https://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@github.com/tibsys/psec"
+source="start-gui.initd"
 
 prepare() {
     mkdir -p "$builddir"
@@ -35,4 +36,6 @@ package() {
     tar xvzf *.tar.gz -C "$pkgdir/usr/lib/psec"
     cd "$pkgdir/usr/lib/psec"
     ln -s "diag-$psec_branch" diag
+
+    install -D -m755 "$srcdir"/start-gui.initd "$pkgdir"/etc/init.d/start-gui
 }

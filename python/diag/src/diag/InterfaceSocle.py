@@ -2,7 +2,7 @@ from PySide6.QtCore import QObject, Signal, qDebug, qWarning
 from PySide6.QtCore import QProcess, QTimer, QDir, Property, Slot, QPoint, QCoreApplication, Qt, QEvent, QSize
 from PySide6.QtGui import QMouseEvent, QCursor
 from PySide6.QtWidgets import QWidget
-from panoptiscan_lib import Journal, Api, Message, TypeMessage, Notification, TypeEvenement, EtatDisque, TypeReponse, Constantes
+from psec import Journal, Api, Message, TypeMessage, Notification, TypeEvenement, EtatDisque, TypeReponse, Constantes
 import threading
 
 class InterfaceSocle(QObject):

@@ -4,7 +4,8 @@
     },
     "gui": {
         "use": 1,
-        "app-package": "psec-diag-gui"
+        "app-package": "psec-diag-gui",
+        "memory": 2000
     },
     "business": {
         "repository": "https://www.alefbet.net/wp-content/uploads/repositories/PSEC",

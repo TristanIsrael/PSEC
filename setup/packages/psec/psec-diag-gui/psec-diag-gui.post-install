@@ -1,0 +1,6 @@
+#!/bin/sh
+
+rc-update add psec-diag
+rc-service psec-diag start
+
+exit 0

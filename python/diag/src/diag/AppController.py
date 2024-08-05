@@ -6,10 +6,10 @@ from MousePointer import MousePointer
 from InterfaceInputs import InterfaceInputs
 from InterfaceSocle import InterfaceSocle
 from hashlib import md5
-from panoptiscan_lib import MouseWheel, Journal, Parametres, Cles
+from psec import MouseWheel, Journal, Parametres, Cles
 import os
 try:
-    from panoptiscan_lib import ControleurBenchmark
+    from psec import ControleurBenchmark
 except:
     print("Le contrôleur de benchmark n'est pas disponible")
 

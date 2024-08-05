@@ -3,7 +3,7 @@ from PySide6.QtCore import  Slot, QPoint, QCoreApplication, Qt, QEvent
 from PySide6.QtGui import QMouseEvent, QWheelEvent, QHoverEvent, QEnterEvent
 from PySide6.QtWidgets import QWidget
 from MousePointer import MousePointer
-from panoptiscan_lib import Journal, Parametres, Cles, Mouse, MouseButton, MouseWheel
+from psec import Journal, Parametres, Cles, Mouse, MouseButton, MouseWheel
 import serial, pickle #, threading
 
 class InterfaceInputs(QObject):
