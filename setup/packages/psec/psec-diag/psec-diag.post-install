@@ -1,0 +1,12 @@
+#!/bin/sh
+
+echo
+echo --------------------------------------------
+echo -------      PSEC Diag Installation       -------
+echo ---        script post-install.sh        ---
+echo --------------------------------------------
+echo
+
+/usr/lib/psec/bin/finish-core-init.sh
+
+exit 0
