@@ -1,6 +1,6 @@
 # Contributor:
 # Maintainer: Tristan Israël <tristan.israel@alefbet.net>
-pkgname=psec-diag
+pkgname=psec-diag-gui
 pkgver=1.0
 pkgrel=1
 pkgdesc="PSEC - Diagnostic tool"
