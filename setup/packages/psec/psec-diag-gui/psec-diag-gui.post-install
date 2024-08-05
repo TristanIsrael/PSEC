@@ -1,6 +1,6 @@
 #!/bin/sh
 
-rc-update add psec-diag
-rc-service psec-diag start
+rc-update add start-gui
+rc-service start-gui start
 
 exit 0
