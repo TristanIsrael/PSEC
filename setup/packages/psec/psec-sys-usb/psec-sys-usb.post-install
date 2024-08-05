@@ -1,8 +1,5 @@
 #!/bin/sh
 
 rc-service mdev stop
-rc-update del mdev sysinit
-rc-update add udev
 rc-service udev start
-rc-update add psec-sys-usb-controller
 rc-service psec-sys-usb-controller start

@@ -1,0 +1,5 @@
+#!/bin/sh
+
+echo Clean system
+rm -rf /etc/psec
+rm -rf /usr/lib/psec
