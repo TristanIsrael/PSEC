@@ -17,3 +17,5 @@ rc-update add virtxend
 rc-update add splash sysinit
 
 /usr/lib/psec/bin/finish-core-init.sh
+
+exit 0
