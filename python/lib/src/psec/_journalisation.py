@@ -1,4 +1,4 @@
-import logging, colorlog, logging.handlers, os, serial, glob, socket, threading, io, time
+import logging, logging.handlers, os, serial, glob, socket, threading, io, time
 from logging import StreamHandler
 from . import Parametres, Constantes, Cles, SingletonMeta, Domaine
 
@@ -197,3 +197,4 @@ class JournalProxy():
                     self.__ouvre_fichier_log()
                 self.fichier_log.write(data)
                 self.verrou_fichier.release()
+                
