@@ -11,6 +11,6 @@ rc-service xenconsoled start
 rc-service xenstored start
 rc-service virtxend start
 
-/usr/lib/psec/bin/finish-core-init.sh
+#/usr/lib/psec/bin/finish-core-init.sh
 
 exit 0
