@@ -44,8 +44,8 @@ class InterfaceSocle(QObject):
     error = Signal(str)
 
     def __init__(self, parent=None):
-        QObject.__init__(self, parent)
-        self.api.set_callback_function(self.__on_message_recu)
+        QObject.__init__(self, parent)        
+        self.api.set_message_callback(self.__on_message_recu)
 
     @Slot()
     def demarre(self):        

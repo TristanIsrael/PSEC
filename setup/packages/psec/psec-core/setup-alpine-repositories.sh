@@ -2,6 +2,9 @@
 
 echo Setup Alpine local repository
 
+echo *** Deprecated ***
+exit 0
+
 . /etc/psec/constants.sh
 
 echo "$ALPINE_PUBLIC_MAIN_REPOSITORY

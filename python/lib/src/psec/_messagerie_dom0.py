@@ -21,8 +21,8 @@ class MessagerieDom0(metaclass=SingletonMeta):
     """
 
     #chemin_socket_locale = None
-    sockets_xenbus = []
-    buffers_xenbus = []
+    sockets_xenbus = {}
+    buffers_xenbus = {}
     socket_locale = None   
     recv_buffer = bytearray() 
     journal = Journal("MessagerieDom0")
@@ -73,13 +73,15 @@ class MessagerieDom0(metaclass=SingletonMeta):
         chemin_sockets = self.__chemin_sockets()
         self.journal.debug("Recherche des sockets DomU dans {}".format(chemin_sockets))
         while True:            
-            fichiers = glob.glob(chemin_sockets)        
+            fichiers = glob.glob(chemin_sockets)
+
             if len(fichiers) == 0:
                 self.journal.info("No messaging socket available")
                 self.sockets_xenbus.clear()
+
             for fichier in fichiers:
-                if fichier not in self.sockets_xenbus:
-                    threading.Thread(target=self.__connecte_interface_xenbus, args=(fichier,)).start()
+                threading.Thread(target=self.__connecte_interface_xenbus, args=(fichier,)).start()
+
             # On attend quelques secondes avant de reboucler
             time.sleep(5)
 

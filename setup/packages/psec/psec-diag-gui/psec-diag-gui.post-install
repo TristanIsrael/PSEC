@@ -2,6 +2,9 @@
 
 mkdir -p /var/log/psec
 
+chmod +x /usr/lib/psec/diag/src/diag/start.sh
+mkdir -p /var/log/psec
+
 rc-update add start-gui
 rc-service start-gui start
 

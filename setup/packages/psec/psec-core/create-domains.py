@@ -54,9 +54,16 @@ class DomainsFactory:
     def __create_domd_gui(self):
         print("Create Driver Domain GUI")
 
+        memory = 1024
+        json_gui = self.topology.get("gui")
+        if json_gui is not None:
+            json_memory = json_gui.get("app-memory")
+            if json_memory is not None:
+                memory = json_memory
+
         conf = self.__create_new_domain(
             domain_name="sys-gui", 
-            memory_in_mb=2000,
+            memory_in_mb=memory,
             nb_cpus=1, 
             boot_iso_location="bootiso-sys-gui.iso",
             share_packages=True,

@@ -92,7 +92,7 @@ class InputsProxy(metaclass=SingletonMeta):
                     try:
                         self.sys_gui_socket.send(data)
                     except:
-                        self.journal.error("Connection error with I/O socket {}".format(fichier_socket))            
+                        self.journal.error("Connection error with GUI I/O socket")
                         self.sys_gui_socket = None
                         return
                         
@@ -114,5 +114,5 @@ class InputsProxy(metaclass=SingletonMeta):
             return True
         except:
             self.journal.warn("The I/O socket {} could not be opened".format(chemin_fichier))
-            self.sys_usb_socket = None
+            self.sys_gui_socket = None
             return False

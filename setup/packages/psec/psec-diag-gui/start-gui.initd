@@ -9,6 +9,9 @@ depend() {
 
 start() {
     ebegin "Starting GUI"
+
+    chmod +x /usr/lib/psec/diag/src/diag/start.sh
+    mkdir -p /var/log/psec
     /usr/lib/psec/diag/src/diag/start.sh &
 }
 

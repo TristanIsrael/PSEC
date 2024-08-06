@@ -12,7 +12,7 @@ rc-service xenstored start
 rc-service virtxend start
 
 rc-update add start-domains
-rc-service start-domains start
+#rc-service start-domains start
 rc-update add psec-core-controller
 rc-service psec-core-controller start
 

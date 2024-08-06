@@ -9,9 +9,7 @@ depend() {
 }
 
 start() {
-    ebegin "Start Domain sys-usb"    
-    chmod +x /usr/lib/psec/diag/src/diag/start.sh
-    mkdir -p /var/log/psec
+    ebegin "Start Domain sys-usb"        
     xl create -f /etc/psec/xen/sys-usb.conf
     eend $?
     
