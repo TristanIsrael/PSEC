@@ -57,9 +57,10 @@ class DomainsFactory:
         memory = 1024
         json_gui = self.topology.get("gui")
         if json_gui != None:
-            json_memory = json_gui.get("app-memory")
+            json_memory = json_gui.get("memory")
             if json_memory != None:
                 memory = json_memory
+                print("Setting {} MB for memory".format(memory))
 
         conf = self.__create_new_domain(
             domain_name="sys-gui", 
