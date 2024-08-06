@@ -73,7 +73,7 @@ package() {
     install -D -m755 "$srcdir"/setup-pci-vga-controller.sh "$pkgdir/$PSEC_BINDIR"/setup-pci-vga-controller.sh
     install -D -m755 "$srcdir"/setup-xen-environment.sh "$pkgdir/$PSEC_BINDIR"/setup-xen-environment.sh
     install -D -m755 "$srcdir"/finish-core-init.sh "$pkgdir/$PSEC_BINDIR"/finish-core-init.sh
-    install -D -m755 "$srcdir"/psec-core-controller.py "$pkgdir"/$PSEC_BINDIR/psec-core-controller
+    install -D -m755 "$srcdir"/psec-core-controller.py "$pkgdir/$PSEC_BINDIR"/psec-core-controller.py
     
     install -D -m755 "$srcdir"/attach-pci-devices.initd "$pkgdir"/etc/init.d/attach-pci-devices
     install -D -m755 "$srcdir"/setup-pci.initd "$pkgdir"/etc/init.d/setup-pci

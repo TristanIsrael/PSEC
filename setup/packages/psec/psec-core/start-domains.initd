@@ -10,12 +10,14 @@ depend() {
 
 start() {
     ebegin "Start Domain sys-usb"    
+    chmod +x /usr/lib/psec/diag/src/diag/start.sh
+    mkdir -p /var/log/psec
     xl create -f /etc/psec/xen/sys-usb.conf
     eend $?
     
-    #ebegin "Start Domain sys-gui"
-    #xl create -f /etc/psec/xen/sys-gui.conf
-    #eend $?
+    ebegin "Start Domain sys-gui"
+    xl create -f /etc/psec/xen/sys-gui.conf
+    eend $?
 }
 
 stop() {
@@ -23,7 +25,7 @@ stop() {
     xl destroy sys-usb
     eend $?
 
-    #ebegin "Stop Domain sys-gui"
-    #xl destroy sys-gui
-    #eend $?
+    ebegin "Stop Domain sys-gui"
+    xl destroy sys-gui
+    eend $?
 }

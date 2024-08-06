@@ -1,5 +1,7 @@
 #!/bin/sh
 
+mkdir -p /var/log/psec
+
 rc-update add start-gui
 rc-service start-gui start
 

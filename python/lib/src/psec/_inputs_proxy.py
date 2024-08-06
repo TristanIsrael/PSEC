@@ -68,7 +68,7 @@ class InputsProxy(metaclass=SingletonMeta):
 
     def __ouvre_socket_gui(self):
         #Ouvre le flux avec la socket
-        chemin_fichier = "{}/{}-inputs.sock".format(Parametres().parametre(Cles.CHEMIN_SOCKETS_DOM0), self.domaine_gui)
+        chemin_fichier = "{}/{}-input.sock".format(Parametres().parametre(Cles.CHEMIN_SOCKETS_DOM0), self.domaine_gui)
         self.journal.debug("Ouvre le canal avec la socket Xenbus {} pour le domaine {}".format(chemin_fichier, self.domaine_gui))
 
         sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)

@@ -56,7 +56,7 @@ class DomainsFactory:
 
         conf = self.__create_new_domain(
             domain_name="sys-gui", 
-            memory_in_mb=400,
+            memory_in_mb=2000,
             nb_cpus=1, 
             boot_iso_location="bootiso-sys-gui.iso",
             share_packages=True,

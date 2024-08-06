@@ -76,22 +76,22 @@ class Constantes(metaclass=SingletonMeta):
         #Cles.CHEMIN_SOCKET_API: "/run/panoptiscan.sock",
         Cles.TAILLE_TRAME: 1024,
         # Journalisations
-        Cles.CHEMIN_JOURNAL_LOCAL: "/var/log/psec.log",
+        Cles.CHEMIN_JOURNAL_LOCAL: "/var/log/psec/psec.log",
         "format_chaine_log_prod": '%(asctime)s %(levelname)-8s %(domaine)-10s [%(name)-20s] %(message)s',
         "format_chaine_log_debug": '%(asctime)s %(levelname)-8s %(domaine)-10s [%(name)-20s] %(message)s',
         Cles.CHEMIN_PORT_JOURNAL_DOMU: "/dev/hvc2",
         Cles.CHEMIN_SOCKETS_JOURNAL: "/var/run",
         Cles.CHEMIN_SOCKETS_MESSAGERIE: "/var/run",
         Cles.CHEMIN_SOCKETS_DOM0: "/var/run",
-        Cles.CHEMIN_SOCKET_INPUT_DOM0: "/var/run/vm-sys-usb-inputs.sock",
+        Cles.CHEMIN_SOCKET_INPUT_DOM0: "/var/run/sys-usb-input.sock",
         Cles.CHEMIN_FICHIERS_PID: "/tmp",        
         Cles.CHEMIN_MONTAGE_USB: "/media/usb", #/mnt
         Cles.DEPOT_LOCAL: "depot_local",
         Cles.ACTIVE_JOURNAL_LOCAL: True,
         "chemin_fichier_config_global": "/etc/psec/global.conf",
-        Cles.NOM_DOMAINE_GUI: "gui",
+        Cles.NOM_DOMAINE_GUI: "sys-gui",
         Cles.BENCHMARK_INPUTS_ITERATIONS: 1000,
-        Cles.CHEMIN_DEPOT_DOM0: "/usr/local/psec/storage",
+        Cles.CHEMIN_DEPOT_DOM0: "/usr/lib/psec/storage",
         Cles.CHEMIN_DEPOT_DOMU: "/mnt/storage"
     }                
 
