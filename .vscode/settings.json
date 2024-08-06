@@ -1,5 +1,5 @@
 {
-    "python.autoComplete.extraPaths": [        
-        "${workspaceFolder}/PSEC/python/lib/src" 
+    "python.analysis.extraPaths": [        
+        "./python/lib/src" 
     ]
 }
