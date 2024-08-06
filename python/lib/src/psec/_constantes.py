@@ -45,7 +45,7 @@ class Domaine:
     """Classe définissant le type de domaine (DomU ou Dom0)"""
     INDEFINI = "indefini"
     DOM0 = "Dom0"
-    SYS_USB = "vm-sys-usb"
+    SYS_USB = "sys-usb"
     GUI = "gui"
     TOUS = "tous"
 

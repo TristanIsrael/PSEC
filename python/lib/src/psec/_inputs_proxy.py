@@ -5,7 +5,7 @@ class InputsProxy(metaclass=SingletonMeta):
     """! La classe InputsProxy agit comme un proxy pour les informations sur les périphériques
     d'entrée
 
-    Les périphériques d'entrée sont raccordés à la VM vm-sys-usb, celle-ci surveille les événements
+    Les périphériques d'entrée sont raccordés à la VM sys-usb, celle-ci surveille les événements
     de la souris, du clavier et de l'interface tactile. Lorsqu'un événement est déclenché par un
     périphérique, les informations sont transmises au Dom0 au travers du canal inputs et traitées
     directement par cette classe.
@@ -46,7 +46,7 @@ class InputsProxy(metaclass=SingletonMeta):
     #
     def __ecoute_socket_vm_sys_usb(self, fichier_socket):
         #Ouvre le flux avec la socket
-        self.journal.debug("Ouvre le canal avec la socket Xenbus {} pour le domaine vm-sys-usb".format(fichier_socket))
+        self.journal.debug("Ouvre le canal avec la socket Xenbus {} pour le domaine sys-usb".format(fichier_socket))
 
         sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         try:            

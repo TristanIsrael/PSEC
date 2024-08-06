@@ -7,12 +7,12 @@ class CommandeFactory():
     L'émetteur de la commande est automatiquement ajouté lors de sa création.
 
     Pour rappel les domaines impliqués dans le socle sont :
-    - vm-sys-usb qui gère les accès aux supports USB
+    - sys-usb qui gère les accès aux supports USB
 
     Les notification sont les suivantes :
     - Le DomU informe le Dom0 qu'il a démarré (DomU -> Dom0)
-    - La vm-sys-usb informe le Dom0 qu'un support USB a été connecté (DomU -> Dom0)
-    - La vm-sys-usb informe le Dom0 qu'un support USB a été déconnecté (DomU -> Dom0)
+    - La sys-usb informe le Dom0 qu'un support USB a été connecté (DomU -> Dom0)
+    - La sys-usb informe le Dom0 qu'un support USB a été déconnecté (DomU -> Dom0)
 
     Les commandes sont les suivantes :
     - Journalisation
@@ -26,10 +26,10 @@ class CommandeFactory():
       - Le DomU demande le niveau de charge de la batterie (DomU -> Dom0)
       - Le DomU demande l'état de l'alimentation secteur (DomU -> Dom0)
     - Fichiers
-      - Le DomU demande la liste des fichiers d'un support USB (DomU -> Dom0 ; Dom0 -> vm-sys-usb)
-      - Le DomU demande la création d'une archive sécurisée sur le support USB de sortie (DomU -> Dom0 ; Dom0 -> vm-sys-usb)
-      - Le DomU demande l'ajout d'un fichier à l'archive sécurisée sur le support USB de sortie (DomU -> Dom0 ; Dom0 -> vm-sys-usb)
-      - Le DomU demande la copie d'un fichier (DomU -> Dom0 ; Dom0 -> vm-sys-usb)      
+      - Le DomU demande la liste des fichiers d'un support USB (DomU -> Dom0 ; Dom0 -> sys-usb)
+      - Le DomU demande la création d'une archive sécurisée sur le support USB de sortie (DomU -> Dom0 ; Dom0 -> sys-usb)
+      - Le DomU demande l'ajout d'un fichier à l'archive sécurisée sur le support USB de sortie (DomU -> Dom0 ; Dom0 -> sys-usb)
+      - Le DomU demande la copie d'un fichier (DomU -> Dom0 ; Dom0 -> sys-usb)      
     - Notifications
       - Le DomU notifie l'appui sur une touche de clavier (DomU -> Dom0 -> *)
       - Le DomU notifie l'appui sur un bouton de souris (DomU -> Dom0 -> *)

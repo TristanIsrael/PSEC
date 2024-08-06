@@ -79,7 +79,7 @@ class MessagerieDom0(metaclass=SingletonMeta):
             for fichier in fichiers:
                 if fichier not in self.sockets_xenbus:
                     threading.Thread(target=self.__connecte_interface_xenbus, args=(fichier,)).start()
-            # On attend quelque secondes avant de reboucler
+            # On attend quelques secondes avant de reboucler
             time.sleep(5)
 
     def __chemin_sockets(self):

@@ -6,9 +6,9 @@ import logging, threading
 from multiprocessing import Pool
 
 class ControleurVmSysUsb():
-    """ Cette classe traite les messages échangés par la vm-sys-usb avec le Dom0 ou les autres domaines. """
+    """ Cette classe traite les messages échangés par la sys-usb avec le Dom0 ou les autres domaines. """
 
-    journal = Journal("Contrôleur vm-sys-usb")
+    journal = Journal("Contrôleur sys-usb")
     pool_tasks = Pool()
     #files_copy_list = []
 
@@ -19,7 +19,7 @@ class ControleurVmSysUsb():
         self.pool_tasks.terminate()
 
     def demarre(self):
-        self.journal.info("Démarrage du Contrôleur du domaine vm-sys-usb")
+        self.journal.info("Démarrage du Contrôleur du domaine sys-usb")
 
         # Démarrage de la messagerie
         MessagerieDomu().set_message_callback(self.__on_message_recu)
