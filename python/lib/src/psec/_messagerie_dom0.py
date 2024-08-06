@@ -21,8 +21,8 @@ class MessagerieDom0(metaclass=SingletonMeta):
     """
 
     #chemin_socket_locale = None
-    sockets_xenbus = {}
-    buffers_xenbus = {}
+    sockets_xenbus = []
+    buffers_xenbus = []
     socket_locale = None   
     recv_buffer = bytearray() 
     journal = Journal("MessagerieDom0")
@@ -75,7 +75,8 @@ class MessagerieDom0(metaclass=SingletonMeta):
         while True:            
             fichiers = glob.glob(chemin_sockets)        
             if len(fichiers) == 0:
-                self.journal.info("Aucun canal de messagerie n'est ouvert actuellement")
+                self.journal.info("No messaging socket available")
+                self.sockets_xenbus.clear()
             for fichier in fichiers:
                 if fichier not in self.sockets_xenbus:
                     threading.Thread(target=self.__connecte_interface_xenbus, args=(fichier,)).start()
@@ -97,10 +98,11 @@ class MessagerieDom0(metaclass=SingletonMeta):
         if self.sockets_xenbus.get(nom_domaine) != None:
             return # Nous avons déjà une socket pour ce domaine
 
-        self.journal.debug("Ouvre le flux avec la socket Xenbus {} pour le domaine {}".format(fichier_socket, nom_domaine))
+        self.journal.debug("Try to connect to messaging socket {} for domain {}".format(fichier_socket, nom_domaine))
 
         sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         self.sockets_xenbus[nom_domaine] = sock
+        self.journal.debug("Messaging socket to domain {} is open".format(nom_domaine))
         try:            
             sock.connect(fichier_socket)  
             recv_buffer = bytearray()                      
@@ -141,7 +143,8 @@ class MessagerieDom0(metaclass=SingletonMeta):
 
                         self.__traite_prochain_message()
         except socket.error:
-            self.journal.error("Impossible d'ouvrir la socket %s" % fichier_socket)
+            self.journal.error("Connection lost to messaging socket {}".format(fichier_socket))
+            self.sockets_xenbus.remove(nom_domaine)
 
     def __traite_prochain_message(self):
         self.journal.debug("Dépile les messages ({} restant)".format(len(self.messages_recus)))

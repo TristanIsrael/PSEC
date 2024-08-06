@@ -17,66 +17,102 @@ class InputsProxy(metaclass=SingletonMeta):
     """
 
     journal = Journal("InputsProxy")
-    socket_gui = None
-    #messages_recus = []
+    sys_gui_socket = None
+    sys_usb_socket = None
     domaine_gui = Domaine.INDEFINI
 
     def demarre(self):
-        self.journal.info("Démarrage du proxy inputs")
+        self.journal.info("Starting I/O proxy")
 
         # On vérifie qu'un domaine GUI a bien été défini
         self.domaine_gui = Parametres().parametre(Cles.NOM_DOMAINE_GUI)
         if self.domaine_gui == None:
-            self.journal.warn("Aucun domaine GUI défini. Le proxy ne sera pas démarré")
+            self.journal.warn("No GUI domain defined, cancel.")
             return        
         
-        chemin_socket = Parametres().parametre(Cles.CHEMIN_SOCKET_INPUT_DOM0)
-        if not os.path.exists(chemin_socket):
-            self.journal.warn("Le fichier socket {} n'existe pas".format(chemin_socket))
-            return
+        threading.Thread(target=self.__monitor_gui_io_socket).start()
+        threading.Thread(target=self.__monitor_usb_io_socket).start()        
+        
+    def __monitor_gui_io_socket(self):       
+        self.journal.debug("Start monitoring GUI I/O socket") 
 
-        if not self.__ouvre_socket_gui():
-            self.journal.warn("La socket vers la GUI n'a pas pu être ouverte.")
-            return
+        while True:            
+            if self.sys_gui_socket is not None:
+                # The socket is already opened
+                time.sleep(1)
+                continue            
 
-        threading.Thread(target=self.__ecoute_socket_vm_sys_usb, args=(chemin_socket,)).start()   
+            if not self.__ouvre_socket_gui():
+                self.journal.warn("The I/O socket with GUI domain could not be opened.")
+                time.sleep(1)
+                continue
+
+    def __monitor_usb_io_socket(self):
+        self.journal.debug("Start monitoring USB I/O socket") 
+
+        chemin_socket_usb = Parametres().parametre(Cles.CHEMIN_SOCKET_INPUT_DOM0)
+        while True:
+            if self.sys_usb_socket is not None:
+                # A connexion already exists
+                time.sleep(1)
+                continue
+
+            if self.sys_gui_socket is None:
+                self.journal.debug("... wait for GUI I/O socket to be ready")
+                time.sleep(1)
+                continue
+
+            if not os.path.exists(chemin_socket_usb):
+                self.journal.warn("... The socket file {} does not exist".format(chemin_socket_usb))
+                time.sleep(1)
+                continue
+            else:
+                threading.Thread(target=self.__ecoute_socket_vm_sys_usb, args=(chemin_socket_usb,)).start()
 
     ##
     # Fonctions privées
     #
     def __ecoute_socket_vm_sys_usb(self, fichier_socket):
         #Ouvre le flux avec la socket
-        self.journal.debug("Ouvre le canal avec la socket Xenbus {} pour le domaine sys-usb".format(fichier_socket))
+        self.journal.debug("Open the I/O socket {} with DomD sys-usb".format(fichier_socket))
 
         sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         try:            
             sock.connect(fichier_socket)  
-            self.journal.debug("La socket vers le domaine sys-usb est ouverte")
-            recv_buffer = bytearray()
+            self.sys_usb_socket = sock
+            self.journal.debug("The I/O socket is opened with DomD sys-usb")
+            #recv_buffer = bytearray()
 
             while(True):
-                #taille = Parametres().parametre(Cles.TAILLE_TRAME)
                 data = sock.recv(128)
 
                 if data:
                     #self.journal.debug("Données reçues depuis le Xenbus : {0}".format(data))                    
                     # On recopie directement sur le port de la GUI
-                    self.socket_gui.send(data)
+                    try:
+                        self.sys_gui_socket.send(data)
+                    except:
+                        self.journal.error("Connection error with I/O socket {}".format(fichier_socket))            
+                        self.sys_gui_socket = None
+                        return
                         
         except socket.error:
-            self.journal.error("Impossible d'ouvrir la socket %s" % fichier_socket)
+            self.journal.error("Could not open connection with I/O socket {}".format(fichier_socket))
+            self.sys_usb_socket = None
 
     def __ouvre_socket_gui(self):
         #Ouvre le flux avec la socket
         chemin_fichier = "{}/{}-input.sock".format(Parametres().parametre(Cles.CHEMIN_SOCKETS_DOM0), self.domaine_gui)
-        self.journal.debug("Ouvre le canal avec la socket Xenbus {} pour le domaine {}".format(chemin_fichier, self.domaine_gui))
+        self.journal.debug("Open I/O socket {} to domain {}".format(chemin_fichier, self.domaine_gui))
 
         sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 
         try:            
             sock.connect(chemin_fichier)
-            self.socket_gui = sock
+            self.journal.debug("The I/O socket is opened with GUI domain")
+            self.sys_gui_socket = sock
             return True
         except:
-            self.journal.warn("La socket {} n'a pas pu être ouverte".format(chemin_fichier))
+            self.journal.warn("The I/O socket {} could not be opened".format(chemin_fichier))
+            self.sys_usb_socket = None
             return False
