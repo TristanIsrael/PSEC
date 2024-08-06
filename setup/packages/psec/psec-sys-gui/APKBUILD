@@ -15,14 +15,8 @@ install=""
 subpackages=""
 replaces=""
 options="!check"  # no tests provided
-psec_branch="1.0"
-giturl="https://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@github.com/tibsys/psec"
-
-prepare() {
-    mkdir -p "$builddir"
-    cd "$builddir"
-    git clone "$giturl" .
-}
+source="modules"
 
 package() {  
+    install -D -m644 "$srcdir"/modules "$pkgdir/etc/modules"
 }
