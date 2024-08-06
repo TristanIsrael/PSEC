@@ -1,4 +1,4 @@
-import sys, glob, threading, serial
+import sys, glob, threading, serial, time
 from typing import Optional
 from evdev import InputDevice, ecodes
 from . import Journal, Mouse, MouseButton, MouseWheel, Parametres, Cles, SingletonMeta
@@ -22,14 +22,15 @@ class DemonInputs(metaclass=SingletonMeta):
     
     """    
 
-    journal = Journal("Démon entrées")
+    journal = Journal("Input daemon")
     mouse = Mouse()    
     chemin_socket_xenbus = None
     interface_xenbus_prete = False
     socket_xenbus = None
+    monitored_inputs = []
     
     def demarre(self):
-        self.journal.info("Démarrage du démon de surveillance des entrées")
+        self.journal.info("Starting input daemon")
         
         # On démarre la messagerie si elle ne l'est pas déjà
         self.chemin_socket_xenbus = Parametres().parametre(Cles.CHEMIN_SOCKET_INPUT_DOMU)
@@ -99,48 +100,72 @@ class DemonInputs(metaclass=SingletonMeta):
         self.__envoie_evenement_souris()
 
     def __recherche_souris(self):
-        self.journal.info("Recherche d'une souris")
-        inputs = glob.glob("/dev/input/event*")
-        for input in inputs:
-            self.journal.debug("Fichier {}".format(input))            
-            dev = InputDevice(input)
-            type_input = self.__type_entree(dev)
-            if type_input == TypeEntree.SOURIS:
-                threading.Thread(target= self.__surveille_souris, args=(dev,)).start()
+        # This function is ran in a specific thread
+        self.journal.info("Looking for a mouse...")
+
+        while True:
+            inputs = glob.glob("/dev/input/event*")
+            for input in inputs:
+                #self.journal.debug("Fichier {}".format(input))
+                try:
+                    dev = InputDevice(input)
+                    type_input = self.__type_entree(dev)
+                    if type_input == TypeEntree.SOURIS and input not in self.monitored_inputs:
+                        threading.Thread(target= self.__surveille_souris, args=(dev,)).start()
+                        self.monitored_inputs.append(input)
+                except:
+                    pass # Ignore all errors silently
+            
+            # Wait a little and start over
+            time.sleep(0.5)
 
     def __recherche_tactile(self):
-        self.journal.info("Recherche d'un écran tactile")
-        inputs = glob.glob("/dev/input/event*")
-        for input in inputs:
-            self.journal.debug("Fichier {}".format(input))            
-            dev = InputDevice(input)
-            type_input = self.__type_entree(dev)
-            if type_input == TypeEntree.TOUCH:
-                # On récupère les valeurs max x et y pour connaître la résolution
-                caps = dev.capabilities()
-                self.mouse.max_x = caps[ecodes.EV_ABS][ecodes.ABS_X][1].max
-                self.mouse.max_y = caps[ecodes.EV_ABS][ecodes.ABS_Y][1].max
+        self.journal.info("Looking for a touchscreen...")
 
-                threading.Thread(target= self.__surveille_tactile, args=(dev,)).start()
+        while True:
+            inputs = glob.glob("/dev/input/event*")
+            for input in inputs:
+                #self.journal.debug("Fichier {}".format(input))  
+                
+                try:          
+                    dev = InputDevice(input)
+                    type_input = self.__type_entree(dev)
+                    if type_input == TypeEntree.TOUCH and input not in self.monitored_inputs:
+                        # On récupère les valeurs max x et y pour connaître la résolution
+                        caps = dev.capabilities()
+                        self.mouse.max_x = caps[ecodes.EV_ABS][ecodes.ABS_X][1].max
+                        self.mouse.max_y = caps[ecodes.EV_ABS][ecodes.ABS_Y][1].max
+
+                        threading.Thread(target= self.__surveille_tactile, args=(dev,)).start()
+                        self.monitored_inputs.append(input)
+                except:
+                    pass # Ignore all errors silently
+
+            # Wait a little and start over
+            time.sleep(0.5)
 
     def __surveille_souris(self, input):
-        self.journal.info("Surveille la souris {}".format(input.name))
+        self.journal.info("Monitor the mouse {}".format(input.name))
 
-        for event in input.read_loop():
-            if event.type == ecodes.EV_REL and (event.code == ecodes.REL_X or event.code == ecodes.REL_Y):
-                axe = event.code
-                delta = event.value
-                self.__on_move(axe, delta)
-            elif event.type == ecodes.EV_REL and (event.code == ecodes.REL_WHEEL):
-                delta = event.value
-                self.__on_wheel(delta)
-            elif event.type == ecodes.EV_KEY:
-                bouton = event.code
-                etat = event.value
-                self.__on_click(bouton, etat)
+        try:
+            for event in input.read_loop():
+                if event.type == ecodes.EV_REL and (event.code == ecodes.REL_X or event.code == ecodes.REL_Y):
+                    axe = event.code
+                    delta = event.value
+                    self.__on_move(axe, delta)
+                elif event.type == ecodes.EV_REL and (event.code == ecodes.REL_WHEEL):
+                    delta = event.value
+                    self.__on_wheel(delta)
+                elif event.type == ecodes.EV_KEY:
+                    bouton = event.code
+                    etat = event.value
+                    self.__on_click(bouton, etat)
+        except:
+            self.journal.debug("The mouse {} is not available anymore".format(input.name))
+            self.monitored_inputs.remove(input.path)
 
-    def __surveille_tactile(self, input):
-        self.journal.info("Surveille l'écran tactile {}".format(input.name))
+    def __surveille_tactile(self, input):        
+        self.journal.info("Monitor the touchscreen {}".format(input.name))
 
         last_abs_x = -1
         last_abs_y = -1
@@ -149,52 +174,56 @@ class DemonInputs(metaclass=SingletonMeta):
         touchBegan = False
         nbPos = 0        
 
-        for event in input.read_loop():
-            # Dans l'ordre, les événements reçus sont :
-            # - BTN_TOUCH = 1
-            # - ABS_X
-            # - ABS_Y
-            # - BTN_TOUCH = 0
-            # 
-            # La surface tactile a sa propre résolution. La position du point peut être calculée
-            # grâce à une règle de 3 prenant en compte la valeur max de ABS_MT_POSITION_X ou ABS_MT_POSITION_Y
-            # par l'application contrôleur ayant connaissance de la résolution de l'écran.
-            # Cette valeur max doit être transmise avec les coordonnées du toucher.
-            if event.type != ecodes.EV_ABS and event.type != ecodes.EV_KEY:
-                continue                
-            elif event.type == ecodes.EV_ABS and event.code == ecodes.ABS_MT_POSITION_X: # ABS_MT_POSITION_X arrive avant le BTN_TOUCH
-                abs_x = event.value                    
-            elif event.type == ecodes.EV_ABS and event.code == ecodes.ABS_MT_POSITION_Y:
-                abs_y = event.value                    
-            elif event.type == ecodes.EV_KEY and event.code == ecodes.BTN_TOUCH:
-                if event.value == 1:
-                    touchBegan = True             
-                else:
-                    #self.touchEnd.emit( QPoint(int(abs_x), int(abs_y)), QSize(int(max_x), int(max_y)) )
-                    # On envoie un premier signal pour la position du toucher
-                    diff_x = last_abs_x - abs_x
-                    diff_y = last_abs_y - abs_y
-                    if diff_x != 0:
-                        self.__on_move(ecodes.REL_X, diff_x)
-                    if diff_y != 0:
-                        self.__on_move(ecodes.REL_Y, diff_y)
+        try:
+            for event in input.read_loop():
+                # Dans l'ordre, les événements reçus sont :
+                # - BTN_TOUCH = 1
+                # - ABS_X
+                # - ABS_Y
+                # - BTN_TOUCH = 0
+                # 
+                # La surface tactile a sa propre résolution. La position du point peut être calculée
+                # grâce à une règle de 3 prenant en compte la valeur max de ABS_MT_POSITION_X ou ABS_MT_POSITION_Y
+                # par l'application contrôleur ayant connaissance de la résolution de l'écran.
+                # Cette valeur max doit être transmise avec les coordonnées du toucher.
+                if event.type != ecodes.EV_ABS and event.type != ecodes.EV_KEY:
+                    continue                
+                elif event.type == ecodes.EV_ABS and event.code == ecodes.ABS_MT_POSITION_X: # ABS_MT_POSITION_X arrive avant le BTN_TOUCH
+                    abs_x = event.value                    
+                elif event.type == ecodes.EV_ABS and event.code == ecodes.ABS_MT_POSITION_Y:
+                    abs_y = event.value                    
+                elif event.type == ecodes.EV_KEY and event.code == ecodes.BTN_TOUCH:
+                    if event.value == 1:
+                        touchBegan = True             
+                    else:
+                        #self.touchEnd.emit( QPoint(int(abs_x), int(abs_y)), QSize(int(max_x), int(max_y)) )
+                        # On envoie un premier signal pour la position du toucher
+                        diff_x = last_abs_x - abs_x
+                        diff_y = last_abs_y - abs_y
+                        if diff_x != 0:
+                            self.__on_move(ecodes.REL_X, diff_x)
+                        if diff_y != 0:
+                            self.__on_move(ecodes.REL_Y, diff_y)
 
-                    abs_x = -1
-                    abs_y = -1
-                    nbPos = 0                    
-            
-            # Si les positions x et y sont connues on peut envoyer un signal de début ou de mise
-            # à jour du toucher
-            if abs_x > -1 and abs_y > -1:
-                if nbPos > 1:
-                    if abs_x != last_abs_x or abs_y != last_abs_y:
-                        self.touchUpdate.emit( QPoint(int(abs_x), int(abs_y)), QSize(int(max_x), int(max_y)) )
-                        last_abs_x = abs_x
-                        last_abs_y = abs_y
-                elif touchBegan is True:
-                    self.touchBegin.emit( QPoint(int(abs_x), int(abs_y)), QSize(int(max_x), int(max_y)) )  
-                    touchBegan = False
-                nbPos += 1   
+                        abs_x = -1
+                        abs_y = -1
+                        nbPos = 0                    
+                
+                # Si les positions x et y sont connues on peut envoyer un signal de début ou de mise
+                # à jour du toucher
+                if abs_x > -1 and abs_y > -1:
+                    if nbPos > 1:
+                        if abs_x != last_abs_x or abs_y != last_abs_y:
+                            self.touchUpdate.emit( QPoint(int(abs_x), int(abs_y)), QSize(int(max_x), int(max_y)) )
+                            last_abs_x = abs_x
+                            last_abs_y = abs_y
+                    elif touchBegan is True:
+                        self.touchBegin.emit( QPoint(int(abs_x), int(abs_y)), QSize(int(max_x), int(max_y)) )  
+                        touchBegan = False
+                    nbPos += 1   
+        except:
+            self.journal.debug("The touchscreen {} is not available anymore".format(input.name))
+            self.monitored_inputs.remove(input.path)
 
     #def __recherche_claviers(self):
     #    self.journal.info("Recherche d'un clavier")
@@ -229,16 +258,16 @@ class DemonInputs(metaclass=SingletonMeta):
     
     def __connecte_interface_xenbus(self) -> bool:
         #Ouvre le flux avec la socket
-        self.journal.debug("Ouvre le flux avec le port série Xenbus %s" % self.chemin_socket_xenbus)
+        self.journal.debug("Open Xenbus I/O channel {}".format(self.chemin_socket_xenbus))
 
         try:
             self.socket_xenbus = serial.Serial(port= self.chemin_socket_xenbus)
             self.interface_xenbus_prete = True            
-            self.journal.info("Le canal d'entrées du domaine {} est ouvert".format(Parametres().identifiant_domaine()))  
+            self.journal.info("Xenbus I/O channel {} is open".format(Parametres().identifiant_domaine()))  
             return True          
         except serial.SerialException as e:
             self.socket_xenbus = None            
-            self.journal.error("Impossible de se connecter au port série %s" % self.chemin_socket_xenbus)
+            self.journal.error("Impossible to open the serial port {}".format(self.chemin_socket_xenbus))
             self.journal.error(e)
             return False
         
