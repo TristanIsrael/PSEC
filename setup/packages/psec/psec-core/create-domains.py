@@ -56,9 +56,9 @@ class DomainsFactory:
 
         memory = 1024
         json_gui = self.topology.get("gui")
-        if json_gui is not None:
+        if json_gui != None:
             json_memory = json_gui.get("app-memory")
-            if json_memory is not None:
+            if json_memory != None:
                 memory = json_memory
 
         conf = self.__create_new_domain(
@@ -150,7 +150,7 @@ disk = [
         if len(channels) > 0:
             txt += "channel = [\n{}\n]\n".format(",\n".join(channels))        
         
-        if pci_passthrough is not None and vga_passthrough is not None:
+        if pci_passthrough != None and vga_passthrough != None:
             parser=ConfigParser()
             with open("/etc/conf.d/xen-pci") as stream:
                 parser.read_string("[none]\n" +stream.read())
