@@ -28,7 +28,7 @@ done
 _pciusb=`echo $pciusb | sed "s/ / /g"`
 
 source /etc/conf.d/xen-pci
-rm -f /tmp/xen-pci
+rm -f /usr/lib/psec/tmp/xen-pci
 #head -n -1 /etc/conf.d/xen-pci > /tmp/xen-pci
 if [ -n "$DEVICES" ]
 then 
@@ -44,5 +44,5 @@ then
 fi
 
 mv /etc/conf.d/xen-pci /etc/conf.d/xen-pci.orig
-mv /tmp/xen-pci /etc/conf.d/xen-pci
+mv /usr/lib/psec/tmp/xen-pci /etc/conf.d/xen-pci
 

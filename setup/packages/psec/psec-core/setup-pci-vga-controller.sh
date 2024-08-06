@@ -26,15 +26,15 @@ for f in `lspci | grep "$PCI_VGA_LABEL" | cut -d " " -f 1`; do
 done
 
 source /etc/conf.d/xen-pci
-rm -f /tmp/xen-pci
+rm -f /usr/lib/psec/tmp/xen-pci
 
-echo "VGA_DEVICES=\"$pciusb\"" >> /tmp/xen-pci
+echo "VGA_DEVICES=\"$pciusb\"" >> /usr/lib/psec/tmp/xen-pci
 
 # Restore USB settings
 if [ -n "$DEVICES" ]
 then
-    echo "DEVICES=\"$DEVICES\"" >> /tmp/xen-pci
+    echo "DEVICES=\"$DEVICES\"" >> /usr/lib/psec/tmp/xen-pci
 fi 
 
 mv /etc/conf.d/xen-pci /etc/conf.d/xen-pci.orig
-mv /tmp/xen-pci /etc/conf.d/xen-pci
+mv /usr/lib/psec/tmp/xen-pci /etc/conf.d/xen-pci

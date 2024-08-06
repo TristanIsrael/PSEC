@@ -27,7 +27,7 @@ fi
 
 echo "... Download boot files (kernel, initrd)"
 mkdir -p /var/lib/xen/boot
-mkdir -p /tmp/alpine-virt
+mkdir -p /usr/lib/psec/tmp/alpine-virt
 modprobe iso9660
 mount -o loop $ALPINE_ISO_LOCAL /media/cdrom
 cp /media/cdrom/boot/vmlinuz-virt /var/lib/xen/boot
