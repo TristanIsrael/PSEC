@@ -77,8 +77,8 @@ class Constantes(metaclass=SingletonMeta):
         Cles.TAILLE_TRAME: 1024,
         # Journalisations
         Cles.CHEMIN_JOURNAL_LOCAL: "/var/log/psec/psec.log",
-        "format_chaine_log_prod": '%(asctime)s %(levelname)-8s %(domaine)-10s [%(name)-20s] %(message)s',
-        "format_chaine_log_debug": '%(asctime)s %(levelname)-8s %(domaine)-10s [%(name)-20s] %(message)s',
+        "format_chaine_log_prod": '%(asctime)s %(levelname)-8s %(domaine)-10s [%(entite)-20s] %(message)s',
+        "format_chaine_log_debug": '%(asctime)s %(levelname)-8s %(domaine)-10s [%(entite)-20s] %(message)s',
         Cles.CHEMIN_PORT_JOURNAL_DOMU: "/dev/hvc2",
         Cles.CHEMIN_SOCKETS_JOURNAL: "/var/run",
         Cles.CHEMIN_SOCKETS_MESSAGERIE: "/var/run",

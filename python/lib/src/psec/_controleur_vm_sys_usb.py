@@ -1,6 +1,13 @@
 from . import Constantes, Parametres, MessagerieDomu, Message, TypeMessage, Commande
 from . import TypeCommande, FichierHelper, ReponseFactory, ErreurFactory
-from . import DemonInputs, Journal, Domaine, ControleurBenchmark, Cles, BenchmarkId
+from . import Journal, Domaine, Cles, BenchmarkId
+try:
+    from . import DemonInputs
+    from . import ControleurBenchmark
+    NO_INPUTS_MONITORING = False
+except:
+    NO_INPUTS_MONITORING = True
+    print("Importing ControleurVmSysUsb without inputs monitoring nor benchmarking capacity")
 from . import NotificationFactory, FichierHelper
 import logging, threading
 from multiprocessing import Pool
@@ -8,25 +15,26 @@ from multiprocessing import Pool
 class ControleurVmSysUsb():
     """ Cette classe traite les messages échangés par la sys-usb avec le Dom0 ou les autres domaines. """
 
-    journal = Journal("Contrôleur sys-usb")
-    pool_tasks = Pool()
+    journal = Journal("Sys-usb controller")
+    pool_tasks = None
     #files_copy_list = []
 
     def __init__(self):
-        pass
+        self.pool_tasks = Pool()
 
     def __del__(self):
         self.pool_tasks.terminate()
 
-    def demarre(self):
+    def demarre(self, serial_port:str = ""):
         self.journal.info("Démarrage du Contrôleur du domaine sys-usb")
 
         # Démarrage de la messagerie
         MessagerieDomu().set_message_callback(self.__on_message_recu)
-        MessagerieDomu().demarre()
+        MessagerieDomu().demarre(force_serial_port= serial_port)
 
         # Démarrage de la surveillance des entrées
-        threading.Thread(target= self.__demarre_surveillance_entrees).start()
+        if NO_INPUTS_MONITORING != True:
+            threading.Thread(target= self.__demarre_surveillance_entrees).start()
 
     def __demarre_surveillance_entrees(self):
         DemonInputs().demarre()

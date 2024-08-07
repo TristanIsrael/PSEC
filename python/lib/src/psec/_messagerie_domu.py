@@ -40,12 +40,18 @@ class MessagerieDomu(metaclass=SingletonMeta):
             self.journal.debug("Utilisation d'une fonction de callback")
             self.message_callback = message_callback            
 
-    def demarre(self, demon = False):    
+    def demarre(self, demon = False, force_serial_port = ""):    
+        self.journal.debug("Starting DomU messaging")
+            
         if self.messagerie_demarree:
             self.journal.info("La messagerie est déjà démarrée")
             return 
         
-        self.chemin_socket_xenbus = Parametres().parametre(Cles.CHEMIN_SOCKET_MSG)
+        if force_serial_port == "":
+            self.chemin_socket_xenbus = Parametres().parametre(Cles.CHEMIN_SOCKET_MSG)
+        else:
+            self.chemin_socket_xenbus = force_serial_port
+
         th = threading.Thread(target=self.__connecte_interface_xenbus)
         th.daemon = demon
         th.start()

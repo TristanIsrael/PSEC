@@ -15,7 +15,7 @@ export ALPINE_PUBLIC_RELEASES_REPOSITORY="$ALPINE_PUBLIC_ROOT/v$ALPINE_VERSION/r
 ALPINE_RELEASE=`cat /etc/alpine-release`
 ARCH=`uname -m`
 RELEASES_ALPINE="$ALPINE_PUBLIC_ROOT/v$ALPINE_VERSION/releases"
-export ALPINE_ISO_URL="$RELEASES_ALPINE/$ARCH/alpine-virt-$ALPINE_RELEASE-$ARCH.iso"
-export ALPINE_ISO_LOCAL=/var/lib/xen/images/alpine-virt.iso
+export ALPINE_ISO_URL="$RELEASES_ALPINE/$ARCH/alpine-standard-$ALPINE_RELEASE-$ARCH.iso"
+export ALPINE_ISO_LOCAL=/var/lib/xen/images/alpine-standard.iso
 
 export LOCAL_PGP_PUBKEY=/etc/apk/keys/local.rsa.pub

@@ -98,6 +98,7 @@ class InputsProxy(metaclass=SingletonMeta):
                         
         except socket.error:
             self.journal.error("Could not open connection with I/O socket {}".format(fichier_socket))
+            self.journal.error(socket.error.strerror) 
             self.sys_usb_socket = None
 
     def __ouvre_socket_gui(self):
