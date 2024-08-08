@@ -126,5 +126,9 @@ Temporary Items
 *.pyc
 
 # Python
-py3-venv
+.venv
 dist/*.tar.gz
+
+### VisualStudioCode ###
+!.vscode/settings.json
+!.vscode/launch.json
