@@ -88,6 +88,7 @@ class MockXenbus():
                     self.__journal.debug("Received {} bytes on Dom0 socket for {}".format(len(data), self.__domain_name))
                     self.__journal.debug(data)
                     os.write(self.__domu_serial_port_master, data)
+                    self.__journal.debug("Data writen on master serial port: {}".format(data))
                     #self.__domu_serial_port_master.write(data)
             except Exception as e:
                 self.__journal.debug("Error with the socket")

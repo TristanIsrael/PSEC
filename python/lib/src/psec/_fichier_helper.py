@@ -17,7 +17,7 @@ class FichierHelper():
         with os.scandir(point_montage) as dossiers:
             for dossier in dossiers:
                 if dossier.is_dir():                    
-                    if os.path.ismount(dossier.path):
+                    if True: #os.path.ismount(dossier.path):
                         #print("Disque trouvé : {}".format(dossier.name))
                         disques.append(dossier.name)
 

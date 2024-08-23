@@ -15,7 +15,7 @@ class MessagerieDomu(metaclass=SingletonMeta):
     chemin_socket_xenbus = None
     socket_xenbus = None    
     recv_buffer = bytearray() 
-    journal = Journal("Messagerie DomU")
+    journal = Journal("Messaging")
     message_callback = None
     demarrage_callback = None
     messagerie_demarree = False
@@ -37,14 +37,14 @@ class MessagerieDomu(metaclass=SingletonMeta):
 
     def set_message_callback(self, message_callback):
         if message_callback != None:
-            self.journal.debug("Utilisation d'une fonction de callback")
+            self.journal.debug("Using callback")
             self.message_callback = message_callback            
 
     def demarre(self, demon = False, force_serial_port = ""):    
         self.journal.debug("Starting DomU messaging")
             
         if self.messagerie_demarree:
-            self.journal.info("La messagerie est déjà démarrée")
+            self.journal.warning("Messaging has already been started")
             return 
         
         if force_serial_port == "":
@@ -55,8 +55,6 @@ class MessagerieDomu(metaclass=SingletonMeta):
         th = threading.Thread(target=self.__connecte_interface_xenbus)
         th.daemon = demon
         th.start()
-        #if demon:
-        #    th.join()
 
     def arrete(self):
         if not self.messagerie_demarree:
@@ -69,14 +67,14 @@ class MessagerieDomu(metaclass=SingletonMeta):
 
     def envoie_message_xenbus(self, message : Message):
         if self.socket_xenbus == None:
-            self.journal.error("Le port série Xenbus n'est pas connecté")
+            self.journal.error("Xenbus serial port is not connected")
         else:
-            self.journal.debug(message.to_json())
+            #self.journal.debug(message.to_json())
             self.socket_xenbus.write(message.to_json()+b'\n')
         
     def envoie_erreur_xenbus(self, erreur : dict):                
         msg = json.dumps(erreur, ensure_ascii=False, separators=(',', ':'))
-        self.journal.error("Erreur :")
+        self.journal.error("Error:")
         self.journal.error(msg)
         #self.envoie_message_xenbus(msg)
 
@@ -85,12 +83,12 @@ class MessagerieDomu(metaclass=SingletonMeta):
     #
     def __connecte_interface_xenbus(self):
         #Ouvre le flux avec la socket
-        self.journal.debug("Ouvre le flux avec le port série Xenbus %s" % self.chemin_socket_xenbus)
+        self.journal.debug("Opening Xenbus channel %s" % self.chemin_socket_xenbus)
 
         try:
             self.socket_xenbus = serial.Serial(port= self.chemin_socket_xenbus)
             self.interface_xenbus_prete = True            
-            self.journal.info("La messagerie du domaine {} est démarrée".format(Parametres().identifiant_domaine()))            
+            self.journal.info("Messaging for Domain {} is started".format(Parametres().identifiant_domaine()))            
             self.messagerie_demarree = True
             if self.demarrage_callback != None:
                 self.demarrage_callback()
@@ -99,7 +97,7 @@ class MessagerieDomu(metaclass=SingletonMeta):
                 data = self.socket_xenbus.read_until(b'\n') #Parametres().parametre(Cles.TAILLE_TRAME))
 
                 if data:
-                    self.journal.debug("Données reçues depuis le Xenbus : {0}".format(data))
+                    self.journal.debug("Data received from Xenbus : {0}".format(data))
                     #self.recv_buffer.extend(data)
                     
                     # Il se peut que le message arrive en plusieurs morceaux,
@@ -107,7 +105,7 @@ class MessagerieDomu(metaclass=SingletonMeta):
                     # Il faut donc extraire un message complet et laisser le reste dans le buffer
                     #endl = self.recv_buffer.find(b'\n')
                     #if endl > -1:                    
-                    self.journal.debug("Il y a un message complet...")
+                    self.journal.debug("We have a complete message...")
                         # On extrait le message complet, on le met de côté et on remet le reste dans le buffer
                         #extract = self.recv_buffer[:endl]
                         #self.recv_buffer = self.recv_buffer[endl+1:]
@@ -117,15 +115,15 @@ class MessagerieDomu(metaclass=SingletonMeta):
                         #j = json.loads(data)
                         self.__traite_donnees_xenbus(data)                            
                     except Exception as e:
-                        self.journal.error("Erreur : Le message ne peut pas être décodé.")
+                        self.journal.error("Error: The message could not be decoded.")
                         self.journal.error(data.decode())
                         self.journal.error(e)
-                        msg = ErreurFactory.genere_erreur(logging.ERROR, "Le message ne peut pas être décodé")
+                        msg = ErreurFactory.genere_erreur(logging.ERROR, "The message could not be decoded")
                         self.envoie_erreur_xenbus(msg)
             
         except socket.error as e:
             self.socket_xenbus = None
-            self.journal.error("Impossible de se connecter au port série %s" % self.chemin_socket_xenbus)
+            self.journal.error("Impossible to conect to serial port %s" % self.chemin_socket_xenbus)
             self.journal.error(e)                    
 
     def __traite_donnees_xenbus(self, message : bytes):
@@ -143,14 +141,14 @@ class MessagerieDomu(metaclass=SingletonMeta):
 
         msg = MessageHelper.cree_message_from_json(message)
         if msg == None:
-            err = ErreurFactory.genere_erreur(logging.ERROR, "Le message est mal formaté")
+            err = ErreurFactory.genere_erreur(logging.ERROR, "The message is not well formed")
             self.envoie_erreur_xenbus(err)
         else:
-            self.journal.debug("Le message a bien été décodé")
-            self.journal.debug(msg.to_json())  
+            self.journal.debug("The message has been decoded")
+            #self.journal.debug(msg.to_json())  
 
             if msg.source == Parametres().parametre(Cles.IDENTIFIANT_DOMAINE):
-                self.journal.debug("Ce message vient d'ici, on l'ignore")
+                self.journal.debug("Message coming from here, we ignore it")
                 return
 
             try:

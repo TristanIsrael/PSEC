@@ -68,6 +68,7 @@ class InputsProxy(metaclass=SingletonMeta):
                 continue
             else:
                 threading.Thread(target=self.__ecoute_socket_vm_sys_usb, args=(chemin_socket_usb,)).start()
+                time.sleep(1)
 
     ##
     # Fonctions privées

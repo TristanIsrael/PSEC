@@ -1,5 +1,6 @@
 import logging, json, threading, socket
-from . import Parametres, Cles, Constantes, CommandeFactory, Message, NotificationFactory, EtatDisque, Journal, MessageHelper, MessagerieDomu
+from . import Parametres, Cles, Constantes, CommandeFactory, Message, NotificationFactory
+from . import EtatDisque, Journal, MessageHelper, MessagerieDomu
 
 class Api():
     """ Cette classe permet à un programme tiers d'envoyer des commandes ou recevoir des 
@@ -31,11 +32,13 @@ class Api():
     def __init__(self, callback_fn = None):
         self.message_callback = callback_fn                
 
-    def demarre(self):
-        self.journal.debug("Démarrage de la messagerie")
+    def demarre(self, force_serial_port = ""):
+        self.journal.debug("Starting messaging")
+
         MessagerieDomu().set_message_callback(self.message_callback)
         MessagerieDomu().set_demarrage_callback(self.ready_callback)
-        threading.Thread(target= MessagerieDomu().demarre, args= (False, )).start()
+
+        threading.Thread(target= MessagerieDomu().demarre, args= (False, force_serial_port, )).start()
 
     def set_message_callback(self, callback_fn):
         self.message_callback = callback_fn

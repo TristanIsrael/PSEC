@@ -48,7 +48,7 @@ class ControleurVmSysUsb():
             threading.Thread(target=self.__traite_commande, args=(message,)).start()        
 
     def __traite_commande(self, commande: Commande):
-        self.journal.debug("Traite une commande")
+        self.journal.debug("Traite la commande {}".format(commande.commande))
 
         if commande.commande == TypeCommande.LISTE_DISQUES:
             self.__get_liste_disques(commande)
@@ -77,8 +77,10 @@ class ControleurVmSysUsb():
     # Traitement des commandes
     #
     def __get_liste_disques(self, commande: Commande):
+        self.journal.debug("Liste des disques demandée")
         # Récupère la liste des points de montage
         disques = FichierHelper.get_liste_disques()
+        print(disques)
 
         # Génère la réponse
         reponse = ReponseFactory.cree_reponse_liste_disques(disques, commande.source)
