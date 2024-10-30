@@ -108,11 +108,13 @@ class NotificationFactory:
         return notif
     
     @staticmethod
-    def cree_notification_nouveau_fichier(filepath:str, disk:str, footprint:str):
+    def cree_notification_nouveau_fichier(source_disk:str, filepath:str, disk:str, footprint:str):
         data = {
+            "source_disk": source_disk,
             "filepath": filepath,
             "disk": disk,
-            "original_footprint": footprint
+            "original_footprint": footprint,
+            "etat": EtatFichier.DISPONIBLE
         }
 
         notif = Notification(TypeEvenement.FICHIER, data)

@@ -73,7 +73,7 @@ class ControleurVmSysUsb():
             filepath = commande.arguments.get("filepath")
             disk = commande.arguments.get("disk")
             contents = commande.arguments.get("contents")
-            self.__get_create_file(filepath, disk, contents, commande.source)
+            self.__create_file(filepath, disk, contents, commande.source)
         elif commande.commande == TypeCommande.LISTE_COMPOSANTS:
             self.__get_component_state(commande.source)
 
@@ -118,7 +118,6 @@ class ControleurVmSysUsb():
         source_disk = commande.arguments.get("nom_disque")        
         source_file = commande.arguments.get("chemin_fichier")
         repository_path = Parametres().parametre(Cles.CHEMIN_DEPOT_DOM0)               
-        source_filepath = "{}/{}/{}".format(Parametres().parametre(Cles.CHEMIN_MONTAGE_USB), source_disk, source_file)        
 
         try:       
             # Création du répertoire de destination si nécessaire
@@ -128,7 +127,7 @@ class ControleurVmSysUsb():
                 os.makedirs("{}/{}".format(repository_path, parent_path), exist_ok= True)
 
             destination = "{}/{}".format(repository_path, parent_path)
-            self.task_runner.run_task(self.__do_copy_file, args=(source_filepath, destination,))
+            self.task_runner.run_task(self.__do_copy_file, args=(source_disk, source_file, destination,))
         except Exception as e:
             print(e)
 
@@ -143,15 +142,18 @@ class ControleurVmSysUsb():
         err = ErreurFactory.genere_erreur(logging.ERROR, erreur)
         MessagerieDomu().envoie_erreur_xenbus(err)
 
-    def __do_copy_file(self, source:str, destination: str):
-        source_footprint = FichierHelper.calculate_footprint(source)
+    def __do_copy_file(self, source_disk:str, filepath:str, destination: str):
+        source_filepath = "{}/{}/{}".format(Parametres().parametre(Cles.CHEMIN_MONTAGE_USB), source_disk, filepath)        
+        source_footprint = FichierHelper.calculate_footprint(source_filepath)
 
-        if FichierHelper.copy_file(source, destination, source_footprint) == True:
-            self.journal.info("Le fichier {} a été copié dans le dépôt. L'empreinte est {}".format(source, source_footprint))
-            # Envoi d'une notification
-            notif = NotificationFactory.cree_notification_nouveau_fichier(source, destination, source_footprint)
+        if FichierHelper.copy_file(source_filepath, destination, source_footprint) == True:
+            self.journal.info("Le fichier {} a été copié dans le dépôt. L'empreinte est {}".format(source_filepath, source_footprint))
+            
+            # Envoi d'une notification pour informer de la présence d'un nouveau fichier
+            notif = NotificationFactory.cree_notification_nouveau_fichier(source_disk= source_disk, filepath= filepath, disk= destination, footprint= source_footprint)
+            MessagerieDomu().envoie_message_xenbus(notif)
         else:
-            self.journal.error("La copie du fichier {} dans le dépôt a échoué.".format(source))
+            self.journal.error("La copie du fichier {} dans le dépôt a échoué.".format(filepath))
 
     def __execute_benchmark(self, id_benchmark:str, source:str):
         if id_benchmark == BenchmarkId.INPUTS:
@@ -173,7 +175,7 @@ class ControleurVmSysUsb():
         reponse.destination = emetteur
         MessagerieDomu().envoie_message_xenbus(reponse)
 
-    def __get_create_file(self, filepath:str, disk:str, contents:bytes, source:str):
+    def __create_file(self, filepath:str, disk:str, contents:bytes, source:str):
         mount_point = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)
         
         complete_filepath = "{}/{}/{}".format(mount_point, disk, filepath)
