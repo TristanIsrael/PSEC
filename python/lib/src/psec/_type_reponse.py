@@ -6,6 +6,7 @@ class TypeReponse:
     BENCHMARK_FILES = "benchmark_files"
     FILE_FOOTPRINT = "file_footprint"
     FILE_CREATION = "file_creation"
+    ETAT_COMPOSANT = "etat_composant"
 
     @staticmethod
     def est_valide(type_reponse):

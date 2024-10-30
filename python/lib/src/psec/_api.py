@@ -24,27 +24,34 @@ class Api():
     callback est la suivante : callback(message : Message) -> None
     """
 
-    ready_callback = None
-    message_callback = None
+    ready_callbacks = list()
+    message_callbacks = list()
     sock = None
     journal = Journal("API")
 
     def __init__(self, callback_fn = None):
-        self.message_callback = callback_fn                
+        if callback_fn is not None:
+            self.message_callbacks.append(callback_fn)
 
     def demarre(self, force_serial_port = ""):
         self.journal.debug("Starting messaging")
 
-        MessagerieDomu().set_message_callback(self.message_callback)
-        MessagerieDomu().set_demarrage_callback(self.ready_callback)
+        MessagerieDomu().set_message_callbacks(self.message_callbacks)
+        MessagerieDomu().set_demarrage_callbacks(self.ready_callbacks)
 
         threading.Thread(target= MessagerieDomu().demarre, args= (False, force_serial_port, )).start()
 
     def set_message_callback(self, callback_fn):
-        self.message_callback = callback_fn
+        if callback_fn is not None:
+            self.message_callbacks.append(callback_fn)
+        else:
+            print("WARNING: callback function is None")
 
     def set_ready_callback(self, callback_fn):
-        self.ready_callback = callback_fn
+        if callback_fn is not None:
+            self.ready_callbacks.append(callback_fn)
+        else:
+            print("WARNING: callback function is None")
 
     ####
     # Fonctions de journalisation
@@ -98,6 +105,10 @@ class Api():
         cmd = CommandeFactory.cree_commande_create_file(filepath, disk, contents)
         self.__envoie_message(cmd)
 
+    def get_components_states(self) -> None:
+        cmd = CommandeFactory.cree_commande_components_list()
+        self.__envoie_message(cmd)
+
     ####
     # Fonctions de notification
     #
@@ -116,5 +127,6 @@ class Api():
         MessagerieDomu().envoie_message_xenbus(message)
 
     def __on_messagerie_ready(self):
-        if self.ready_callback != None:
-            self.ready_callback()
+        if len(self.ready_callbacks) > 0 :
+            for cb in self.ready_callbacks:
+                cb()

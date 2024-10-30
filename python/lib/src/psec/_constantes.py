@@ -65,6 +65,13 @@ class BenchmarkId():
     INPUTS = "inputs"
     FILES = "files"
 
+class EtatComposant():
+    INCONNU = "inconnu"
+    DEMARRAGE = "demarrage"
+    OK = "ok"
+    ERREUR_SYSTEME = "erreur_systeme"
+    ERREUR_LOGICIELLE = "erreur_logicielle"    
+
 class Constantes(metaclass=SingletonMeta):
     """Classe définissant des constantes pour le système"""    
 

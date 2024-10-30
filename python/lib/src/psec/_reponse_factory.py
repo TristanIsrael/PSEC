@@ -1,4 +1,4 @@
-from . import Reponse, TypeReponse, Constantes, Domaine, Parametres, Cles
+from . import Reponse, TypeReponse, Constantes, Domaine, Parametres, Cles, EtatComposant
 
 class ReponseFactory():
     """ La classe ReponseFactory permet de générer les messages en réponse à certaines commandes.    
@@ -8,7 +8,7 @@ class ReponseFactory():
     @staticmethod
     def cree_reponse_liste_disques(liste_disques:list = list(), destination:str = Domaine.TOUS):
         reponse = Reponse(TypeReponse.LISTE_DISQUES, liste_disques)
-        ReponseFactory._ajoute_source(reponse)
+        ReponseFactory.__ajoute_source(reponse)
         reponse.destination = destination
         return reponse
     
@@ -19,7 +19,7 @@ class ReponseFactory():
             "files": liste_fichiers
         }
         reponse = Reponse( TypeReponse.LISTE_FICHIERS, data )
-        ReponseFactory._ajoute_source(reponse)
+        ReponseFactory.__ajoute_source(reponse)
         reponse.destination = destination
         return reponse
 
@@ -30,7 +30,7 @@ class ReponseFactory():
             "iterations": iterations
         }
         reponse = Reponse( TypeReponse.BENCHMARK_INPUTS, data )
-        ReponseFactory._ajoute_source(reponse)
+        ReponseFactory.__ajoute_source(reponse)
         reponse.destination = emetteur
         return reponse
 
@@ -40,7 +40,7 @@ class ReponseFactory():
             "etat": "demarre"
         }
         reponse = Reponse( TypeReponse.BENCHMARK_FILES, data )
-        ReponseFactory._ajoute_source(reponse)
+        ReponseFactory.__ajoute_source(reponse)
         reponse.destination = emetteur
         return reponse
     
@@ -51,7 +51,7 @@ class ReponseFactory():
             "metrics": metrics
         }
         reponse = Reponse( TypeReponse.BENCHMARK_FILES, data )
-        ReponseFactory._ajoute_source(reponse)
+        ReponseFactory.__ajoute_source(reponse)
         reponse.destination = emetteur
         return reponse
 
@@ -62,7 +62,7 @@ class ReponseFactory():
             "message": erreur
         }
         reponse = Reponse( TypeReponse.BENCHMARK_FILES, data )
-        ReponseFactory._ajoute_source(reponse)
+        ReponseFactory.__ajoute_source(reponse)
         reponse.destination = emetteur
         return reponse
     
@@ -74,21 +74,34 @@ class ReponseFactory():
             "footprint": footprint
         }
         reponse = Reponse( TypeReponse.FILE_FOOTPRINT, data)
-        ReponseFactory._ajoute_source(reponse)
+        ReponseFactory.__ajoute_source(reponse)
         return reponse
     
     @staticmethod
-    def cree_reponse_create_file(filepath:str, disk:str, footprint:str, success:bool):
+    def cree_reponse_create_file(filepath:str, disk:str, footprint:str, success:bool) -> Reponse:
         data = {
             "filepath": filepath,
             "disk": disk,
             "footprint": footprint,
             "success": success
         }
-        reponse = Reponse( TypeReponse.FILE_CREATION, data)
-        ReponseFactory._ajoute_source(reponse)
+        reponse = Reponse( TypeReponse.FILE_CREATION, data )
+        ReponseFactory.__ajoute_source(reponse)
         return reponse
-       
+
     @staticmethod
-    def _ajoute_source(reponse):
+    def cree_reponse_etat_composant(nom:str, etat:EtatComposant) -> Reponse:
+        data = {
+            "composant": nom,
+            "etat": etat
+        }
+        reponse = Reponse( TypeReponse.ETAT_COMPOSANT, data )
+        ReponseFactory.__ajoute_source(reponse)
+        return reponse
+
+    ########
+    ## Méthodes privées
+    ##
+    @staticmethod
+    def __ajoute_source(reponse:Reponse) -> None:
         reponse.source = Parametres().parametre(Cles.IDENTIFIANT_DOMAINE)

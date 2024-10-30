@@ -1,2 +1,4 @@
-PySide6
 pyserial
+joblib
+humanize
+watchdog

@@ -1,4 +1,5 @@
 from . import Parametres, Cles, Constantes
+from pathlib import Path
 import os, hashlib, subprocess
 
 class FichierHelper():   
@@ -92,13 +93,19 @@ class FichierHelper():
 
     @staticmethod
     def calculate_footprint(filepath:str) -> str:
-        with open(filepath, "rb") as f:            
-            hash = hashlib.file_digest(f, Constantes.FOOTPRINT_METHOD)
-            return hash.hexdigest()                
+        try:
+            with open(filepath, "rb") as f:            
+                hash = hashlib.file_digest(f, Constantes.FOOTPRINT_METHOD)
+                return hash.hexdigest()                
+        except Exception as e:
+            print("Erreur")
+            print(e)
         
     @staticmethod
     def copy_file(source_filepath:str, destination_folder:str, footprint:str):
         ''' Copie le fichier source_filepath dans le répertoire destination_folder
+
+        Le répertoire de destination doit exister.
 
         L'empreinte du fichier source est comparée avec celle de la copie.
 
@@ -108,7 +115,8 @@ class FichierHelper():
         cmd = ['cp', source_filepath, destination_folder]
         print("Exécution de la commande {}".format(cmd))
         
-        subprocess.run(cmd, check= True, shell= False)        
+        result = subprocess.run(cmd, check= True, shell= False)        
+        return result.returncode == 0
 
     @staticmethod
     def copy_file_to_repository(source_filepath:str, footprint:str):

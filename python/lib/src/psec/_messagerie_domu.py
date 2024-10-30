@@ -16,8 +16,8 @@ class MessagerieDomu(metaclass=SingletonMeta):
     socket_xenbus = None    
     recv_buffer = bytearray() 
     journal = Journal("Messaging")
-    message_callback = None
-    demarrage_callback = None
+    message_callbacks = list()
+    demarrage_callbacks = list()
     messagerie_demarree = False
 
     ### 
@@ -31,14 +31,23 @@ class MessagerieDomu(metaclass=SingletonMeta):
         if self.socket_xenbus != None:
             self.socket_xenbus.close()
 
-    def set_demarrage_callback(self, demarrage_callback):
-        if demarrage_callback != None:
-            self.demarrage_callback = demarrage_callback
+    def set_demarrage_callback(self, demarrage_callback):    
+        if demarrage_callback is not None:
+            self.demarrage_callbacks.append(demarrage_callback)
 
-    def set_message_callback(self, message_callback):
-        if message_callback != None:
-            self.journal.debug("Using callback")
-            self.message_callback = message_callback            
+    def set_demarrage_callbacks(self, demarrage_callbacks):    
+        for cb in demarrage_callbacks:
+            if cb is not None:
+                self.demarrage_callbacks.append(cb)
+
+    def set_message_callback(self, message_callback):        
+        if message_callback is not None:
+            self.message_callbacks.append(message_callback)
+
+    def set_message_callbacks(self, message_callback):      
+        for cb in message_callback:  
+            if cb is not None:
+                self.message_callbacks.append(cb)
 
     def demarre(self, demon = False, force_serial_port = ""):    
         self.journal.debug("Starting DomU messaging")
@@ -90,14 +99,15 @@ class MessagerieDomu(metaclass=SingletonMeta):
             self.interface_xenbus_prete = True            
             self.journal.info("Messaging for Domain {} is started".format(Parametres().identifiant_domaine()))            
             self.messagerie_demarree = True
-            if self.demarrage_callback != None:
-                self.demarrage_callback()
+            if len(self.demarrage_callbacks) > 0:                
+                for cb in self.demarrage_callbacks:
+                    cb()
 
             while(self.messagerie_demarree):
                 data = self.socket_xenbus.read_until(b'\n') #Parametres().parametre(Cles.TAILLE_TRAME))
 
                 if data:
-                    self.journal.debug("Data received from Xenbus : {0}".format(data))
+                    #self.journal.debug("Data received from Xenbus : {0}".format(data))
                     #self.recv_buffer.extend(data)
                     
                     # Il se peut que le message arrive en plusieurs morceaux,
@@ -105,7 +115,7 @@ class MessagerieDomu(metaclass=SingletonMeta):
                     # Il faut donc extraire un message complet et laisser le reste dans le buffer
                     #endl = self.recv_buffer.find(b'\n')
                     #if endl > -1:                    
-                    self.journal.debug("We have a complete message...")
+                    #self.journal.debug("We have a complete message...")
                         # On extrait le message complet, on le met de côté et on remet le reste dans le buffer
                         #extract = self.recv_buffer[:endl]
                         #self.recv_buffer = self.recv_buffer[endl+1:]
@@ -152,9 +162,11 @@ class MessagerieDomu(metaclass=SingletonMeta):
                 return
 
             try:
-                if self.message_callback != None:
-                    self.message_callback(msg)
-            except Exception:
+                if len(self.message_callbacks) > 0:
+                    for cb in self.message_callbacks:
+                        cb(msg)
+            except Exception as e:
+                print(e)
                 pass # On ne traite pas les erreurs de la callback
 
             #if msg.type == TypeMessage.COMMANDE:

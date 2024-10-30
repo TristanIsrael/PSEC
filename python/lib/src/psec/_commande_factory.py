@@ -124,6 +124,12 @@ class CommandeFactory():
         commande.destination = Domaine.DOM0 if disk == Constantes.REPOSITORY else Domaine.SYS_USB
         return commande
 
+    @staticmethod
+    def cree_commande_components_list() -> Commande:
+        commande = Commande(TypeCommande.LISTE_COMPOSANTS, {})
+        commande.destination = Domaine.TOUS
+        return commande
+
     ###
     # Fonctions privées
     #

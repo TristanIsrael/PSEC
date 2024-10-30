@@ -1,6 +1,7 @@
 from . import Constantes, Parametres, MessagerieDomu, Message, TypeMessage, Commande
 from . import TypeCommande, FichierHelper, ReponseFactory, ErreurFactory
-from . import Journal, Domaine, Cles, BenchmarkId
+from . import Journal, Domaine, Cles, BenchmarkId, EtatDomu, EtatComposant
+from . import TaskRunner
 try:
     from . import DemonInputs
     from . import ControleurBenchmark
@@ -9,21 +10,22 @@ except:
     NO_INPUTS_MONITORING = True
     print("Importing ControleurVmSysUsb without inputs monitoring nor benchmarking capacity")
 from . import NotificationFactory, FichierHelper
-import logging, threading
-from multiprocessing import Pool
+import logging, threading, os
+from pathlib import Path
 
 class ControleurVmSysUsb():
     """ Cette classe traite les messages échangés par la sys-usb avec le Dom0 ou les autres domaines. """
 
     journal = Journal("Sys-usb controller")
-    pool_tasks = None
+    task_runner = TaskRunner()
     #files_copy_list = []
 
     def __init__(self):
-        self.pool_tasks = Pool()
+        pass
 
     def __del__(self):
-        self.pool_tasks.terminate()
+        self.task_runner.stop()
+        pass
 
     def demarre(self, serial_port:str = ""):
         self.journal.info("Démarrage du Contrôleur du domaine sys-usb")
@@ -72,6 +74,8 @@ class ControleurVmSysUsb():
             disk = commande.arguments.get("disk")
             contents = commande.arguments.get("contents")
             self.__get_create_file(filepath, disk, contents, commande.source)
+        elif commande.commande == TypeCommande.LISTE_COMPOSANTS:
+            self.__get_component_state(commande.source)
 
     ####
     # Traitement des commandes
@@ -115,8 +119,18 @@ class ControleurVmSysUsb():
         source_file = commande.arguments.get("chemin_fichier")
         repository_path = Parametres().parametre(Cles.CHEMIN_DEPOT_DOM0)               
         source_filepath = "{}/{}/{}".format(Parametres().parametre(Cles.CHEMIN_MONTAGE_USB), source_disk, source_file)        
-       
-        self.pool_tasks.apply_async(self.__do_copy_file, (source_filepath, repository_path,))
+
+        try:       
+            # Création du répertoire de destination si nécessaire
+            parent_path = Path(source_file).parent
+            if not parent_path.exists():
+                print("Création du répertoire {} dans le dépôt".format(parent_path))
+                os.makedirs("{}/{}".format(repository_path, parent_path), exist_ok= True)
+
+            destination = "{}/{}".format(repository_path, parent_path)
+            self.task_runner.run_task(self.__do_copy_file, args=(source_filepath, destination,))
+        except Exception as e:
+            print(e)
 
     #def __copie_fichier(self, commande: Commande):
     #    pass
@@ -133,7 +147,7 @@ class ControleurVmSysUsb():
         source_footprint = FichierHelper.calculate_footprint(source)
 
         if FichierHelper.copy_file(source, destination, source_footprint) == True:
-            self.journal.info("La copie du fichier {} dans le dépôt s'est bien déroulée. L'empreinte est {}".format(source, source_footprint))
+            self.journal.info("Le fichier {} a été copié dans le dépôt. L'empreinte est {}".format(source, source_footprint))
             # Envoi d'une notification
             notif = NotificationFactory.cree_notification_nouveau_fichier(source, destination, source_footprint)
         else:
@@ -179,5 +193,14 @@ class ControleurVmSysUsb():
         # On envoie la notification de succès
         footprint = FichierHelper.calculate_footprint(complete_filepath)
         reponse = ReponseFactory.cree_reponse_create_file(filepath, disk, footprint, True)
+        reponse.destination = source
+        MessagerieDomu().envoie_message_xenbus(reponse)
+
+    def __get_component_state(self, source:str) -> None:
+        ''' Retourne l'état courant des composants
+            Si la messagerie est prête, le domaine est prêt
+        '''
+
+        reponse = ReponseFactory.cree_reponse_etat_composant("sys-usb", EtatComposant.OK)
         reponse.destination = source
         MessagerieDomu().envoie_message_xenbus(reponse)

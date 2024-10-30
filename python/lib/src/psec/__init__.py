@@ -1,5 +1,5 @@
 from ._singleton import SingletonMeta
-from ._constantes import Constantes, Cles, EtatDomu, EtatDisque, Domaine, BoutonSouris, TypeEntree, EtatFichier, BenchmarkId
+from ._constantes import Constantes, Cles, EtatDomu, EtatDisque, Domaine, BoutonSouris, TypeEntree, EtatFichier, BenchmarkId, EtatComposant
 try:
     from ._keymap_fr import KeymapFR
 except Exception as e:
@@ -25,6 +25,7 @@ from ._messagerie_domu import MessagerieDomu
 from ._messagerie_dom0 import MessagerieDom0
 from ._surveillance_disque import SurveillanceDisque
 from ._mouse import Mouse, MouseButton, MouseWheel
+from ._tasks_runner import TaskRunner
 try:
     from ._demon_inputs import DemonInputs          
     from ._controleur_benchmark import ControleurBenchmark  
@@ -46,7 +47,7 @@ __version__ = '1.0'
 
 __all__ = [
     "KeymapFR",
-    "Commande", "TypeCommande", "CommandeFactory", "TypeEntree", "BoutonSouris", "EtatFichier",
+    "Commande", "TypeCommande", "CommandeFactory", "TypeEntree", "BoutonSouris", "EtatFichier", "EtatComposant"
     "Constantes", "EtatDomu", "EtatDisque", "Domaine",
     "ErreurFactory", 
     "Journal", "JournalProxy",
@@ -63,7 +64,8 @@ __all__ = [
     "DemonInputs", "DemonProxyJournal",
     "Mouse", "MouseButton", "MouseWheel", "InputsProxy",
     "ControleurBenchmark", "BenchmarkId",
-    "MockXenbus"
+    "MockXenbus",
+    "TaskRunner"
 ]
 
 logging.getLogger(__name__).addHandler(NullHandler())
