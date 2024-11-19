@@ -27,6 +27,7 @@ done
 
 _pciusb=`echo $pciusb | sed "s/ / /g"`
 
+touch /etc/conf.d/xen-pci
 source /etc/conf.d/xen-pci
 rm -f /usr/lib/psec/tmp/xen-pci
 #if [ -n "$DEVICES" ]

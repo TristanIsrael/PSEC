@@ -56,8 +56,20 @@ The default typical `topology.json` is:
 }
 ```
 
-### Creating a product
+## Creating a product
 
 Creating a product is mainly a matter of :
 - creating a main Alpine package containing a `topology.json` file.
 - creating different specific Alpine packages for the business functions.
+
+### Data sources
+
+The system needs to download dependencies (packages, configuration) on different sources.
+
+The file `/etc/psec/constants.sh` defines the default sources :
+
+| Constant | Default value | Description |
+|--|--|--|
+| ALPINE_VERSION | `3.20` | Defines the Alpine version to use with the product. The URL of the packages repository depends on this constant|
+| PSEC_PUBLIC_REPOSITORY | `https://alefbet.net/wp-content/uploads/repositories/PSEC` | Defines the place where the PSEC packages are stored. Can be a local server. |
+| ALPINE_PUBLIC_ROOT | `http://dl-cdn.alpinelinux.org/alpine` | Defines the URL of the official Alpine mirror used to download Alpine packages |

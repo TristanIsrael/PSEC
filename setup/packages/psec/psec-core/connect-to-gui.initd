@@ -1,0 +1,23 @@
+#!/sbin/openrc-run
+
+name="connect-to-gui"
+
+depend() {
+    after start-x
+}
+
+start() {
+    ebegin "Starting SPICE client"
+
+    start-stop-daemon --start --make-pidfile --pidfile /var/run/$name.pid --background --exec remote-viewer -- spice+unix:///var/run/spice.sock -f --display=:0
+
+    eend $?
+}
+
+stop() {
+    ebegin "Stopping SPICE client"
+
+    kill -9 $(cat /var/run/$name.pid)
+
+    eend $?
+}

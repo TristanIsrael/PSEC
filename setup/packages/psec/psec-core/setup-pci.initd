@@ -11,9 +11,9 @@ start() {
     /usr/lib/psec/bin/setup-pci-usb-controllers.sh
     eend $?
 
-    ebegin "Identify PCI VGA devices"
-    /usr/lib/psec/bin/setup-pci-vga-controller.sh 
-    eend $?
+    #ebegin "Identify PCI VGA devices"
+    #/usr/lib/psec/bin/setup-pci-vga-controller.sh 
+    #eend $?
 }
 
 stop() {

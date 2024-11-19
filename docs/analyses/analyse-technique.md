@@ -355,7 +355,7 @@ Pour vérifier si l'IOMMU est activé sur l'hôte : `dmesg | grep -e DMAR -e IOM
 
 # GRUB et UEFI
 
-S'il manque l'entrée Xen dans le menu Grub, il faut renommer le fichier /boot/vmlinuz-lts pour que son nom coincide avec celui de config*.
+S'il manque l'entrée Xen dans le menu Grub, il faut renommer le fichier /boot/vmlinuz-lts pour que son nom coincide avec celui de config*. D'autre part, le fichier config peut ne pas être correctement nommé. Si le nom est différent de config-lts, créer un raccourci nommé config-lts.
 
 # Machine virtuelle QEMU
 
@@ -501,3 +501,73 @@ Mettre à jour le fichier `grub.cfg` en conséquence.
 ## Affichage
 
 Sur tablette, il peut être nécessaire de faire pivoter l'affichage. Pour ce faire, ajouter `fbcon=rotate:1` sur la ligne de commande grub.
+
+## Reverse-engineering Qubes OS
+
+Version : 4.2.3
+Matériel : Durabook R8
+
+## GRUB
+
+```
+
+multiboot2  /xen-4.17.4.gz placeholder console=none dom0_mem=min:1024M dom0_mem=max:4096M ucode=scan smt=off gnttab_max_frames=2048 gnttab_max_maptrack_frames=4096 
+module2    /vmlinuz-6.6.48-1.qubes.fc37.x86_64 placeholder root=... ro rd.luks.uuid=luks... rd.lvm.lv=... plymouth.ignore-serial-consoles 6.6.48-1.qubes.fc37.x86_64 x86_64 rghb quiet usbcore.authorized_default=0
+module2 --nounzip /initramfs...
+
+```
+
+## Redirection du flux graphique
+
+L'objectif est de rediriger le flux graphique du serveur VNC de l'application au travers du canal série du DomU.
+
+### Simuler le canal série
+
+`socat PTY,link=/dev/ttyV0,raw,echo=0 PTY,link=/dev/ttyV1,raw,echo=0`
+
+### Rediriger le flux VNC dans le canal série
+
+`socat TCP:localhost:5900 /dev/ttyV0,raw,echo=0`
+
+### Rediriger le flux du canal série vers le client VNC
+
+`socat /dev/ttyV1,raw,echo=0 TCP-LISTEN:5901,reuseaddr,fork`
+
+
+## Affichage écran DomU
+
+### Méthode VNC
+
+- Installer un serveur X léger : `apk add xserver-xorg xrandr`
+- Faire tourner l'écran (tactile) : `DISPLAY=:0 xrandr --output DSI-1 --rotate left`
+- Installer un client vnc : `apk add tigervnc-client`
+- Se connecter à la VM en plein écran : `DISPLAY=:0 vncviewer :0 -fullscreen`
+
+### Méthode SPICE
+
+- Installer un serveur X léger : `apk add xserver-xorg xrandr`
+- Faire tourner l'écran (tactile) : `DISPLAY=:0 xrandr --output DSI-1 --rotate left`
+- Installer un client SPICE : `apk add virt-viewer`
+- Ajouter l'affichage au DomU : 
+```
+device_model_args = [
+	"-spice", "unix,addr=/tmp/spice.sock,disable-ticketing=on"
+]
+```
+- Démarrer le DomU
+- Démarrer le client SPICE : `DISPLAY=:0 remote-viewer spice+unix:///tmp/spice.sock`
+
+*à essayer :*
+```
+--title=Saphir
+--spice-disable-effects=all
+--spice-color-depth=32
+--spice-disable-audio
+```
+
+### Méthode SDL
+
+- Installer un serveur X léger : `apk add xserver-xorg xrandr`
+- Faire tourner l'écran (tactile) : `DISPLAY=:0 xrandr --output DSI-1 --rotate left`
+
+*à essayer* : `vfb = [ 'sdl=1' ]`

@@ -7,16 +7,16 @@ pkgdesc="PSEC - GUI virtual machine"
 url="https://www.alefbet.net/"
 arch="noarch"
 license="MIT"
-depends="psec-lib"
+depends="psec-lib socat"
 makedepends=""
 builddir="$srcdir/$pkgname-$pkgver"
 checkdepends=""
 install=""
 subpackages=""
-replaces=""
+replaces="psec-core"
 options="!check"  # no tests provided
 source="modules"
 
 package() {  
-    install -D -m644 "$srcdir"/modules "$pkgdir/etc/modules"
+    install -D -m644 "$srcdir"/modules "$pkgdir/etc/modules"    
 }

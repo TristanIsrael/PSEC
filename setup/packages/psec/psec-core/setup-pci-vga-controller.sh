@@ -25,6 +25,7 @@ for f in `lspci | grep "$PCI_VGA_LABEL" | cut -d " " -f 1`; do
     fi
 done
 
+touch /etc/conf.d/xen-pci
 source /etc/conf.d/xen-pci
 rm -f /usr/lib/psec/tmp/xen-pci
 

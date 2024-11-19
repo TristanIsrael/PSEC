@@ -7,7 +7,7 @@ pkgdesc="PSEC - Core of the system"
 url="https://www.alefbet.net/"
 arch="noarch"
 license="MIT"
-depends="cdrkit psec-lib xen xen-hypervisor xen-qemu xen-qemu-openrc"
+depends="cdrkit psec-lib xen xen-hypervisor xen-qemu xen-qemu-openrc abuild pciutils xorg-server xrandr virt-viewer terminus-font"
 makedepends=""
 builddir="$srcdir/$pkgname-$pkgver"
 install="$pkgname.post-install $pkgname.post-deinstall"
@@ -35,6 +35,9 @@ setup-xen-environment.sh
 splash.initd
 start-domains.initd
 topology.json
+start-x.initd
+rotate-screen.py
+connect-to-gui.initd
 "
 
 PSEC_CONFDIR="etc/psec"
@@ -84,6 +87,9 @@ package() {
     install -D -m644 "$srcdir"/modules "$pkgdir/etc/modules"
 
     #install -D -m644 "$srcdir"/sys-usb.conf "$pkgdir/$PSEC_CONFDIR/xen/sys-usb.conf"
-    install -D -m644 "$srcdir"/topology.json "$pkgdir/$PSEC_CONFDIR/topology.json"
-}
+    install -D -m644 "$srcdir"/topology.json "$pkgdir/$PSEC_CONFDIR"/topology.json
 
+    install -D -m755 "$srcdir"/start-x.initd "$pkgdir"/etc/init.d/start-x
+    install -D -m644 "$srcdir"/rotate-screen.py "$pkgdir/$PSEC_BINDIR"/rotate-screen.py
+    install -D -m755 "$srcdir"/connect-to-gui.initd "$pkgdir"/etc/init.d/connect-to-gui
+}

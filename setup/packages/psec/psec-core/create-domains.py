@@ -55,24 +55,29 @@ class DomainsFactory:
         print("Create Driver Domain GUI")
 
         memory = 1024
+        rotation = 0
         json_gui = self.topology.get("gui")
         if json_gui != None:
             json_memory = json_gui.get("memory")
             if json_memory != None:
                 memory = json_memory
                 print("Setting {} MB for memory".format(memory))
+            #json_screen = json_gui.get("screen")
+            #if json_screen != None:
+            #    rotation = json_screen.get("rotation")  
+            #    print("Rotate screen with {} degrees".format(rotation))
 
         conf = self.__create_new_domain(
-            domain_name="sys-gui", 
-            memory_in_mb=memory,
-            nb_cpus=1, 
-            boot_iso_location="bootiso-sys-gui.iso",
-            share_packages=True,
-            share_storage=True,
-            share_system=True,
-            rxtx_inputs=True,
-            pci_passthrough=False,
-            vga_passthrough=True
+            domain_name= "sys-gui", 
+            memory_in_mb= memory,
+            nb_cpus= 1, 
+            boot_iso_location= "bootiso-sys-gui.iso",
+            share_packages= True,
+            share_storage= True,
+            share_system= True,
+            rxtx_inputs= True,
+            pci_passthrough= False,
+            provides_gui= True
         )
 
         with open('/etc/psec/xen/sys-gui.conf', 'w') as f:
@@ -106,7 +111,7 @@ class DomainsFactory:
                     share_system= False,
                     rxtx_inputs= False,
                     pci_passthrough= False,
-                    vga_passthrough= False
+                    provides_gui= False
                 )
 
                 with open("/etc/psec/xen/{}.conf".format(name), 'w') as f:
@@ -114,7 +119,7 @@ class DomainsFactory:
 
                 self.__fetch_alpine_packages(package)     
 
-    def __create_new_domain(self, domain_name:str, memory_in_mb:int, nb_cpus:int, boot_iso_location:str, share_packages:bool=True, share_storage:bool=True, share_system:bool=False, rxtx_inputs:bool=False, pci_passthrough:bool=False, vga_passthrough:bool=False):
+    def __create_new_domain(self, domain_name:str, memory_in_mb:int, nb_cpus:int, boot_iso_location:str, share_packages:bool=True, share_storage:bool=True, share_system:bool=False, rxtx_inputs:bool=False, pci_passthrough:bool=False, provides_gui:bool=False):
         txt = '''
 type = "pv"
 name = "{}"
@@ -142,33 +147,42 @@ disk = [
 
         # Add serial channels
         channels = []
-        channels.append("'name=console, connection=pty'")
-        channels.append("'name={}-msg, connection=socket, path=/var/run/{}-msg.sock'".format(domain_name, domain_name))
-        channels.append("'name={}-log, connection=socket, path=/var/run/{}-log.sock'".format(domain_name, domain_name))
-        if rxtx_inputs:
-            channels.append("'name={}-input, connection=socket, path=/var/run/{}-input.sock'".format(domain_name, domain_name))
+        channels.append("'name=console, connection=pty'") # /dev/hvc0
+        channels.append("'name={}-msg, connection=socket, path=/var/run/{}-msg.sock'".format(domain_name, domain_name)) # /dev/hvc1
+        channels.append("'name={}-log, connection=socket, path=/var/run/{}-log.sock'".format(domain_name, domain_name)) # /dev/hvc2
+        if rxtx_inputs or provides_gui:
+            channels.append("'name={}-input, connection=socket, path=/var/run/{}-input.sock'".format(domain_name, domain_name)) # /dev/hvc3
+        if provides_gui:
+            channels.append("'name={}-vnc, connection=socket, path=/var/run/{}-vnc.sock'".format(domain_name, domain_name)) # /dev/hvc4
         
         if len(channels) > 0:
             txt += "channel = [\n{}\n]\n".format(",\n".join(channels))        
         
-        if pci_passthrough != None and vga_passthrough != None:
+        if pci_passthrough is not None and pci_passthrough == True:
             parser=ConfigParser()
             with open("/etc/conf.d/xen-pci") as stream:
                 parser.read_string("[none]\n" +stream.read())
 
                 # Add PCI passthrough
                 if pci_passthrough and parser["none"]["DEVICES"] != None:
-                    devs = parser["none"]["DEVICES"]
+                    devs = parser["none"]["DEVICES"].strip()
 
                     if devs != "" and devs != None:
                         txt += "pci = [{}]\n".format(devs.replace(' ', '","'))
 
                 # Add VGA passthrough
-                if vga_passthrough and parser["none"]["VGA_DEVICES"] != None:
-                    devs = parser["none"]["VGA_DEVICES"]
+                #if vga_passthrough and parser["none"]["VGA_DEVICES"] != None:
+                #    devs = parser["none"]["VGA_DEVICES"]
+                #
+                #    if devs != "" and devs != None:
+                #        txt += "pci = [{}]\n".format(devs.replace(' ', '", "'))
 
-                    if devs != "" and devs != None:
-                        txt += "pci = [{}]\n".format(devs.replace(' ', '", "'))
+        if provides_gui:
+            txt += "\
+stdvga = 1\n\
+device_model_args = [\n\
+    '-spice', 'unix=on,addr=/var/run/spice.sock,disable-ticketing=on,ipv4=off,ipv6=off'\n\
+]\n"
 
         return txt
 

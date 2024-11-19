@@ -99,3 +99,58 @@ Voir Dell Latitude E5510
 La tablette T800 comporte un écran de 8 pouces avec une surface tactile, un disque NVME, un processeur Atom x7 doté de 4 coeurs tournant à 1,6 Ghz et d'une puce graphique (intégrée au CPU) Intel HD Graphics.
 
 Bogomips = 3200
+
+### CPU
+
+```
+Intel ATOM x7-28750 @1.6Ghz
+Coeurs : 4
+VT-x
+```
+
+### GPU
+
+```
+Intel HD Graphics 405 (16EU)
+```
+
+### GRUB
+
+#### Xen kernel options
+
+#### Linux kernel options
+Essayer `pci=nomsi swiotlb=8192`
+
+## DURABOOK R8
+
+Pour obtenir un boot complet sur le Dom0 il faut modifier les options de grub de cette manière :
+```
+load_video
+set gfxpayload=keep
+insmod gzio
+```
+
+### UEFI
+Dans le BIOS désactiver la fonctionnalité `VMD` sinon le système ne démarrera pas.
+
+### Disque NVME
+Pour utiliser le disque NVME, l'option `pci=nomsi` est nécessaire.
+
+### Analyse des paramètres grub et kernel
+L'ajout de `edd=off no-real-mode` sur la ligne de commande de Xen `multiboot2` provoque une extinction de l'écran intégré de la tablette.
+
+La configuration fonctionnelle est la suivante: 
+```
+    load_video
+    set gfxpayload=keep
+    insmod gzio
+	insmod part_gpt
+	insmod ext2
+	search --no-floppy --fs-uuid --set=root 767befbd-ce80-44ec-a659-76526ca10e00
+	echo	'Loading Xen xen ...'    
+	multiboot2	/boot/xen.gz placeholder dom0_mem=1024M,max:1024M
+	echo	'Loading Linux lts ...'
+	module2	/boot/vmlinuz-lts placeholder root=UUID=767befbd-ce80-44ec-a659-76526ca10e00 ro fbcon=rotate:3 modules=sd-mod,usb-storage,ext4,nvme rootfstype=ext4
+	echo	'Loading initial ramdisk ...'
+	module2	--nounzip   /boot/initramfs-lts
+```

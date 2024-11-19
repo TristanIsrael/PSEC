@@ -15,14 +15,14 @@ start() {
     printf "\n\npci = ['%s']" $(echo $DEVICES | sed "s/ /','/g") >> /etc/psec/xen/sys-usb.conf
     eend 0
     
-    echo "Attaching PCI VGA devices to sys-gui"
-    sed -i '/pci =/d' /etc/psec/xen/sys-gui.conf
-    printf "\n\npci = ['%s']" $(echo $VGA_DEVICES | sed "s/ /','/g") >> /etc/psec/xen/sys-gui.conf    
-    for bdf in $(echo $VGA_DEVICES | tr " " "\n")
-    do
-        xl pci-assignable-add $bdf
-    done    
-    eend 0
+    #echo "Attaching PCI VGA devices to sys-gui"
+    #sed -i '/pci =/d' /etc/psec/xen/sys-gui.conf
+    #printf "\n\npci = ['%s']" $(echo $VGA_DEVICES | sed "s/ /','/g") >> /etc/psec/xen/sys-gui.conf    
+    #for bdf in $(echo $VGA_DEVICES | tr " " "\n")
+    #do
+    #    xl pci-assignable-add $bdf
+    #done    
+    #eend 0
 }
 
 stop() {
