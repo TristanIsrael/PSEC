@@ -1,4 +1,7 @@
 {
+    "pci": {
+        "blacklist": "00:0d.0"
+    },
     "usb": {
         "use": 1
     },

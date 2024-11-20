@@ -7,6 +7,6 @@ echo ---        script post-install.sh        ---
 echo --------------------------------------------
 echo
 
-/usr/lib/psec/bin/finish-core-init.sh
+/usr/lib/psec/bin/post-install.sh
 
 exit 0

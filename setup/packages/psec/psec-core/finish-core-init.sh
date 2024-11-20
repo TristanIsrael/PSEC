@@ -16,12 +16,13 @@
     /usr/lib/psec/bin/create-local-alpine-repository.sh
     /usr/lib/psec/bin/setup-xen-environment.sh
 
+    echo ... Start initd scripts
+    rc-service setup-pci start
+
     echo Create XEN Domains
     /usr/bin/python3 /usr/lib/psec/bin/create-domains.py $ALPINE_LOCAL_REPOSITORY/`uname -m`
 
-    echo ... Start initd scripts
-    rc-service setup-pci start
     rc-service xen-pci start
-    rc-service attach-pci-devices start    
+    #rc-service attach-pci-devices start    
     #rc-service start-domains start
 #fi

@@ -47,10 +47,11 @@ class DomainsFactory:
             rxtx_inputs=True,
             pci_passthrough=True
         )'''
-        conf = self.__create_domain_sys_usb(memory_in_mb= 400, nb_cpus= 1)
+        conf = self.__create_domain_sys_usb(memory_in_mb=400, nb_cpus=1)
 
-        with open('/etc/psec/xen/sys-usb.conf', 'w') as f:
-            f.write(conf)
+        if conf is not None:
+            with open('/etc/psec/xen/sys-usb.conf', 'w') as f:
+                f.write(conf)
 
     def __create_domd_gui(self):
         print("Create Driver Domain GUI")
@@ -80,10 +81,11 @@ class DomainsFactory:
             pci_passthrough= False,
             provides_gui= True
         )'''
-        conf = self.__create_domain_sys_gui(memory_in_mb= memory, nb_cpus= 1)
+        conf = self.__create_domain_sys_gui(memory_in_mb=memory, nb_cpus=1)
 
-        with open('/etc/psec/xen/sys-gui.conf', 'w') as f:
-            f.write(conf)
+        if conf is not None:
+            with open('/etc/psec/xen/sys-gui.conf', 'w') as f:
+                f.write(conf)
     
     def __parse_business_domains(self, json:dict):
         repository = json.get("repository")
@@ -110,10 +112,8 @@ class DomainsFactory:
                     boot_iso_location= "bootiso-{}.iso".format(name),
                     share_packages= True,
                     share_storage= True,
-                    share_system= False,
-                    rxtx_inputs= False,
-                    pci_passthrough= False,
-                    provides_gui= False
+                    share_system= False
+                    #rxtx_inputs= False
                 )
 
                 with open("/etc/psec/xen/{}.conf".format(name), 'w') as f:
@@ -121,15 +121,15 @@ class DomainsFactory:
 
                 self.__fetch_alpine_packages(package)     
 
-    def __create_domain_sys_usb(memory_in_mb:int, nb_cpus:int) -> None:
+    def __create_domain_sys_usb(self, memory_in_mb:int, nb_cpus:int) -> None:
         txt = '''
 type = "pv"
 name = "sys-usb"
 kernel = "/var/lib/xen/boot/vmlinuz-virt"
 ramdisk = "/var/lib/xen/boot/initramfs-virt"
 extra = "modules=loop,squashfs,iso9660 console=hvc0"
-memory=400
-vcpus = 1
+memory={}
+vcpus = {}
 disk = [
 	'format=raw, vdev=xvdc, access=r, devtype=cdrom, target=/usr/lib/psec/system/bootiso-sys-usb.iso'
 ]
@@ -157,7 +157,9 @@ channel = [
                 if devs != "" and devs != None:
                     txt += "pci = [{}]\n".format(devs.replace(' ', '","'))
 
-    def __create_domain_sys_gui(memory_in_mb:int, nb_cpus:int) -> None:
+        return txt
+
+    def __create_domain_sys_gui(self, memory_in_mb:int, nb_cpus:int) -> None:
         txt = '''
 type = "hvm"
 name = "sys-gui"
@@ -166,7 +168,7 @@ vcpus = {}
 disk = [
 	'format=raw, vdev=xvdc, access=r, devtype=cdrom, target=/usr/lib/psec/system/bootiso-sys-gui.iso'
 ]
-p0 = [
+p9 = [
     'tag=packages, path=/usr/lib/psec/packages, backend=0, security_model=none',
     'tag=storage, path=/usr/lib/psec/storage, backend=0, security_model=none',
     'tag=system, path=/usr/lib/psec/system, backend=0, security_model=none'
@@ -175,8 +177,7 @@ channel = [
 'name=console, connection=pty',
 'name=sys-gui-msg, connection=socket, path=/var/run/sys-gui-msg.sock',
 'name=sys-gui-log, connection=socket, path=/var/run/sys-gui-log.sock',
-'name=sys-gui-input, connection=socket, path=/var/run/sys-gui-input.sock',
-'name=sys-gui-vnc, connection=socket, path=/var/run/sys-gui-vnc.sock'
+'name=sys-gui-input, connection=socket, path=/var/run/sys-gui-input.sock'
 ]
 vga = "qxl"
 device_model_args = [
@@ -189,7 +190,7 @@ vif=[]
 
         return txt
 
-    def __create_new_domain(self, domain_name:str, memory_in_mb:int, nb_cpus:int, boot_iso_location:str, share_packages:bool=True, share_storage:bool=True, share_system:bool=False, rxtx_inputs:bool=False):
+    def __create_new_domain(self, domain_name:str, memory_in_mb:int, nb_cpus:int, boot_iso_location:str, share_packages:bool=True, share_storage:bool=True, share_system:bool=False):
         txt = '''
 type = "pv"
 name = "{}"

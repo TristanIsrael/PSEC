@@ -40,6 +40,7 @@ connect-to-gui.initd
 psec.conf
 get-sys-gui-domid.sh
 write-screen-information-to-xenstore.py
+post-install.sh
 "
 
 PSEC_CONFDIR="etc/psec"
@@ -95,7 +96,8 @@ package() {
     install -D -m644 "$srcdir"/rotate-screen.py "$pkgdir/$PSEC_BINDIR"/rotate-screen.py
     install -D -m755 "$srcdir"/connect-to-gui.initd "$pkgdir"/etc/init.d/connect-to-gui
 
-    install -D -m644 "$srcdir"/get-sys-gui-domid.sh "$pkgdir/$PSEC_BINDIR"/get-sys-gui-domid.sh
+    install -D -m755 "$srcdir"/post-install.sh "$pkgdir/$PSEC_BINDIR"/post-install.sh
+    install -D -m755 "$srcdir"/get-sys-gui-domid.sh "$pkgdir/$PSEC_BINDIR"/get-sys-gui-domid.sh
     install -D -m644 "$srcdir"/write-screen-information-to-xenstore.py "$pkgdir/$PSEC_BINDIR"/write-screen-information-to-xenstore.py
-    
+
 }

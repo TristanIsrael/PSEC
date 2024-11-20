@@ -2,7 +2,7 @@
 
 # Vérifier si le nombre d'arguments n'est pas égal à 1
 if [ $# -ne 1 ]; then
-    echo "Erreur : Il manque le chemin du dépôt distant."
+    echo "Erreur : Il manque le chemin du dépôt local."
     echo "Usage : $0 <argument>"
     exit 1
 fi

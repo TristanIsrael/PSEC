@@ -14,7 +14,7 @@ rc-service modules restart
 rc-service xenconsoled start
 rc-service xenstored start
 rc-update add xen-pci
-rc-service xen-pci start
+#rc-service xen-pci start
 #rc-service virtxend start
 
 rc-update add start-domains
@@ -22,11 +22,13 @@ rc-update add attach-pci-devices
 rc-update add psec-core-controller
 rc-service psec-core-controller start
 
+# finish-core-init est exécuté par le script post-install du produit...
 #/usr/lib/psec/bin/finish-core-init.sh
 rc-update add start-x
 rc-service start-x start
 
+# Transféré dans le script post-install qui sera appelé par le produit
 rc-update add connect-to-gui
-rc-service connect-to-gui start
+#rc-service connect-to-gui start
 
 exit 0
