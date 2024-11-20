@@ -9,14 +9,15 @@ depend() {
 start() {
     ebegin "Starting X server"    
 
-    start-stop-daemon --start --make-pidfile --exec X --pidfile /var/run/$name.pid --background
+    # Generate X config files
+    X -configure
+    mv /xorg.conf.new /etc/X11/xorg.conf
+    /usr/bin/python3 /usr/lib/psec/bin/generate-x-config.py
 
-    /usr/bin/xset -display :0 s off
-    /usr/bin/xset -display :0 -dpms
-    /usr/bin/xset -display :0 s noblank
+    start-stop-daemon --start --make-pidfile --exec X --pidfile /var/run/$name.pid --background -- -config /etc/X11/xorg.conf
 
     # Rotate the screen if needed
-    /usr/bin/python3 /usr/lib/psec/bin/rotate-screen.py $sysguiid
+    #/usr/bin/python3 /usr/lib/psec/bin/rotate-screen.py
 
     eend $?
 }
