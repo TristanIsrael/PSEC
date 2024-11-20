@@ -543,21 +543,24 @@ L'objectif est de rediriger le flux graphique du serveur VNC de l'application au
 - Installer un client vnc : `apk add tigervnc-client`
 - Se connecter à la VM en plein écran : `DISPLAY=:0 vncviewer :0 -fullscreen`
 
-### Méthode SPICE
+### Méthode SPICE + QXL
 
 - Installer un serveur X léger : `apk add xserver-xorg xrandr`
 - Faire tourner l'écran (tactile) : `DISPLAY=:0 xrandr --output DSI-1 --rotate left`
 - Installer un client SPICE : `apk add virt-viewer`
 - Ajouter l'affichage au DomU : 
 ```
+vga = "qxl"
+videoram = 128
 device_model_args = [
-	"-spice", "unix,addr=/tmp/spice.sock,disable-ticketing=on"
+    '-spice', 'unix=on,addr=/var/run/spice.sock,disable-ticketing=on,ipv4=off,ipv6=off,image-compression=off',
+    '-full-screen'
 ]
 ```
 - Démarrer le DomU
 - Démarrer le client SPICE : `DISPLAY=:0 remote-viewer spice+unix:///tmp/spice.sock`
 
-*à essayer :*
+
 ```
 --title=Saphir
 --spice-disable-effects=all
@@ -565,9 +568,38 @@ device_model_args = [
 --spice-disable-audio
 ```
 
+Changer la résolution dans le DomU :
+- Démarrer un serveur X
+- Démarrer spice-agentd ? -> a priori pas nécessaire
+- `xrandr --output Virtual-1 --display :0 --mode 1280x800`
+
+En automatique (fichier /etc/X11/xorg.conf.d/resolution.conf)
+```
+Section "Monitor"
+    Identifier   "Monitor0"
+    Option       "PreferredMode" "1280x800"
+EndSection
+
+Section "Screen"
+    Identifier "Screen0"
+    Monitor    "Monitor0"
+    DefaultDepth 24
+    SubSection "Display"
+        Modes       "1280x800"
+    EndSubSection
+EndSection
+
+```
+
+https://stafwag.github.io/blog/blog/2018/04/22/high-screen-resolution-on-a-kvm-virtual-machine-with-qxl/
+
 ### Méthode SDL
 
 - Installer un serveur X léger : `apk add xserver-xorg xrandr`
 - Faire tourner l'écran (tactile) : `DISPLAY=:0 xrandr --output DSI-1 --rotate left`
 
 *à essayer* : `vfb = [ 'sdl=1' ]`
+
+## Notes diverses
+
+### Désactiver IPv6

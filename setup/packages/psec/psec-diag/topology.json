@@ -7,7 +7,7 @@
         "app-package": "psec-diag-gui",
         "memory": 2000,
         "screen": {
-            "rotation": 0
+            "rotation": 90
         }
     },
     "business": {

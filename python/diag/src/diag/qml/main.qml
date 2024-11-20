@@ -5,16 +5,6 @@ EcranPrincipal {
     id: window
 
     /** Slots */
-    /*Connections {
-        target: AppController
-        function onMouseXChanged() {
-            console.debug(AppController.mouseX)
-        }
-        function onMouseYChanged() {
-            console.debug(AppController.mouseY)
-        }
-    }*/
-
     Component.onCompleted: {
         if(force_paysage) {
             mode_paysage = force_paysage

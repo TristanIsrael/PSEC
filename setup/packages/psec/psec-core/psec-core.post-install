@@ -7,6 +7,8 @@ echo ---        script post-install.sh        ---
 echo --------------------------------------------
 echo
 
+hostname dom0
+
 rc-service modules restart
 
 rc-service xenconsoled start

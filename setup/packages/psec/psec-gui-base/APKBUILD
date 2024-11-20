@@ -1,0 +1,23 @@
+# Contributor:
+# Maintainer: Tristan Israël <tristan.israel@alefbet.net>
+pkgname=psec-gui-base
+pkgver=1.0
+pkgrel=1
+pkgdesc="PSEC - Base package for GUI domain"
+url="https://www.alefbet.net/"
+arch="noarch"
+license="MIT"
+depends="xorg-server xrandr xset xe-guest-utilities"
+makedepends=""
+builddir="$srcdir/$pkgname-$pkgver"
+checkdepends=""
+install="$pkgname.post-install"
+subpackages=""
+replaces=""
+options="!check"  # no tests provided
+source="psec-gui-base.installed"
+
+
+package() {
+    install -D -m644 "$srcdir"/psec-gui-base.installed "$pkgdir"/etc/psec/packages/psec-gui-base.installed
+}

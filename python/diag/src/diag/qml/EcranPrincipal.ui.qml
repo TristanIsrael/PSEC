@@ -10,8 +10,9 @@ ApplicationWindow {
     property bool mode_paysage: force_paysage | (width < height)
 
     width: 1024
-    height: 768    
+    height: 768
     visible: true
+    visibility: Window.FullScreen
 
     Rectangle {
         color: "#ccc"

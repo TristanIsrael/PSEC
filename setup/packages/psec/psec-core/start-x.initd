@@ -7,16 +7,16 @@ depend() {
 }
 
 start() {
-    ebegin "Starting X server"
-
-    # Rotate the screen if needed
-    /usr/bin/python3 /usr/lib/psec/bin/rotate-screen.py
+    ebegin "Starting X server"    
 
     start-stop-daemon --start --make-pidfile --exec X --pidfile /var/run/$name.pid --background
 
     /usr/bin/xset -display :0 s off
     /usr/bin/xset -display :0 -dpms
     /usr/bin/xset -display :0 s noblank
+
+    # Rotate the screen if needed
+    /usr/bin/python3 /usr/lib/psec/bin/rotate-screen.py $sysguiid
 
     eend $?
 }
