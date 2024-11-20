@@ -9,7 +9,7 @@ depend() {
 start() {
     ebegin "Starting SPICE client"
 
-    start-stop-daemon --start --make-pidfile --pidfile /var/run/$name.pid --background --exec remote-viewer -- spice+unix:///var/run/spice.sock -f --display=:0
+    start-stop-daemon --start --make-pidfile --pidfile /var/run/$name.pid --background --exec remote-viewer -- spice+unix:///var/run/spice.sock -k --display=:0
 
     eend $?
 }

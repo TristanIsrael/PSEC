@@ -10,9 +10,13 @@ start() {
     ebegin "Starting X server"
 
     # Rotate the screen if needed
-    /usr/lib/psec/bin/rotate-screen.sh
+    /usr/bin/python3 /usr/lib/psec/bin/rotate-screen.py
 
     start-stop-daemon --start --make-pidfile --exec X --pidfile /var/run/$name.pid --background
+
+    /usr/bin/xset -display :0 s off
+    /usr/bin/xset -display :0 -dpms
+    /usr/bin/xset -display :0 s noblank
 
     eend $?
 }

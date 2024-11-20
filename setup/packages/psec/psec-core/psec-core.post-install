@@ -7,9 +7,13 @@ echo ---        script post-install.sh        ---
 echo --------------------------------------------
 echo
 
+rc-service modules restart
+
 rc-service xenconsoled start
 rc-service xenstored start
-rc-service virtxend start
+rc-update add xen-pci
+rc-service xen-pci start
+#rc-service virtxend start
 
 rc-update add start-domains
 rc-update add attach-pci-devices

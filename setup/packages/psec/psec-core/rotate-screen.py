@@ -10,14 +10,14 @@ def angle_to_rotate(angle):
     return mapping.get(angle, "normal")
 
 def rotate_screen(angle:int) -> None:
-    get_output_command = "xrandr | grep ' connected' | awk 'NR==1 {print $1}'"
+    get_output_command = "xrandr --display :0 | grep ' connected' | awk 'NR==1 {print $1}'"
 
     try:
         screen_name = subprocess.check_output(get_output_command, shell=True, text=True).strip()
 
         if screen_name:
             # Commande pour appliquer la rotation
-            rotate_command = "xrandr --output {} --rotate {}".format(screen_name, angle_to_rotate(angle))
+            rotate_command = "xrandr --display :0 --output {} --rotate {}".format(screen_name, angle_to_rotate(angle))
 
             # Exécute la commande de rotation
             subprocess.run(rotate_command, shell=True, check=True)

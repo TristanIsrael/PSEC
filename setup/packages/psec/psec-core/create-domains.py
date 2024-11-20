@@ -36,7 +36,7 @@ class DomainsFactory:
     def __create_domd_usb(self):
         print("Create Driver Domain USB")
 
-        conf = self.__create_new_domain(
+        '''conf = self.__create_new_domain(
             domain_name="sys-usb", 
             memory_in_mb=400,
             nb_cpus=1, 
@@ -46,7 +46,8 @@ class DomainsFactory:
             share_system=True,
             rxtx_inputs=True,
             pci_passthrough=True
-        )
+        )'''
+        conf = self.__create_domain_sys_usb(memory_in_mb= 400, nb_cpus= 1)
 
         with open('/etc/psec/xen/sys-usb.conf', 'w') as f:
             f.write(conf)
@@ -67,7 +68,7 @@ class DomainsFactory:
             #    rotation = json_screen.get("rotation")  
             #    print("Rotate screen with {} degrees".format(rotation))
 
-        conf = self.__create_new_domain(
+        '''conf = self.__create_new_domain(
             domain_name= "sys-gui", 
             memory_in_mb= memory,
             nb_cpus= 1, 
@@ -78,7 +79,8 @@ class DomainsFactory:
             rxtx_inputs= True,
             pci_passthrough= False,
             provides_gui= True
-        )
+        )'''
+        conf = self.__create_domain_sys_gui(memory_in_mb= memory, nb_cpus= 1)
 
         with open('/etc/psec/xen/sys-gui.conf', 'w') as f:
             f.write(conf)
@@ -119,7 +121,75 @@ class DomainsFactory:
 
                 self.__fetch_alpine_packages(package)     
 
-    def __create_new_domain(self, domain_name:str, memory_in_mb:int, nb_cpus:int, boot_iso_location:str, share_packages:bool=True, share_storage:bool=True, share_system:bool=False, rxtx_inputs:bool=False, pci_passthrough:bool=False, provides_gui:bool=False):
+    def __create_domain_sys_usb(memory_in_mb:int, nb_cpus:int) -> None:
+        txt = '''
+type = "pv"
+name = "sys-usb"
+kernel = "/var/lib/xen/boot/vmlinuz-virt"
+ramdisk = "/var/lib/xen/boot/initramfs-virt"
+extra = "modules=loop,squashfs,iso9660 console=hvc0"
+memory=400
+vcpus = 1
+disk = [
+	'format=raw, vdev=xvdc, access=r, devtype=cdrom, target=/usr/lib/psec/system/bootiso-sys-usb.iso'
+]
+p9 = [
+'tag=packages, path=/usr/lib/psec/packages, backend=0, security_model=none',
+'tag=storage, path=/usr/lib/psec/storage, backend=0, security_model=none',
+'tag=system, path=/usr/lib/psec/system, backend=0, security_model=none'
+]
+channel = [
+'name=console, connection=pty',
+'name=sys-usb-msg, connection=socket, path=/var/run/sys-usb-msg.sock',
+'name=sys-usb-log, connection=socket, path=/var/run/sys-usb-log.sock',
+'name=sys-usb-input, connection=socket, path=/var/run/sys-usb-input.sock'
+]
+'''.format(memory_in_mb, nb_cpus)
+        
+        parser=ConfigParser()
+        with open("/etc/conf.d/xen-pci") as stream:
+            parser.read_string("[none]\n" +stream.read())
+
+            # Add PCI passthrough
+            if parser["none"]["DEVICES"] != None:
+                devs = parser["none"]["DEVICES"].strip()
+
+                if devs != "" and devs != None:
+                    txt += "pci = [{}]\n".format(devs.replace(' ', '","'))
+
+    def __create_domain_sys_gui(memory_in_mb:int, nb_cpus:int) -> None:
+        txt = '''
+type = "hvm"
+name = "sys-gui"
+memory={}
+vcpus = {}
+disk = [
+	'format=raw, vdev=xvdc, access=r, devtype=cdrom, target=/usr/lib/psec/system/bootiso-sys-gui.iso'
+]
+p0 = [
+    'tag=packages, path=/usr/lib/psec/packages, backend=0, security_model=none',
+    'tag=storage, path=/usr/lib/psec/storage, backend=0, security_model=none',
+    'tag=system, path=/usr/lib/psec/system, backend=0, security_model=none'
+]
+channel = [
+'name=console, connection=pty',
+'name=sys-gui-msg, connection=socket, path=/var/run/sys-gui-msg.sock',
+'name=sys-gui-log, connection=socket, path=/var/run/sys-gui-log.sock',
+'name=sys-gui-input, connection=socket, path=/var/run/sys-gui-input.sock',
+'name=sys-gui-vnc, connection=socket, path=/var/run/sys-gui-vnc.sock'
+]
+vga = "qxl"
+device_model_args = [
+    '-spice', 'unix=on,addr=/var/run/spice.sock,disable-ticketing=on,ipv4=off,ipv6=off'
+]
+acpi=0
+usb=0
+vif=[]
+'''.format(memory_in_mb, nb_cpus)
+
+        return txt
+
+    def __create_new_domain(self, domain_name:str, memory_in_mb:int, nb_cpus:int, boot_iso_location:str, share_packages:bool=True, share_storage:bool=True, share_system:bool=False, rxtx_inputs:bool=False):
         txt = '''
 type = "pv"
 name = "{}"
@@ -149,40 +219,10 @@ disk = [
         channels = []
         channels.append("'name=console, connection=pty'") # /dev/hvc0
         channels.append("'name={}-msg, connection=socket, path=/var/run/{}-msg.sock'".format(domain_name, domain_name)) # /dev/hvc1
-        channels.append("'name={}-log, connection=socket, path=/var/run/{}-log.sock'".format(domain_name, domain_name)) # /dev/hvc2
-        if rxtx_inputs or provides_gui:
-            channels.append("'name={}-input, connection=socket, path=/var/run/{}-input.sock'".format(domain_name, domain_name)) # /dev/hvc3
-        if provides_gui:
-            channels.append("'name={}-vnc, connection=socket, path=/var/run/{}-vnc.sock'".format(domain_name, domain_name)) # /dev/hvc4
+        channels.append("'name={}-log, connection=socket, path=/var/run/{}-log.sock'".format(domain_name, domain_name)) # /dev/hvc2        
         
         if len(channels) > 0:
             txt += "channel = [\n{}\n]\n".format(",\n".join(channels))        
-        
-        if pci_passthrough is not None and pci_passthrough == True:
-            parser=ConfigParser()
-            with open("/etc/conf.d/xen-pci") as stream:
-                parser.read_string("[none]\n" +stream.read())
-
-                # Add PCI passthrough
-                if pci_passthrough and parser["none"]["DEVICES"] != None:
-                    devs = parser["none"]["DEVICES"].strip()
-
-                    if devs != "" and devs != None:
-                        txt += "pci = [{}]\n".format(devs.replace(' ', '","'))
-
-                # Add VGA passthrough
-                #if vga_passthrough and parser["none"]["VGA_DEVICES"] != None:
-                #    devs = parser["none"]["VGA_DEVICES"]
-                #
-                #    if devs != "" and devs != None:
-                #        txt += "pci = [{}]\n".format(devs.replace(' ', '", "'))
-
-        if provides_gui:
-            txt += "\
-stdvga = 1\n\
-device_model_args = [\n\
-    '-spice', 'unix=on,addr=/var/run/spice.sock,disable-ticketing=on,ipv4=off,ipv6=off'\n\
-]\n"
 
         return txt
 

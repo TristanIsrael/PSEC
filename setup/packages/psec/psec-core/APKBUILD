@@ -7,12 +7,12 @@ pkgdesc="PSEC - Core of the system"
 url="https://www.alefbet.net/"
 arch="noarch"
 license="MIT"
-depends="cdrkit psec-lib xen xen-hypervisor xen-qemu xen-qemu-openrc abuild pciutils xorg-server xrandr virt-viewer terminus-font"
+depends="openrc cdrkit psec-lib xen xen-hypervisor xen-qemu xen-qemu-openrc abuild pciutils xorg-server xrandr xset virt-viewer font-terminus"
 makedepends=""
 builddir="$srcdir/$pkgname-$pkgver"
 install="$pkgname.post-install $pkgname.post-deinstall"
 checkdepends=""
-subpackages="$pkgname-openrc"
+subpackages=""
 replaces="alpine-baselayout-data"
 options="!check"  # no tests provided
 
@@ -22,7 +22,6 @@ create-domains.py
 create-local-alpine-repository.sh
 finish-core-init.sh
 generate-pgp-keys.sh
-modules
 provision-domain.sh
 psec-core-controller.initd
 psec-core-controller.py
@@ -38,6 +37,7 @@ topology.json
 start-x.initd
 rotate-screen.py
 connect-to-gui.initd
+psec.conf
 "
 
 PSEC_CONFDIR="etc/psec"
@@ -84,7 +84,7 @@ package() {
     install -D -m755 "$srcdir"/start-domains.initd "$pkgdir"/etc/init.d/start-domains
     install -D -m755 "$srcdir"/psec-core-controller.initd "$pkgdir"/etc/init.d/psec-core-controller
 
-    install -D -m644 "$srcdir"/modules "$pkgdir/etc/modules"
+    install -D -m644 "$srcdir"/psec.conf "$pkgdir/etc/modules-load.d/psec.conf"
 
     #install -D -m644 "$srcdir"/sys-usb.conf "$pkgdir/$PSEC_CONFDIR/xen/sys-usb.conf"
     install -D -m644 "$srcdir"/topology.json "$pkgdir/$PSEC_CONFDIR"/topology.json
