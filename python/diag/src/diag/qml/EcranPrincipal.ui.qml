@@ -9,8 +9,8 @@ ApplicationWindow {
 
     property bool mode_paysage: force_paysage | (width < height)
 
-    width: 1024
-    height: 768
+    width: Screen.desktopAvailableWidth
+    height: Screen.desktopAvailableHeight
     visible: true
     visibility: Window.FullScreen
 

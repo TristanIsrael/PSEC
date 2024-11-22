@@ -2,6 +2,7 @@
 
 name="start-gui"
 command_background="yes"
+export DISPLAY=:0
 
 depend() {    
     after syslog

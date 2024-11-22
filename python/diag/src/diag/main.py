@@ -57,8 +57,9 @@ if __name__ == '__main__':
     if not engine.rootObjects():
         sys.exit(-1)
 
-    qml_root = engine.rootObjects()[0]    
-    
+    qml_root = engine.rootObjects()[0]        
+    qml_root.showFullScreen()
+
     # Intégration avec le socle
     appController.set_fenetre_app(qml_root)    
     appController.set_interface_socle(interfaceSocle)
