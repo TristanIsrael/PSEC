@@ -1,9 +1,9 @@
 #!/bin/sh
 
-echo "Starting X server"
+echo "**** Starting X server"
 X &
 
-echo "Setting graphical mode"
+echo "**** Setting graphical mode"
 
 # Read screen size
 domid=`xenstore-read domid`
@@ -42,6 +42,9 @@ esac
 # Apply the resolution
 resolution="$new_width"x"$new_height"
 xrandr --output Virtual-1 --display :0 --mode $resolution
+
+echo "**** Resizing shared memory"
+mount -o remount,size=16M /dev/shm
 
 echo "Initialization finished"
 
