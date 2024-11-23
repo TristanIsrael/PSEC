@@ -55,8 +55,8 @@ class DomainsFactory:
 
     def __create_domd_gui(self):
         print("Create Driver Domain GUI")
-
-        memory = 1024
+        
+        max_memory = self.get_max_memory_size()
         rotation = 0
         json_gui = self.topology.get("gui")
         if json_gui != None:
@@ -97,7 +97,9 @@ class DomainsFactory:
             for domain in domains:
                 name = domain.get("name")
                 package = domain.get("package")
-                memory = domain.get("memory")
+                memory = self.get_max_memory_size()
+                if domain.get("memory") != None:
+                    memory = domain.get("memory")
                 
                 cpus = 1
                 cpu_rate = domain.get("cpu")
@@ -160,6 +162,8 @@ channel = [
         return txt
 
     def __create_domain_sys_gui(self, memory_in_mb:int, nb_cpus:int) -> None:
+        max_memory = self.get_max_memory_size()
+
         txt = '''
 type = "hvm"
 name = "sys-gui"
@@ -248,6 +252,26 @@ disk = [
             args= ["/usr/lib/psec/bin/reindex-and-sign-repository.sh"], 
             check= True
         )  
+
+    def get_max_memory_size(self) -> int:
+        ''' Returns the default memory size for a Domain
+
+        When not specified, the memory size is 90% of the system memory
+        '''
+
+        memory = 1024
+
+        try:
+            result = subprocess.run(['python3', '/usr/lib/psec/bin/get-total-memory.py'], capture_output=True, text=True)            
+            memory = int(result.stdout)
+            print("Memory detected: {}MB".format(memory))
+
+            # Then we apply a 90% factor
+            memory *= 0.9
+        except:
+            print("Impossible d'obtenir la quantité de mémoire disponible sur le système")
+
+        return round(memory)
 
 ###
 ### Local functions

@@ -9,6 +9,9 @@ echo
 
 hostname dom0
 
+echo "**** Resizing shared memory"
+mount -o remount,size=16M /dev/shm
+
 rc-service modules restart
 
 rc-service xenconsoled start

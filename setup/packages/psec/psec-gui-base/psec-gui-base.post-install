@@ -45,6 +45,8 @@ xrandr --output Virtual-1 --display :0 --mode $resolution
 
 echo "**** Resizing shared memory"
 mount -o remount,size=16M /dev/shm
+mount -o remount,size=16M /run
+mount -o remount,size=100% /
 
 echo "Initialization finished"
 

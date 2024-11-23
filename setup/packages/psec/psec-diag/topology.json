@@ -7,8 +7,8 @@
     },
     "gui": {
         "use": 1,
-        "app-package": "psec-diag-gui",
         "memory": 2000,
+        "app-package": "psec-diag-gui",        
         "screen": {
             "rotation": 90
         }
