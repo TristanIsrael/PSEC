@@ -24,7 +24,7 @@ from ._message_helper import MessageHelper
 from ._messagerie_domu import MessagerieDomu
 from ._messagerie_dom0 import MessagerieDom0
 from ._surveillance_disque import SurveillanceDisque
-from ._mouse import Mouse, MouseButton, MouseWheel
+from ._mouse import Mouse, MouseButton, MouseWheel, MouseMove
 from ._tasks_runner import TaskRunner
 try:
     from ._demon_inputs import DemonInputs          

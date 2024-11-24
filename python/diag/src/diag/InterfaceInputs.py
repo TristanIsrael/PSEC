@@ -1,10 +1,10 @@
 from PySide6.QtCore import QObject, Signal, qDebug, qWarning, QTimer
-from PySide6.QtCore import  Slot, QPoint, QCoreApplication, Qt, QEvent
-from PySide6.QtGui import QMouseEvent, QWheelEvent, QHoverEvent, QEnterEvent
+from PySide6.QtCore import  Slot, QPoint, QCoreApplication, Qt, QEvent, QPointF
+from PySide6.QtGui import QMouseEvent, QWheelEvent, QHoverEvent, QEnterEvent, QGuiApplication
 from PySide6.QtWidgets import QWidget
 from MousePointer import MousePointer
-from psec import Journal, Parametres, Cles, Mouse, MouseButton, MouseWheel
-import serial, pickle #, threading
+from psec import Journal, Parametres, Cles, Mouse, MouseButton, MouseWheel, MouseMove
+import serial, subprocess #, threading
 
 class InterfaceInputs(QObject):
     """! Cette classe traite les informations sur les entrées (clavier, souris et tactile) en provenance du socle.
@@ -80,16 +80,21 @@ class InterfaceInputs(QObject):
             self.__traite_donnees_souris(mouse)
 
     def __traite_donnees_souris(self, mouse:Mouse):
-        newX = self.mouse.x + mouse.x
-        newY = self.mouse.y + mouse.y
-
         # Si c'est du tactile il faut recalculer la position en fonction de la résolution de la dalle tactile
-        if mouse.max_x > 0 and mouse.max_y > 0:
-            new_x = self.mouse.x / self.fenetre_app.width() * mouse.max_x
-            new_y = self.mouse.y / self.fenetre_app.height() * mouse.max_y
-            mouse.x = new_x
-            mouse.y = new_y
+        # Les coordonnées sont transmises en pourcentage des dimensions de la dalle
+        newY:float=0.0
+        newY:float=0.0
 
+        if mouse.move == MouseMove.RELATIVE:
+            newX = self.mouse.x + mouse.x
+            newY = self.mouse.y + mouse.y
+        elif mouse.move == MouseMove.ABSOLUTE:            
+            newCoord = self.__convert_tactile_to_window(mouse)            
+            newX = newCoord.x()
+            newY = newCoord.y()           
+            #print(mouse.x, self.fenetre_app.width(), newX, newY)        
+
+        # On limite aux dimensions de l'écran
         self.mouse.x = max(0, min(self.fenetre_app.width(), newX))
         self.mouse.y = max(0, min(self.fenetre_app.height(), newY))
         screenPos = QPoint(self.mouse.x, self.mouse.y)
@@ -172,4 +177,32 @@ class InterfaceInputs(QObject):
         if mouse.button_pressed(MouseButton.RIGHT):
             buttons &= Qt.RightButton
 
-        return buttons
+        return buttons    
+    
+    def __get_screen_rotation(self) -> int:
+        result = subprocess.run(["/usr/bin/xenstore-read", "domid"], capture_output=True, text=True)
+        domid = result.stdout.strip()
+        result = subprocess.run(["/usr/bin/xenstore-read", "/local/domain/{}/screen_rotation".format(domid)], capture_output=True, text=True)
+        orientation = int(result.stdout)
+
+        return orientation
+    
+    def __convert_tactile_to_window(self, mouse):        
+        #print(mouse.x, mouse.y)
+        rotation = self.__get_screen_rotation()
+
+        if rotation == 90:
+            posX = mouse.x * self.fenetre_app.height()/100
+            posY = mouse.y * self.fenetre_app.width()/100
+            x_window = posY
+            y_window = self.fenetre_app.height() - posX
+        else:
+            posX = mouse.x * self.fenetre_app.width()/100
+            posY = mouse.y * self.fenetre_app.height()/100
+            x_window = posX
+            y_window = self.fenetre_app.height() - posY
+
+        #print(posX, posY)
+        #print(x_window, y_window)
+        
+        return QPointF(x_window, y_window)

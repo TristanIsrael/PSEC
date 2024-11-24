@@ -1,7 +1,7 @@
 import sys, glob, threading, serial, time
 from typing import Optional
 from evdev import InputDevice, ecodes
-from . import Journal, Mouse, MouseButton, MouseWheel, Parametres, Cles, SingletonMeta
+from . import Journal, Mouse, MouseButton, MouseWheel, MouseMove, Parametres, Cles, SingletonMeta
 
 class TypeEntree:
     INCONNU = 0
@@ -28,6 +28,10 @@ class DemonInputs(metaclass=SingletonMeta):
     interface_xenbus_prete = False
     socket_xenbus = None
     monitored_inputs = []
+    mouse_max_x = 1
+    mouse_max_y = 1
+    last_x = 0
+    last_y = 0
     
     def demarre(self):
         self.journal.info("Starting input daemon")
@@ -56,12 +60,26 @@ class DemonInputs(metaclass=SingletonMeta):
         delta_x = 0 if axe != ecodes.REL_X else delta
         delta_y = 0 if axe != ecodes.REL_Y else delta
 
-        #self.journal.debug("Le mouvement du pointeur est {},{}".format(delta_x, delta_y))
+        self.journal.debug("Le mouvement du pointeur est {},{}".format(delta_x, delta_y))
 
+        self.mouse.move = MouseMove.RELATIVE
         self.mouse.x = int(delta_x)
         self.mouse.y = int(delta_y)
         self.mouse.wheel = MouseWheel.NO_MOVE
         self.__envoie_evenement_souris()
+
+    def __on_position(self, x:int, y:int):
+        #self.journal.debug("Les coordonnées du pointeur sont {},{}".format(x, y))
+
+        self.mouse.move = MouseMove.ABSOLUTE
+        self.mouse.x = int(x / self.mouse_max_x*100)
+        self.mouse.y = int(y / self.mouse_max_y*100)
+        self.mouse.wheel = MouseWheel.NO_MOVE
+
+        if self.last_x != self.mouse.x or self.last_y != self.mouse.y:
+            self.__envoie_evenement_souris()
+            self.last_x = self.mouse.x
+            self.last_y = self.mouse.y
 
     def __on_wheel(self, delta: int):
         if delta == 0:
@@ -77,7 +95,7 @@ class DemonInputs(metaclass=SingletonMeta):
         self.mouse.wheel = MouseWheel.NO_MOVE
 
     def __on_click(self, bouton, etat):
-        #self.journal.debug("L'état du bouton {} de la souris est {}".format(bouton, etat))
+        self.journal.debug("L'état du bouton {} de la souris est {}".format(bouton, etat))
         self.mouse.x = 0
         self.mouse.y = 0
 
@@ -133,8 +151,10 @@ class DemonInputs(metaclass=SingletonMeta):
                     if type_input == TypeEntree.TOUCH and input not in self.monitored_inputs:
                         # On récupère les valeurs max x et y pour connaître la résolution
                         caps = dev.capabilities()
-                        self.mouse.max_x = caps[ecodes.EV_ABS][ecodes.ABS_X][1].max
-                        self.mouse.max_y = caps[ecodes.EV_ABS][ecodes.ABS_Y][1].max
+                        self.mouse_max_x = caps[ecodes.EV_ABS][ecodes.ABS_X][1].max
+                        self.mouse_max_y = caps[ecodes.EV_ABS][ecodes.ABS_Y][1].max
+
+                        #print("max_x={}, max_y={}".format(self.mouse.max_x, self.mouse.max_y))
 
                         threading.Thread(target= self.__surveille_tactile, args=(dev,)).start()
                         self.monitored_inputs.append(input)
@@ -187,40 +207,28 @@ class DemonInputs(metaclass=SingletonMeta):
                 # par l'application contrôleur ayant connaissance de la résolution de l'écran.
                 # Cette valeur max doit être transmise avec les coordonnées du toucher.
                 if event.type != ecodes.EV_ABS and event.type != ecodes.EV_KEY:
-                    continue                
-                elif event.type == ecodes.EV_ABS and event.code == ecodes.ABS_MT_POSITION_X: # ABS_MT_POSITION_X arrive avant le BTN_TOUCH
+                    continue #ignoré               
+                elif event.type == ecodes.EV_ABS and event.code == ecodes.ABS_MT_POSITION_X:
                     abs_x = event.value                    
                 elif event.type == ecodes.EV_ABS and event.code == ecodes.ABS_MT_POSITION_Y:
-                    abs_y = event.value                    
-                elif event.type == ecodes.EV_KEY and event.code == ecodes.BTN_TOUCH:
-                    if event.value == 1:
-                        touchBegan = True             
-                    else:
-                        #self.touchEnd.emit( QPoint(int(abs_x), int(abs_y)), QSize(int(max_x), int(max_y)) )
-                        # On envoie un premier signal pour la position du toucher
-                        diff_x = last_abs_x - abs_x
-                        diff_y = last_abs_y - abs_y
-                        if diff_x != 0:
-                            self.__on_move(ecodes.REL_X, diff_x)
-                        if diff_y != 0:
-                            self.__on_move(ecodes.REL_Y, diff_y)
-
-                        abs_x = -1
-                        abs_y = -1
-                        nbPos = 0                    
+                    abs_y = event.value                  
+                elif event.type == ecodes.EV_ABS and event.code == ecodes.ABS_X: 
+                    abs_x = event.value                    
+                elif event.type == ecodes.EV_ABS and event.code == ecodes.ABS_Y:
+                    abs_y = event.value
+                                
+                # On envoie la position absolue
+                self.__on_position(abs_x, abs_y)
                 
-                # Si les positions x et y sont connues on peut envoyer un signal de début ou de mise
-                # à jour du toucher
-                if abs_x > -1 and abs_y > -1:
-                    if nbPos > 1:
-                        if abs_x != last_abs_x or abs_y != last_abs_y:
-                            self.touchUpdate.emit( QPoint(int(abs_x), int(abs_y)), QSize(int(max_x), int(max_y)) )
-                            last_abs_x = abs_x
-                            last_abs_y = abs_y
-                    elif touchBegan is True:
-                        self.touchBegin.emit( QPoint(int(abs_x), int(abs_y)), QSize(int(max_x), int(max_y)) )  
-                        touchBegan = False
-                    nbPos += 1   
+                '''diff_x = abs_x if last_abs_x == -1 else last_abs_x - abs_x
+                diff_y = abs_y if last_abs_y == -1 else last_abs_y - abs_y
+
+                if diff_x != 0:
+                    self.__on_move(ecodes.REL_X, diff_x)
+                    last_abs_x = abs_x
+                if diff_y != 0:
+                    self.__on_move(ecodes.REL_Y, diff_y)
+                    last_abs_y = abs_y'''
         except:
             self.journal.debug("The touchscreen {} is not available anymore".format(input.name))
             self.monitored_inputs.remove(input.path)

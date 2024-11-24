@@ -164,6 +164,7 @@ elle envoie la réponse `end_benchmark` avec comme données la structure suivant
 |---|---|---|---|
 | QEMU x86_64 sur Mac M2 | 1000 | 811 ms | 123 itérations/cs |
 | Dell Latitude E5510 Core i5 | 1000 | 117 ms | 854 itérations/cs |
+| Durabook R8 | 1000 | 39ms | 2564 itérations/cs |
 
 ### Transferts de fichiers
 
@@ -219,8 +220,16 @@ Les métriques affichées sont :
 | | 10 Ko | 100 Ko | 500 Ko | 1 Mo | 10 Mo | 100 Mo |
 |--|--|--|--|--|--|--|
 | Ecriture USB | 20,2 | 80,02 | 21,08 | 6,13 | 2,54 | 3,59 |
-| Lecture USB | 44,4 | 282,02 | 798,67 | 997,49 | 1389,78 | 15,88 |
+| Lecture USB | 44,4 | 282,02 | 798,67 | 997,49 | 1 389,78 | 15,88 |
 | Ecriture dépôt | 1,17 | 12,19 | 51,47 | 95,83 | 107,35 | 17,08 |
+
+#### Durabook R8
+
+| | 10 Ko | 100 Ko | 500 Ko | 1 Mo | 10 Mo | 100 Mo |
+|--|--|--|--|--|--|--|
+| Ecriture USB | 31,0 | 116,48 | 52,75 | 90,41 | 7,45 | 7,37 |
+| Lecture USB | 110,3 | 685,62 | 939,66 | 1 088,32 | 66,71 | 24,54 |
+| Ecriture dépôt | 1,49 | 14,72 | 60,27 | 149,60 | 257,38 | 26,35 |
 
 ## Commandes
 
