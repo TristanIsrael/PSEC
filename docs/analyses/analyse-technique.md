@@ -605,7 +605,7 @@ https://stafwag.github.io/blog/blog/2018/04/22/high-screen-resolution-on-a-kvm-v
 ```
 vga = "stdvga"
 device_model_override = "/usr/lib/psec/packages/dist/install/usr/lib/xen/bin/qemu-system-i386"
-qemu_env = ['LD_LIBRARY_PATH=/usr/lib/psec/packages/dist/install/usr/lib/']
+qemu_env = ['LD_LIBRARY_PATH=/usr/lib/psec/packages/dist/install/usr/lib/'] 
 device_model_args = [
      '-display', 'gtk,show-tabs=off,show-cursor=off,window-close=off,show-menubar=off',
 ]

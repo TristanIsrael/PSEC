@@ -16,34 +16,37 @@ subpackages=""
 replaces="alpine-baselayout-data"
 options="!check"  # no tests provided
 
-source="attach-pci-devices.initd
-constants.sh
-create-domains.py
-create-local-alpine-repository.sh
-finish-core-init.sh
-generate-pgp-keys.sh
-provision-domain.sh
-psec-core-controller.initd
-psec-core-controller.py
-reindex-and-sign-repository.sh
-setup-alpine-repositories.sh
-setup-pci-usb-controllers.sh 
-setup-pci-vga-controller.sh
-setup-pci.initd
-setup-xen-environment.sh
-splash.initd
-start-domains.initd
-topology.json
-start-x.initd
-rotate-screen.py
-connect-to-gui.initd
-psec.conf
-get-sys-gui-domid.sh
-write-screen-information-to-xenstore.py
-post-install.sh
-generate-x-config.py
-10-energy-saving.conf
-get-total-memory.py
+source="
+init/attach-pci-devices.initd
+init/psec-core-controller.initd
+init/setup-pci.initd
+init/splash.initd
+init/start-domains.initd
+init/start-x.initd
+
+scripts/create-local-alpine-repository.sh
+scripts/finish-core-init.sh
+scripts/generate-pgp-keys.sh
+scripts/provision-domain.sh
+scripts/reindex-and-sign-repository.sh
+scripts/setup-alpine-repositories.sh
+scripts/setup-pci-usb-controllers.sh 
+scripts/setup-pci-vga-controller.sh
+scripts/setup-xen-environment.sh
+scripts/get-sys-gui-domid.sh
+scripts/post-install.sh
+
+conf/constants.sh
+conf/psec.conf
+conf/10-energy-saving.conf
+conf/topology.json
+
+python/rotate-screen.py
+python/create-domains.py
+python/psec-core-controller.py
+python/write-screen-information-to-xenstore.py
+python/generate-x-config.py
+python/get-total-memory.py
 "
 
 PSEC_CONFDIR="etc/psec"
@@ -98,7 +101,7 @@ package() {
     install -D -m755 "$srcdir"/start-x.initd "$pkgdir"/etc/init.d/start-x
     install -D -m644 "$srcdir"/rotate-screen.py "$pkgdir/$PSEC_BINDIR"/rotate-screen.py
     install -D -m644 "$srcdir"/generate-x-config.py "$pkgdir/$PSEC_BINDIR"/generate-x-config.py
-    install -D -m755 "$srcdir"/connect-to-gui.initd "$pkgdir"/etc/init.d/connect-to-gui
+    #install -D -m755 "$srcdir"/connect-to-gui.initd "$pkgdir"/etc/init.d/connect-to-gui
 
     install -D -m755 "$srcdir"/post-install.sh "$pkgdir/$PSEC_BINDIR"/post-install.sh
     install -D -m755 "$srcdir"/get-sys-gui-domid.sh "$pkgdir/$PSEC_BINDIR"/get-sys-gui-domid.sh

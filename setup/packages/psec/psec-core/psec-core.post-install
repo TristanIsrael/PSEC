@@ -31,7 +31,7 @@ rc-update add start-x
 rc-service start-x start
 
 # Transféré dans le script post-install qui sera appelé par le produit
-rc-update add connect-to-gui
+#rc-update add connect-to-gui
 #rc-service connect-to-gui start
 
 exit 0
