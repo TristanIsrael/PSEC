@@ -15,9 +15,9 @@ install="$pkgname.post-install"
 subpackages=""
 replaces=""
 options="!check"  # no tests provided
-source="psec-gui-base.installed"
+source="10-energy-saving.conf"
 
 
 package() {
-    install -D -m644 "$srcdir"/psec-gui-base.installed "$pkgdir"/etc/psec/packages/psec-gui-base.installed
+    install -D -m644 "$srcdir"/10-energy-saving.conf "$pkgdir"/etc/X11/xorg.conf.d/10-energy-saving.conf
 }

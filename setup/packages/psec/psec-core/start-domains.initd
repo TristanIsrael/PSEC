@@ -14,7 +14,7 @@ start() {
     eend $?
     
     ebegin "Start Domain sys-gui"
-    xl create -f /etc/psec/xen/sys-gui.conf
+    DISPLAY=:0 LD_LIBRARY_PATH=/usr/local/lib/xen-4.19.0/usr/lib xl create -f /etc/psec/xen/sys-gui.conf
     
     # Write screen information in the Xenstore for sys-gui
     sysguiid="$(/usr/lib/psec/bin/get-sys-gui-domid.sh)"

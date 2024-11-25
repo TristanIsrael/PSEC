@@ -598,8 +598,37 @@ https://stafwag.github.io/blog/blog/2018/04/22/high-screen-resolution-on-a-kvm-v
 - Installer un serveur X léger : `apk add xserver-xorg xrandr`
 - Faire tourner l'écran (tactile) : `DISPLAY=:0 xrandr --output DSI-1 --rotate left`
 
-*à essayer* : `vfb = [ 'sdl=1' ]`
+*à essayer* : `vfb = [ 'sdl=1' ]`* -> Affichage incorrect
+
+### Méthode GTK
+
+```
+vga = "stdvga"
+device_model_override = "/usr/lib/psec/packages/dist/install/usr/lib/xen/bin/qemu-system-i386"
+qemu_env = ['LD_LIBRARY_PATH=/usr/lib/psec/packages/dist/install/usr/lib/']
+device_model_args = [
+     '-display', 'gtk,show-tabs=off,show-cursor=off,window-close=off,show-menubar=off',
+]
+acpi=0
+usb=0
+vif=[]
+```
 
 ## Notes diverses
+
+Désactiver l'économie d'énergie
+
+## Ajouter le support de GTK+ et SDL dans QEMU Xen
+
+Dépendances : `sdl2-dev, gtk+3.0-dev, sdl2_image-dev`
+
+```
+$ git clone https://gitlab.alpinelinux.org/alpine/aports.git
+$ cd aports
+$ cd main/xen/
+$ abuild -rK
+$ cd src/tools/qemu-xen
+$ ./configure --enable-gtk --enable-sdl --enable-sdl-image
+```
 
 ### Désactiver IPv6

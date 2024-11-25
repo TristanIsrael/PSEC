@@ -57,14 +57,13 @@ class Mouse():
         return "{},{},{},{},{}".format(self.move, self.x, self.y, self.buttons, self.wheel).encode()
     
     @staticmethod
-    def fromData(data: bytes):  
+    def fromData(data: bytes):
         if data.count(b',') < 4:
             return None
         else:
-            s = data.split(b',')  
-            #if s[0] == MouseMove.RELATIVE:
-            return Mouse(int(s[0]), int(s[1]), int(s[2]), int(s[3]), int(s[4]))
-            #else:
-                #return Mouse(int(s[0]), float(s[1]), float(s[2]), int(s[3]), int(s[4]))
-        
-            
+            try:
+                s = data.split(b',')                 
+                return Mouse(int(s[0]), int(s[1]), int(s[2]), int(s[3]), int(s[4]))
+                #return Mouse(int(s[0]), int(s[1]), int(s[2]), int(s[3]), int(s[4]))            
+            except:
+                return None

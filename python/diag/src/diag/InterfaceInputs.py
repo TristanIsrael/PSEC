@@ -82,7 +82,7 @@ class InterfaceInputs(QObject):
     def __traite_donnees_souris(self, mouse:Mouse):
         # Si c'est du tactile il faut recalculer la position en fonction de la résolution de la dalle tactile
         # Les coordonnées sont transmises en pourcentage des dimensions de la dalle
-        newY:float=0.0
+        newX:float=0.0
         newY:float=0.0
 
         if mouse.move == MouseMove.RELATIVE:
@@ -91,7 +91,10 @@ class InterfaceInputs(QObject):
         elif mouse.move == MouseMove.ABSOLUTE:            
             newCoord = self.__convert_tactile_to_window(mouse)            
             newX = newCoord.x()
-            newY = newCoord.y()           
+            newY = newCoord.y()     
+        else:
+            print("Erreur de décodage")
+            return
             #print(mouse.x, self.fenetre_app.width(), newX, newY)        
 
         # On limite aux dimensions de l'écran
@@ -180,12 +183,15 @@ class InterfaceInputs(QObject):
         return buttons    
     
     def __get_screen_rotation(self) -> int:
-        result = subprocess.run(["/usr/bin/xenstore-read", "domid"], capture_output=True, text=True)
-        domid = result.stdout.strip()
-        result = subprocess.run(["/usr/bin/xenstore-read", "/local/domain/{}/screen_rotation".format(domid)], capture_output=True, text=True)
-        orientation = int(result.stdout)
+        try:
+            result = subprocess.run(["/usr/bin/xenstore-read", "domid"], capture_output=True, text=True)
+            domid = result.stdout.strip()
+            result = subprocess.run(["/usr/bin/xenstore-read", "/local/domain/{}/screen_rotation".format(domid)], capture_output=True, text=True)
+            orientation = int(result.stdout)
 
-        return orientation
+            return orientation
+        except:
+            return 0
     
     def __convert_tactile_to_window(self, mouse):        
         #print(mouse.x, mouse.y)

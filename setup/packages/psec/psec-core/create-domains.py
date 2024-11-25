@@ -183,9 +183,11 @@ channel = [
 'name=sys-gui-log, connection=socket, path=/var/run/sys-gui-log.sock',
 'name=sys-gui-input, connection=socket, path=/var/run/sys-gui-input.sock'
 ]
-vga = "qxl"
+vga = "stdvga"
+device_model_override = "/usr/local/lib/xen-4.19.0/usr/lib/xen/bin/qemu-system-i386"
+qemu_env = ['LD_LIBRARY_PATH=/usr/local/lib/xen-4.19.0/usr/lib'] 
 device_model_args = [
-    '-spice', 'unix=on,addr=/var/run/spice.sock,disable-ticketing=on,ipv4=off,ipv6=off'
+     '-display', 'gtk,show-tabs=off,show-cursor=off,window-close=off,show-menubar=off',
 ]
 acpi=0
 usb=0

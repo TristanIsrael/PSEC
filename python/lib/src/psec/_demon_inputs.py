@@ -60,7 +60,7 @@ class DemonInputs(metaclass=SingletonMeta):
         delta_x = 0 if axe != ecodes.REL_X else delta
         delta_y = 0 if axe != ecodes.REL_Y else delta
 
-        self.journal.debug("Le mouvement du pointeur est {},{}".format(delta_x, delta_y))
+        #self.journal.debug("Le mouvement du pointeur est {},{}".format(delta_x, delta_y))
 
         self.mouse.move = MouseMove.RELATIVE
         self.mouse.x = int(delta_x)
@@ -68,18 +68,23 @@ class DemonInputs(metaclass=SingletonMeta):
         self.mouse.wheel = MouseWheel.NO_MOVE
         self.__envoie_evenement_souris()
 
-    def __on_position(self, x:int, y:int):
+    def __on_position(self, x:int, y:int, touched:int):
         #self.journal.debug("Les coordonnées du pointeur sont {},{}".format(x, y))
 
         self.mouse.move = MouseMove.ABSOLUTE
+        if touched > 0:
+            self.mouse.buttons |= MouseButton.LEFT
+        else:
+            self.mouse.buttons &= ~MouseButton.LEFT
+
         self.mouse.x = int(x / self.mouse_max_x*100)
         self.mouse.y = int(y / self.mouse_max_y*100)
         self.mouse.wheel = MouseWheel.NO_MOVE
-
-        if self.last_x != self.mouse.x or self.last_y != self.mouse.y:
-            self.__envoie_evenement_souris()
+        
+        if self.last_x != self.mouse.x or self.last_y != self.mouse.y or touched == 0:
+            self.__envoie_evenement_souris()            
             self.last_x = self.mouse.x
-            self.last_y = self.mouse.y
+            self.last_y = self.mouse.y        
 
     def __on_wheel(self, delta: int):
         if delta == 0:
@@ -168,7 +173,7 @@ class DemonInputs(metaclass=SingletonMeta):
         self.journal.info("Monitor the mouse {}".format(input.name))
 
         try:
-            for event in input.read_loop():
+            for event in input.read_loop():                
                 if event.type == ecodes.EV_REL and (event.code == ecodes.REL_X or event.code == ecodes.REL_Y):
                     axe = event.code
                     delta = event.value
@@ -186,13 +191,10 @@ class DemonInputs(metaclass=SingletonMeta):
 
     def __surveille_tactile(self, input):        
         self.journal.info("Monitor the touchscreen {}".format(input.name))
-
-        last_abs_x = -1
-        last_abs_y = -1
+        
         abs_x = -1
         abs_y = -1
-        touchBegan = False
-        nbPos = 0        
+        btn_touch = -1
 
         try:
             for event in input.read_loop():
@@ -216,19 +218,18 @@ class DemonInputs(metaclass=SingletonMeta):
                     abs_x = event.value                    
                 elif event.type == ecodes.EV_ABS and event.code == ecodes.ABS_Y:
                     abs_y = event.value
-                                
+                elif event.type == ecodes.EV_KEY and event.code == ecodes.BTN_TOUCH:
+                    btn_touch = event.value
+                           
                 # On envoie la position absolue
-                self.__on_position(abs_x, abs_y)
-                
-                '''diff_x = abs_x if last_abs_x == -1 else last_abs_x - abs_x
-                diff_y = abs_y if last_abs_y == -1 else last_abs_y - abs_y
+                if abs_x > -1 and abs_y > -1 and btn_touch > -1:
+                    self.__on_position(abs_x, abs_y, btn_touch)
 
-                if diff_x != 0:
-                    self.__on_move(ecodes.REL_X, diff_x)
-                    last_abs_x = abs_x
-                if diff_y != 0:
-                    self.__on_move(ecodes.REL_Y, diff_y)
-                    last_abs_y = abs_y'''
+                    if btn_touch == 0:
+                        # Après le relâchement on réinitialise le contexte
+                        abs_x = -1
+                        abs_y = -1    
+                        btn_touch = -1
         except:
             self.journal.debug("The touchscreen {} is not available anymore".format(input.name))
             self.monitored_inputs.remove(input.path)
