@@ -3,13 +3,13 @@
 name="splash"
 
 depend() {
-    before modules
+    before *
 }
 
 start() {
     width=`cat /sys/class/graphics/fb0/virtual_size | cut -d, -f1`
     height=`cat /sys/class/graphics/fb0/virtual_size | cut -d, -f2`
-    splash_file="/boot/Splash_$width_$height.ppm"
+    splash_file="/boot/Splash_${width}_${height}.ppm"
 
     if [ ! -f $splash_file ]
     then 

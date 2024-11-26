@@ -47,6 +47,8 @@ python/psec-core-controller.py
 python/write-screen-information-to-xenstore.py
 python/generate-x-config.py
 python/get-total-memory.py
+
+boot/Splash_1280_800.ppm
 "
 
 PSEC_CONFDIR="etc/psec"
@@ -110,4 +112,6 @@ package() {
     install -D -m644 "$srcdir"/get-total-memory.py "$pkgdir/$PSEC_BINDIR"/get-total-memory.py
 
     install -D -m644 "$srcdir"/10-energy-saving.conf "$pkgdir"/etc/X11/xorg.conf.d/10-energy-saving.conf
+
+    install -D -m644 "$srcdir"/Splash_1280_800.ppm "$pkgdir"/boot/Splash_1280_800.ppm
 }

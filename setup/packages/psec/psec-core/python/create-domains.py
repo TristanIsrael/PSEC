@@ -96,7 +96,7 @@ class DomainsFactory:
         if domains != None:
             for domain in domains:
                 name = domain.get("name")
-                package = domain.get("package")
+                package = domain.get("app-package")
                 memory = self.get_max_memory_size()
                 if domain.get("memory") != None:
                     memory = domain.get("memory")
