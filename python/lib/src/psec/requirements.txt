@@ -2,3 +2,4 @@ pyserial
 joblib
 humanize
 watchdog
+paho-mqtt

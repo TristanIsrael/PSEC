@@ -1,4 +1,4 @@
-from . import Constantes, Parametres, Cles, Domaine
+from .. import Constantes, Parametres, Cles, Domaine
 import time, json, zlib
 
 class TypeMessage:

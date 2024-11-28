@@ -1,6 +1,5 @@
-import logging, json, threading, socket
-from . import Parametres, Cles, Constantes, CommandeFactory, Message, NotificationFactory
-from . import EtatDisque, Journal, MessageHelper, MessagerieDomu
+from . import Constantes, RequestFactory, Topics
+from . import Logger, MqttClient, ConnectionType, MqttFactory
 
 class Api():
     """ Cette classe permet à un programme tiers d'envoyer des commandes ou recevoir des 
@@ -27,106 +26,103 @@ class Api():
     ready_callbacks = list()
     message_callbacks = list()
     sock = None
-    journal = Journal("API")
 
-    def __init__(self, callback_fn = None):
-        if callback_fn is not None:
-            self.message_callbacks.append(callback_fn)
+    def __init__(self, identifier:str):
+        self.identifier = identifier
+        
+    def set_mqtt_msg(self, connection_type:ConnectionType = ConnectionType.SERIAL_PORT, connection_string:str = ""):
+        self.client_msg = MqttClient(connection_type, connection_string)
 
-    def demarre(self, force_serial_port = ""):
-        self.journal.debug("Starting messaging")
+    def set_mqtt_log(self, connection_type:ConnectionType = ConnectionType.SERIAL_PORT, connection_string:str = ""):
+        self.client_log = MqttClient(connection_type, connection_string)
 
-        MessagerieDomu().set_message_callbacks(self.message_callbacks)
-        MessagerieDomu().set_demarrage_callbacks(self.ready_callbacks)
+    def start(self):
+        if self.client_log is None:
+            self.client_log = MqttFactory.create_client_log_domu(self.identifier)
 
-        threading.Thread(target= MessagerieDomu().demarre, args= (False, force_serial_port, )).start()
+        if self.client_msg is None:
+            self.client_msg = MqttFactory.create_client_msg_domu(self.identifier)
 
-    def set_message_callback(self, callback_fn):
+        Logger().setup("API", self.client_log)
+
+        self.client_msg.on_connected = self.__on_messaging_ready        
+        self.client_msg.on_message = self.__on_message_received
+
+    def add_message_callback(self, callback_fn):
         if callback_fn is not None:
             self.message_callbacks.append(callback_fn)
         else:
-            print("WARNING: callback function is None")
+            Logger().warn("WARNING: message callback function is None")
 
-    def set_ready_callback(self, callback_fn):
+    def add_ready_callback(self, callback_fn):
         if callback_fn is not None:
             self.ready_callbacks.append(callback_fn)
         else:
-            print("WARNING: callback function is None")
+            Logger().warn("WARNING: ready callback function is None")
 
     ####
     # Fonctions de journalisation
     #
     def debug(self, message : str):
-        self.journal.debug(message)
+        Logger().debug(message)
 
     def info(self, message : str):
-        self.journal.info(message)
+        Logger().info(message)
 
     def warn(self, message : str):
-        self.journal.warn(message)
+        Logger().warn(message)
 
     def error(self, message : str):
-        self.journal.error(message)
+        Logger().error(message)
 
     def critical(self, message : str):
-        self.journal.critical(message)
+        Logger().critical(message)
 
     ####
     # Fonctions de gestion des supports de stockage
     #
-    def get_liste_disques(self):
-        cmd = CommandeFactory.cree_commande_liste_disques()
-        self.__envoie_message(cmd)
+    def get_disks_list(self):
+        self.client_msg.publish("{}/request".format(Topics.LIST_DISKS), {})
 
-    def get_liste_fichiers(self, disque : str):
-        cmd = CommandeFactory.cree_commande_liste_fichiers(disque)
-        self.__envoie_message(cmd)
+    def get_files_list(self, disk: str):
+        payload = RequestFactory.create_request_files_list(disk)
+        self.client_msg.publish("{}/request".format(Topics.LIST_FILES), payload)
 
-    def lit_fichier(self, disk:str, filepath:str):
-        cmd = CommandeFactory.cree_commande_lit_fichier(disk, filepath)
-        self.__envoie_message(cmd)
+    def read_file(self, disk:str, filepath:str):
+        payload = RequestFactory.create_request_read_file(disk, filepath)
+        self.client_msg.publish("{}/request".format(Topics.READ_FILE), payload)
 
-    def copie_fichier(self, source_disk:str, filepath:str, destination_disk:str):
-        cmd = CommandeFactory.cree_commande_copie_fichier(source_disk, filepath, destination_disk)
-        self.__envoie_message(cmd)
+    def copy_file(self, source_disk:str, filepath:str, destination_disk:str):
+        payload = RequestFactory.create_request_copy_file(source_disk, filepath, destination_disk)
+        self.client_msg.publish("{}/request".format(Topics.COPY_FILE), payload)
 
-    def copie_fichier_dans_depot(self, source_disk:str, filepath:str):        
-        self.copie_fichier(source_disk, filepath, Constantes.REPOSITORY)
+    def copy_file_to_storage(self, source_disk:str, filepath:str):        
+        self.copy_file(source_disk, filepath, Constantes.REPOSITORY)
 
-    def supprime_fichier(self, nom_du_fichier:str, nom_du_disque:str):
-        cmd = CommandeFactory.cree_commande_supprime_fichier(nom_du_fichier, nom_du_disque)
-        self.__envoie_message(cmd)    
+    def delete_file(self, filepath:str, disk:str):
+        payload = RequestFactory.create_request_delete_file(filepath, disk)
+        self.client_msg.publish("{}/request".format(Topics.DELETE_FILE), payload)
 
     def get_file_footprint(self, filepath:str, disk:str):
-        cmd = CommandeFactory.cree_commande_get_file_footprint(filepath, disk)
-        self.__envoie_message(cmd)
+        payload = RequestFactory.create_request_get_file_footprint(filepath, disk)
+        self.client_msg.publish("{}/request".format(Topics.FILE_FOOTPRINT), payload)
 
     def create_file(self, filepath:str, disk:str, contents:bytes):
-        cmd = CommandeFactory.cree_commande_create_file(filepath, disk, contents)
-        self.__envoie_message(cmd)
+        payload = RequestFactory.create_request_create_file(filepath, disk, contents)
+        self.client_msg.publish("{}/request".format(Topics.CREATE_FILE), payload)
 
-    def get_components_states(self) -> None:
-        cmd = CommandeFactory.cree_commande_components_list()
-        self.__envoie_message(cmd)
+    def discover_modules(self) -> None:        
+        self.client_msg.publish("{}/request".format(Topics.DISCOVER_MODULES), {})
 
-    ####
-    # Fonctions de notification
-    #
-    def notifie_ajout_disque(self, nom_disque):
-        notif = NotificationFactory.cree_notification_disque(nom_disque, EtatDisque.PRESENT)
-        self.__envoie_message(notif)
-
-    def notifie_retrait_disque(self, nom_disque):
-        notif = NotificationFactory.cree_notification_disque(nom_disque, EtatDisque.ABSENT)
-        self.__envoie_message(notif)
 
     ####
     # Fonctions privées
-    #
-    def __envoie_message(self, message : Message):        
-        MessagerieDomu().envoie_message_xenbus(message)
-
-    def __on_messagerie_ready(self):
+    #    
+    def __on_messaging_ready(self):
         if len(self.ready_callbacks) > 0 :
             for cb in self.ready_callbacks:
                 cb()
+
+    def __on_message_received(self, topic:str, payload:dict):
+        for cb in self.message_callbacks:
+            cb(topic, payload)

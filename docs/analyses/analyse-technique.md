@@ -631,4 +631,6 @@ $ cd src/tools/qemu-xen
 $ ./configure --enable-gtk --enable-sdl --enable-sdl-image
 ```
 
-### Désactiver IPv6
+## Mosquitto
+
+Démarrer Mosquitto sur macOS : `mosquitto -c ~/mosquitto-multiple.conf`

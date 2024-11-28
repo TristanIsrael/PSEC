@@ -1,6 +1,6 @@
 import json, time, socket, logging, threading, os, serial
-from . import Constantes, Cles, SingletonMeta, Parametres, ErreurFactory, MessageHelper, CommandeFactory, TypeMessage
-from . import TypeCommande, Commande, FichierHelper, Journal, Reponse, Message, TypeReponse
+from .. import Constantes, Cles, SingletonMeta, Parametres, EventFactory, MessageHelper, RequestFactory, TypeMessage
+from .. import TypeCommande, Commande, FichierHelper, Journal, Reponse, Message, TypeReponse
 
 class MessagerieDomu(metaclass=SingletonMeta):
     """Classe permettant l'envoi et la réception de messages entre Domaines utilisateurs et Domaine 0
@@ -128,7 +128,7 @@ class MessagerieDomu(metaclass=SingletonMeta):
                         self.journal.error("Error: The message could not be decoded.")
                         self.journal.error(data.decode())
                         self.journal.error(e)
-                        msg = ErreurFactory.genere_erreur(logging.ERROR, "The message could not be decoded")
+                        msg = EventFactory.create_event(logging.ERROR, "The message could not be decoded")
                         self.envoie_erreur_xenbus(msg)
             
         except socket.error as e:
@@ -151,7 +151,7 @@ class MessagerieDomu(metaclass=SingletonMeta):
 
         msg = MessageHelper.cree_message_from_json(message)
         if msg == None:
-            err = ErreurFactory.genere_erreur(logging.ERROR, "The message is not well formed")
+            err = EventFactory.create_event(logging.ERROR, "The message is not well formed")
             self.envoie_erreur_xenbus(err)
         else:
             self.journal.debug("The message has been decoded")

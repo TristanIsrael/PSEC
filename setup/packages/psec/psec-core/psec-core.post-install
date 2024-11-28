@@ -20,6 +20,11 @@ rc-update add xen-pci
 #rc-service xen-pci start
 #rc-service virtxend start
 
+mkdir -p /var/run/mosquitto
+chown mosquitto:mosquitto /var/run/mosquitto
+rc-update add mosquitto
+rc-service mosquitto start
+
 rc-update add start-domains
 rc-update add attach-pci-devices
 rc-update add psec-core-controller

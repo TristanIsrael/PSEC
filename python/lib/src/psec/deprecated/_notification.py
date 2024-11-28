@@ -1,4 +1,4 @@
-from . import TypeMessage, Message, TypeEvenement
+from .. import TypeMessage, Message, TypeEvenement
 
 class Notification(Message):
     """ Classe définissant une notification """

@@ -1,5 +1,3 @@
-from . import Constantes, EtatDisque, EtatFichier, Domaine, BoutonSouris
-from . import TypeEntree, Parametres, TypeEvenement, Notification, TypeMessage, Cles
 
 class NotificationFactory:
     """ Cette classe permet de créer des notifications simmplement.
@@ -8,116 +6,19 @@ class NotificationFactory:
     """
 
     @staticmethod
-    def __nom_domaine_gui() -> str:
-        nom = str(Parametres().parametre(Cles.NOM_DOMAINE_GUI))
-        return nom
-
-    @staticmethod
-    def cree_notification_domu_pret(destination:str = Domaine.DOM0):
-        notif = Notification(TypeEvenement.ETAT_DOMU, {"pret": 1})
-        notif.destination = destination
-        return notif
-
-    @staticmethod
-    def cree_notification_domu_nonpret(destination:str = Domaine.DOM0):
-        notif = Notification(TypeEvenement.ETAT_DOMU, {"pret": 0})
-        notif.destination = destination
-        return notif
-    
-    @staticmethod
-    def cree_notification_disque(nom:str, etat:str, destination:str = Domaine.TOUS):
-        notif = Notification(
-            TypeEvenement.DISQUE, 
-            {
-                "nom": nom, 
-                "etat": etat
-            }
-        )
-        notif.destination = destination
-        return notif
-    
-    @staticmethod
-    def cree_notification_fichier(nom : str, etat:str, destination:str = Domaine.TOUS):
-        notif = Notification(
-            TypeEvenement.FICHIER, 
-            {
-                "fichier": nom, 
-                "etat": etat
-            }
-        )
-        notif.destination = destination
-        return notif
-
-    @staticmethod
-    def cree_notification_souris(position_x : int, position_y : int, bouton : BoutonSouris = BoutonSouris.AUCUN):
-        """ Cette fonction permet de créer une notification concernant la souris """   
-    
-        data = {
-            "entree": TypeEntree.SOURIS,
-            "position": {
-                "x": position_x,
-                "y": position_y
-            },
-            "boutons" : {
-                "gauche": 1 if bouton == BoutonSouris.GAUCHE else 0,
-                "milieu": 1 if bouton == BoutonSouris.MILIEU else 0,
-                "droit": 1 if bouton == BoutonSouris.DROIT else 0
-            }
+    def create_notification_disk_state(disk:str, state:str):
+        payload = {
+            "disk": disk, 
+            "state": state
         }
 
-        notif = Notification(TypeEvenement.ENTREE, data)
-        notif.source = Parametres().identifiant_domaine()
-        notif.destination = NotificationFactory.__nom_domaine_gui()
-        return notif
-    
-    @staticmethod
-    def cree_notification_tactile(position_x : int, position_y : int, touche : bool):
-        data = {
-            "entree": TypeEntree.TACTILE,
-            "position": {
-                "x": position_x,
-                "y": position_y
-            },
-            "touche": 1 if touche else 0
-        }
+        return payload
 
-        notif = Notification(TypeEvenement.ENTREE, data)
-        notif.source = Parametres().identifiant_domaine()
-        notif.destination = NotificationFactory.__nom_domaine_gui()
-        return notif
-    
     @staticmethod
-    def cree_notification_clavier(touche):
-        """ Cette fonction permet de définir une notification concernant une frappe clavier """
-
-        data = {
-            "entree": TypeEntree.CLAVIER,
-            "touche": touche
+    def create_notification_new_file(disk:str, filepath:str) -> dict:
+        payload = {            
+            "disk": disk,
+            "filepath": filepath
         }
         
-        notif = Notification(TypeEvenement.ENTREE, data)
-        notif.source = Parametres().identifiant_domaine()
-        notif.destination = NotificationFactory.__nom_domaine_gui()
-        return notif
-
-    @staticmethod
-    def cree_notification_test(donnees : dict):
-        notif = Notification(TypeEvenement.TEST, donnees)
-        notif.source = Parametres().identifiant_domaine()
-        notif.destination = Domaine.TOUS
-        return notif
-    
-    @staticmethod
-    def cree_notification_nouveau_fichier(source_disk:str, filepath:str, disk:str, footprint:str):
-        data = {
-            "source_disk": source_disk,
-            "filepath": filepath,
-            "disk": disk,
-            "original_footprint": footprint,
-            "etat": EtatFichier.DISPONIBLE
-        }
-
-        notif = Notification(TypeEvenement.FICHIER, data)
-        notif.source = Parametres().identifiant_domaine()
-        notif.destination = Domaine.TOUS
-        return notif
+        return payload

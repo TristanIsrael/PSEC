@@ -9,10 +9,11 @@ class TaskRunner:
     threads_ = []
     running_ = False
 
-    def __init__(self, max_tasks:int = 0) -> None:
+    def __init__(self, max_tasks:int = 0):
         if max_tasks > 0:
             self.max_tasks_ = max_tasks
 
+    def start(self):
         # Management thread
         Thread(target= self.__loop).start()
 

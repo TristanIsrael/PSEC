@@ -7,7 +7,7 @@ pkgdesc="PSEC - Core of the system"
 url="https://www.alefbet.net/"
 arch="noarch"
 license="MIT"
-depends="openrc cdrkit psec-lib xen xen-hypervisor xen-qemu xen-qemu-openrc abuild pciutils xorg-server xrandr font-terminus gtk+3.0 sdl2 sdl2_image"
+depends="openrc cdrkit psec-lib xen xen-hypervisor xen-qemu xen-qemu-openrc abuild pciutils xorg-server xrandr font-terminus gtk+3.0 sdl2 sdl2_image mosquitto mosquitto-openrc socat"
 makedepends=""
 builddir="$srcdir/$pkgname-$pkgver"
 install="$pkgname.post-install $pkgname.post-deinstall"
@@ -35,6 +35,7 @@ scripts/setup-pci-vga-controller.sh
 scripts/setup-xen-environment.sh
 scripts/get-sys-gui-domid.sh
 scripts/post-install.sh
+scripts/show-logs.sh
 
 conf/constants.sh
 conf/psec.conf
@@ -47,8 +48,9 @@ python/psec-core-controller.py
 python/write-screen-information-to-xenstore.py
 python/generate-x-config.py
 python/get-total-memory.py
+python/create-mqtt-tunnels.py
 
-boot/Splash_1280_800.ppm
+boot/Splash_800_1280.ppm
 "
 
 PSEC_CONFDIR="etc/psec"
@@ -88,6 +90,7 @@ package() {
     install -D -m755 "$srcdir"/setup-xen-environment.sh "$pkgdir/$PSEC_BINDIR"/setup-xen-environment.sh
     install -D -m755 "$srcdir"/finish-core-init.sh "$pkgdir/$PSEC_BINDIR"/finish-core-init.sh
     install -D -m755 "$srcdir"/psec-core-controller.py "$pkgdir/$PSEC_BINDIR"/psec-core-controller.py
+    install -D -m755 "$srcdir"/create-mqtt-tunnels.py "$pkgdir/$PSEC_BINDIR"/create-mqtt-tunnels.py
     
     install -D -m755 "$srcdir"/attach-pci-devices.initd "$pkgdir"/etc/init.d/attach-pci-devices
     install -D -m755 "$srcdir"/setup-pci.initd "$pkgdir"/etc/init.d/setup-pci
@@ -108,10 +111,12 @@ package() {
     install -D -m755 "$srcdir"/post-install.sh "$pkgdir/$PSEC_BINDIR"/post-install.sh
     install -D -m755 "$srcdir"/get-sys-gui-domid.sh "$pkgdir/$PSEC_BINDIR"/get-sys-gui-domid.sh
     install -D -m644 "$srcdir"/write-screen-information-to-xenstore.py "$pkgdir/$PSEC_BINDIR"/write-screen-information-to-xenstore.py
+    install -D -m755 "$srcdir"/show-logs.sh "$pkgdir/$PSEC_BINDIR"/show-logs.sh
 
     install -D -m644 "$srcdir"/get-total-memory.py "$pkgdir/$PSEC_BINDIR"/get-total-memory.py
 
     install -D -m644 "$srcdir"/10-energy-saving.conf "$pkgdir"/etc/X11/xorg.conf.d/10-energy-saving.conf
 
-    install -D -m644 "$srcdir"/Splash_1280_800.ppm "$pkgdir"/boot/Splash_1280_800.ppm
+    install -D -m644 "$srcdir"/Splash_800_1280.ppm "$pkgdir"/boot/Splash_800_1280.ppm
+
 }

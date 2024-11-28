@@ -5,7 +5,7 @@ import os, hashlib, subprocess
 class FichierHelper():   
 
     @staticmethod
-    def get_liste_disques() -> list:
+    def get_disks_list() -> list:
         """ Cette fonction retourne la liste des disques externes rattachés au système 
         
             La liste des disques est obtenue à partie des dossiers contenus dans Constantes.CHEMIN_MONTAGE_USB 
@@ -25,7 +25,7 @@ class FichierHelper():
         return disques
 
     @staticmethod
-    def get_liste_fichiers(nom_disque) -> list:
+    def get_files_list(disk) -> list:
         """ Cette fonction renvoie l'arborescence complète d'un point de montage
         
             Le chemin utilisé est constitué par la concaténation du paramètre CHEMIN_MONTAGE_USB et 
@@ -38,7 +38,7 @@ class FichierHelper():
         """
 
         chemin:str = ""
-        if nom_disque == Constantes.REPOSITORY:
+        if disk == Constantes.REPOSITORY:
             chemin = Parametres().parametre(Cles.CHEMIN_DEPOT_DOM0)
         else:
             chemin_montage = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)
@@ -46,15 +46,15 @@ class FichierHelper():
                 print("Aucun point de montage défini. Abandon")
                 return []
             
-            chemin = "{}/{}".format(chemin_montage, nom_disque)
+            chemin = "{}/{}".format(chemin_montage, disk)
 
         print("Récupération de la liste des fichiers pour le point de montage {}".format(chemin))
         fichiers = []
-        FichierHelper.__get_contenu_dossier(chemin, fichiers, len(chemin))
+        FichierHelper.__get_folder_contents(chemin, fichiers, len(chemin))
         return fichiers
        
     @staticmethod
-    def __get_contenu_dossier(chemin, liste, decoupage = 0):
+    def __get_folder_contents(chemin, liste, decoupage = 0):
         with os.scandir(chemin) as entrees:
             for entree in entrees:
                 filepath = chemin[decoupage:]
@@ -76,7 +76,7 @@ class FichierHelper():
                     }
 
                     liste.append(entryDict)
-                    FichierHelper.__get_contenu_dossier(entree.path, liste, decoupage)
+                    FichierHelper.__get_folder_contents(entree.path, liste, decoupage)
 
     @staticmethod
     def split_filepath(file_path:str) -> tuple[str, str]:

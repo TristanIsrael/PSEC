@@ -1,3 +1,3 @@
-from psec import ControleurDom0
-c=ControleurDom0()
-c.demarre()
+from psec import Dom0Controller
+c=Dom0Controller()
+c.start()

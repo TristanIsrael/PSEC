@@ -1,3 +1,3 @@
-from psec import ControleurVmSysUsb
-c=ControleurVmSysUsb()
-c.demarre()
+from psec import SysUsbController
+c=SysUsbController()
+c.start()

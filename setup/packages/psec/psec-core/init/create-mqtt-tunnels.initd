@@ -1,0 +1,23 @@
+#!/sbin/openrc-run
+
+name="create-mqtt-tunnels"
+
+depend() {
+    after start-domains
+}
+
+start() {
+    ebegin "Create MQTT tunnels"
+
+    start-stop-daemon --start --make-pidfile --exec /usr/bin/python3 --pidfile /var/run/$name.pid --background -- /usr/lib/psec/bin/create-mqtt-tunnels.py
+
+    eend $?
+}
+
+stop() {
+    ebegin "Destroy MQTT tunnels"
+
+    kill -9 $(cat /var/run/$name.pid)
+
+    eend $?
+}

@@ -1,5 +1,5 @@
 import json, zlib
-from . import Notification, TypeMessage, Commande, Message, Reponse
+from .. import Notification, TypeMessage, Commande, Message, Reponse
 
 class MessageHelper():
 

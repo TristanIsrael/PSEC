@@ -1,32 +1,33 @@
-from . import SingletonMeta, Journal, CommandeFactory, BenchmarkId, Domaine, MessagerieDomu, Parametres, Cles
-from . import DemonInputs, Mouse, MouseButton, ReponseFactory, Reponse, FichierHelper
+from . import SingletonMeta, Logger, RequestFactory, BenchmarkId, Domaine, Parametres, Cles
+from . import DemonInputs, Mouse, MouseButton, ResponseFactory, FichierHelper, MqttClient, Topics
 import random, time
 
 class ControleurBenchmark(metaclass=SingletonMeta):
 
-    journal = Journal("ControleurBenchmark")
-
-    def __init__(self):
+    def __init__(self, client_msg: MqttClient, client_log: MqttClient):
+        self.client_msg = client_msg
         random.seed()
+
+        Logger().setup("Benchmark controller", client_log)
 
     ###
     # Fonctions appelées par le DomU    
     #
     def demarre_benchmark_inputs(self):
-        self.journal.info("Demande le démarrage du benchmark sur les entrées")
-        commande = CommandeFactory.cree_commande_start_benchmark(BenchmarkId.INPUTS, Domaine.SYS_USB)
-        MessagerieDomu().envoie_message_xenbus(commande)
+        Logger().info("Demande le démarrage du benchmark sur les entrées")
+        payload = RequestFactory.cree_commande_start_benchmark(BenchmarkId.INPUTS)
+        self.client_msg.publish("{}/request".format(Topics.BENCHMARK), payload)
 
     def demarre_benchmark_fichiers(self):
-        self.journal.info("Demande le démarrage du benchmark fichiers")
-        commande = CommandeFactory.cree_commande_start_benchmark(BenchmarkId.FILES, Domaine.SYS_USB)
-        MessagerieDomu().envoie_message_xenbus(commande)
+        Logger().info("Demande le démarrage du benchmark fichiers")
+        payload = RequestFactory.cree_commande_start_benchmark(BenchmarkId.FILES)
+        self.client_msg.publish("{}/request".format(Topics.BENCHMARK), payload)
 
     ###
     # Fonctions exécutées sur sys-usb
     #
     def execute_benchmark_inputs(self, emetteur:str):
-        self.journal.info("Exécution du benchmark sur les entrées")
+        Logger().info("Exécution du benchmark sur les entrées")
 
         start_ms = time.time()*1000
 
@@ -40,17 +41,17 @@ class ControleurBenchmark(metaclass=SingletonMeta):
 
         end_ms = time.time()*1000
         duration = int(end_ms-start_ms)
-        reponse = ReponseFactory.cree_reponse_benchmark_inputs(duration, iterations, emetteur)
-        MessagerieDomu().envoie_message_xenbus(reponse)
+        response = ResponseFactory.cree_reponse_benchmark_inputs(duration, iterations, emetteur)
+        self.client_msg.publish("{}/response".format(Topics.BENCHMARK), response)
 
     def execute_benchmark_fichiers(self, emetteur:str):
-        self.journal.info("Exécution du benchmark sur les fichiers")
+        Logger().info("Exécution du benchmark sur les fichiers")
 
         start_ms = time.time()*1000
 
         # Informe le demandeur que le benchmark vient de démarrer
-        reponse = ReponseFactory.cree_reponse_benchmark_fichiers_demarre(emetteur)
-        MessagerieDomu().envoie_message_xenbus(reponse)
+        response = ResponseFactory.cree_reponse_benchmark_fichiers_demarre(emetteur)
+        self.client_msg.publish("{}/response".format(Topics.BENCHMARK), response)
 
         # Le scénario de benchmark est le suivant :
         # prérequis - Vérification de la présence d'un support USB
@@ -63,15 +64,14 @@ class ControleurBenchmark(metaclass=SingletonMeta):
         # L'exécution du benchmark appelle des fonctions bloquantes.
         # La VM sys-usb sera bloquée pendant toute la durée du benchmark
         # Cela permet d'éviter d'être perturbé par des demandes sans rapport avec le benchmark
-        liste_disques = FichierHelper.get_liste_disques()
+        liste_disques = FichierHelper.get_disks_list()
         if len(liste_disques) == 0:
-            errstr = "Le benchmark ne peut pas démarrer car aucun support externe n'est connecté"
-            self.__envoie_erreur_benchmark(errstr, emetteur)
+            Logger().error("The benchmark cannot start because no external storage is connected")
             return #Fin 
 
         # On prend le premier disque disponible
         disque = liste_disques[0]
-        self.journal.info("Le benchmark sera exécuté sur le disque {}".format(disque))
+        Logger().info("Le benchmark sera exécuté sur le disque {}".format(disque))
 
         # On crée une structure pour conserver les métriques
         metrics = []
@@ -97,16 +97,11 @@ class ControleurBenchmark(metaclass=SingletonMeta):
         #self.__execute_benchmark_fichiers(disque= disque, taille_fichier_ko= 1024*1024, quantite_fichiers= 1, emetteur= emetteur, metrics= metrics)
 
         # Informe le demandeur que le benchmark vient de se terminer
-        reponse = ReponseFactory.cree_reponse_benchmark_fichiers_termine(emetteur, metrics)
-        MessagerieDomu().envoie_message_xenbus(reponse)
-
-    def __envoie_erreur_benchmark(self, errstr:str, emetteur:str):
-        self.journal.error(errstr)
-        reponse = ReponseFactory.cree_reponse_benchmark_fichiers_erreur(errstr, emetteur)
-        MessagerieDomu().envoie_message_xenbus(reponse)
-
+        response = ResponseFactory.cree_reponse_benchmark_fichiers_termine(emetteur, metrics)
+        self.client_msg.publish("{}/response".format(Topics.BENCHMARK), response)
+    
     def __execute_benchmark_fichiers(self, disque:str, taille_fichier_ko:int, quantite_fichiers:int, emetteur:str, metrics:list):
-        self.journal.info("Démarrage d'une itération de benchmark fichier pour {} fichiers de {} Ko".format(quantite_fichiers, taille_fichier_ko))
+        Logger().info("Démarrage d'une itération de benchmark fichier pour {} fichiers de {} Ko".format(quantite_fichiers, taille_fichier_ko))
 
         point_montage = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)
 
@@ -115,20 +110,19 @@ class ControleurBenchmark(metaclass=SingletonMeta):
             filepath = "{}/{}/benchfile_{}ko_{}".format(point_montage, disque, taille_fichier_ko, n_fichier)                        
             
             try:
-                self.journal.info("Etape 1 : Création du fichier {}".format(filepath))
+                Logger().info("Etape 1 : Création du fichier {}".format(filepath))
                 start_ms = time.time()*1000
                 FichierHelper.create_file(filepath, taille_fichier_ko)
                 end_ms = time.time()*1000
                 metrics.append({"step": "write_on_disk", "size": taille_fichier_ko, "iteration": n_fichier, "duration_ms": end_ms-start_ms})                                
             except Exception as e:
-                errstr = "Error during file creation : " + str(e)
-                self.__envoie_erreur_benchmark(errstr, emetteur)
+                Logger().error("Error during file creation: {}".format(str(e)))
                 return
             
         # Step 2 : read files from disk
         for n_fichier in range(1, quantite_fichiers+1):
             filepath = "{}/{}/benchfile_{}ko_{}".format(point_montage, disque, taille_fichier_ko, n_fichier)
-            self.journal.info("Etape 2 : Lecture du fichier {}".format(filepath))
+            Logger().info("Etape 2 : Lecture du fichier {}".format(filepath))
             try:                
                 start_ms = time.time()*1000
                 
@@ -140,22 +134,20 @@ class ControleurBenchmark(metaclass=SingletonMeta):
 
                 end_ms = time.time()*1000
                 metrics.append({"step": "read_from_disk", "size": taille_fichier_ko, "iteration": n_fichier, "duration_ms": end_ms-start_ms})                                
-            except Exception as e:
-                errstr = "Error during file read : " + str(e)
-                self.__envoie_erreur_benchmark(errstr, emetteur)
+            except Exception as e:                
+                Logger().error("Error during file read: {}".format(str(e)))
                 return
 
         # Step 3 : copy files to repository  
         for n_fichier in range(1, quantite_fichiers+1):
             filepath = "{}/{}/benchfile_{}ko_{}".format(point_montage, disque, taille_fichier_ko, n_fichier)
             footprint = ""
-            self.journal.info("Etape 2 : Copie du fichier dans le dépôt")
+            Logger().info("Etape 2 : Copie du fichier dans le dépôt")
             try:
                 start_ms = time.time()*1000
                 FichierHelper.copy_file_to_repository(filepath, footprint)
                 end_ms = time.time()*1000
                 metrics.append({"step": "copy_to_repository", "size": taille_fichier_ko, "iteration": n_fichier, "duration_ms": end_ms-start_ms})                                
             except Exception as e:
-                errstr = "Error during copy to repository : " + str(e)
-                self.__envoie_erreur_benchmark(errstr, emetteur)
+                Logger().error("Error during copy to repository: {}".format(str(e)))
                 return

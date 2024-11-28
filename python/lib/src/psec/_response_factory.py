@@ -1,0 +1,86 @@
+from . import Constantes, Domaine, Parametres, Cles, EtatComposant
+
+class ResponseFactory():
+    """ La classe ResponseFactory permet de générer les messages en réponse à certaines commandes.    
+    
+    """
+
+    @staticmethod
+    def create_response_disks_list(disks_list:list = list()) -> dict:
+        payload = {
+            "disks": disks_list
+        }        
+        return payload
+    
+    @staticmethod
+    def create_response_list_files(disk:str, files:list = list()) -> dict:
+        payload = {
+            "disk": disk,
+            "files": files
+        }        
+        return payload
+
+    @staticmethod
+    def cree_reponse_benchmark_inputs(duree:int, iterations:int) -> dict:
+        payload = {
+            "duration": duree,
+            "iterations": iterations
+        }
+        return payload
+
+    @staticmethod
+    def cree_reponse_benchmark_fichiers_demarre() -> dict:
+        payload = {
+            "etat": "demarre"
+        }
+        return payload
+    
+    @staticmethod
+    def cree_reponse_benchmark_fichiers_termine(metrics:list) -> dict:
+        payload = {
+            "etat": "termine",
+            "metrics": metrics
+        }
+        return payload
+
+    @staticmethod
+    def cree_reponse_benchmark_fichiers_erreur(erreur:str) -> dict:
+        payload = {
+            "etat": "erreur",
+            "message": erreur
+        }
+        return payload
+    
+    @staticmethod
+    def create_response_file_footprint(filepath:str, disk:str, footprint:str) -> dict:
+        payload = {
+            "filepath": filepath,
+            "disk": disk,
+            "footprint": footprint
+        }
+        return payload
+    
+    @staticmethod
+    def create_response_create_file(filepath:str, disk:str, footprint:str, success:bool) -> dict:
+        payload = {
+            "filepath": filepath,
+            "disk": disk,
+            "footprint": footprint,
+            "success": success
+        }
+        return payload
+
+    @staticmethod
+    def cree_reponse_etat_composant(nom:str, etat:EtatComposant) -> dict:
+        payload = {
+            "composant": nom,
+            "etat": etat
+        }
+        return payload
+
+    @staticmethod
+    def create_response_copy_file(success:bool) -> dict:
+        payload = {
+            "status": "ok" if success else "error"
+        }
+        return payload
