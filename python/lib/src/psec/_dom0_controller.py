@@ -12,13 +12,14 @@ class Dom0Controller():
 
     def __init__(self, client_msg: MqttClient, client_log: MqttClient):
         self.client_msg = client_msg
+        self.client_log = client_log
 
         Logger().setup("System controller", client_log)
 
     def start(self):
         Logger().debug("Starting Dom0 controller")
 
-        InputsProxy().demarre()
+        InputsProxy(self.client_log).demarre()
 
         # Register on Mqtt broker        
         self.client_msg.on_connected = self.__on_mqtt_connected

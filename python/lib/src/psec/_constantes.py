@@ -8,8 +8,7 @@ class Cles:
     CHEMIN_SOCKET_INPUT_DOMU = "chemin_socket_input_domu"
     CHEMIN_SOCKET_INPUT_DOM0 = "chemin_socket_input_dom0"
     CHEMIN_SOCKETS_JOURNAL = "chemin_sockets_log"     
-    CHEMIN_SOCKETS_MESSAGERIE = "chemin_sockets_msg"
-    CHEMIN_SOCKETS_DOM0 = "chemin_sockets_dom0"
+    CHEMIN_SOCKETS_MESSAGERIE = "chemin_sockets_msg"    
     #CHEMIN_SOCKET_API = "chemin_socket_api"
     #CHEMIN_FICHIER_CONFIG_LOCAL = "chemin_fichier_config_local"
     CHEMIN_FICHIER_CONFIG_GLOBAL = "chemin_fichier_config_global"        
@@ -29,6 +28,7 @@ class Cles:
     MQTT_LOG_BROKER_SOCKET = "mqtt_log_broker_socket"
     MQTT_MSG_SOCKET_FILTER = "mqtt_msg_socket_filter"
     MQTT_LOG_SOCKET_FILTER = "mqtt_log_socket_filter"
+    XEN_SOCKETS_PATH = "xen_sockets_path"
 
 class EtatDomu:
     INCONNU = 0

@@ -106,7 +106,7 @@ class InputsProxy(metaclass=SingletonMeta):
 
     def __ouvre_socket_gui(self):
         #Ouvre le flux avec la socket
-        chemin_fichier = "{}/{}-input.sock".format(Parametres().parametre(Cles.CHEMIN_SOCKETS_DOM0), self.domaine_gui)
+        chemin_fichier = "{}/{}-input.sock".format(Parametres().parametre(Cles.XEN_SOCKETS_PATH), self.domaine_gui)
         Logger().debug("Open I/O socket {} to domain {}".format(chemin_fichier, self.domaine_gui))
 
         sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
