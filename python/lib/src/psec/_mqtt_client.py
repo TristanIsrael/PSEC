@@ -1,5 +1,6 @@
 import os, time, serial, json, threading
 import paho.mqtt.client as mqtt
+from paho.mqtt.client import CallbackAPIVersion
 
 class ConnectionType():
     UNIX_SOCKET = "unix_socket"
@@ -22,7 +23,7 @@ class SerialTransport:
     
 class SerialMQTTClient(mqtt.Client):
     def __init__(self, serial_transport, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__(callback_api_version=CallbackAPIVersion.VERSION2, *args, **kwargs)
         self.serial_transport = serial_transport
 
     def _send_packet(self, packet):
@@ -52,7 +53,7 @@ class MqttClient():
         print("Starting MQTT client {}".format(self.identifier))
 
         if self.connection_type != ConnectionType.SERIAL_PORT:            
-            self.mqtt_client = mqtt.Client(client_id=self.identifier, transport=self.__get_transport_type())
+            self.mqtt_client = mqtt.Client(callback_api_version=CallbackAPIVersion.VERSION2, client_id=self.identifier, transport=self.__get_transport_type())
             self.mqtt_client.on_connect = self.__on_connected
             self.mqtt_client.on_message = self.__on_message
             
@@ -108,7 +109,7 @@ class MqttClient():
         else:
             print("No message callback")
 
-    def __on_connected(self, client, userdata, connect_flags, reason_code):
+    def __on_connected(self, client, userdata, connect_flags, reason_code, properties):
         print("Connected to the MQTT broker")
         if self.on_connected is not None:
             self.on_connected()

@@ -1,5 +1,6 @@
 from . import MqttClient, SingletonMeta
 import logging
+from datetime import datetime
 
 class Logger(metaclass=SingletonMeta):
 
@@ -32,12 +33,12 @@ class Logger(metaclass=SingletonMeta):
 
     def __create_event(self, module:str, description:str) -> dict :
         now = datetime.now()
-        datetime = now.strftime(f"%Y-%m-%d %H:%M:%S.{now.microsecond // 1000:03d}")
+        dt = now.strftime(f"%Y-%m-%d %H:%M:%S.{now.microsecond // 1000:03d}")
 
         payload = {
             "component": self.component_name,
             "module": module,
-            "datetime": datetime,
+            "datetime": dt,
             "description": description
         }
 

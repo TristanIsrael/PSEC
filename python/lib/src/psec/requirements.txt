@@ -2,4 +2,4 @@ pyserial
 joblib
 humanize
 watchdog
-paho-mqtt==1.6.1
+paho-mqtt>=2.0.0
