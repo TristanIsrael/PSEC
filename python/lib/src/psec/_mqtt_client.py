@@ -1,5 +1,6 @@
 import os, time, serial, json, threading
 import paho.mqtt.client as mqtt
+from paho.mqtt import client
 from paho.mqtt.client import CallbackAPIVersion
 
 class ConnectionType():
@@ -60,7 +61,7 @@ class MqttClient():
             if self.connection_type == ConnectionType.TCP_DEBUG:
                 self.mqtt_client.connect("localhost")
             elif self.connection_type == ConnectionType.UNIX_SOCKET:
-                self.mqtt_client.connect(host=self.connection_string, port=1, clean_start=True)
+                self.mqtt_client.connect(host=self.connection_string, port=1)
             else:
                 print("The connection type {} is not handled".format(self.connection_type))
                 return
