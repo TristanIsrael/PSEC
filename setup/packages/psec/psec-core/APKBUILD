@@ -7,13 +7,13 @@ pkgdesc="PSEC - Core of the system"
 url="https://www.alefbet.net/"
 arch="noarch"
 license="MIT"
-depends="openrc cdrkit psec-lib xen xen-hypervisor xen-qemu xen-qemu-openrc abuild pciutils xorg-server xrandr font-terminus gtk+3.0 sdl2 sdl2_image mosquitto mosquitto-openrc socat"
+depends="openrc cdrkit psec-lib xen xen-hypervisor xen-qemu xen-qemu-openrc abuild pciutils xorg-server xrandr font-terminus gtk+3.0 sdl2 sdl2_image mosquitto mosquitto-openrc mosquitto-clients py3-paho-mqtt socat"
 makedepends=""
 builddir="$srcdir/$pkgname-$pkgver"
 install="$pkgname.post-install $pkgname.post-deinstall"
 checkdepends=""
 subpackages=""
-replaces="alpine-baselayout-data"
+replaces="alpine-baselayout-data mosquitto"
 options="!check"  # no tests provided
 
 source="
@@ -41,6 +41,7 @@ conf/constants.sh
 conf/psec.conf
 conf/10-energy-saving.conf
 conf/topology.json
+conf/mosquitto.conf
 
 python/rotate-screen.py
 python/create-domains.py
@@ -118,5 +119,8 @@ package() {
     install -D -m644 "$srcdir"/10-energy-saving.conf "$pkgdir"/etc/X11/xorg.conf.d/10-energy-saving.conf
 
     install -D -m644 "$srcdir"/Splash_800_1280.ppm "$pkgdir"/boot/Splash_800_1280.ppm
+
+    # Mosquitto
+    install -D -m644 "$srcdir"/mosquitto.conf "$pkgdir"/etc/mosquitto/mosquitto.conf
 
 }
