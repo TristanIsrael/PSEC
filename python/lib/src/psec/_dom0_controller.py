@@ -24,7 +24,9 @@ class Dom0Controller():
         # Register on Mqtt broker        
         self.client_msg.on_connected = self.__on_mqtt_connected
         self.client_msg.on_message = self.__on_mqtt_message
-        self.client_msg.start()
+
+        if not self.client_msg.connected:
+            self.client_msg.start()
     
     def __on_mqtt_connected(self):
         self.client_msg.subscribe("system/+/+/request") # All the system requests

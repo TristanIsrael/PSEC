@@ -41,6 +41,7 @@ class MqttClient():
     identifier:str = "unknown"
     on_connected = None
     on_message = None
+    connected = False
 
     def __init__(self, identifier:str, connection_type:ConnectionType = ConnectionType.UNIX_SOCKET, connection_string:str = ""):
         self.identifier = identifier
@@ -59,7 +60,7 @@ class MqttClient():
             self.mqtt_client.on_message = self.__on_message
             
             if self.connection_type == ConnectionType.TCP_DEBUG:
-                self.mqtt_client.connect("localhost")
+                self.mqtt_client.connect(host="localhost")
             elif self.connection_type == ConnectionType.UNIX_SOCKET:
                 self.mqtt_client.connect(host=self.connection_string, port=1)
             else:
@@ -112,5 +113,6 @@ class MqttClient():
 
     def __on_connected(self, client, userdata, connect_flags, reason_code, properties):
         print("Connected to the MQTT broker")
+        self.connected = True
         if self.on_connected is not None:
             self.on_connected()

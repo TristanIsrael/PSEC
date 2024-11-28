@@ -7,6 +7,9 @@ class Logger(metaclass=SingletonMeta):
     def setup(self, component_name:str, client_log:MqttClient):
         self.component_name = component_name
         self.client_log = client_log
+        
+        if not client_log.connected:
+            self.client_log.start()
 
     def critical(self, description:str, module:str = ""):
         payload = self.__create_event(module, description)

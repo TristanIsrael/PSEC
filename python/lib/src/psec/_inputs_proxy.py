@@ -38,6 +38,7 @@ class InputsProxy(metaclass=SingletonMeta):
     def __monitor_gui_io_socket(self):       
         Logger().debug("Start monitoring GUI I/O socket") 
 
+        Logger().debug("Wait for sys-usb I/O socket to be ready")
         while True:            
             if self.sys_gui_socket is not None:
                 # The socket is already opened
@@ -45,27 +46,27 @@ class InputsProxy(metaclass=SingletonMeta):
                 continue            
 
             if not self.__ouvre_socket_gui():
-                Logger().warn("The I/O socket with GUI domain could not be opened.")
+                #Logger().warn("The I/O socket with GUI domain could not be opened.")
                 time.sleep(1)
                 continue
 
     def __monitor_usb_io_socket(self):
         Logger().debug("Start monitoring USB I/O socket") 
 
+        Logger().debug("Wait for sys-gui I/O socket to be ready")
         chemin_socket_usb = Parametres().parametre(Cles.CHEMIN_SOCKET_INPUT_DOM0)
         while True:
             if self.sys_usb_socket is not None:
                 # A connexion already exists
                 time.sleep(1)
                 continue
-
-            if self.sys_gui_socket is None:
-                Logger().debug("... wait for GUI I/O socket to be ready")
+            
+            if self.sys_gui_socket is None:                
                 time.sleep(1)
-                continue
+                continue            
 
             if not os.path.exists(chemin_socket_usb):
-                Logger().warn("... The socket file {} does not exist".format(chemin_socket_usb))
+                #Logger().warn("... The socket file {} does not exist".format(chemin_socket_usb))
                 time.sleep(1)
                 continue
             else:
@@ -83,7 +84,7 @@ class InputsProxy(metaclass=SingletonMeta):
         try:            
             sock.connect(fichier_socket)  
             self.sys_usb_socket = sock
-            Logger().debug("The I/O socket is opened with DomD sys-usb")
+            Logger().debug("The I/O socket is opened with sys-usb")
             #recv_buffer = bytearray()
 
             while(True):
@@ -104,16 +105,19 @@ class InputsProxy(metaclass=SingletonMeta):
             Logger().error(socket.error.strerror) 
             self.sys_usb_socket = None
 
-    def __ouvre_socket_gui(self):
+    def __ouvre_socket_gui(self) -> bool:
         #Ouvre le flux avec la socket
         chemin_fichier = "{}/{}-input.sock".format(Parametres().parametre(Cles.XEN_SOCKETS_PATH), self.domaine_gui)
+        if not os.path.exists(chemin_fichier):
+            return False 
+        
         Logger().debug("Open I/O socket {} to domain {}".format(chemin_fichier, self.domaine_gui))
 
         sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 
         try:            
             sock.connect(chemin_fichier)
-            Logger().debug("The I/O socket is opened with GUI domain")
+            Logger().debug("The I/O socket is opened with sys-gui domain")
             self.sys_gui_socket = sock
             return True
         except:
