@@ -60,7 +60,7 @@ class MqttClient():
             if self.connection_type == ConnectionType.TCP_DEBUG:
                 self.mqtt_client.connect("localhost")
             elif self.connection_type == ConnectionType.UNIX_SOCKET:
-                self.mqtt_client.connect("localhost", unix_socket_path=self.connection_string)
+                self.mqtt_client.connect(host=self.connection_string, port=1, clean_start=True)
             else:
                 print("The connection type {} is not handled".format(self.connection_type))
                 return
@@ -97,7 +97,7 @@ class MqttClient():
         if self.connection_type == ConnectionType.TCP_DEBUG:
             return "tcp"
         elif self.connection_type == ConnectionType.UNIX_SOCKET:
-            return "websockets"
+            return "unix"
         
         return "" 
     
