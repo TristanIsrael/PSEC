@@ -87,6 +87,7 @@ class Constantes(metaclass=SingletonMeta):
         Cles.MQTT_LOG_BROKER_SOCKET: "/var/run/mosquitto/mqtt_log.sock",
         Cles.MQTT_MSG_SOCKET_FILTER: "/var/run/*-msg.sock",
         Cles.MQTT_LOG_SOCKET_FILTER: "/var/run/*-log.sock",
+        Cles.XEN_SOCKETS_PATH: "/var/run",
 
         Cles.CHEMIN_FICHIER_CONFIG_GLOBAL: "/etc/psec/global.conf",        
         # Sockets pv channel entre Dom0 et DomU        
