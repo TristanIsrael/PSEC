@@ -243,7 +243,10 @@ disk = [
             print(e)    
 
     def __fetch_alpine_packages(self, package):
-        # Fetch Alpine packages                
+        # Fetch Alpine packages   
+        if package is None:
+            print("Error: package is empty")
+
         subprocess.run(
             args= ["apk", "fetch", "-R", package], 
             cwd= alpine_repo,

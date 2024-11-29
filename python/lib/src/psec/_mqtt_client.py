@@ -20,7 +20,6 @@ class SerialSocket():
         return b""   
     
     def send(self, buffer: bytes) -> int:
-        #print("Write data on serial port")
         return self.serial.write(buffer)
 
     def close(self) -> None:
@@ -91,7 +90,7 @@ class MqttClient():
             self.mqtt_client.loop_start()
         elif self.connection_type == ConnectionType.SERIAL_PORT:            
             #serial_transport = SerialTransport(port=self.connection_string, baudrate=115200)
-            self.mqtt_client = SerialMQTTClient(path=self.connection_string, baudrate=115200, reconnect_on_failure=True)
+            self.mqtt_client = SerialMQTTClient(client_id=self.identifier, path=self.connection_string, baudrate=115200, reconnect_on_failure=False)
             self.mqtt_client.on_connect = self.__on_connected
             self.mqtt_client.on_message = self.__on_message
             self.mqtt_client.connect(host="localhost", port=1)

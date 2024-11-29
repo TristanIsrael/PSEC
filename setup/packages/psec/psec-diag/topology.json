@@ -18,7 +18,7 @@
         "domains": [
             {
                 "name": "test-domain",
-                "package": "bash",
+                "app-package": "bash",
                 "memory": 100,
                 "cpu": 0.1
             }

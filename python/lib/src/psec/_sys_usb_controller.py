@@ -24,6 +24,7 @@ class SysUsbController():
 
     def __init__(self, client_msg: MqttClient, client_log: MqttClient):
         self.client_msg = client_msg
+        self.client_log = client_log
         Logger().setup("USB controller", client_log)
 
     def __del__(self):
@@ -41,12 +42,12 @@ class SysUsbController():
 
         # Démarrage de la surveillance des entrées
         if NO_INPUTS_MONITORING != True:
-            DemonInputs().start()
+            DemonInputs(self.client_msg, self.client_log).start()
             #threading.Thread(target= DemonInputs().demarre()).start()
 
     def stop(self):
         self.task_runner.stop()
-        DemonInputs().stop()
+        DemonInputs(self.client_msg, self.client_log).stop()
 
     def __on_mqtt_connected(self):
         self.client_msg.subscribe("system/+/+/request") # All the disks requests

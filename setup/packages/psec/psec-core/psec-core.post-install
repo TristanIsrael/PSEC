@@ -25,6 +25,9 @@ chown mosquitto:mosquitto /var/run/mosquitto
 rc-update add mosquitto
 rc-service mosquitto start
 
+rc-update add create-mqtt-tunnels
+rc-service create-mqtt-tunnels start
+
 rc-update add start-domains
 rc-update add attach-pci-devices
 rc-update add psec-core-controller

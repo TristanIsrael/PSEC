@@ -1,8 +1,8 @@
 import subprocess, os, time, threading, atexit
 from psec import Constantes, Cles
 
-broker_msg_socket = Constantes.constante(Cles.MQTT_MSG_BROKER_SOCKET)
-broker_log_socket = Constantes.constante(Cles.MQTT_LOG_BROKER_SOCKET)
+broker_msg_socket = Constantes().constante(Cles.MQTT_MSG_BROKER_SOCKET)
+broker_log_socket = Constantes().constante(Cles.MQTT_LOG_BROKER_SOCKET)
 
 def create_log_tunnel(socket:str):
     cmd = ["socat", "UNIX-CONNECT:{}".format(socket), "UNIX-CONNECT:{}".format(broker_log_socket)]
@@ -24,7 +24,7 @@ def wait_for_broker_socket() -> bool:
 def watch_log_sockets():
     print("Looking for log mqtt sockets")
 
-    cmd = "find /var/run -name '*-log.sock'"
+    cmd = "find /var/run/ -name '*-log.sock'"
     sockets = set()
 
     while True:
@@ -35,6 +35,7 @@ def watch_log_sockets():
         for file in new_files:
             print(f"New logging socket found : {file}")
             create_log_tunnel(file)
+            return
 
         sockets.update(files)
         time.sleep(1)
@@ -43,7 +44,7 @@ def watch_log_sockets():
 def watch_msg_sockets():
     print("Looking for msg mqtt sockets")
 
-    cmd = "find /var/run -name '*-msg.sock'"
+    cmd = "find /var/run/ -name '*-msg.sock'"
     sockets = set()
 
     while True:
@@ -54,6 +55,7 @@ def watch_msg_sockets():
         for file in new_files:
             print(f"New messaging socket found : {file}")
             create_msg_tunnel(file)
+            return
 
         sockets.update(files)
         time.sleep(1)

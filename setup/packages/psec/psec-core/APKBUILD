@@ -23,6 +23,7 @@ init/setup-pci.initd
 init/splash.initd
 init/start-domains.initd
 init/start-x.initd
+init/create-mqtt-tunnels.initd
 
 scripts/create-local-alpine-repository.sh
 scripts/finish-core-init.sh
@@ -122,5 +123,6 @@ package() {
 
     # Mosquitto
     install -D -m644 "$srcdir"/mosquitto.conf "$pkgdir"/etc/mosquitto/mosquitto.conf
+    install -D -m755 "$srcdir"/create-mqtt-tunnels.initd "$pkgdir"/etc/init.d/create-mqtt-tunnels.sh
 
 }

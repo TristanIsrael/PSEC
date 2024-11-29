@@ -58,6 +58,9 @@ echo "{
 }
 " > $WORKDIR/apkovl/etc/psec/global.conf
 
+echo ... Configure hostname
+echo "$DOMAIN" > $WORKDIR/apkovl/etc/hostname
+
 echo ... Copy local PGP key
 cp $LOCAL_PGP_PUBKEY $WORKDIR/apkovl/etc/apk/keys
 

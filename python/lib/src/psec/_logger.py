@@ -9,9 +9,6 @@ class Logger(metaclass=SingletonMeta):
         self.module_name = module_name
         self.client_log = client_log
 
-        if not client_log.connected:
-            self.client_log.start()
-
     def critical(self, description:str, module:str = ""):
         payload = self.__create_event(module, description)
         self.client_log.publish("system/events/critical", payload)
