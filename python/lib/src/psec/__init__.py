@@ -5,7 +5,7 @@ try:
 except Exception as e:
     print("La classe KeymapFR ne sera pas disponible")
     print(e)
-from ._mqtt_client import MqttClient, ConnectionType
+from ._mqtt_client import MqttClient, ConnectionType, SerialMQTTClient
 from ._topics import Topics
 from ._logger import Logger
 from ._parametres import Parametres, Cles
@@ -51,7 +51,7 @@ __all__ = [
     "ControleurBenchmark", "BenchmarkId",
     #"MockXenbus",
     "TaskRunner",
-    "MqttClient", "ConnectionType", "Topics", "MqttFactory",
+    "MqttClient", "ConnectionType", "Topics", "MqttFactory", "SerialMQTTClient"
     "Dom0Controller", "SysUsbController", "Api"
 ]
 

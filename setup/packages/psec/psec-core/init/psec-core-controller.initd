@@ -3,7 +3,7 @@
 name="psec-core-controller"
 
 depend() {
-    after syslog
+    after mosquitto
 }
 
 start() {

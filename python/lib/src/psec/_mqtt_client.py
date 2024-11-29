@@ -8,32 +8,46 @@ class ConnectionType():
     SERIAL_PORT = "serial_port"
     TCP_DEBUG = "tcp"
 
-class SerialTransport:
-    def __init__(self, port, baudrate=115200):
-        self.serial = serial.Serial(port, baudrate)
+class SerialSocket():
+    def __init__(self, path:str, baudrate:int):
+        #print("Connect to serial port")
+        self.serial = serial.Serial(path, baudrate)
 
-    def write(self, data):
-        """Envoyer des données sur le port série."""
-        self.serial.write(data)
-
-    def read(self):
-        """Lire des données du port série."""
+    def recv(self, buffer_size: int) -> bytes:
         if self.serial.in_waiting > 0:
-            return self.serial.read(self.serial.in_waiting)
-        return b""
+            return self.serial.read(buffer_size)
+        
+        return b""   
+    
+    def send(self, buffer: bytes) -> int:
+        #print("Write data on serial port")
+        return self.serial.write(buffer)
+
+    def close(self) -> None:
+        #print("Close serial port")
+        self.serial.close()
+
+    def fileno(self) -> int:
+        return self.serial.fileno()
+
+    def setblocking(self, flag: bool) -> None:
+        pass
     
 class SerialMQTTClient(mqtt.Client):
-    def __init__(self, serial_transport, *args, **kwargs):
+    def __init__(self, path:str, baudrate:int, *args, **kwargs):
         super().__init__(callback_api_version=CallbackAPIVersion.VERSION2, *args, **kwargs)
-        self.serial_transport = serial_transport
+        self.path = path
+        self.baudrate = baudrate
 
-    def _send_packet(self, packet):
-        """Remplacer l'envoi de paquets MQTT pour utiliser le port série."""
-        self.serial_transport.write(packet)
-
-    def _packet_read(self):
-        """Lire les données reçues via le port série."""
-        return self.serial_transport.read()
+    def _create_socket(self):
+        try:
+            socket = SerialSocket(self.path, self.baudrate)
+            self._sockpairR = socket
+            #print("Socket created")
+            return socket
+        except:
+            print("An error occured while opening the serial port")
+            return None
 
 class MqttClient():
     connection_type:ConnectionType = ConnectionType.UNIX_SOCKET
@@ -43,6 +57,7 @@ class MqttClient():
     on_message = None
     connected = False
     is_starting = False
+    can_run = True
 
     def __init__(self, identifier:str, connection_type:ConnectionType = ConnectionType.UNIX_SOCKET, connection_string:str = ""):
         self.identifier = identifier
@@ -57,10 +72,11 @@ class MqttClient():
             return
         
         self.is_starting = True
+        self.can_run = True
         print("Starting MQTT client {}".format(self.identifier))        
 
         if self.connection_type != ConnectionType.SERIAL_PORT:            
-            self.mqtt_client = mqtt.Client(callback_api_version=CallbackAPIVersion.VERSION2, client_id=self.identifier, transport=self.__get_transport_type())
+            self.mqtt_client = mqtt.Client(callback_api_version=CallbackAPIVersion.VERSION2, client_id=self.identifier, transport=self.__get_transport_type(), reconnect_on_failure=True)
             self.mqtt_client.on_connect = self.__on_connected
             self.mqtt_client.on_message = self.__on_message
             
@@ -71,20 +87,23 @@ class MqttClient():
             else:
                 print("The connection type {} is not handled".format(self.connection_type))
                 return
+            
+            self.mqtt_client.loop_start()
         elif self.connection_type == ConnectionType.SERIAL_PORT:            
-            serial_transport = SerialTransport(port=self.connection_string, baudrate=115200)
-            self.mqtt_client = SerialMQTTClient(serial_transport)
+            #serial_transport = SerialTransport(port=self.connection_string, baudrate=115200)
+            self.mqtt_client = SerialMQTTClient(path=self.connection_string, baudrate=115200, reconnect_on_failure=True)
             self.mqtt_client.on_connect = self.__on_connected
             self.mqtt_client.on_message = self.__on_message
-            self.mqtt_client.connect("localhost")
+            self.mqtt_client.connect(host="localhost", port=1)
+
+            threading.Thread(target=self.mqtt_client.loop_forever).start()
         else:
             print("The connection type {} is not handled".format(self.connection_type))
-            return
-        
-        self.mqtt_client.loop_start()
+            return        
 
     def stop(self):
         if self.mqtt_client is not None:
+            self.can_run = False
             self.mqtt_client.loop_stop()
             self.mqtt_client.disconnect()
             print("Mqtt client exited")
@@ -119,5 +138,14 @@ class MqttClient():
     def __on_connected(self, client, userdata, connect_flags, reason_code, properties):
         print("Connected to the MQTT broker")
         self.connected = True
+        
         if self.on_connected is not None:
             self.on_connected()
+
+        print("Starting keepalive")
+        threading.Timer(30, self.__keepalive).start()
+
+    def __keepalive(self):
+        if self.connected and self.can_run:
+            self.mqtt_client.publish("misc/keepalive", "ping")
+            threading.Timer(30, self.__keepalive).start()
