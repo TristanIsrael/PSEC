@@ -1,13 +1,14 @@
 from . import MqttClient, SingletonMeta
-import logging
+import os
 from datetime import datetime
 
 class Logger(metaclass=SingletonMeta):
 
-    def setup(self, component_name:str, client_log:MqttClient):
-        self.component_name = component_name
+    def setup(self, module_name:str, client_log:MqttClient):
+        self.domain_name = os.uname().nodename
+        self.module_name = module_name
         self.client_log = client_log
-        
+
         if not client_log.connected:
             self.client_log.start()
 
@@ -39,8 +40,8 @@ class Logger(metaclass=SingletonMeta):
         dt = now.strftime(f"%Y-%m-%d %H:%M:%S.{now.microsecond // 1000:03d}")
 
         payload = {
-            "component": self.component_name,
-            "module": module,
+            "component": self.domain_name,
+            "module": module if module is not "" else self.module_name,
             "datetime": dt,
             "description": description
         }

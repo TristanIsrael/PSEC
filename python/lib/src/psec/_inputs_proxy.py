@@ -38,7 +38,7 @@ class InputsProxy(metaclass=SingletonMeta):
     def __monitor_gui_io_socket(self):       
         Logger().debug("Start monitoring GUI I/O socket") 
 
-        Logger().debug("Wait for sys-usb I/O socket to be ready")
+        Logger().debug("...wait for sys-usb I/O socket to be ready")
         while True:            
             if self.sys_gui_socket is not None:
                 # The socket is already opened
@@ -53,7 +53,7 @@ class InputsProxy(metaclass=SingletonMeta):
     def __monitor_usb_io_socket(self):
         Logger().debug("Start monitoring USB I/O socket") 
 
-        Logger().debug("Wait for sys-gui I/O socket to be ready")
+        Logger().debug("...wait for sys-gui I/O socket to be ready")
         chemin_socket_usb = Parametres().parametre(Cles.CHEMIN_SOCKET_INPUT_DOM0)
         while True:
             if self.sys_usb_socket is not None:

@@ -42,6 +42,7 @@ class MqttClient():
     on_connected = None
     on_message = None
     connected = False
+    is_starting = False
 
     def __init__(self, identifier:str, connection_type:ConnectionType = ConnectionType.UNIX_SOCKET, connection_string:str = ""):
         self.identifier = identifier
@@ -52,7 +53,11 @@ class MqttClient():
         self.stop()   
 
     def start(self):        
-        print("Starting MQTT client {}".format(self.identifier))
+        if self.is_starting or self.connected:
+            return
+        
+        self.is_starting = True
+        print("Starting MQTT client {}".format(self.identifier))        
 
         if self.connection_type != ConnectionType.SERIAL_PORT:            
             self.mqtt_client = mqtt.Client(callback_api_version=CallbackAPIVersion.VERSION2, client_id=self.identifier, transport=self.__get_transport_type())
