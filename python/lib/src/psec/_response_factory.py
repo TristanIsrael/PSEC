@@ -1,4 +1,4 @@
-from . import Constantes, Domaine, Parametres, Cles, EtatComposant
+from . import Constantes, Domaine, Parametres, Cles, EtatComposant, BenchmarkId
 
 class ResponseFactory():
     """ La classe ResponseFactory permet de générer les messages en réponse à certaines commandes.    
@@ -23,6 +23,7 @@ class ResponseFactory():
     @staticmethod
     def cree_reponse_benchmark_inputs(duree:int, iterations:int) -> dict:
         payload = {
+            "id": BenchmarkId.INPUTS,
             "duration": duree,
             "iterations": iterations
         }
@@ -31,14 +32,16 @@ class ResponseFactory():
     @staticmethod
     def cree_reponse_benchmark_fichiers_demarre() -> dict:
         payload = {
-            "etat": "demarre"
+            "id": BenchmarkId.FILES,
+            "state": "started"
         }
         return payload
     
     @staticmethod
     def cree_reponse_benchmark_fichiers_termine(metrics:list) -> dict:
         payload = {
-            "etat": "termine",
+            "id": BenchmarkId.FILES,
+            "estatetat": "finished",
             "metrics": metrics
         }
         return payload
@@ -46,7 +49,8 @@ class ResponseFactory():
     @staticmethod
     def cree_reponse_benchmark_fichiers_erreur(erreur:str) -> dict:
         payload = {
-            "etat": "erreur",
+            "id": BenchmarkId.FILES,
+            "state": "error",
             "message": erreur
         }
         return payload

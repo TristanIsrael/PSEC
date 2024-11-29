@@ -7,9 +7,9 @@ if len(sys.argv) < 2:
 
 def on_api_connected():
     nom = sys.argv[1]
-    api.notifie_ajout_disque(nom)
+    api.notify_disk_added(nom)
     exit(0)
 
-api = Api()
-api.set_ready_callback(on_api_connected)
-api.demarre()
+api = Api("notify-disk-added")
+api.add_ready_callback(on_api_connected)
+api.start()

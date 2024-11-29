@@ -12,7 +12,7 @@ class Topics():
 
     # Notifications
     NEW_FILE = "system/disks/new_file"
-    DISK_STATE= "system/disks/state"
+    DISK_STATE = "system/disks/state"
 
     # Logging
     ERROR = "system/events/error"

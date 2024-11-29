@@ -33,9 +33,10 @@ def watch_log_sockets():
         
         new_files = set(files) - sockets
         for file in new_files:
+            if file == "":
+                continue
             print(f"New logging socket found : {file}")
-            create_log_tunnel(file)
-            return
+            create_log_tunnel(file)            
 
         sockets.update(files)
         time.sleep(1)
@@ -53,9 +54,10 @@ def watch_msg_sockets():
         
         new_files = set(files) - sockets
         for file in new_files:
+            if file == "":
+                continue
             print(f"New messaging socket found : {file}")
-            create_msg_tunnel(file)
-            return
+            create_msg_tunnel(file)            
 
         sockets.update(files)
         time.sleep(1)

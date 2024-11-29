@@ -6,7 +6,7 @@ from MousePointer import MousePointer
 from InterfaceInputs import InterfaceInputs
 from InterfaceSocle import InterfaceSocle
 from hashlib import md5
-from psec import MouseWheel, Journal, Parametres, Cles
+from psec import MouseWheel, Logger, Parametres, Cles
 import os
 try:
     from psec import ControleurBenchmark
@@ -34,7 +34,6 @@ class AppController(QObject):
     testFinished = Signal(bool, str) # success, error
     followMouseCursorChanged = Signal()
     workerThread = None
-    journal = Journal("AppController")
     test_step = 0
     testfile_footprint = ""
 
@@ -103,16 +102,16 @@ class AppController(QObject):
     @Slot()
     def start_test(self, step=0, args = {}):
         if len(self.interface_socle.disks) == 0:
-            self.journal.error("start_test : Il n'y a pas de disque connecté")
+            Logger().error("start_test : Il n'y a pas de disque connecté", "AppController")
             return 
         
         disk = self.interface_socle.disks[0]
         
         if step == 0:                        
-            self.journal.info("Démarrage des tests : étape 1")
+            Logger().info("Démarrage des tests : étape 1", "AppController")
 
             # 1 - Création d'un fichier sur le support USB            
-            self.journal.info("Création d'un fichier aléatoire")
+            Logger().info("Création d'un fichier aléatoire", "AppController")
             repository_path = Parametres().parametre(Cles.CHEMIN_DEPOT_DOMU)
             filepath = '/test_file'.format(repository_path)                    
             contents = os.urandom(1024*1024)
@@ -126,12 +125,12 @@ class AppController(QObject):
             # Next step after the confirmation of writing
             self.test_step = 1 
         elif step == 2:
-            self.journal.info("Démarrage de l'étape 2")
+            Logger().info("Démarrage de l'étape 2", "AppController")
 
             # Vérification de l'étape précédente
             if self.testfile_footprint != args.get("footprint"):
                 error = "L'empreinte du fichier est incorrecte"
-                self.journal.error(error)
+                Logger().error(error, "AppController")
                 self.testFinished(False, error)
                 return 
 
@@ -142,12 +141,12 @@ class AppController(QObject):
             # Next step after the confirmation of writing
             self.test_step = 2
         elif step == 3:
-            self.journal.info("Démarrage de l'étape 3")            
+            Logger().info("Démarrage de l'étape 3", "AppController")            
 
             # Vérification de l'étape précédente
             if self.testfile_footprint != args.get("footprint"):
                 error = "L'empreinte du fichier est incorrecte"
-                self.journal.error(error)
+                Logger().error(error, "AppController")
                 self.testFinished(False, error)
                 return 
             
@@ -158,16 +157,16 @@ class AppController(QObject):
             # Next step after the confirmation of writing
             self.test_step = 3
         elif step == 4:
-            self.journal.info("Démarrage de l'étape 4")
+            Logger().info("Démarrage de l'étape 4", "AppController")
 
             # Vérification de l'étape précédente
             if self.testfile_footprint != args.get("footprint"):
                 error = "L'empreinte du fichier est incorrecte"
-                self.journal.error(error)
+                Logger().error(error, "AppController")
                 self.testFinished(False, error)
                 return 
             
-            self.journal.info("Les tests sont terminés et réussis")
+            Logger().info("Les tests sont terminés et réussis", "AppController")
             self.testFinished(True, "")
     
     @Slot()
@@ -240,7 +239,7 @@ class AppController(QObject):
 
     @Slot() 
     def demarre_surveillance_inputs(self):
-        self.journal.debug("Démarrage de la surveillance des entrées")
+        Logger().debug("Démarrage de la surveillance des entrées", "AppController")
         self.interfaceInputs = InterfaceInputs(self.fenetre_app)  
         self.workerThread = QThread()        
         self.interfaceInputs.moveToThread(self.workerThread)  
@@ -252,17 +251,17 @@ class AppController(QObject):
 
     @Slot(str, str, str)
     def __on_file_created(self, filepath, disk, footprint):
-        self.journal.info("Le fichier {} a bien été créé sur le disque {}".format(filepath, disk))
+        Logger().info("Le fichier {} a bien été créé sur le disque {}".format(filepath, disk), "AppController")
 
         if self.test_step == 1:
-            self.journal.debug("Réponse étape 1 reçue")
-            self.start_test(2, { "filepath": filepath, "disk": disk, "footprint": footprint })
+            Logger().debug("Réponse étape 1 reçue")
+            self.start_test(2, { "filepath": filepath, "disk": disk, "footprint": footprint }, "AppController")
         elif self.test_step == 2:
-            self.journal.debug("Réponse étape 2 reçue")
-            self.start_test(3, { "filepath": filepath, "disk": disk, "footprint": footprint })
+            Logger().debug("Réponse étape 2 reçue")
+            self.start_test(3, { "filepath": filepath, "disk": disk, "footprint": footprint }, "AppController")
         elif self.test_step == 3:
-            self.journal.debug("Réponse étape 3 reçue")
-            self.start_test(4, { "filepath": filepath, "disk": disk, "footprint": footprint })
+            Logger().debug("Réponse étape 3 reçue")
+            self.start_test(4, { "filepath": filepath, "disk": disk, "footprint": footprint }, "AppController")
 
     mouseX = Property(int, __mouse_x, notify=mouseXChanged)
     mouseY = Property(int, __mouse_y, notify=mouseYChanged)

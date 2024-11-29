@@ -46,7 +46,7 @@ conf/mosquitto.conf
 
 python/rotate-screen.py
 python/create-domains.py
-python/psec-core-controller.py
+python/start-psec-core-controller.py
 python/write-screen-information-to-xenstore.py
 python/generate-x-config.py
 python/get-total-memory.py
@@ -91,7 +91,7 @@ package() {
     install -D -m755 "$srcdir"/setup-pci-vga-controller.sh "$pkgdir/$PSEC_BINDIR"/setup-pci-vga-controller.sh
     install -D -m755 "$srcdir"/setup-xen-environment.sh "$pkgdir/$PSEC_BINDIR"/setup-xen-environment.sh
     install -D -m755 "$srcdir"/finish-core-init.sh "$pkgdir/$PSEC_BINDIR"/finish-core-init.sh
-    install -D -m755 "$srcdir"/psec-core-controller.py "$pkgdir/$PSEC_BINDIR"/psec-core-controller.py
+    install -D -m755 "$srcdir"/start-psec-core-controller.py "$pkgdir/$PSEC_BINDIR"/start-psec-core-controller.py
     install -D -m755 "$srcdir"/create-mqtt-tunnels.py "$pkgdir/$PSEC_BINDIR"/create-mqtt-tunnels.py
     
     install -D -m755 "$srcdir"/attach-pci-devices.initd "$pkgdir"/etc/init.d/attach-pci-devices
@@ -123,6 +123,6 @@ package() {
 
     # Mosquitto
     install -D -m644 "$srcdir"/mosquitto.conf "$pkgdir"/etc/mosquitto/mosquitto.conf
-    install -D -m755 "$srcdir"/create-mqtt-tunnels.initd "$pkgdir"/etc/init.d/create-mqtt-tunnels.sh
+    install -D -m755 "$srcdir"/create-mqtt-tunnels.initd "$pkgdir"/etc/init.d/create-mqtt-tunnels
 
 }

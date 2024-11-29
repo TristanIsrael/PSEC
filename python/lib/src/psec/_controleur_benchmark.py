@@ -15,12 +15,12 @@ class ControleurBenchmark(metaclass=SingletonMeta):
     #
     def demarre_benchmark_inputs(self):
         Logger().info("Demande le démarrage du benchmark sur les entrées")
-        payload = RequestFactory.cree_commande_start_benchmark(BenchmarkId.INPUTS)
+        payload = RequestFactory.create_request_start_benchmark(BenchmarkId.INPUTS)
         self.client_msg.publish("{}/request".format(Topics.BENCHMARK), payload)
 
     def demarre_benchmark_fichiers(self):
         Logger().info("Demande le démarrage du benchmark fichiers")
-        payload = RequestFactory.cree_commande_start_benchmark(BenchmarkId.FILES)
+        payload = RequestFactory.create_request_start_benchmark(BenchmarkId.FILES)
         self.client_msg.publish("{}/request".format(Topics.BENCHMARK), payload)
 
     ###
@@ -44,13 +44,13 @@ class ControleurBenchmark(metaclass=SingletonMeta):
         response = ResponseFactory.cree_reponse_benchmark_inputs(duration, iterations, emetteur)
         self.client_msg.publish("{}/response".format(Topics.BENCHMARK), response)
 
-    def execute_benchmark_fichiers(self, emetteur:str):
+    def execute_benchmark_fichiers(self):
         Logger().info("Exécution du benchmark sur les fichiers")
 
         start_ms = time.time()*1000
 
         # Informe le demandeur que le benchmark vient de démarrer
-        response = ResponseFactory.cree_reponse_benchmark_fichiers_demarre(emetteur)
+        response = ResponseFactory.cree_reponse_benchmark_fichiers_demarre()
         self.client_msg.publish("{}/response".format(Topics.BENCHMARK), response)
 
         # Le scénario de benchmark est le suivant :
@@ -87,20 +87,20 @@ class ControleurBenchmark(metaclass=SingletonMeta):
         # | 100 Mo | 10 | 1 Go |
         # | 500 Mo | 2 | 1 Go |
         # | 1 Go | 1 | 1 Go |
-        self.__execute_benchmark_fichiers(disque= disque, taille_fichier_ko= 10, quantite_fichiers= 100, emetteur= emetteur, metrics= metrics)
-        self.__execute_benchmark_fichiers(disque= disque, taille_fichier_ko= 100, quantite_fichiers= 100, emetteur= emetteur, metrics= metrics)
-        self.__execute_benchmark_fichiers(disque= disque, taille_fichier_ko= 500, quantite_fichiers= 100, emetteur= emetteur, metrics= metrics)
-        self.__execute_benchmark_fichiers(disque= disque, taille_fichier_ko= 1*1024, quantite_fichiers= 10, emetteur= emetteur, metrics= metrics)
-        self.__execute_benchmark_fichiers(disque= disque, taille_fichier_ko= 10*1024, quantite_fichiers= 10, emetteur= emetteur, metrics= metrics)
-        self.__execute_benchmark_fichiers(disque= disque, taille_fichier_ko= 100*1024, quantite_fichiers= 5, emetteur= emetteur, metrics= metrics)
+        self.__execute_benchmark_fichiers(disque= disque, taille_fichier_ko= 10, quantite_fichiers= 100, metrics= metrics)
+        self.__execute_benchmark_fichiers(disque= disque, taille_fichier_ko= 100, quantite_fichiers= 100, metrics= metrics)
+        self.__execute_benchmark_fichiers(disque= disque, taille_fichier_ko= 500, quantite_fichiers= 100, metrics= metrics)
+        self.__execute_benchmark_fichiers(disque= disque, taille_fichier_ko= 1*1024, quantite_fichiers= 10, metrics= metrics)
+        self.__execute_benchmark_fichiers(disque= disque, taille_fichier_ko= 10*1024, quantite_fichiers= 10, metrics= metrics)
+        self.__execute_benchmark_fichiers(disque= disque, taille_fichier_ko= 100*1024, quantite_fichiers= 5, metrics= metrics)
         #self.__execute_benchmark_fichiers(disque= disque, taille_fichier_ko= 500*1024, quantite_fichiers= 2, emetteur= emetteur, metrics= metrics)
         #self.__execute_benchmark_fichiers(disque= disque, taille_fichier_ko= 1024*1024, quantite_fichiers= 1, emetteur= emetteur, metrics= metrics)
 
         # Informe le demandeur que le benchmark vient de se terminer
-        response = ResponseFactory.cree_reponse_benchmark_fichiers_termine(emetteur, metrics)
+        response = ResponseFactory.cree_reponse_benchmark_fichiers_termine(metrics)
         self.client_msg.publish("{}/response".format(Topics.BENCHMARK), response)
     
-    def __execute_benchmark_fichiers(self, disque:str, taille_fichier_ko:int, quantite_fichiers:int, emetteur:str, metrics:list):
+    def __execute_benchmark_fichiers(self, disque:str, taille_fichier_ko:int, quantite_fichiers:int, metrics:list):
         Logger().info("Démarrage d'une itération de benchmark fichier pour {} fichiers de {} Ko".format(quantite_fichiers, taille_fichier_ko))
 
         point_montage = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)

@@ -2,7 +2,7 @@
 
 import os
 from pathlib import Path
-import sys
+import sys, threading
 
 curdir = os.path.dirname(__file__)
 libdir = os.path.realpath(curdir+"/../../../lib/src") # Pour le débogage local
@@ -14,10 +14,8 @@ from PySide6.QtCore import QObject, QCoreApplication, Qt, qInstallMessageHandler
 from PySide6.QtQuickControls2 import QQuickStyle
 
 from InterfaceSocle import InterfaceSocle
-from InterfaceInputs import InterfaceInputs
 import rc_ressources
 from AppController import AppController
-from MousePointer import MousePointer
 from DiskModel import DiskModel
 from DiskProxyModel import DiskProxyModel
 
@@ -34,13 +32,24 @@ class EvtFilter(QObject):
 
         return False
 
+api_ready = threading.Event()
+
+def on_ready():
+    print("API ready callback")
+    api_ready.set()
+
 if __name__ == '__main__':
     app = QGuiApplication(sys.argv)
     QQuickStyle.setStyle("Universal")
 
     appController = AppController()
     interfaceSocle = InterfaceSocle(app)
-    interfaceSocle.demarre()
+    interfaceSocle.start(on_ready)
+
+    print("Waiting for the API to be ready")
+    api_ready.wait()
+    
+    print("Continue")
     diskModel = DiskModel(interfaceSocle, app)
 
     # Expose les Types QML
@@ -63,5 +72,5 @@ if __name__ == '__main__':
     # Intégration avec le socle
     appController.set_fenetre_app(qml_root)    
     appController.set_interface_socle(interfaceSocle)
- 
+
     app.exec()

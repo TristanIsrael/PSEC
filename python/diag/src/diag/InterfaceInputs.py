@@ -3,15 +3,14 @@ from PySide6.QtCore import  Slot, QPoint, QCoreApplication, Qt, QEvent, QPointF
 from PySide6.QtGui import QMouseEvent, QWheelEvent, QHoverEvent, QEnterEvent, QGuiApplication
 from PySide6.QtWidgets import QWidget
 from MousePointer import MousePointer
-from psec import Journal, Parametres, Cles, Mouse, MouseButton, MouseWheel, MouseMove
+from psec import Parametres, Cles, Mouse, MouseButton, MouseWheel, MouseMove, Logger
 import serial, subprocess #, threading
 
 class InterfaceInputs(QObject):
     """! Cette classe traite les informations sur les entrées (clavier, souris et tactile) en provenance du socle.
 
     """
-
-    journal = Journal("InterfaceInputs")
+    
     fenetre_app:QWidget = None
     dernier_bouton = Qt.NoButton
     chemin_socket_inputs = None   
@@ -32,12 +31,12 @@ class InterfaceInputs(QObject):
     @Slot()
     def demarre_surveillance(self):        
         try:
-            self.journal.info("Démarrage de la surveillance des inputs")    
+            Logger().info("Démarrage de la surveillance des inputs", "InterfaceInputs")
             self.chemin_socket_inputs = Parametres().parametre(Cles.CHEMIN_SOCKET_INPUT_DOMU)
             self.__connecte_interface_xenbus()
         except Exception as e:
-            self.journal.error("Impossible d'ouvrir le port Xenbus Inputs")
-            self.journal.error(e)
+            Logger().error("Impossible d'ouvrir le port Xenbus Inputs", "InterfaceInputs")
+            Logger().error(e, "InterfaceInputs")
 
     def mock(self):       
         print("MOCK") 
@@ -50,15 +49,15 @@ class InterfaceInputs(QObject):
     #
     def __connecte_interface_xenbus(self):
         #Ouvre le flux avec la socket
-        self.journal.debug("Ouvre le flux avec le port série Inputs %s" % self.chemin_socket_inputs)
+        Logger().debug("Ouvre le flux avec le port série Inputs %s" % self.chemin_socket_inputs, "InterfaceInputs")
 
         try:
             self.socket_inputs:serial.Serial = serial.Serial(port= self.chemin_socket_inputs)
-            self.journal.info("La surveillance des entrées est démarrée")     
+            Logger().info("La surveillance des entrées est démarrée", "InterfaceInputs")     
             self.pret.emit()       
         except serial.SerialException as e:
-            self.journal.error("Impossible de se connecter au port série %s" % self.chemin_socket_inputs)
-            self.journal.error(e)  
+            Logger().error("Impossible de se connecter au port série %s" % self.chemin_socket_inputs, "InterfaceInputs")
+            Logger().error(e, "InterfaceInputs")  
             return
         
         try:
@@ -69,8 +68,8 @@ class InterfaceInputs(QObject):
                 self.__traite_donnees_input(data[:-1])
 
         except serial.SerialException as e:
-            self.journal.error("Erreur de lecture sur le port inputs %s" % self.chemin_socket_inputs)
-            self.journal.error(e)    
+            Logger().error("Erreur de lecture sur le port inputs %s" % self.chemin_socket_inputs, "InterfaceInputs")
+            Logger().error(e, "InterfaceInputs")    
 
     def __traite_donnees_input(self, data:bytes):
         # On recoit une version sérialisée d'un objet
@@ -93,7 +92,7 @@ class InterfaceInputs(QObject):
             newX = newCoord.x()
             newY = newCoord.y()     
         else:
-            print("Erreur de décodage")
+            Logger().error("Erreur de décodage", "InterfaceInputs")
             return
             #print(mouse.x, self.fenetre_app.width(), newX, newY)        
 
@@ -127,7 +126,7 @@ class InterfaceInputs(QObject):
             QCoreApplication.postEvent(self.fenetre_app, event)
             
             self.wheel.emit(mouse.wheel)
-            #self.journal.debug("wheel {}".format(mouse.wheel))            
+            #Logger().debug("wheel {}".format(mouse.wheel))            
 
             self.mouse.wheel = MouseWheel.NO_MOVE
 

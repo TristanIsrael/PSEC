@@ -2,15 +2,12 @@ from PySide6.QtCore import QObject, Signal, qDebug, qWarning
 from PySide6.QtCore import QProcess, QTimer, QDir, Property, Slot, QPoint, QCoreApplication, Qt, QEvent, QSize
 from PySide6.QtGui import QMouseEvent, QCursor
 from PySide6.QtWidgets import QWidget
-from psec import Journal, Api, Message, TypeMessage, Notification, TypeEvenement, EtatDisque, TypeReponse, Constantes
+from psec import Api, EtatDisque, Constantes, Logger, MqttClient, ConnectionType, Cles, Topics, BenchmarkId
 import threading
 
 class InterfaceSocle(QObject):
     """! Cette classe surveille le XenBus pour échanger des messages avec les autres composants du système.    
     """
-
-    journal = Journal("InterfaceSocle")
-    api = Api()
 
     # Member variables    
     benchmark_data_ = {}
@@ -44,25 +41,23 @@ class InterfaceSocle(QObject):
     error = Signal(str)
 
     def __init__(self, parent=None):
-        QObject.__init__(self, parent)        
-        self.api.set_message_callback(self.__on_message_recu)        
+        QObject.__init__(self, parent)
 
     @Slot()
-    def demarre(self):        
-        try:
-            self.api.demarre()
-        except Exception as e:
-            self.journal.error("L'API n'est pas prête")
-            self.journal.error(e)
-            return        
+    def start(self, ready_callback):
+        self.ready_callback = ready_callback
+        self.api = Api("Diag")
+        self.api.add_message_callback(self.__on_message_recu)
+        self.api.add_ready_callback(self.ready_callback)
+        self.api.start()
 
     @Slot()
     def get_liste_disques(self):
-        return self.api.get_liste_disques()
+        return self.api.get_disks_list()
 
     @Slot()
     def get_contenu_disque(self, nom):
-        return self.api.get_liste_fichiers(nom)
+        return self.api.get_files_list(nom)
 
     @Slot()
     def get_contenu_depot(self):
@@ -79,104 +74,100 @@ class InterfaceSocle(QObject):
 
     #@Slot(str, str, str)
     def download_file(self, disk:str, folder:str, name:str):
-        self.journal.debug("Envoi d'une commande pour le téléchargement du fichier {}{}/{}".format(disk, folder, name))
+        Logger().debug("Envoi d'une commande pour le téléchargement du fichier {}{}/{}".format(disk, folder, name))
         filepath = "{}/{}".format(folder, name)
-        self.api.copie_fichier_dans_depot(disk, filepath)
+        self.api.copy_file_to_storage(disk, filepath)
         #self.api.lit_fichier(disk, "{}/{}".format(folder, name))
 
     ###
     # Fonctions privées
     #
-    def __on_message_recu(self, message : Message):
-        self.journal.debug("Message reçu :")
-        self.journal.debug(message.to_json())
-
-        if message.type == TypeMessage.NOTIFICATION:
-            self.__on_notification_recue(message)  
-        elif message.type == TypeMessage.REPONSE:
-            self.__on_reponse_recue(message)
-
-    def __on_notification_recue(self, message : Message):
-        self.journal.debug("C'est une notification...")
-        payload = message.payload
-        data = payload.get("data")
-
-        # Filtrage des notifications
-        if payload["evenement"] == TypeEvenement.DISQUE:
-            self.__gere_notification_disque(data)
-        else:
-            self.journal.debug("Les notifications {} ne sont pas gérées.".format(payload["evenement"]))
-            return        
-
-    def __gere_notification_disque(self, data):
-        nom = data.get("nom")
-        etat = data.get("etat")
-
-        if nom == None or etat == None:
-            self.journal.warn("La notification n'est pas correctement formatée")
-            return
+    def __on_message_recu(self, topic:str, payload:dict):
+        Logger().debug("Message reçu :")
+        Logger().debug("topic: {}, payload: {}".format(topic, payload))
         
-        self.diskChanged.emit(nom, etat == EtatDisque.PRESENT)
-    
-    def __on_reponse_recue(self, reponse):
-        self.journal.debug("C'est une réponse...")
-        if reponse.commande == TypeReponse.LISTE_DISQUES:            
-            liste = reponse.data
-            self.journal.debug("liste des disques reçue : {}".format(liste))
+        if topic == Topics.DISK_STATE:
+            disk = payload.get("disk")
+            if disk is None:
+                Logger().error("The disk value is missing")
+                return
+            
+            state = payload.get("state")
+            if state is None:
+                Logger().error("The state value is missing")
+                return
+            
+            self.diskChanged.emit(disk, state == "connected")
+        elif topic == "{}/response".format(Topics.LIST_DISKS):
+            disks = payload.get("disks")
+            if disks is None:
+                Logger().error("The disks value is missing")
+                return 
+                        
+            Logger().debug("Disks list received : {}".format(disks))
             self.disks_.clear()
-            self.disks_.extend(liste)
+            self.disks_.extend(disks)
             self.disksChanged.emit()
 
             # Demande la liste des fichiers pour chaque disque
-            for disk in liste:
+            for disk in disks:
                 self.get_contenu_disque(disk)
-        elif reponse.commande == TypeReponse.LISTE_FICHIERS:
-            liste = reponse.data
-            self.journal.debug("Liste des fichiers reçue : {}".format(liste))
-            disk_name = liste.get("disk")
-            files = liste.get("files")
-            if disk_name == "" or disk_name == None:
-                self.journal.error("Le nom du disque est invalide : {}".format(disk_name))
-                return 
+        elif topic == "{}/response".format(Topics.LIST_FILES):
+            disk = payload.get("disk")
+            files = payload.get("files")
+
+            if disk is None:
+                Logger().error("The disk argument is missing")
+                return
+            
+            if files is None:
+                Logger().error("The files argument is missing")
+                return
+
+            Logger().debug("Files list received, count={}".format(len(files)))            
             
             # Inject the disk into the values
             for file in files:
-                file["disk"] = disk_name
+                file["disk"] = disk
 
             self.files_.extend(files)            
             #self.files_[disk_name] = files
             self.filesChanged.emit()
-        elif reponse.commande == TypeReponse.BENCHMARK_INPUTS:
-            data = reponse.data
-            self.journal.debug("Données benchmark reçues : {}".format(data))
-            duration = data.get("duration")
-            iterations = data.get("iterations")
-            self.benchmark_data_ = {
-                "inputs_duration": duration,
-                "inputs_iterations": iterations
-            }
-            self.benchmarkDataChanged.emit()
-        elif reponse.commande == TypeReponse.BENCHMARK_FILES:
-            data = reponse.data
-            self.journal.debug("Données benchmark reçues : {}".format(data))
-            etat = data.get("etat")
-            self.benchmark_data_["files_etat"] = etat
-            self.benchmarkDataChanged.emit()
+        elif topic == "{}/response".format(Topics.BENCHMARK):            
+            Logger().debug("Received benchmark data: {}".format(payload))
 
-            if etat == "erreur":
-                self.journal.error("Erreur pendant le benchmark des fichiers")
-                # Todo: à gérer au niveau de l'interface graphique
-            elif etat == "termine":
-                metrics = data.get("metrics")
-                if metrics != None and len(metrics) > 0:
-                    self.__analyze_benchmark_files_metrics(metrics)
-        elif reponse.commande == TypeReponse.FILE_CREATION:
-            data = reponse.data
-            self.journal.debug("Etat création fichier reçue : {}".format(data))
-            success = data.get("success")
-            filepath = data.get("filepath")
-            disk = data.get("disk")
-            footprint = data.get("footprint")
+            id = payload.get("id")
+
+            if id is None:
+                Logger().error("Benchmark ID is missing")
+                return
+            
+            if id == BenchmarkId.INPUTS:
+                duration = payload.get("duration")
+                iterations = payload.get("iterations")
+                self.benchmark_data_ = {
+                    "inputs_duration": duration,
+                    "inputs_iterations": iterations
+                }
+                self.benchmarkDataChanged.emit()
+            elif id == BenchmarkId.FILES:                        
+                state = payload.get("state")
+                self.benchmark_data_["files_etat"] = state
+                self.benchmarkDataChanged.emit()
+
+                if state == "error":
+                    Logger().error("Error during files I/O benchmark")
+                    # Todo: à gérer au niveau de l'interface graphique
+                elif state == "termine":
+                    metrics = data.get("metrics")
+                    if metrics != None and len(metrics) > 0:
+                        self.__analyze_benchmark_files_metrics(metrics)
+        elif topic == "{}/response".format(Topics.CREATE_FILE):
+            Logger().debug("File creation response: {}".format(payload))
+            success = payload.get("success")
+            filepath = payload.get("filepath")
+            disk = payload.get("disk")
+            footprint = payload.get("footprint")
 
             if not success:
                 self.error.emit("La création du fichier {} sur le disque {} a échoué".format(filepath, disk))
@@ -185,7 +176,7 @@ class InterfaceSocle(QObject):
             self.fileCreated.emit(filepath, disk, footprint)
 
     def __analyze_benchmark_files_metrics(self, metrics=[]):
-        self.journal.info("Analyze benchmark metrics")
+        Logger().info("Analyze benchmark metrics")
 
         # On recoit un tableau de données comme ceci :
         '''
@@ -285,7 +276,7 @@ class InterfaceSocle(QObject):
         self.benchmark_data_["read_usb_100m"] = read_usb_100m
         self.benchmark_data_["copy_repository_100m"] = copy_repository_100m
 
-        self.journal.debug(self.benchmark_data_)
+        Logger().debug(self.benchmark_data_)
         self.benchmarkDataChanged.emit()
 
     def __initialize_metrics(self):

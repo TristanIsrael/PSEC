@@ -1,6 +1,7 @@
 import os, pty
 from serial import Serial
 import threading, uuid, socket, tempfile
+from psec import Logger
 
 class MockXenbus():
     """ Classe MockXenbus
@@ -47,7 +48,7 @@ class MockXenbus():
             threading.Thread(target=self.__ecoute_port_serie).start()
             return fd_esclave
         else:
-            self.journal.error("Le port série n'est pas prêt. Reçu={}".format(recu))
+            Logger().error("Le port série n'est pas prêt. Reçu={}".format(recu), "MockXenbus")
             return None
 
     def __cree_nom_fichier(self):

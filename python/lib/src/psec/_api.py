@@ -1,5 +1,5 @@
-from . import Constantes, RequestFactory, Topics
-from . import Logger, MqttClient, ConnectionType, MqttFactory
+from . import Constantes, RequestFactory, Topics, NotificationFactory
+from . import Logger, MqttClient, ConnectionType, MqttFactory, Cles
 
 class Api():
     """ Cette classe permet à un programme tiers d'envoyer des commandes ou recevoir des 
@@ -29,24 +29,42 @@ class Api():
 
     def __init__(self, identifier:str):
         self.identifier = identifier
-        
+
+    '''
     def set_mqtt_msg(self, connection_type:ConnectionType = ConnectionType.SERIAL_PORT, connection_string:str = ""):
         self.client_msg = MqttClient(connection_type, connection_string)
 
     def set_mqtt_log(self, connection_type:ConnectionType = ConnectionType.SERIAL_PORT, connection_string:str = ""):
         self.client_log = MqttClient(connection_type, connection_string)
+    '''
 
     def start(self):
+        '''
         if self.client_log is None:
             self.client_log = MqttFactory.create_client_log_domu(self.identifier)
 
         if self.client_msg is None:
             self.client_msg = MqttFactory.create_client_msg_domu(self.identifier)
 
-        Logger().setup("API", self.client_log)
-
+        Logger().setup("API", self.client_log)        
         self.client_msg.on_connected = self.__on_messaging_ready        
+        '''
+        self.nb_mqtt = 0   
+
+        self.client_log = MqttClient("Diag logger", ConnectionType.SERIAL_PORT, Constantes().constante(Cles.SERIAL_PORT_LOG))
+        self.client_log.on_connected = self.__on_mqtt_connected
+        self.client_log.start()
+
+        self.client_msg = MqttClient("Diag messaging", ConnectionType.SERIAL_PORT, Constantes().constante(Cles.SERIAL_PORT_MSG))
+        self.client_msg.on_connected = self.__on_mqtt_connected
         self.client_msg.on_message = self.__on_message_received
+        self.client_msg.start()        
+
+    def __on_mqtt_connected(self):
+        self.nb_mqtt += 1        
+        if self.nb_mqtt == 2:
+            Logger().setup(self.identifier, self.client_log)
+            self.__on_messaging_ready()
 
     def add_message_callback(self, callback_fn):
         if callback_fn is not None:
@@ -114,6 +132,16 @@ class Api():
     def discover_modules(self) -> None:        
         self.client_msg.publish("{}/request".format(Topics.DISCOVER_MODULES), {})
 
+    ####
+    # Fonctions de notification
+    #
+    def notify_disk_added(self, disk):
+        payload = NotificationFactory.create_notification_disk_state(disk, "connected")
+        self.client_msg.publish("{}".format(Topics.DISK_STATE), payload)
+    
+    def notify_disk_removed(self, disk):
+        payload = NotificationFactory.create_notification_disk_state(disk, "diconnected")
+        self.client_msg.publish("{}".format(Topics.DISK_STATE), payload)
 
     ####
     # Fonctions privées
