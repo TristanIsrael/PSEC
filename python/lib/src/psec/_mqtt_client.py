@@ -12,6 +12,8 @@ class SerialSocket():
     def __init__(self, path:str, baudrate:int):
         #print("Connect to serial port")
         self.serial = serial.Serial(path, baudrate)
+        self.serial.reset_input_buffer()
+        self.serial.reset_output_buffer()
 
     def recv(self, buffer_size: int) -> bytes:
         if self.serial.in_waiting > 0:
@@ -24,6 +26,8 @@ class SerialSocket():
 
     def close(self) -> None:
         #print("Close serial port")
+        self.serial.reset_input_buffer()
+        self.serial.reset_output_buffer()
         self.serial.close()
 
     def fileno(self) -> int:
@@ -40,7 +44,7 @@ class SerialMQTTClient(mqtt.Client):
 
     def _create_socket(self):
         try:
-            socket = SerialSocket(self.path, self.baudrate)
+            socket = SerialSocket(self.path, self.baudrate)            
             self._sockpairR = socket
             #print("Socket created")
             return socket
@@ -80,7 +84,7 @@ class MqttClient():
             self.mqtt_client.on_message = self.__on_message
             
             if self.connection_type == ConnectionType.TCP_DEBUG:
-                self.mqtt_client.connect(host="localhost")
+                self.mqtt_client.connect(host="localhost", keepalive=30)
             elif self.connection_type == ConnectionType.UNIX_SOCKET:
                 self.mqtt_client.connect(host=self.connection_string, port=1)
             else:
@@ -93,7 +97,7 @@ class MqttClient():
             self.mqtt_client = SerialMQTTClient(client_id=self.identifier, path=self.connection_string, baudrate=115200, reconnect_on_failure=False)
             self.mqtt_client.on_connect = self.__on_connected
             self.mqtt_client.on_message = self.__on_message
-            self.mqtt_client.connect(host="localhost", port=1)
+            self.mqtt_client.connect(host="localhost", port=1, keepalive=30)
 
             threading.Thread(target=self.mqtt_client.loop_forever).start()
         else:
@@ -126,7 +130,7 @@ class MqttClient():
         
         return "" 
     
-    def __on_message(self, client, userdata, msg):
+    def __on_message(self, client:mqtt.Client, userdata, msg:mqtt.MQTTMessage):
         #print(f"[{userdata}] Message reçu sur {msg.topic}: {msg.payload.decode()}")
         if self.on_message is not None:
             payload = json.loads(msg.payload.decode())
@@ -134,17 +138,18 @@ class MqttClient():
         else:
             print("No message callback")
 
-    def __on_connected(self, client, userdata, connect_flags, reason_code, properties):
+    def __on_connected(self, client:mqtt.Client, userdata, connect_flags, reason_code, properties):
         print("Connected to the MQTT broker")
         self.connected = True
         
         if self.on_connected is not None:
             self.on_connected()
 
-        print("Starting keepalive")
-        threading.Timer(30, self.__keepalive).start()
+        #print("Starting keepalive")
+        #threading.Timer(30, self.__keepalive).start()
 
-    def __keepalive(self):
-        if self.connected and self.can_run:
-            self.mqtt_client.publish("misc/keepalive", "ping")
-            threading.Timer(30, self.__keepalive).start()
+    #def __keepalive(self):
+    #    if self.connected and self.can_run:
+    #        #self.mqtt_client.publish("misc/keepalive", "ping")
+    #        self.mqtt_client._send_pingreq()
+    #        threading.Timer(30, self.__keepalive).start()

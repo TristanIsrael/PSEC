@@ -47,7 +47,7 @@ class InterfaceSocle(QObject):
     def start(self, ready_callback):
         self.ready_callback = ready_callback
         self.api = Api("Diag")
-        self.api.add_message_callback(self.__on_message_recu)
+        self.api.add_message_callback(self.__on_message_received)
         self.api.add_ready_callback(self.ready_callback)
         self.api.start()
 
@@ -82,7 +82,7 @@ class InterfaceSocle(QObject):
     ###
     # Fonctions privées
     #
-    def __on_message_recu(self, topic:str, payload:dict):
+    def __on_message_received(self, topic:str, payload:dict):
         Logger().debug("Message reçu :")
         Logger().debug("topic: {}, payload: {}".format(topic, payload))
         
@@ -159,7 +159,7 @@ class InterfaceSocle(QObject):
                     Logger().error("Error during files I/O benchmark")
                     # Todo: à gérer au niveau de l'interface graphique
                 elif state == "termine":
-                    metrics = data.get("metrics")
+                    metrics = payload.get("metrics")
                     if metrics != None and len(metrics) > 0:
                         self.__analyze_benchmark_files_metrics(metrics)
         elif topic == "{}/response".format(Topics.CREATE_FILE):
