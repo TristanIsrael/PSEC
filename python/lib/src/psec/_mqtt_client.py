@@ -16,19 +16,21 @@ class SerialSocket():
         self.serial.reset_output_buffer()
 
     def recv(self, buffer_size: int) -> bytes:
-        if self.serial.in_waiting > 0:
+        if self.serial is not None and self.serial.is_open and self.serial.in_waiting > 0:
             return self.serial.read(buffer_size)
         
         return b""   
     
     def send(self, buffer: bytes) -> int:
-        return self.serial.write(buffer)
+        if self.serial is not None and self.serial.is_open:
+            return self.serial.write(buffer)
 
     def close(self) -> None:
         #print("Close serial port")
-        self.serial.reset_input_buffer()
-        self.serial.reset_output_buffer()
-        self.serial.close()
+        if self.serial is not None and self.serial.is_open:
+            self.serial.reset_input_buffer()
+            self.serial.reset_output_buffer()
+            self.serial.close()
 
     def fileno(self) -> int:
         return self.serial.fileno()
@@ -37,18 +39,23 @@ class SerialSocket():
         pass
     
 class SerialMQTTClient(mqtt.Client):
+    socket_:SerialSocket = None
+
     def __init__(self, path:str, baudrate:int, *args, **kwargs):
         super().__init__(callback_api_version=CallbackAPIVersion.VERSION2, *args, **kwargs)
         self.path = path
         self.baudrate = baudrate        
 
+    def close(self):
+        if self.socket_ is not None:
+            self.socket_.close()        
+    
     def _create_socket(self):
         try:
             print("Create socket on {}".format(self.path))
-            socket = SerialSocket(self.path, self.baudrate)            
-            self._sockpairR = socket
-            #print("Socket created")
-            return socket
+            self.socket_ = SerialSocket(self.path, self.baudrate)            
+            self._sockpairR = self.socket_
+            return self.socket_
         except:
             print("An error occured while opening the serial port")
             return None
@@ -60,8 +67,7 @@ class MqttClient():
     on_connected = None
     on_message = None
     connected = False
-    is_starting = False
-    can_run = True
+    is_starting = False    
 
     def __init__(self, identifier:str, connection_type:ConnectionType = ConnectionType.UNIX_SOCKET, connection_string:str = ""):
         self.identifier = identifier
@@ -76,8 +82,7 @@ class MqttClient():
         if self.is_starting or self.connected:
             return
         
-        self.is_starting = True
-        self.can_run = True
+        self.is_starting = True    
         print("Starting MQTT client {}".format(self.identifier))        
 
         if self.connection_type != ConnectionType.SERIAL_PORT:            
@@ -99,7 +104,8 @@ class MqttClient():
             self.mqtt_client = SerialMQTTClient(client_id=self.identifier, path=self.connection_string, baudrate=115200, reconnect_on_failure=False)
             self.mqtt_client.on_connect = self.__on_connected
             self.mqtt_client.on_message = self.__on_message
-            self.mqtt_client.connect(host="localhost", port=1, keepalive=30)
+            self.mqtt_client.on_disconnect = self.mqtt_client.close()
+            self.mqtt_client.connect(host="localhost", port=1, keepalive=30)            
 
             threading.Thread(target=self.mqtt_client.loop_forever).start()
         else:
@@ -108,10 +114,13 @@ class MqttClient():
 
     def stop(self):
         if self.mqtt_client is not None:
-            self.can_run = False
-            self.mqtt_client.loop_stop()
-            self.mqtt_client.disconnect()
-            print("Mqtt client exited")
+            print("Quit Mqtt client")
+            try:
+                self.mqtt_client.disconnect()
+                self.mqtt_client.loop_stop()
+            except:
+                #Ignore exceptions when closing
+                pass
 
     #def subscribe(self, topic:str):
     #   print("Subscribe to topic {}".format(topic))

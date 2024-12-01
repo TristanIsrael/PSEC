@@ -5,9 +5,12 @@ if len(sys.argv) < 2:
     print("Argument missing : {} disk_name".format(sys.argv[0]))
     exit(-1)
 
-def on_api_connected():
-    nom = sys.argv[1]
-    api.notify_disk_added(nom)
+name = sys.argv[1]
+
+def on_api_connected():    
+    api.info("The disk {} has been connected to the system.".format(name))
+    api.notify_disk_added(name)
+    api.stop()
     exit(0)
 
 api = Api("notify-disk-added")

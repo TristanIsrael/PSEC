@@ -1,8 +1,8 @@
-from PySide6.QtCore import QObject, Signal, qDebug, qWarning
+from PySide6.QtCore import QObject, Signal
 from PySide6.QtCore import QProcess, QTimer, QDir, Property, Slot, QPoint, QCoreApplication, Qt, QEvent, QSize
 from PySide6.QtGui import QMouseEvent, QCursor
 from PySide6.QtWidgets import QWidget
-from psec import Api, EtatDisque, Constantes, Logger, MqttClient, ConnectionType, Cles, Topics, BenchmarkId
+from psec import Api, EtatDisque, Constantes, Topics, BenchmarkId
 import threading
 
 class InterfaceSocle(QObject):
@@ -46,18 +46,19 @@ class InterfaceSocle(QObject):
     @Slot()
     def start(self, ready_callback):
         self.ready_callback = ready_callback
-        self.api = Api("Diag")
-        self.api.add_message_callback(self.__on_message_received)
-        self.api.add_ready_callback(self.ready_callback)
-        self.api.start()
+        Api().add_message_callback(self.__on_message_received)
+        Api().add_ready_callback(self.ready_callback)
+        Api().start("Diag")
 
     @Slot()
     def get_liste_disques(self):
-        return self.api.get_disks_list()
+        print("Get list disks")
+        Api().debug("Get disks list")
+        return Api().get_disks_list()
 
     @Slot()
     def get_contenu_disque(self, nom):
-        return self.api.get_files_list(nom)
+        return Api().get_files_list(nom)
 
     @Slot()
     def get_contenu_depot(self):
@@ -74,37 +75,37 @@ class InterfaceSocle(QObject):
 
     #@Slot(str, str, str)
     def download_file(self, disk:str, folder:str, name:str):
-        Logger().debug("Envoi d'une commande pour le téléchargement du fichier {}{}/{}".format(disk, folder, name))
+        Api().debug("Envoi d'une commande pour le téléchargement du fichier {}{}/{}".format(disk, folder, name))
         filepath = "{}/{}".format(folder, name)
-        self.api.copy_file_to_storage(disk, filepath)
-        #self.api.lit_fichier(disk, "{}/{}".format(folder, name))
+        Api().copy_file_to_storage(disk, filepath)
+        #Api().lit_fichier(disk, "{}/{}".format(folder, name))
 
     ###
     # Fonctions privées
     #
     def __on_message_received(self, topic:str, payload:dict):
-        Logger().debug("Message reçu :")
-        Logger().debug("topic: {}, payload: {}".format(topic, payload))
+        Api().debug("Message reçu :")
+        Api().debug("topic: {}, payload: {}".format(topic, payload))
         
         if topic == Topics.DISK_STATE:
             disk = payload.get("disk")
             if disk is None:
-                Logger().error("The disk value is missing")
+                Api().error("The disk value is missing")
                 return
             
             state = payload.get("state")
             if state is None:
-                Logger().error("The state value is missing")
+                Api().error("The state value is missing")
                 return
             
             self.diskChanged.emit(disk, state == "connected")
         elif topic == "{}/response".format(Topics.LIST_DISKS):
             disks = payload.get("disks")
             if disks is None:
-                Logger().error("The disks value is missing")
+                Api().error("The disks value is missing")
                 return 
                         
-            Logger().debug("Disks list received : {}".format(disks))
+            Api().debug("Disks list received : {}".format(disks))
             self.disks_.clear()
             self.disks_.extend(disks)
             self.disksChanged.emit()
@@ -117,14 +118,14 @@ class InterfaceSocle(QObject):
             files = payload.get("files")
 
             if disk is None:
-                Logger().error("The disk argument is missing")
+                Api().error("The disk argument is missing")
                 return
             
             if files is None:
-                Logger().error("The files argument is missing")
+                Api().error("The files argument is missing")
                 return
 
-            Logger().debug("Files list received, count={}".format(len(files)))            
+            Api().debug("Files list received, count={}".format(len(files)))            
             
             # Inject the disk into the values
             for file in files:
@@ -134,12 +135,12 @@ class InterfaceSocle(QObject):
             #self.files_[disk_name] = files
             self.filesChanged.emit()
         elif topic == "{}/response".format(Topics.BENCHMARK):            
-            Logger().debug("Received benchmark data: {}".format(payload))
+            Api().debug("Received benchmark data: {}".format(payload))
 
             id = payload.get("id")
 
             if id is None:
-                Logger().error("Benchmark ID is missing")
+                Api().error("Benchmark ID is missing")
                 return
             
             if id == BenchmarkId.INPUTS:
@@ -156,14 +157,14 @@ class InterfaceSocle(QObject):
                 self.benchmarkDataChanged.emit()
 
                 if state == "error":
-                    Logger().error("Error during files I/O benchmark")
+                    Api().error("Error during files I/O benchmark")
                     # Todo: à gérer au niveau de l'interface graphique
                 elif state == "termine":
                     metrics = payload.get("metrics")
                     if metrics != None and len(metrics) > 0:
                         self.__analyze_benchmark_files_metrics(metrics)
         elif topic == "{}/response".format(Topics.CREATE_FILE):
-            Logger().debug("File creation response: {}".format(payload))
+            Api().debug("File creation response: {}".format(payload))
             success = payload.get("success")
             filepath = payload.get("filepath")
             disk = payload.get("disk")
@@ -174,9 +175,26 @@ class InterfaceSocle(QObject):
                 return 
         
             self.fileCreated.emit(filepath, disk, footprint)
+        elif topic == Topics.DISK_STATE:
+            disk = payload.get("disk")
+            state = payload.get("state")
+
+            if disk is None or state is None:
+                Api().warn("The disks state notification is malformed.")
+                return
+            
+            if state == EtatDisque.PRESENT and disk not in self.disks_:
+                print("disk added:{}".format(disk))
+                self.disks_.extend(disk)
+                self.disksChanged.emit()
+            elif state == EtatDisque.ABSENT and disk in self.disks_:
+                print("disk removed:{}".format(disk))
+                self.disks_.remove(disk)
+                self.diskChanged.emit()
+
 
     def __analyze_benchmark_files_metrics(self, metrics=[]):
-        Logger().info("Analyze benchmark metrics")
+        Api().info("Analyze benchmark metrics")
 
         # On recoit un tableau de données comme ceci :
         '''
@@ -276,7 +294,7 @@ class InterfaceSocle(QObject):
         self.benchmark_data_["read_usb_100m"] = read_usb_100m
         self.benchmark_data_["copy_repository_100m"] = copy_repository_100m
 
-        Logger().debug(self.benchmark_data_)
+        Api().debug(self.benchmark_data_)
         self.benchmarkDataChanged.emit()
 
     def __initialize_metrics(self):

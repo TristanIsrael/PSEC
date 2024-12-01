@@ -1,4 +1,4 @@
-from PySide6.QtCore import QObject, QPoint, qDebug, Qt, QEvent
+from PySide6.QtCore import QObject, QPoint, Qt, QEvent
 from PySide6.QtGui import QPainter, QCursor, QPixmap, QImage
 from PySide6.QtQuick import QQuickItem, QQuickPaintedItem
 import pathlib

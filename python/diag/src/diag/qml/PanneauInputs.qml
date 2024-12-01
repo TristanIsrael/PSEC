@@ -13,7 +13,7 @@ PanneauInputsUi {
     Connections {
         target: btnStartBenchmark
         function onClicked() {
-            console.info(qsTr("L'utilisateur demande le démarrage du benchmark inputs"))
+            AppController.info(qsTr("L'utilisateur demande le démarrage du benchmark inputs"))
             AppController.start_benchmark_inputs()
         }
     }
@@ -21,7 +21,7 @@ PanneauInputsUi {
     Connections {
         target: InterfaceSocle
         function onBenchmarkDataChanged() {
-            console.info(qsTr("Données de benchmark reçues"))
+            AppController.info(qsTr("Données de benchmark reçues"))
             var benchmarkData = InterfaceSocle.benchmarkData
             if(benchmarkData !== undefined) {
                 if(benchmarkData["inputs_duration"] !== undefined) 

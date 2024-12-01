@@ -1,5 +1,4 @@
-from PySide6.QtCore import QObject, QAbstractListModel, QModelIndex, Qt, Signal, Slot
-from PySide6.QtCore import qDebug, QDir, QFileInfo, Property, QThread, qWarning
+from PySide6.QtCore import QObject, QAbstractListModel, QModelIndex, Qt
 from InterfaceSocle import InterfaceSocle
 import humanize
 

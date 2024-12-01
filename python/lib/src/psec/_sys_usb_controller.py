@@ -1,6 +1,6 @@
 from . import Constantes, Parametres, MqttClient, Topics
 from . import FichierHelper, ResponseFactory
-from . import Logger, Domaine, Cles, BenchmarkId, EtatDomu, EtatComposant
+from . import Logger, Domaine, Cles, BenchmarkId, MqttClient, ConnectionType
 from . import TaskRunner
 try:
     from . import DemonInputs
@@ -21,21 +21,26 @@ class SysUsbController():
     """ Cette classe traite les messages échangés par la sys-usb avec le Dom0 ou les autres domaines. """
 
     task_runner = TaskRunner()
+    nb_mqtt_conn = 0
 
-    def __init__(self, client_msg: MqttClient, client_log: MqttClient):
-        self.client_msg = client_msg
-        self.client_log = client_log
-        Logger().setup("USB controller", client_log)
-
-    def __del__(self):
-        self.task_runner.stop()
+    def __init__(self):        
         pass
 
-    def start(self):
-        Logger().debug("Starting sys-usb controller")
+    def __del__(self):
+        self.task_runner.stop()        
 
+    def start(self):           
+        self.client_log = MqttClient("sys-usb logger", ConnectionType.SERIAL_PORT, Constantes().constante(Cles.SERIAL_PORT_LOG))
+        self.client_log.on_connected = self.__on_mqtt_connected
+        self.client_log.start()
+
+        self.client_msg = MqttClient("sys-usb messaging", ConnectionType.SERIAL_PORT, Constantes().constante(Cles.SERIAL_PORT_MSG))
         self.client_msg.on_connected = self.__on_mqtt_connected
         self.client_msg.on_message = self.__on_mqtt_message
+        self.client_msg.start()
+
+        #self.client_msg.on_connected = self.__on_mqtt_connected
+        #self.client_msg.on_message = self.__on_mqtt_message
 
         # Démarre du worker 
         self.task_runner.start()
@@ -50,9 +55,16 @@ class SysUsbController():
         DemonInputs(self.client_msg, self.client_log).stop()
 
     def __on_mqtt_connected(self):
-        self.client_msg.subscribe("system/+/+/request") # All the disks requests
+        self.nb_mqtt_conn += 1
+        print(self.nb_mqtt_conn)
+        if self.nb_mqtt_conn == 2:            
+            Logger().setup("USB controller", self.client_log)
+            Logger().debug("Starting sys-usb controller")
+            print("subscribe")
+            self.client_msg.subscribe("system/+/+/request") # All the disks requests
 
-    def __on_mqtt_message(self, topic:str, payload:dict):        
+    def __on_mqtt_message(self, topic:str, payload:dict):   
+        print("message")     
         Logger().debug("Message received : topic={}, payload={}".format(topic, payload))
 
         threading.Thread(target=self.__message_worker, args=(topic, payload,)).start()        
@@ -61,6 +73,7 @@ class SysUsbController():
         Logger().debug("Handle message {}".format(topic))
 
         base_topic, _ = topic.rsplit("/", 1)
+        print(base_topic)
 
         if base_topic == Topics.LIST_DISKS:
             self.__handle_list_disks(topic)
@@ -71,11 +84,11 @@ class SysUsbController():
             #self.__lit_fichier(commande)
         elif base_topic == Topics.READ_FILE:
             self.__handle_read_file(topic, payload)
-        elif base_topic == Topics.REMOVE_FILE:
+        elif base_topic == Topics.DELETE_FILE:
             self.__handle_remove_file(topic, payload)
         elif base_topic == Topics.BENCHMARK:
             self.__handle_benchmark(topic, payload)
-        elif base_topic == Topics.GET_FILE_FOOTPRINT:            
+        elif base_topic == Topics.FILE_FOOTPRINT:            
             self.__handle_file_footprint(topic, payload)
         elif base_topic == Topics.CREATE_FILE:            
             self.__handle_create_file(topic, payload)

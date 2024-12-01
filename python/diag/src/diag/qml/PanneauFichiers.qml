@@ -86,11 +86,11 @@ Rectangle {
                     anchors.fill: parent
                     onClicked: function() {
                         if(fileType === "special_up") {
-                            console.debug("Up")
+                            AppController.debug("Up")
                             lv.model.go_up()
                             selectedFile = ""
                         } else if(fileType === "folder") {
-                            console.debug("Afficher %1".arg(lblFilename.text))
+                            AppController.debug("Afficher %1".arg(lblFilename.text))
                             lv.model.folder = lblFilename.text
                             currentFolder = lv.model.folder
                             selectedFile = ""
@@ -104,7 +104,7 @@ Rectangle {
     
     function onResetSelection(disk) {
         if(disk !== "" && disk !== root.disk) {
-            console.debug("Reset selection on %1. (disk=%2)".arg(root.disk).arg(disk))
+            AppController.debug("Reset selection on %1. (disk=%2)".arg(root.disk).arg(disk))
             root.selectedFile = ""
         }
     }

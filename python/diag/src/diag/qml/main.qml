@@ -23,7 +23,7 @@ EcranPrincipal {
 
     onVisibilityChanged: {  
         if(visible)      
-            console.debug("Résolution : " +Qt.application.screens[0].width +"x" +Qt.application.screens[0].height)
+            AppController.debug("Résolution : " +Qt.application.screens[0].width +"x" +Qt.application.screens[0].height)
     }
 
 }

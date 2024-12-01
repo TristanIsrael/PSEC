@@ -6,7 +6,7 @@ from MousePointer import MousePointer
 from InterfaceInputs import InterfaceInputs
 from InterfaceSocle import InterfaceSocle
 from hashlib import md5
-from psec import MouseWheel, Logger, Parametres, Cles
+from psec import MouseWheel, Api, Parametres, Cles
 import os
 try:
     from psec import ControleurBenchmark
@@ -91,6 +91,27 @@ class AppController(QObject):
         self.interface_socle = interface_socle
         self.interface_socle.fileCreated.connect(self.__on_file_created)
 
+    @Slot(str)
+    @Slot(str, str)
+    def debug(self, message:str, module:str = ""):
+        print(message, module)
+        Api().debug(message, module)
+
+    @Slot(str)
+    @Slot(str, str)
+    def info(self, message:str, module:str = ""):
+        Api().info(message, module)
+
+    @Slot(str)
+    @Slot(str, str)
+    def warn(self, message:str, module:str = ""):
+        Api().warn(message, module)
+
+    @Slot(str)
+    @Slot(str, str)
+    def error(self, message:str, module:str = ""):
+        Api().error(message, module)
+
     @Slot()
     def start_benchmark_inputs(self):
         ControleurBenchmark().demarre_benchmark_inputs()
@@ -102,16 +123,16 @@ class AppController(QObject):
     @Slot()
     def start_test(self, step=0, args = {}):
         if len(self.interface_socle.disks) == 0:
-            Logger().error("start_test : Il n'y a pas de disque connecté", "AppController")
+            Api().error("start_test : Il n'y a pas de disque connecté", "AppController")
             return 
         
         disk = self.interface_socle.disks[0]
         
         if step == 0:                        
-            Logger().info("Démarrage des tests : étape 1", "AppController")
+            Api().info("Démarrage des tests : étape 1", "AppController")
 
             # 1 - Création d'un fichier sur le support USB            
-            Logger().info("Création d'un fichier aléatoire", "AppController")
+            Api().info("Création d'un fichier aléatoire", "AppController")
             repository_path = Parametres().parametre(Cles.CHEMIN_DEPOT_DOMU)
             filepath = '/test_file'.format(repository_path)                    
             contents = os.urandom(1024*1024)
@@ -125,12 +146,12 @@ class AppController(QObject):
             # Next step after the confirmation of writing
             self.test_step = 1 
         elif step == 2:
-            Logger().info("Démarrage de l'étape 2", "AppController")
+            Api().info("Démarrage de l'étape 2", "AppController")
 
             # Vérification de l'étape précédente
             if self.testfile_footprint != args.get("footprint"):
                 error = "L'empreinte du fichier est incorrecte"
-                Logger().error(error, "AppController")
+                Api().error(error, "AppController")
                 self.testFinished(False, error)
                 return 
 
@@ -141,12 +162,12 @@ class AppController(QObject):
             # Next step after the confirmation of writing
             self.test_step = 2
         elif step == 3:
-            Logger().info("Démarrage de l'étape 3", "AppController")            
+            Api().info("Démarrage de l'étape 3", "AppController")            
 
             # Vérification de l'étape précédente
             if self.testfile_footprint != args.get("footprint"):
                 error = "L'empreinte du fichier est incorrecte"
-                Logger().error(error, "AppController")
+                Api().error(error, "AppController")
                 self.testFinished(False, error)
                 return 
             
@@ -157,16 +178,16 @@ class AppController(QObject):
             # Next step after the confirmation of writing
             self.test_step = 3
         elif step == 4:
-            Logger().info("Démarrage de l'étape 4", "AppController")
+            Api().info("Démarrage de l'étape 4", "AppController")
 
             # Vérification de l'étape précédente
             if self.testfile_footprint != args.get("footprint"):
                 error = "L'empreinte du fichier est incorrecte"
-                Logger().error(error, "AppController")
+                Api().error(error, "AppController")
                 self.testFinished(False, error)
                 return 
             
-            Logger().info("Les tests sont terminés et réussis", "AppController")
+            Api().info("Les tests sont terminés et réussis", "AppController")
             self.testFinished(True, "")
     
     @Slot()
@@ -239,7 +260,7 @@ class AppController(QObject):
 
     @Slot() 
     def demarre_surveillance_inputs(self):
-        Logger().debug("Démarrage de la surveillance des entrées", "AppController")
+        Api().debug("Démarrage de la surveillance des entrées", "AppController")
         self.interfaceInputs = InterfaceInputs(self.fenetre_app)  
         self.workerThread = QThread()        
         self.interfaceInputs.moveToThread(self.workerThread)  
@@ -251,16 +272,16 @@ class AppController(QObject):
 
     @Slot(str, str, str)
     def __on_file_created(self, filepath, disk, footprint):
-        Logger().info("Le fichier {} a bien été créé sur le disque {}".format(filepath, disk), "AppController")
+        Api().info("Le fichier {} a bien été créé sur le disque {}".format(filepath, disk), "AppController")
 
         if self.test_step == 1:
-            Logger().debug("Réponse étape 1 reçue")
+            Api().debug("Réponse étape 1 reçue")
             self.start_test(2, { "filepath": filepath, "disk": disk, "footprint": footprint }, "AppController")
         elif self.test_step == 2:
-            Logger().debug("Réponse étape 2 reçue")
+            Api().debug("Réponse étape 2 reçue")
             self.start_test(3, { "filepath": filepath, "disk": disk, "footprint": footprint }, "AppController")
         elif self.test_step == 3:
-            Logger().debug("Réponse étape 3 reçue")
+            Api().debug("Réponse étape 3 reçue")
             self.start_test(4, { "filepath": filepath, "disk": disk, "footprint": footprint }, "AppController")
 
     mouseX = Property(int, __mouse_x, notify=mouseXChanged)

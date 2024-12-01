@@ -1,7 +1,7 @@
 from . import Constantes, RequestFactory, Topics, NotificationFactory
-from . import Logger, MqttClient, ConnectionType, MqttFactory, Cles
+from . import Logger, MqttClient, ConnectionType, Cles, SingletonMeta
 
-class Api():
+class Api(metaclass=SingletonMeta):
     """ Cette classe permet à un programme tiers d'envoyer des commandes ou recevoir des 
     notifications sans avoir à passer par la socket.
 
@@ -27,9 +27,6 @@ class Api():
     message_callbacks = list()
     sock = None
 
-    def __init__(self, identifier:str):
-        self.identifier = identifier
-
     '''
     def set_mqtt_msg(self, connection_type:ConnectionType = ConnectionType.SERIAL_PORT, connection_string:str = ""):
         self.client_msg = MqttClient(connection_type, connection_string)
@@ -38,7 +35,7 @@ class Api():
         self.client_log = MqttClient(connection_type, connection_string)
     '''
 
-    def start(self):
+    def start(self, identifier:str):
         '''
         if self.client_log is None:
             self.client_log = MqttFactory.create_client_log_domu(self.identifier)
@@ -49,6 +46,7 @@ class Api():
         Logger().setup("API", self.client_log)        
         self.client_msg.on_connected = self.__on_messaging_ready        
         '''
+        self.identifier = identifier
         self.nb_mqtt = 0   
 
         self.client_log = MqttClient("Diag logger", ConnectionType.SERIAL_PORT, Constantes().constante(Cles.SERIAL_PORT_LOG))
@@ -59,6 +57,16 @@ class Api():
         self.client_msg.on_connected = self.__on_mqtt_connected
         self.client_msg.on_message = self.__on_message_received
         self.client_msg.start()        
+
+    def stop(self):
+        self.client_msg.stop()
+        self.client_log.stop()
+
+    def get_client_msg(self):
+        return self.client_msg
+    
+    def get_client_log(self):
+        return self.client_log
 
     def __on_mqtt_connected(self):
         self.nb_mqtt += 1        
@@ -81,20 +89,20 @@ class Api():
     ####
     # Fonctions de journalisation
     #
-    def debug(self, message : str):
-        Logger().debug(message)
+    def debug(self, message : str, module: str = ""):
+        Logger().debug(message, module)
 
-    def info(self, message : str):
-        Logger().info(message)
+    def info(self, message : str, module: str = ""):
+        Logger().info(message, module)
 
-    def warn(self, message : str):
-        Logger().warn(message)
+    def warn(self, message : str, module: str = ""):
+        Logger().warn(message, module)
 
-    def error(self, message : str):
-        Logger().error(message)
+    def error(self, message : str, module: str = ""):
+        Logger().error(message, module)
 
-    def critical(self, message : str):
-        Logger().critical(message)
+    def critical(self, message : str, module: str = ""):
+        Logger().critical(message, module)
 
     ####
     # Fonctions de gestion des supports de stockage
@@ -147,10 +155,9 @@ class Api():
     # Fonctions privées
     #    
     def __on_messaging_ready(self):
-        if len(self.ready_callbacks) > 0 :
-            for cb in self.ready_callbacks:
-                cb()
+        for cb in self.ready_callbacks:
+            cb()
 
-    def __on_message_received(self, topic:str, payload:dict):
+    def __on_message_received(self, topic:str, payload:dict):        
         for cb in self.message_callbacks:
             cb(topic, payload)

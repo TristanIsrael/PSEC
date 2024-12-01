@@ -51,13 +51,13 @@ PanneauDepotUi {
     Connections {
         target: grpDepot
         function onReloadContent() {
-            console.debug("L'utilisateur demande le rafraichissement du dépôt")
+            AppController.debug("L'utilisateur demande le rafraichissement du dépôt")
             InterfaceSocle.get_contenu_depot()
         }
     }
 
     Component.onCompleted: function() {
-        console.debug("Demande le contenu du dépôt")
+        AppController.debug("Demande le contenu du dépôt")
         InterfaceSocle.get_contenu_depot()
     }
 
@@ -76,7 +76,7 @@ PanneauDepotUi {
             total_duration_s = total_duration_ms/1000.0
             total_size_mo = iterations * (size_ko/1024)
             bandwidth = total_size_mo/total_duration_s
-            console.debug("débit", dict_entry_name, bandwidth)                      
+            AppController.debug("débit", dict_entry_name, bandwidth)                      
         }
 
         return bandwidth

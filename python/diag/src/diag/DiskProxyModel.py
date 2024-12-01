@@ -1,4 +1,4 @@
-from PySide6.QtCore import QObject, QSortFilterProxyModel, QAbstractItemModel, QModelIndex, Property, Qt, qDebug, qWarning, Signal, Slot
+from PySide6.QtCore import QObject, QSortFilterProxyModel, QAbstractItemModel, QModelIndex, Property, Qt, Signal, Slot
 from DiskModel import DiskModel
 
 class DiskProxyModel(QSortFilterProxyModel):

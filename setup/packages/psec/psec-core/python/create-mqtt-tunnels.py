@@ -4,71 +4,76 @@ from psec import Constantes, Cles
 broker_msg_socket = Constantes().constante(Cles.MQTT_MSG_BROKER_SOCKET)
 broker_log_socket = Constantes().constante(Cles.MQTT_LOG_BROKER_SOCKET)
 
-def tunnel_data(src_socket, dst_socket):
-    """
-    Tunnel data between two Unix sockets without buffering or delay.
-    Continuously transfers data in both directions until the connection is closed.
-    """
-    while True:
-        # Using select to check for data in both sockets without blocking
-        rlist, _, _ = select.select([src_socket, dst_socket], [], [], 1)
+BUFFER_SIZE = 4096
 
-        for sock in rlist:
-            data = sock.recv(4096)
-            if data:
-                # Send the received data to the other socket
-                if sock is src_socket:
-                    dst_socket.sendall(data)
-                else:
-                    src_socket.sendall(data)
-            else:
-                # If no data, the socket is closed
-                return
+class UnixSocketTunneler:
+    def __init__(self, socket1_path, socket2_path):
+        self.socket1_path = socket1_path
+        self.socket2_path = socket2_path
+        self.stop_event = threading.Event()
 
-def reconnect_socket(socket_path):
-    """
-    Attempts to reconnect the socket to the specified Unix socket path.
-    """
-    while True:
-        try:
-            # Try to create a new socket connection
-            sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-            sock.connect(socket_path)
-            print(f"Connected to {socket_path}")
-            return sock
-        except socket.error as e:
-            # If the connection fails, wait and try again
-            print(f"Failed to connect to {socket_path}, retrying in 5 seconds... Error: {e}")
-            time.sleep(5)
+    def handle_connection(self, src_socket:socket.socket, dst_socket:socket.socket):
+        """
+        Continuously forward data from src_socket to dst_socket.
+        """
+        while not self.stop_event.is_set():
+            try:
+                data = src_socket.recv(BUFFER_SIZE)
+                if not data:  # Connection closed
+                    break                
+                dst_socket.sendall(data)
+            except (socket.error, BrokenPipeError):
+                break
 
-def main(src_socket_path, dst_socket_path):
-    """
-    Main function that connects to two Unix sockets and tunnels data between them.
-    """
-    while True:
-        # Attempt to reconnect both source and destination sockets
-        print(f"Connecting to source socket: {src_socket_path}")
-        src_socket = reconnect_socket(src_socket_path)
+    def tunnel(self):
+        """
+        Set up connections and manage bidirectional tunneling.
+        """
+        while not self.stop_event.is_set():
+            try:
+                # Create sockets
+                sock1 = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+                sock2 = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 
-        print(f"Connecting to destination socket: {dst_socket_path}")
-        dst_socket = reconnect_socket(dst_socket_path)
+                # Connect to the specified sockets
+                sock1.connect(self.socket1_path)
+                sock2.connect(self.socket2_path)
 
-        try:
-            # Tunnel data between the two sockets
-            tunnel_data(src_socket, dst_socket)
-        except Exception as e:
-            # If an error occurs, print it and attempt to reconnect
-            print(f"An error occurred: {e}. Reconnecting...")
-        finally:
-            # Ensure sockets are closed if the connection fails
-            src_socket.close()
-            dst_socket.close()
+                print(f"Connected: {self.socket1_path} --> {self.socket2_path}")
+
+                # Start threads for bidirectional tunneling
+                thread1 = threading.Thread(target=self.handle_connection, args=(sock1, sock2))
+                thread2 = threading.Thread(target=self.handle_connection, args=(sock2, sock1))
+
+                thread1.start()
+                thread2.start()
+
+                # Wait for both threads to finish
+                thread1.join()
+                thread2.join()
+
+            except socket.error as e:
+                print(f"Socket error: {e}. Retrying in 5 seconds...")
+                time.sleep(5)  # Wait before retrying
+            finally:
+                sock1.close()
+                sock2.close()
+
+    def stop(self):
+        """
+        Stop the tunneling process.
+        """
+        self.stop_event.set()
 
 def create_log_tunnel(socket:str):
-    threading.Thread(target=main, args=(socket, broker_log_socket,)).start()
+    tunneler = UnixSocketTunneler(socket, broker_log_socket)
+    threading.Thread(target=tunneler.tunnel).start()
+    #threading.Thread(target=main, args=(socket, broker_log_socket,)).start()
 
 def create_msg_tunnel(socket:str):
-    threading.Thread(target=main, args=(socket, broker_msg_socket,)).start()
+    tunneler = UnixSocketTunneler(socket, broker_msg_socket)
+    threading.Thread(target=tunneler.tunnel).start()
+    #threading.Thread(target=main, args=(socket, broker_msg_socket,)).start()
 
 def wait_for_broker_socket() -> bool:
     print("Waiting for MQTT Broker sockets...")

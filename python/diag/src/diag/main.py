@@ -10,8 +10,9 @@ sys.path.append(libdir)
 
 from PySide6.QtGui import QGuiApplication, QCursor
 from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterType, qmlRegisterSingletonType, qmlRegisterUncreatableType, qmlRegisterSingletonInstance
-from PySide6.QtCore import QObject, QCoreApplication, Qt, qInstallMessageHandler, QEvent, QThread, qWarning, QPoint, QSize
+from PySide6.QtCore import QObject, QCoreApplication, Qt, QEvent, QThread, QPoint, QSize
 from PySide6.QtQuickControls2 import QQuickStyle
+from psec import Api, ControleurBenchmark
 
 from InterfaceSocle import InterfaceSocle
 import rc_ressources
@@ -35,8 +36,9 @@ class EvtFilter(QObject):
 api_ready = threading.Event()
 
 def on_ready():
-    print("API ready callback")
+    print("PSEC API is ready")
     api_ready.set()
+    ControleurBenchmark().setup(Api().get_client_msg(), Api().get_client_log())
 
 if __name__ == '__main__':
     app = QGuiApplication(sys.argv)
@@ -49,7 +51,6 @@ if __name__ == '__main__':
     print("Waiting for the API to be ready")
     api_ready.wait()
     
-    print("Continue")
     diskModel = DiskModel(interfaceSocle, app)
 
     # Expose les Types QML
@@ -71,6 +72,8 @@ if __name__ == '__main__':
 
     # Intégration avec le socle
     appController.set_fenetre_app(qml_root)    
-    appController.set_interface_socle(interfaceSocle)
+    appController.set_interface_socle(interfaceSocle)    
+
+    Api().info("Application started")
 
     app.exec()

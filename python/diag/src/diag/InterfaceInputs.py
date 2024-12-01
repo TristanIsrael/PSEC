@@ -1,9 +1,9 @@
-from PySide6.QtCore import QObject, Signal, qDebug, qWarning, QTimer
+from PySide6.QtCore import QObject, Signal, QTimer
 from PySide6.QtCore import  Slot, QPoint, QCoreApplication, Qt, QEvent, QPointF
 from PySide6.QtGui import QMouseEvent, QWheelEvent, QHoverEvent, QEnterEvent, QGuiApplication
 from PySide6.QtWidgets import QWidget
 from MousePointer import MousePointer
-from psec import Parametres, Cles, Mouse, MouseButton, MouseWheel, MouseMove, Logger
+from psec import Parametres, Cles, Mouse, MouseButton, MouseWheel, MouseMove, Api
 import serial, subprocess #, threading
 
 class InterfaceInputs(QObject):
@@ -31,12 +31,12 @@ class InterfaceInputs(QObject):
     @Slot()
     def demarre_surveillance(self):        
         try:
-            Logger().info("Démarrage de la surveillance des inputs", "InterfaceInputs")
+            Api().info("Démarrage de la surveillance des inputs", "InterfaceInputs")
             self.chemin_socket_inputs = Parametres().parametre(Cles.CHEMIN_SOCKET_INPUT_DOMU)
             self.__connecte_interface_xenbus()
         except Exception as e:
-            Logger().error("Impossible d'ouvrir le port Xenbus Inputs", "InterfaceInputs")
-            Logger().error(e, "InterfaceInputs")
+            Api().error("Impossible d'ouvrir le port Xenbus Inputs", "InterfaceInputs")
+            Api().error(e, "InterfaceInputs")
 
     def mock(self):       
         print("MOCK") 
@@ -49,15 +49,15 @@ class InterfaceInputs(QObject):
     #
     def __connecte_interface_xenbus(self):
         #Ouvre le flux avec la socket
-        Logger().debug("Ouvre le flux avec le port série Inputs %s" % self.chemin_socket_inputs, "InterfaceInputs")
+        Api().debug("Ouvre le flux avec le port série Inputs %s" % self.chemin_socket_inputs, "InterfaceInputs")
 
         try:
             self.socket_inputs:serial.Serial = serial.Serial(port= self.chemin_socket_inputs)
-            Logger().info("La surveillance des entrées est démarrée", "InterfaceInputs")     
+            Api().info("La surveillance des entrées est démarrée", "InterfaceInputs")     
             self.pret.emit()       
         except serial.SerialException as e:
-            Logger().error("Impossible de se connecter au port série %s" % self.chemin_socket_inputs, "InterfaceInputs")
-            Logger().error(e, "InterfaceInputs")  
+            Api().error("Impossible de se connecter au port série %s" % self.chemin_socket_inputs, "InterfaceInputs")
+            Api().error(e, "InterfaceInputs")  
             return
         
         try:
@@ -68,8 +68,8 @@ class InterfaceInputs(QObject):
                 self.__traite_donnees_input(data[:-1])
 
         except serial.SerialException as e:
-            Logger().error("Erreur de lecture sur le port inputs %s" % self.chemin_socket_inputs, "InterfaceInputs")
-            Logger().error(e, "InterfaceInputs")    
+            Api().error("Erreur de lecture sur le port inputs %s" % self.chemin_socket_inputs, "InterfaceInputs")
+            Api().error(e, "InterfaceInputs")    
 
     def __traite_donnees_input(self, data:bytes):
         # On recoit une version sérialisée d'un objet
@@ -92,7 +92,7 @@ class InterfaceInputs(QObject):
             newX = newCoord.x()
             newY = newCoord.y()     
         else:
-            Logger().error("Erreur de décodage", "InterfaceInputs")
+            Api().error("Erreur de décodage", "InterfaceInputs")
             return
             #print(mouse.x, self.fenetre_app.width(), newX, newY)        
 
@@ -126,7 +126,7 @@ class InterfaceInputs(QObject):
             QCoreApplication.postEvent(self.fenetre_app, event)
             
             self.wheel.emit(mouse.wheel)
-            #Logger().debug("wheel {}".format(mouse.wheel))            
+            #Api().debug("wheel {}".format(mouse.wheel))            
 
             self.mouse.wheel = MouseWheel.NO_MOVE
 
@@ -163,7 +163,7 @@ class InterfaceInputs(QObject):
         :param cible: L'objet graphique qui va recevoir l'événement (une fenêtre d'application)
         :type cible: QObject
         """
-        qDebug("Génération d'un événement {} aux coordonnées locales ({},{}) / écran ({},{})".format(eventType, localPos.x(), localPos.y(), screenPos.x(), screenPos.y()))
+        Api().debug("Génération d'un événement {} aux coordonnées locales ({},{}) / écran ({},{})".format(eventType, localPos.x(), localPos.y(), screenPos.x(), screenPos.y()))
 
         # Création des événements press et release pour la souris
         event = QMouseEvent(eventType, localPos, screenPos, button, buttons, Qt.KeyboardModifier.NoModifier)

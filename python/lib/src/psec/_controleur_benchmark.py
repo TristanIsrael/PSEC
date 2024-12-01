@@ -4,7 +4,7 @@ import random, time
 
 class ControleurBenchmark(metaclass=SingletonMeta):
 
-    def __init__(self, client_msg: MqttClient, client_log: MqttClient):
+    def setup(self, client_msg: MqttClient, client_log: MqttClient):
         self.client_msg = client_msg
         random.seed()
 
