@@ -17,12 +17,19 @@ replaces=""
 options="!check"  # no tests provided
 psec_branch="1.0"
 giturl="https://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@github.com/tibsys/psec"
+gitbranch="move-to-mqtt"
 source="start-gui.initd"
 
 prepare() {
     mkdir -p "$builddir"
     cd "$builddir"
-    git clone "$giturl" .
+    if [ -z "$gitbranch" ]; then
+        echo Using main branch
+        git clone "$giturl" .    
+    else
+        echo Using branch "$gitbranch"
+        git clone --branch "$gitbranch" "$giturl" .
+    fi
 }
 
 build() {
