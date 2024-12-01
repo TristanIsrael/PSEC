@@ -1,4 +1,4 @@
-import os, time, serial, json, threading
+import os, time, serial, json, threading, atexit
 import paho.mqtt.client as mqtt
 from paho.mqtt import client
 from paho.mqtt.client import CallbackAPIVersion
@@ -10,7 +10,7 @@ class ConnectionType():
 
 class SerialSocket():
     def __init__(self, path:str, baudrate:int):
-        #print("Connect to serial port")
+        print("Connect to serial port {}".format(path))
         self.serial = serial.Serial(path, baudrate)
         self.serial.reset_input_buffer()
         self.serial.reset_output_buffer()
@@ -40,10 +40,11 @@ class SerialMQTTClient(mqtt.Client):
     def __init__(self, path:str, baudrate:int, *args, **kwargs):
         super().__init__(callback_api_version=CallbackAPIVersion.VERSION2, *args, **kwargs)
         self.path = path
-        self.baudrate = baudrate
+        self.baudrate = baudrate        
 
     def _create_socket(self):
         try:
+            print("Create socket on {}".format(self.path))
             socket = SerialSocket(self.path, self.baudrate)            
             self._sockpairR = socket
             #print("Socket created")
@@ -66,6 +67,7 @@ class MqttClient():
         self.identifier = identifier
         self.connection_type = connection_type
         self.connection_string = connection_string
+        atexit.register(self.stop)
 
     def __del__(self):
         self.stop()   
