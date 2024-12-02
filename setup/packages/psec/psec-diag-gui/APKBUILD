@@ -17,7 +17,7 @@ replaces=""
 options="!check"  # no tests provided
 psec_branch="1.0"
 giturl="https://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@github.com/tibsys/psec"
-gitbranch="move-to-mqtt"
+gitbranch=""
 source="start-gui.initd"
 
 prepare() {
