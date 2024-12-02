@@ -10,26 +10,24 @@ class Dom0Controller():
 
     """    
 
-    def __init__(self, client_msg: MqttClient, client_log: MqttClient):
-        self.client_msg = client_msg
-        self.client_log = client_log
+    def __init__(self, mqtt_client: MqttClient):
+        self.mqtt_client = mqtt_client
 
-        Logger().setup("System controller", client_log)
+        # Handle Mqtt messages
+        self.mqtt_client.on_connected = self.__on_mqtt_connected
+        self.mqtt_client.on_message = self.__on_mqtt_message
+        
+        Logger().setup("System controller", mqtt_client)
 
     def start(self):
         Logger().debug("Starting Dom0 controller")
 
-        InputsProxy(self.client_log).demarre()
+        InputsProxy(self.mqtt_client).demarre()
 
-        # Register on Mqtt broker        
-        self.client_msg.on_connected = self.__on_mqtt_connected
-        self.client_msg.on_message = self.__on_mqtt_message
-
-        if not self.client_msg.connected:
-            self.client_msg.start()
+        self.mqtt_client.start()
     
     def __on_mqtt_connected(self):
-        self.client_msg.subscribe("system/+/+/request") # All the system requests
+        self.mqtt_client.subscribe("system/+/+/request") # All the system requests
 
     def __on_mqtt_message(self, topic:str, payload:dict):
         base_topic, _ = topic.rsplit("/", 1)
@@ -44,7 +42,7 @@ class Dom0Controller():
 
         if topic == Topics.LIST_FILES:
             self.__handle_list_files(topic, payload)
-        elif topic == Topics.GET_FILE_FOOTPRINT:
+        elif topic == Topics.FILE_FOOTPRINT:
             self.__handle_file_footprint(payload)
 
     def __handle_list_files(self, topic:str, payload:dict) -> None:
@@ -56,7 +54,7 @@ class Dom0Controller():
 
         # Génère la réponse
         response = ResponseFactory.create_response_list_files(Constantes.REPOSITORY, fichiers)
-        self.client_msg.publish("{}/response".format(topic), response)
+        self.mqtt_client.publish("{}/response".format(topic), response)
 
     def __handle_file_footprint(self, topic:str, payload:dict) -> None:
         if not self.__is_storage_request(payload):
@@ -78,7 +76,7 @@ class Dom0Controller():
         
         # Génère la réponse
         response = ResponseFactory.create_response_file_footprint(filepath, disk, footprint)
-        self.client_msg.publish("{}/response".format(topic), response)
+        self.mqtt_client.publish("{}/response".format(topic), response)
 
     def __is_storage_request(self, payload:dict) -> bool:
         if payload.get("disk") is not None:

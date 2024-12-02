@@ -27,52 +27,28 @@ class Api(metaclass=SingletonMeta):
     message_callbacks = list()
     sock = None
 
-    '''
-    def set_mqtt_msg(self, connection_type:ConnectionType = ConnectionType.SERIAL_PORT, connection_string:str = ""):
-        self.client_msg = MqttClient(connection_type, connection_string)
+    def start(self, mqtt_client:MqttClient):
+        self.mqtt_client = mqtt_client
 
-    def set_mqtt_log(self, connection_type:ConnectionType = ConnectionType.SERIAL_PORT, connection_string:str = ""):
-        self.client_log = MqttClient(connection_type, connection_string)
-    '''
+        self.mqtt_client.on_connected = self.__on_mqtt_connected
+        self.mqtt_client.on_message = self.__on_message_received
 
-    def start(self, identifier:str):
-        '''
-        if self.client_log is None:
-            self.client_log = MqttFactory.create_client_log_domu(self.identifier)
+        self.mqtt_client.start()
 
-        if self.client_msg is None:
-            self.client_msg = MqttFactory.create_client_msg_domu(self.identifier)
-
-        Logger().setup("API", self.client_log)        
-        self.client_msg.on_connected = self.__on_messaging_ready        
-        '''
-        self.identifier = identifier
-        self.nb_mqtt = 0   
-
-        self.client_log = MqttClient("Diag logger", ConnectionType.SERIAL_PORT, Constantes().constante(Cles.SERIAL_PORT_LOG))
+        '''self.client_log = MqttClient("Diag logger", ConnectionType.SERIAL_PORT, Constantes().constante(Cles.SERIAL_PORT_LOG))
         self.client_log.on_connected = self.__on_mqtt_connected
         self.client_log.start()
 
-        self.client_msg = MqttClient("Diag messaging", ConnectionType.SERIAL_PORT, Constantes().constante(Cles.SERIAL_PORT_MSG))
-        self.client_msg.on_connected = self.__on_mqtt_connected
-        self.client_msg.on_message = self.__on_message_received
-        self.client_msg.start()        
+        self.mqtt_client = MqttClient("Diag messaging", ConnectionType.SERIAL_PORT, Constantes().constante(Cles.SERIAL_PORT_MSG))
+        self.mqtt_client.on_connected = self.__on_mqtt_connected
+        self.mqtt_client.on_message = self.__on_message_received
+        self.mqtt_client.start()'''
 
     def stop(self):
-        self.client_msg.stop()
-        self.client_log.stop()
+        self.mqtt_client.stop()
 
-    def get_client_msg(self):
-        return self.client_msg
-    
-    def get_client_log(self):
-        return self.client_log
-
-    def __on_mqtt_connected(self):
-        self.nb_mqtt += 1        
-        if self.nb_mqtt == 2:
-            Logger().setup(self.identifier, self.client_log)
-            self.__on_messaging_ready()
+    def get_mqtt_client(self):
+        return self.mqtt_client
 
     def add_message_callback(self, callback_fn):
         if callback_fn is not None:
@@ -108,53 +84,56 @@ class Api(metaclass=SingletonMeta):
     # Fonctions de gestion des supports de stockage
     #
     def get_disks_list(self):
-        self.client_msg.publish("{}/request".format(Topics.LIST_DISKS), {})
+        self.mqtt_client.publish("{}/request".format(Topics.LIST_DISKS), {})
 
     def get_files_list(self, disk: str):
         payload = RequestFactory.create_request_files_list(disk)
-        self.client_msg.publish("{}/request".format(Topics.LIST_FILES), payload)
+        self.mqtt_client.publish("{}/request".format(Topics.LIST_FILES), payload)
 
     def read_file(self, disk:str, filepath:str):
         payload = RequestFactory.create_request_read_file(disk, filepath)
-        self.client_msg.publish("{}/request".format(Topics.READ_FILE), payload)
+        self.mqtt_client.publish("{}/request".format(Topics.READ_FILE), payload)
 
     def copy_file(self, source_disk:str, filepath:str, destination_disk:str):
         payload = RequestFactory.create_request_copy_file(source_disk, filepath, destination_disk)
-        self.client_msg.publish("{}/request".format(Topics.COPY_FILE), payload)
+        self.mqtt_client.publish("{}/request".format(Topics.COPY_FILE), payload)
 
     def copy_file_to_storage(self, source_disk:str, filepath:str):        
         self.copy_file(source_disk, filepath, Constantes.REPOSITORY)
 
     def delete_file(self, filepath:str, disk:str):
         payload = RequestFactory.create_request_delete_file(filepath, disk)
-        self.client_msg.publish("{}/request".format(Topics.DELETE_FILE), payload)
+        self.mqtt_client.publish("{}/request".format(Topics.DELETE_FILE), payload)
 
     def get_file_footprint(self, filepath:str, disk:str):
         payload = RequestFactory.create_request_get_file_footprint(filepath, disk)
-        self.client_msg.publish("{}/request".format(Topics.FILE_FOOTPRINT), payload)
+        self.mqtt_client.publish("{}/request".format(Topics.FILE_FOOTPRINT), payload)
 
     def create_file(self, filepath:str, disk:str, contents:bytes):
         payload = RequestFactory.create_request_create_file(filepath, disk, contents)
-        self.client_msg.publish("{}/request".format(Topics.CREATE_FILE), payload)
+        self.mqtt_client.publish("{}/request".format(Topics.CREATE_FILE), payload)
 
     def discover_modules(self) -> None:        
-        self.client_msg.publish("{}/request".format(Topics.DISCOVER_MODULES), {})
+        self.mqtt_client.publish("{}/request".format(Topics.DISCOVER_MODULES), {})
 
     ####
     # Fonctions de notification
     #
     def notify_disk_added(self, disk):
         payload = NotificationFactory.create_notification_disk_state(disk, "connected")
-        self.client_msg.publish("{}".format(Topics.DISK_STATE), payload)
+        self.mqtt_client.publish("{}".format(Topics.DISK_STATE), payload)
     
     def notify_disk_removed(self, disk):
         payload = NotificationFactory.create_notification_disk_state(disk, "diconnected")
-        self.client_msg.publish("{}".format(Topics.DISK_STATE), payload)
+        self.mqtt_client.publish("{}".format(Topics.DISK_STATE), payload)
 
     ####
     # Fonctions privées
     #    
-    def __on_messaging_ready(self):
+    def __on_mqtt_connected(self):
+        Logger().setup(self.mqtt_client)
+        self.mqtt_client.subscribe("system/+/+")
+
         for cb in self.ready_callbacks:
             cb()
 

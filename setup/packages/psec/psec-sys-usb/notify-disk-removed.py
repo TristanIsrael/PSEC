@@ -1,5 +1,5 @@
 import sys
-from psec import Api
+from psec import Api, MqttFactory
 
 if len(sys.argv) < 2:
     print("Argument missing : {} disk_name".format(sys.argv[0]))
@@ -13,6 +13,8 @@ def on_api_connected():
     api.stop()
     exit(0)
 
+mqtt_client = MqttFactory.create_mqtt_client_domu("sys-usb")
+
 api = Api("notify-disk-removed")
 api.add_ready_callback(on_api_connected)
-api.start()
+api.start(mqtt_client)

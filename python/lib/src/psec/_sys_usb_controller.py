@@ -23,45 +23,35 @@ class SysUsbController():
     task_runner = TaskRunner()
     nb_mqtt_conn = 0
 
-    def __init__(self):        
-        pass
+    def __init__(self, mqtt_client:MqttClient):
+        self.mqtt_client = mqtt_client
 
     def __del__(self):
         self.task_runner.stop()        
 
-    def start(self):           
-        self.client_log = MqttClient("sys-usb logger", ConnectionType.SERIAL_PORT, Constantes().constante(Cles.SERIAL_PORT_LOG))
-        self.client_log.on_connected = self.__on_mqtt_connected
-        self.client_log.start()
+    def start(self):
+        self.mqtt_client.on_connected = self.__on_mqtt_connected
+        self.mqtt_client.on_message = self.__on_mqtt_message
 
-        self.client_msg = MqttClient("sys-usb messaging", ConnectionType.SERIAL_PORT, Constantes().constante(Cles.SERIAL_PORT_MSG))
-        self.client_msg.on_connected = self.__on_mqtt_connected
-        self.client_msg.on_message = self.__on_mqtt_message
-        self.client_msg.start()
-
-        #self.client_msg.on_connected = self.__on_mqtt_connected
-        #self.client_msg.on_message = self.__on_mqtt_message
+        self.mqtt_client.start()
 
         # Démarre du worker 
         self.task_runner.start()
 
         # Démarrage de la surveillance des entrées
         if NO_INPUTS_MONITORING != True:
-            DemonInputs(self.client_msg, self.client_log).start()
+            DemonInputs(self.mqtt_client).start()
             #threading.Thread(target= DemonInputs().demarre()).start()
 
     def stop(self):
         self.task_runner.stop()
-        DemonInputs(self.client_msg, self.client_log).stop()
+        DemonInputs(self.mqtt_client).stop()
 
-    def __on_mqtt_connected(self):
-        self.nb_mqtt_conn += 1
-        print(self.nb_mqtt_conn)
-        if self.nb_mqtt_conn == 2:            
-            Logger().setup("USB controller", self.client_log)
-            Logger().debug("Starting sys-usb controller")
-            print("subscribe")
-            self.client_msg.subscribe("system/+/+/request") # All the disks requests
+    def __on_mqtt_connected(self):       
+        Logger().setup("USB controller", self.mqtt_client)
+        Logger().debug("Starting sys-usb controller")
+        print("subscribe")
+        self.mqtt_client.subscribe("system/+/+/request") # All the system requests
 
     def __on_mqtt_message(self, topic:str, payload:dict):   
         print("message")     
@@ -107,7 +97,7 @@ class SysUsbController():
 
         # Génère la réponse
         response = ResponseFactory.create_response_disks_list(disks)
-        self.client_msg.publish("{}/response".format(topic), response)
+        self.mqtt_client.publish("{}/response".format(topic), response)
 
 
     def __handle_list_files(self, topic:str, payload: dict) -> None:
@@ -123,7 +113,7 @@ class SysUsbController():
 
         # Génère la réponse
         response = ResponseFactory.create_response_list_files(disk, fichiers)
-        self.client_msg.publish("{}/response".format(topic), response)
+        self.mqtt_client.publish("{}/response".format(topic), response)
 
 
     def __handle_read_file(self, topic:str, payload: dict):
@@ -192,14 +182,14 @@ class SysUsbController():
 
             # Envoi d'une notification pour informer de la présence d'un nouveau fichier
             notif = NotificationFactory.create_notification_new_file(disk= target_disk, filepath= filepath)
-            self.client_msg.publish("{}/notification".format(Topics.NEW_FILE), notif)
+            self.mqtt_client.publish("{}/notification".format(Topics.NEW_FILE), notif)
 
             response = ResponseFactory.create_response_copy_file(True)            
         else:
             response = ResponseFactory.create_response_copy_file(False)
             Logger().error("La copie du fichier {} dans le dépôt a échoué.".format(filepath))
 
-        self.client_msg.publish("{}/response".format(topic), response)
+        self.mqtt_client.publish("{}/response".format(topic), response)
 
 
     def __handle_benchmark(self, topic:str, payload:dict):
@@ -241,7 +231,7 @@ class SysUsbController():
         Logger().info("The footprint of the file {} on the disk {} is {}".format(disk, filepath, footprint))
 
         response = ResponseFactory.create_response_file_footprint(filepath, disk, footprint)
-        self.client_msg.publish("{}/response".format(topic), response)
+        self.mqtt_client.publish("{}/response".format(topic), response)
 
 
     def __handle_create_file(self, topic:str, payload:dict):
@@ -276,13 +266,13 @@ class SysUsbController():
             Logger().error(e)
             
             response = ResponseFactory.create_response_create_file(filepath, disk, "", False)
-            self.client_msg.publish("{}/response".format(topic), response)
+            self.mqtt_client.publish("{}/response".format(topic), response)
             return
 
         # On envoie la notification de succès
         footprint = FichierHelper.calculate_footprint(complete_filepath)
         response = ResponseFactory.create_response_create_file(filepath, disk, footprint, True)
-        self.client_msg.publish("{}/response".format(topic), response)
+        self.mqtt_client.publish("{}/response".format(topic), response)
 
     def __handle_discover_modules(self, topic:str, payload:dict) -> None:
         response = {
@@ -293,5 +283,5 @@ class SysUsbController():
             ]
         }
 
-        self.client_msg.publish("{}/response".format(topic), response)
+        self.mqtt_client.publish("{}/response".format(topic), response)
     

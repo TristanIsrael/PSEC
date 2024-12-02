@@ -4,11 +4,11 @@ import random, time
 
 class ControleurBenchmark(metaclass=SingletonMeta):
 
-    def setup(self, client_msg: MqttClient, client_log: MqttClient):
-        self.client_msg = client_msg
+    def setup(self, mqtt_client: MqttClient):
+        self.mqtt_client = mqtt_client
         random.seed()
 
-        Logger().setup("Benchmark controller", client_log)
+        Logger().setup("Benchmark controller", mqtt_client)
 
     ###
     # Fonctions appelées par le DomU    
@@ -16,12 +16,12 @@ class ControleurBenchmark(metaclass=SingletonMeta):
     def demarre_benchmark_inputs(self):
         Logger().info("Demande le démarrage du benchmark sur les entrées")
         payload = RequestFactory.create_request_start_benchmark(BenchmarkId.INPUTS)
-        self.client_msg.publish("{}/request".format(Topics.BENCHMARK), payload)
+        self.mqtt_client.publish("{}/request".format(Topics.BENCHMARK), payload)
 
     def demarre_benchmark_fichiers(self):
         Logger().info("Demande le démarrage du benchmark fichiers")
         payload = RequestFactory.create_request_start_benchmark(BenchmarkId.FILES)
-        self.client_msg.publish("{}/request".format(Topics.BENCHMARK), payload)
+        self.mqtt_client.publish("{}/request".format(Topics.BENCHMARK), payload)
 
     ###
     # Fonctions exécutées sur sys-usb
@@ -42,7 +42,7 @@ class ControleurBenchmark(metaclass=SingletonMeta):
         end_ms = time.time()*1000
         duration = int(end_ms-start_ms)
         response = ResponseFactory.cree_reponse_benchmark_inputs(duration, iterations, emetteur)
-        self.client_msg.publish("{}/response".format(Topics.BENCHMARK), response)
+        self.mqtt_client.publish("{}/response".format(Topics.BENCHMARK), response)
 
     def execute_benchmark_fichiers(self):
         Logger().info("Exécution du benchmark sur les fichiers")
@@ -51,7 +51,7 @@ class ControleurBenchmark(metaclass=SingletonMeta):
 
         # Informe le demandeur que le benchmark vient de démarrer
         response = ResponseFactory.cree_reponse_benchmark_fichiers_demarre()
-        self.client_msg.publish("{}/response".format(Topics.BENCHMARK), response)
+        self.mqtt_client.publish("{}/response".format(Topics.BENCHMARK), response)
 
         # Le scénario de benchmark est le suivant :
         # prérequis - Vérification de la présence d'un support USB
@@ -98,7 +98,7 @@ class ControleurBenchmark(metaclass=SingletonMeta):
 
         # Informe le demandeur que le benchmark vient de se terminer
         response = ResponseFactory.cree_reponse_benchmark_fichiers_termine(metrics)
-        self.client_msg.publish("{}/response".format(Topics.BENCHMARK), response)
+        self.mqtt_client.publish("{}/response".format(Topics.BENCHMARK), response)
     
     def __execute_benchmark_fichiers(self, disque:str, taille_fichier_ko:int, quantite_fichiers:int, metrics:list):
         Logger().info("Démarrage d'une itération de benchmark fichier pour {} fichiers de {} Ko".format(quantite_fichiers, taille_fichier_ko))

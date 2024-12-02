@@ -34,9 +34,9 @@ class DemonInputs(metaclass=SingletonMeta):
     last_y = 0
     can_run = True
     
-    def __init__(self, client_msg: MqttClient, client_log: MqttClient):
-        self.client_msg = client_msg
-        Logger().setup("Input daemon", client_log)
+    def __init__(self, mqtt_client: MqttClient):
+        self.mqtt_client = mqtt_client
+        Logger().setup("Input daemon", mqtt_client)
 
     def start(self):
         Logger().info("Starting input daemon")

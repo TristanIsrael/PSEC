@@ -45,9 +45,8 @@ class InterfaceSocle(QObject):
 
     @Slot()
     def start(self, ready_callback):
-        self.ready_callback = ready_callback
         Api().add_message_callback(self.__on_message_received)
-        Api().add_ready_callback(self.ready_callback)
+        Api().add_ready_callback(ready_callback)
         Api().start("Diag")
 
     @Slot()

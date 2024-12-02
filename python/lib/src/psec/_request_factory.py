@@ -39,22 +39,22 @@ class RequestFactory():
     '''    
 
     @staticmethod
-    def create_request_files_list(nom_disque : str) -> dict:
+    def create_request_files_list(disk : str) -> dict:
         return { 
-            "nom_disque": nom_disque 
+            "disk": disk 
             }
     
     @staticmethod
-    def create_request_read_file(nom_disque : str, chemin_fichier : str) -> dict:
+    def create_request_read_file(disk : str, filepath : str) -> dict:
         return {
-            "nom_disque": nom_disque,
-            "chemin_fichier": chemin_fichier
+            "disk": disk,
+            "filepath": filepath
         }        
     
     @staticmethod
     def create_request_copy_file(source_disk:str, filepath:str, destination_disk:str) -> dict :
         # Exemple :
-        # { nom_fichier: "Mon Disque:/répertoire/fichier", nom_disque_destination: "Autre disque" }
+        # { filepath: "Mon Disque:/répertoire/fichier", disk_destination: "Autre disque" }
         return {
             "disk": source_disk,
             "filepath": filepath,
@@ -62,10 +62,10 @@ class RequestFactory():
         }        
     
     @staticmethod
-    def create_request_delete_file(nom_fichier : str, nom_disque : str = Constantes().constante(Cles.DEPOT_LOCAL)) -> dict:
+    def create_request_delete_file(filepath : str, disk : str = Constantes().constante(Cles.DEPOT_LOCAL)) -> dict:
         return {
-            "nom_fichier": nom_fichier,
-            "nom_disque": nom_disque
+            "filepath": filepath,
+            "disk": disk
         }
     
     @staticmethod

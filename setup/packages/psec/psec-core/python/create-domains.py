@@ -141,7 +141,6 @@ p9 = [
 'tag=system, path=/usr/lib/psec/system, backend=0, security_model=none'
 ]
 channel = [
-'name=console, connection=pty',
 'name=sys-usb-msg, connection=socket, path=/var/run/sys-usb-msg.sock',
 'name=sys-usb-log, connection=socket, path=/var/run/sys-usb-log.sock',
 'name=sys-usb-input, connection=socket, path=/var/run/sys-usb-input.sock'
@@ -178,7 +177,6 @@ p9 = [
     'tag=system, path=/usr/lib/psec/system, backend=0, security_model=none'
 ]
 channel = [
-'name=console, connection=pty',
 'name=sys-gui-msg, connection=socket, path=/var/run/sys-gui-msg.sock',
 'name=sys-gui-log, connection=socket, path=/var/run/sys-gui-log.sock',
 'name=sys-gui-input, connection=socket, path=/var/run/sys-gui-input.sock'

@@ -2,7 +2,6 @@ import subprocess, os, time, threading, select, socket
 from psec import Constantes, Cles
 
 broker_msg_socket = Constantes().constante(Cles.MQTT_MSG_BROKER_SOCKET)
-broker_log_socket = Constantes().constante(Cles.MQTT_LOG_BROKER_SOCKET)
 
 BUFFER_SIZE = 4096
 
@@ -22,7 +21,8 @@ class UnixSocketTunneler:
                 if not data:  # Connection closed
                     break                
                 dst_socket.sendall(data)
-            except (socket.error, BrokenPipeError):
+            except (socket.error, BrokenPipeError) as e:
+                print(e)
                 break
 
     def tunnel(self):
@@ -65,45 +65,19 @@ class UnixSocketTunneler:
         """
         self.stop_event.set()
 
-def create_log_tunnel(socket:str):
-    tunneler = UnixSocketTunneler(socket, broker_log_socket)
-    threading.Thread(target=tunneler.tunnel).start()
-    #threading.Thread(target=main, args=(socket, broker_log_socket,)).start()
-
 def create_msg_tunnel(socket:str):
     tunneler = UnixSocketTunneler(socket, broker_msg_socket)
-    threading.Thread(target=tunneler.tunnel).start()
-    #threading.Thread(target=main, args=(socket, broker_msg_socket,)).start()
+    #threading.Thread(target=tunneler.tunnel).start()
+    tunneler.tunnel()
 
 def wait_for_broker_socket() -> bool:
     print("Waiting for MQTT Broker sockets...")
     
     while True:
-        if os.path.exists(broker_log_socket) and os.path.exists(broker_msg_socket):
+        if os.path.exists(broker_msg_socket):
             return True
         else:
             time.sleep(1)
-
-def watch_log_sockets():
-    print("Looking for log mqtt sockets")
-
-    cmd = "find /var/run/ -name '*-log.sock'"
-    sockets = set()
-
-    while True:
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-        files = result.stdout.strip().split("\n")
-        
-        new_files = set(files) - sockets
-        for file in new_files:
-            if file == "":
-                continue
-            print(f"New logging socket found : {file}")
-            create_log_tunnel(file)            
-
-        sockets.update(files)
-        time.sleep(1)
-    
 
 def watch_msg_sockets():
     print("Looking for msg mqtt sockets")
@@ -128,5 +102,4 @@ def watch_msg_sockets():
 if __name__ == "__main__":
     wait_for_broker_socket()
 
-    threading.Thread(target=watch_log_sockets).start()
     threading.Thread(target=watch_msg_sockets).start()

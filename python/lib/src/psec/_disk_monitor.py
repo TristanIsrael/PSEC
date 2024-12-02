@@ -6,9 +6,9 @@ from . import Logger, NotificationFactory, EtatDisque, Parametres, MqttClient, T
 class DiskEventHandler(FileSystemEventHandler):
     """ Gère les changements sur le point de montage des supports de stockage"""    
 
-    def __init__(self, client_msg:MqttClient) -> None:
+    def __init__(self, mqtt_client:MqttClient) -> None:
         super().__init__()        
-        self.client_msg = client_msg
+        self.mqtt_client = mqtt_client
 
     def on_moved(self, event:FileSystemEvent) -> None:
         super().on_moved(event)
@@ -22,7 +22,7 @@ class DiskEventHandler(FileSystemEventHandler):
             nom_dossier = os.path.basename(event.src_path)
             # Envoi de la notification
             notif = NotificationFactory.create_notification_disk_state(nom_dossier, EtatDisque.PRESENT)            
-            self.client_msg.publish("{}/notification".format(Topics.DISK_STATE), notif)
+            self.mqtt_client.publish("{}/notification".format(Topics.DISK_STATE), notif)
         else:
             Logger().debug("{} ignored".format(event.src_path))
 
@@ -34,8 +34,8 @@ class DiskEventHandler(FileSystemEventHandler):
         if event.is_directory:
             nom_dossier = os.path.basename(event.src_path)
             # Envoi de la notification
-            notif = NotificationFactory.cree_notification_disque(nom= nom_dossier, etat= EtatDisque.ABSENT)            
-            self.client_msg.publish("{}/notification".format(Topics.DISK_STATE), notif)
+            notif = NotificationFactory.create_notification_disk_state(nom= nom_dossier, etat= EtatDisque.ABSENT)            
+            self.mqtt_client.publish("{}/notification".format(Topics.DISK_STATE), notif)
         else:
             Logger().debug("{} ignored".format(event.src_path))
 
@@ -69,15 +69,15 @@ class DiskMonitor():
     le répertoire /mnt. Dans ce cas, la notification SUPPORT_USB sera émise.
     """    
 
-    def __init__(self, folder:str, client_msg:MqttClient, client_log:MqttClient):
-        Logger().setup("Disk monitor", client_log)
+    def __init__(self, folder:str, mqtt_client:MqttClient):
+        Logger().setup("Disk monitor", mqtt_client)
         self.folder = folder
-        self.client_msg = client_msg
+        self.mqtt_client = mqtt_client
 
     def demarre(self):
         Logger().debug("Starting disks monitoring on mount point {}".format(self.folder))
 
-        event_handler = DiskEventHandler(self.client_msg)
+        event_handler = DiskEventHandler(self.mqtt_client)
         observer = PollingObserver()
         observer.schedule(event_handler, self.folder, recursive=False)
         observer.start()

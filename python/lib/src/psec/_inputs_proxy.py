@@ -20,8 +20,8 @@ class InputsProxy(metaclass=SingletonMeta):
     sys_usb_socket = None
     domaine_gui = Domaine.INDEFINI
 
-    def __init__(self, client_log:MqttClient):
-        Logger().setup("IO Proxy", client_log)
+    def __init__(self, mqtt_client:MqttClient):
+        Logger().setup("IO Proxy", mqtt_client)
 
     def demarre(self):
         Logger().info("Starting I/O proxy")

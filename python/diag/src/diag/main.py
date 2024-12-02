@@ -38,7 +38,7 @@ api_ready = threading.Event()
 def on_ready():
     print("PSEC API is ready")
     api_ready.set()
-    ControleurBenchmark().setup(Api().get_client_msg(), Api().get_client_log())
+    ControleurBenchmark().setup(Api().get_mqtt_client())
 
 if __name__ == '__main__':
     app = QGuiApplication(sys.argv)
