@@ -14,6 +14,9 @@ class Topics():
     NEW_FILE = "system/disks/new_file"
     DISK_STATE = "system/disks/state"
 
+    # Miscelaneous
+    KEEPALIVE = "mics/ping"
+
     # Logging
     ERROR = "system/events/error"
     WARNING = "system/events/warning"

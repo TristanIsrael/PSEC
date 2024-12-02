@@ -50,14 +50,12 @@ class SysUsbController():
     def __on_mqtt_connected(self):       
         Logger().setup("USB controller", self.mqtt_client)
         Logger().debug("Starting sys-usb controller")
-        print("subscribe")
         self.mqtt_client.subscribe("system/+/+/request") # All the system requests
 
-    def __on_mqtt_message(self, topic:str, payload:dict):   
-        print("message")     
+    def __on_mqtt_message(self, topic:str, payload:dict):
         Logger().debug("Message received : topic={}, payload={}".format(topic, payload))
 
-        threading.Thread(target=self.__message_worker, args=(topic, payload,)).start()        
+        threading.Thread(target=self.__message_worker, args=(topic, payload,)).start()
 
     def __message_worker(self, topic:str, payload:dict):
         Logger().debug("Handle message {}".format(topic))

@@ -15,31 +15,42 @@ class Logger(metaclass=SingletonMeta):
         self.is_setup = True
 
     def critical(self, description:str, module:str = ""):
+        if not self.is_setup:
+            return
         payload = self.__create_event(module, description)
         self.mqtt_client.publish("system/events/critical", payload)
 
     def error(self, description:str, module:str = ""):
+        if not self.is_setup:
+            return
         payload = self.__create_event(module, description)
         self.mqtt_client.publish("system/events/error", payload)
 
     def warning(self, description:str, module:str = ""):
+        if not self.is_setup:
+            return
         payload = self.__create_event(module, description)
         self.mqtt_client.publish("system/events/warning", payload)
 
     def warn(self, description:str, module:str = ""):
+        if not self.is_setup:
+            return
         self.warning(description, module)
 
     def info(self, description:str, module:str = ""):
+        if not self.is_setup:
+            return
         payload = self.__create_event(module, description)
         self.mqtt_client.publish("system/events/info", payload)
 
     def debug(self, description:str, module:str = ""):
+        if not self.is_setup:
+            return
         payload = self.__create_event(module, description)
         self.mqtt_client.publish("system/events/debug", payload)
 
     def __create_event(self, module:str, description:str) -> dict :
         if not self.is_setup:
-            print("Logger is not setup")
             return
         
         now = datetime.now()

@@ -5,22 +5,32 @@ broker_msg_socket = Constantes().constante(Cles.MQTT_MSG_BROKER_SOCKET)
 
 BUFFER_SIZE = 4096
 
+def hexdump(data, prefix=""):
+    """Print binary data in hexdump format."""
+    for i in range(0, len(data), 16):
+        chunk = data[i:i + 16]
+        hex_bytes = " ".join(f"{byte:02x}" for byte in chunk)
+        ascii_bytes = "".join(chr(byte) if 32 <= byte <= 126 else '.' for byte in chunk)
+        print(f"{prefix}{i:04x}: {hex_bytes:<48} {ascii_bytes}")
+
 class UnixSocketTunneler:
-    def __init__(self, socket1_path, socket2_path):
-        self.socket1_path = socket1_path
-        self.socket2_path = socket2_path
+    def __init__(self, client_socket_path, broker_socket_path):
+        self.client_socket_path = client_socket_path
+        self.broker_socket_path = broker_socket_path
         self.stop_event = threading.Event()
 
-    def handle_connection(self, src_socket:socket.socket, dst_socket:socket.socket):
+    def handle_connection(self, client_socket:socket.socket, broker_socket:socket.socket, direction:str):
         """
         Continuously forward data from src_socket to dst_socket.
         """
         while not self.stop_event.is_set():
             try:
-                data = src_socket.recv(BUFFER_SIZE)
+                data = client_socket.recv(BUFFER_SIZE)
+                hexdump(data, prefix=f"{direction}> ")
                 if not data:  # Connection closed
+                    print("Error: data empty")
                     break                
-                dst_socket.sendall(data)
+                broker_socket.sendall(data)
             except (socket.error, BrokenPipeError) as e:
                 print(e)
                 break
@@ -32,18 +42,18 @@ class UnixSocketTunneler:
         while not self.stop_event.is_set():
             try:
                 # Create sockets
-                sock1 = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-                sock2 = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+                client_sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+                broker_sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 
                 # Connect to the specified sockets
-                sock1.connect(self.socket1_path)
-                sock2.connect(self.socket2_path)
+                client_sock.connect(self.client_socket_path)
+                broker_sock.connect(self.broker_socket_path)
 
-                print(f"Connected: {self.socket1_path} --> {self.socket2_path}")
+                print(f"Connected: {self.client_socket_path} --> {self.broker_socket_path}")
 
                 # Start threads for bidirectional tunneling
-                thread1 = threading.Thread(target=self.handle_connection, args=(sock1, sock2))
-                thread2 = threading.Thread(target=self.handle_connection, args=(sock2, sock1))
+                thread1 = threading.Thread(target=self.handle_connection, args=(client_sock, broker_sock, "A->B"))
+                thread2 = threading.Thread(target=self.handle_connection, args=(broker_sock, client_sock, "B->A"))
 
                 thread1.start()
                 thread2.start()
@@ -56,8 +66,8 @@ class UnixSocketTunneler:
                 print(f"Socket error: {e}. Retrying in 5 seconds...")
                 time.sleep(5)  # Wait before retrying
             finally:
-                sock1.close()
-                sock2.close()
+                client_sock.close()
+                broker_sock.close()
 
     def stop(self):
         """
@@ -65,8 +75,8 @@ class UnixSocketTunneler:
         """
         self.stop_event.set()
 
-def create_msg_tunnel(socket:str):
-    tunneler = UnixSocketTunneler(socket, broker_msg_socket)
+def create_msg_tunnel(client_socket:str):
+    tunneler = UnixSocketTunneler(client_socket, broker_msg_socket)
     #threading.Thread(target=tunneler.tunnel).start()
     tunneler.tunnel()
 
@@ -94,7 +104,7 @@ def watch_msg_sockets():
             if file == "":
                 continue
             print(f"New messaging socket found : {file}")
-            create_msg_tunnel(file)            
+            threading.Thread(target=create_msg_tunnel, args=(file,)).start()
 
         sockets.update(files)
         time.sleep(1)

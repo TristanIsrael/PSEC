@@ -5,8 +5,8 @@ try:
 except Exception as e:
     print("La classe KeymapFR ne sera pas disponible")
     print(e)
-from ._mqtt_client import MqttClient, ConnectionType, SerialMQTTClient
 from ._topics import Topics
+from ._mqtt_client import MqttClient, ConnectionType, SerialMQTTClient
 from ._logger import Logger
 from ._parametres import Parametres, Cles
 from ._request_factory import RequestFactory
