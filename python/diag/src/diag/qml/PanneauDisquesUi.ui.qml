@@ -53,11 +53,11 @@ RowLayout {
                                 root.selectedFolder = currentFolder
                                 root.selectedFile = selectedFile
                                 btnDownload.enabled = true                            
-                                root.resetSelection(disk)
+                                grpDisques.resetSelection(disk)
                             }
                         }  
                         Component.onCompleted: function() {
-                            root.resetSelection.connect(pnlFile.onResetSelection)
+                            grpDisques.resetSelection.connect(pnlFile.onResetSelection)
                         }                  
                     }            
                 }

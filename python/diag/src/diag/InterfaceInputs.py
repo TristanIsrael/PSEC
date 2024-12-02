@@ -114,7 +114,10 @@ class InterfaceInputs(QObject):
 
             # On émet le signal du clic
             self.clicked.emit(screenPos)
-            return
+
+            # Si c'est une souris on s'arrête là
+            if mouse.move == MouseMove.RELATIVE:
+                return
 
         # Enfin on gère l'action sur la molette        
         if not self.mouse.wheel_equals(mouse):

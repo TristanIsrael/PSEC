@@ -34,7 +34,7 @@ RowLayout {
                 height: parent.height
                 
                 //1:1
-                Text { text: qsTr("Position du pointeur :") }
+                Label { text: qsTr("Position du pointeur :") }
                 //1:2
                 RowLayout { 
                     RectangleValeur { text: "%1,%2".arg(AppController.mouseX).arg(AppController.mouseY) } 
@@ -42,14 +42,14 @@ RowLayout {
                 }
             
                 //2:1
-                Text { text: qsTr("Position du clic/toucher :") }
+                Label { text: qsTr("Position du clic/toucher :") }
                 //2:2
                 RectangleValeur { text: "%1,%2".arg(AppController.clicX).arg(AppController.clicY) }   
 
                 //3:1        
-                Text { text: qsTr("Action de la molette :") }
+                Label { text: qsTr("Action de la molette :") }
                 //3:2
-                Text {
+                Label {
                     id: lblMolette
                     text: qsTr("direction : %1").arg(AppController.wheel === 1 ? "haut" : AppController.wheel === -1 ? "bas" : "aucune")
                 }
@@ -60,7 +60,7 @@ RowLayout {
             }
 
             ColumnLayout {
-                Text { 
+                Label { 
                     text: qsTr("Tests manuels") 
                     font.bold: true
                 }  
@@ -106,7 +106,7 @@ RowLayout {
                     }  
                 }
 
-                Text {
+                Label {
                     id: lblTestManuel
                     text: qsTr("Combobox non survolée")
                 }
@@ -143,63 +143,63 @@ RowLayout {
                 text: qsTr("Démarrer")
             }                
 
-            Text {
-                horizontalAlignment: Text.AlignRight
+            Label {
+                horizontalAlignment: Label.AlignRight
                 font.bold: true
                 text: qsTr("Durée émission")
             }
 
-            Text {
+            Label {
                 text: "%1 ms".arg(dureeEmission)
             } 
 
-            Text {
-                horizontalAlignment: Text.AlignRight
+            Label {
+                horizontalAlignment: Label.AlignRight
                 font.bold: true
                 text: qsTr("Durée réception")
             }
 
-            Text {
+            Label {
                 text: "%1 ms".arg(dureeReception)
             }
 
-            Text {
-                horizontalAlignment: Text.AlignRight
+            Label {
+                horizontalAlignment: Label.AlignRight
                 font.bold: true
                 text: qsTr("Itérations émises")
             }
 
-            Text {
+            Label {
                 text: "%1".arg(iterationsEmises)
             }
 
-            Text {
-                horizontalAlignment: Text.AlignRight
+            Label {
+                horizontalAlignment: Label.AlignRight
                 font.bold: true
                 text: qsTr("Itérations reçues")
             }
 
-            Text {
+            Label {
                 text: "%1".arg(iterationsRecues)
             }
 
-            Text {
-                horizontalAlignment: Text.AlignRight
+            Label {
+                horizontalAlignment: Label.AlignRight
                 font.bold: true
                 text: qsTr("Débit général")
             }
 
-            Text {
+            Label {
                 text: "%1/cs".arg(debitGeneral)
             }
 
-            Text {
-                horizontalAlignment: Text.AlignRight
+            Label {
+                horizontalAlignment: Label.AlignRight
                 font.bold: true
                 text: qsTr("Débit courant")
             }
 
-            Text {
+            Label {
                 text: "%1/cs".arg(debitCourant)
             }            
         }

@@ -14,6 +14,9 @@ ApplicationWindow {
     visible: true
     visibility: Window.FullScreen
 
+    font.family: "Roboto"
+    font.pointSize: 18
+
     Rectangle {
         color: "#ccc"
         anchors {

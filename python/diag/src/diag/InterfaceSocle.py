@@ -106,9 +106,13 @@ class InterfaceSocle(QObject):
             self.diskChanged.emit(disk, state == "connected")
             if state == "connected":
                 self.disks_.append(disk)
+                self.disksChanged.emit()
                 self.__update_disks_files_list()
             else:
                 self.disks_.remove(disk)
+                self.disksChanged.emit()
+                self.files_.clear()
+                self.filesChanged.emit()
         elif topic == "{}/response".format(Topics.LIST_DISKS):
             disks = payload.get("disks")
             if disks is None:
@@ -117,7 +121,7 @@ class InterfaceSocle(QObject):
                         
             Api().debug("Disks list received : {}".format(disks))
             self.disks_.clear()
-            self.disks_.extend(disks)
+            self.disks_.extend(disks)            
             self.disksChanged.emit()
             self.__update_disks_files_list()            
         elif topic == "{}/response".format(Topics.LIST_FILES):
