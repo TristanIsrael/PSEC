@@ -111,7 +111,7 @@ class DemonInputs(metaclass=SingletonMeta):
         self.mouse.wheel = MouseWheel.NO_MOVE
 
     def __on_click(self, bouton, etat):
-        Logger().debug("L'état du bouton {} de la souris est {}".format(bouton, etat))
+        #Logger().debug("L'état du bouton {} de la souris est {}".format(bouton, etat))
         self.mouse.x = 0
         self.mouse.y = 0
 

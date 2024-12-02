@@ -1,6 +1,6 @@
 from . import Constantes, Parametres, MqttClient, Topics
 from . import FichierHelper, ResponseFactory
-from . import Logger, Domaine, Cles, BenchmarkId, MqttClient, ConnectionType
+from . import Logger, Cles, BenchmarkId, MqttClient, DiskMonitor
 from . import TaskRunner
 try:
     from . import DemonInputs
@@ -41,7 +41,7 @@ class SysUsbController():
         # Démarrage de la surveillance des entrées
         if NO_INPUTS_MONITORING != True:
             DemonInputs(self.mqtt_client).start()
-            #threading.Thread(target= DemonInputs().demarre()).start()
+            #threading.Thread(target= DemonInputs().demarre()).start()        
 
     def stop(self):
         self.task_runner.stop()
@@ -51,6 +51,11 @@ class SysUsbController():
         Logger().setup("USB controller", self.mqtt_client)
         Logger().debug("Starting sys-usb controller")
         self.mqtt_client.subscribe("system/+/+/request") # All the system requests
+
+        ControleurBenchmark().setup(self.mqtt_client)
+
+        self.disk_monitor = DiskMonitor(Constantes().constante(Cles.CHEMIN_MONTAGE_USB), self.mqtt_client)
+        threading.Thread(target=self.disk_monitor.start).start()        
 
     def __on_mqtt_message(self, topic:str, payload:dict):
         Logger().debug("Message received : topic={}, payload={}".format(topic, payload))
@@ -64,24 +69,24 @@ class SysUsbController():
         print(base_topic)
 
         if base_topic == Topics.LIST_DISKS:
-            self.__handle_list_disks(topic)
+            self.__handle_list_disks(base_topic)
         elif base_topic == Topics.LIST_FILES:
-            self.__handle_list_files(topic, payload)
+            self.__handle_list_files(base_topic, payload)
         elif base_topic == Topics.COPY_FILE:
             Logger().error("File copy is not implemented")
             #self.__lit_fichier(commande)
         elif base_topic == Topics.READ_FILE:
-            self.__handle_read_file(topic, payload)
+            self.__handle_read_file(base_topic, payload)
         elif base_topic == Topics.DELETE_FILE:
-            self.__handle_remove_file(topic, payload)
+            self.__handle_remove_file(base_topic, payload)
         elif base_topic == Topics.BENCHMARK:
-            self.__handle_benchmark(topic, payload)
+            self.__handle_benchmark(base_topic, payload)
         elif base_topic == Topics.FILE_FOOTPRINT:            
-            self.__handle_file_footprint(topic, payload)
+            self.__handle_file_footprint(base_topic, payload)
         elif base_topic == Topics.CREATE_FILE:            
-            self.__handle_create_file(topic, payload)
+            self.__handle_create_file(base_topic, payload)
         elif base_topic == Topics.DISCOVER_MODULES:
-            self.__handle_discover_modules(topic)
+            self.__handle_discover_modules(base_topic)
 
     ####
     # Traitement des commandes
@@ -104,6 +109,9 @@ class SysUsbController():
         if disk is None:
             # S'il manque un argument on envoie une erreur
             Logger().error("Argument missing: disk. Topic is {}".format(topic))
+            return
+
+        if disk == Constantes.REPOSITORY:
             return
 
         # Récupère la liste des fichiers        

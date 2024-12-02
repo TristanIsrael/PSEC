@@ -12,7 +12,7 @@ class InterfaceInputs(QObject):
     """
     
     fenetre_app:QWidget = None
-    dernier_bouton = Qt.NoButton
+    dernier_bouton = Qt.MouseButton.NoButton
     chemin_socket_inputs = None   
     socket_inputs = None 
     mouse = Mouse()
@@ -99,22 +99,22 @@ class InterfaceInputs(QObject):
         # On limite aux dimensions de l'écran
         self.mouse.x = max(0, min(self.fenetre_app.width(), newX))
         self.mouse.y = max(0, min(self.fenetre_app.height(), newY))
-        screenPos = QPoint(self.mouse.x, self.mouse.y)
+        screenPos = QPoint(self.mouse.x, self.mouse.y)        
         
-        # On émet le signal de la nouvelle position        
-        event = QMouseEvent(QEvent.MouseMove, screenPos, screenPos, Qt.NoButton, Qt.NoButton, Qt.NoModifier)
-        QCoreApplication.postEvent(self.fenetre_app, event)
-        self.nouvellePosition.emit(screenPos)
-        
-        # Ensuite on regarde s'il y a eu un changement sur les boutons
-        if not self.mouse.buttons_equal(mouse):
-            self.__genere_evt_bouton_souris(mouse, MouseButton.LEFT, screenPos)
-            self.__genere_evt_bouton_souris(mouse, MouseButton.MIDDLE, screenPos)
-            self.__genere_evt_bouton_souris(mouse, MouseButton.RIGHT, screenPos)
-            self.mouse.buttons = mouse.buttons
+        # On traite d'abord le clic de souris
+        diff = self.mouse.buttons ^ mouse.buttons
+        if self.mouse.buttons != mouse.buttons:
+            if diff & MouseButton.LEFT == MouseButton.LEFT:
+                self.__genere_evt_bouton_souris(mouse, MouseButton.LEFT, screenPos)
+            if diff & MouseButton.MIDDLE == MouseButton.MIDDLE:
+                self.__genere_evt_bouton_souris(mouse, MouseButton.MIDDLE, screenPos)
+            if diff & MouseButton.RIGHT == MouseButton.RIGHT:
+                self.__genere_evt_bouton_souris(mouse, MouseButton.RIGHT, screenPos)
+            self.mouse.buttons = mouse.buttons            
 
             # On émet le signal du clic
             self.clicked.emit(screenPos)
+            return
 
         # Enfin on gère l'action sur la molette        
         if not self.mouse.wheel_equals(mouse):
@@ -122,16 +122,23 @@ class InterfaceInputs(QObject):
             pixelDelta = QPoint(0, 2 if mouse.wheel == MouseWheel.UP else -2)
             localPos = screenPos # On est en plein écran
             
-            event = QWheelEvent(localPos, screenPos, pixelDelta, angleDelta, Qt.NoButton, Qt.KeyboardModifier.NoModifier, Qt.NoScrollPhase, False)
+            #event = QWheelEvent(localPos, screenPos, pixelDelta, angleDelta, Qt.NoButton, Qt.KeyboardModifier.NoModifier, Qt.NoScrollPhase, False)             
+            event = QWheelEvent(localPos, screenPos, QPoint(), angleDelta, Qt.MouseButton.NoButton, Qt.KeyboardModifier.NoModifier, Qt.ScrollPhase.ScrollUpdate, False)
             QCoreApplication.postEvent(self.fenetre_app, event)
             
             self.wheel.emit(mouse.wheel)
             #Api().debug("wheel {}".format(mouse.wheel))            
 
             self.mouse.wheel = MouseWheel.NO_MOVE
+            return
+
+        # On émet le signal de la nouvelle position
+        event = QMouseEvent(QEvent.Type.MouseMove, screenPos, screenPos, Qt.MouseButton.NoButton, Qt.MouseButton.NoButton, Qt.KeyboardModifier.NoModifier)
+        QCoreApplication.postEvent(self.fenetre_app, event)
+        self.nouvellePosition.emit(screenPos)
 
     def __genere_evt_bouton_souris(self, mouse:Mouse, button: int, screenPos: int):
-        qbutton = Qt.LeftButton if button == MouseButton.LEFT else Qt.MiddleButton if button == MouseButton.MIDDLE else Qt.RightButton
+        qbutton = Qt.MouseButton.LeftButton if button == MouseButton.LEFT else Qt.MouseButton.MiddleButton if button == MouseButton.MIDDLE else Qt.MouseButton.RightButton
 
         # Le tracking des boutons fonctionne de la façon suivante :
         # - si l'état des boutons est différent par rapport à la dernière valeur connue
@@ -140,11 +147,12 @@ class InterfaceInputs(QObject):
 
         if not mouse.button_equals(self.mouse, button):
             if mouse.button_pressed(button): # Si le bouton est actuellement appuyé
-                event = QMouseEvent(QEvent.MouseButtonPress, screenPos, screenPos, qbutton, qbutton, Qt.KeyboardModifier.NoModifier)
+                event = QMouseEvent(QEvent.Type.MouseButtonPress, screenPos, screenPos, qbutton, qbutton, Qt.KeyboardModifier.NoModifier)
                 QCoreApplication.postEvent(self.fenetre_app, event)
             else: # Sinon le bouton n'est plus appuyé
                 # L'événement MouseButtonRelease doit être différé pour être pris en compte
-                event = QMouseEvent(QEvent.MouseButtonRelease, screenPos, screenPos, qbutton, Qt.NoButton, Qt.KeyboardModifier.NoModifier)
+                #event = QMouseEvent(QEvent.MouseButtonRelease, screenPos, screenPos, qbutton, Qt.NoButton, Qt.KeyboardModifier.NoModifier)
+                event = QMouseEvent(QEvent.Type.MouseButtonRelease, screenPos, screenPos, qbutton, qbutton, Qt.KeyboardModifier.NoModifier)
                 QCoreApplication.postEvent(self.fenetre_app, event)                
 
     def __genereMouseEvent(self, eventType: QEvent.Type, localPos: QPoint, screenPos: QPoint, button: Qt.MouseButton, buttons: Qt.MouseButtons):
@@ -170,14 +178,14 @@ class InterfaceInputs(QObject):
         QCoreApplication.postEvent(self.fenetre_app, event)
 
     def __mouse_buttons_to_qbuttons(self, mouse:Mouse) -> Qt.MouseButtons:        
-        buttons = Qt.NoButton
+        buttons = Qt.MouseButton.NoButton
 
         if mouse.button_pressed(MouseButton.LEFT):
-            buttons &= Qt.LeftButton
+            buttons &= Qt.MouseButton.LeftButton
         if mouse.button_pressed(MouseButton.MIDDLE):
-            buttons &= Qt.MiddleButton
+            buttons &= Qt.MouseButton.MiddleButton
         if mouse.button_pressed(MouseButton.RIGHT):
-            buttons &= Qt.RightButton
+            buttons &= Qt.MouseButton.RightButton
 
         return buttons    
     

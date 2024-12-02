@@ -54,7 +54,7 @@ class Mouse():
         return self.wheel != MouseWheel.NO_MOVE 
 
     def serialize(self) -> bytes:        
-        return "{},{},{},{},{}".format(self.move, self.x, self.y, self.buttons, self.wheel).encode()
+        return "{},{},{},{},{}".format(self.move, self.x, self.y, self.buttons, self.wheel).encode()    
     
     @staticmethod
     def fromData(data: bytes):

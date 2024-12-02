@@ -19,10 +19,14 @@ class SerialSocket():
         self.serial.reset_output_buffer()
 
     def has_data_in(self):
-        return self.serial.in_waiting > 0
+        if self.serial.is_open:
+            return self.serial.in_waiting > 0
+        return False
     
     def has_data_out(self):
-        return self.serial.out_waiting > 0
+        if self.serial.is_open:
+            return self.serial.out_waiting > 0
+        return False
 
     def recv(self, buffer_size: int) -> bytes:
         #print("wait for bytes")

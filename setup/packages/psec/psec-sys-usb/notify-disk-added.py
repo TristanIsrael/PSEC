@@ -1,4 +1,4 @@
-import sys
+import sys, threading
 from psec import Api, MqttFactory
 
 if len(sys.argv) < 2:
@@ -7,14 +7,20 @@ if len(sys.argv) < 2:
 
 name = sys.argv[1]
 
-def on_api_connected():    
-    api.info("The disk {} has been connected to the system.".format(name))
-    api.notify_disk_added(name)
-    api.stop()
-    exit(0)
+api_ready = threading.Event()
+def on_api_connected():
+    api_ready.set()
 
-mqtt_client = MqttFactory.create_mqtt_client_domu("sys-usb")
+mqtt_client = MqttFactory.create_mqtt_client_domu("notify-disk-added")
 
-api = Api("notify-disk-added")
+api = Api()
 api.add_ready_callback(on_api_connected)
 api.start(mqtt_client)
+
+api_ready.wait()
+
+api.info("The disk {} has been connected to the system.".format(name))
+api.notify_disk_added(name)
+api.stop()
+mqtt_client.stop()
+exit(0)

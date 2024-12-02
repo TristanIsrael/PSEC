@@ -45,7 +45,7 @@ ApplicationWindow {
             }
             
         }
-    }
+    }    
 
     /*Timer {
         interval: 1000

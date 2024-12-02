@@ -10,6 +10,8 @@ class Dom0Controller():
 
     """    
 
+    mqtt_lock = threading.Event()
+
     def __init__(self, mqtt_client: MqttClient):
         self.mqtt_client = mqtt_client
 
@@ -19,15 +21,14 @@ class Dom0Controller():
         
         Logger().setup("System controller", mqtt_client)
 
-    def start(self):
-        Logger().debug("Starting Dom0 controller")
-
-        InputsProxy(self.mqtt_client).demarre()
-
+    def start(self):                
         self.mqtt_client.start()
+        self.mqtt_lock.wait()
     
     def __on_mqtt_connected(self):
+        Logger().debug("Starting Dom0 controller")        
         self.mqtt_client.subscribe("system/+/+/request") # All the system requests
+        InputsProxy(self.mqtt_client).demarre()
 
     def __on_mqtt_message(self, topic:str, payload:dict):
         base_topic, _ = topic.rsplit("/", 1)

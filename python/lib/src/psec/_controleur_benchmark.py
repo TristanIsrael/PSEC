@@ -8,26 +8,26 @@ class ControleurBenchmark(metaclass=SingletonMeta):
         self.mqtt_client = mqtt_client
         random.seed()
 
-        Logger().setup("Benchmark controller", mqtt_client)
+        #Logger().setup("Benchmark controller", mqtt_client)
 
     ###
     # Fonctions appelées par le DomU    
     #
     def demarre_benchmark_inputs(self):
-        Logger().info("Demande le démarrage du benchmark sur les entrées")
+        Logger().info("Demande le démarrage du benchmark sur les entrées", "BenchmarkController")
         payload = RequestFactory.create_request_start_benchmark(BenchmarkId.INPUTS)
         self.mqtt_client.publish("{}/request".format(Topics.BENCHMARK), payload)
 
     def demarre_benchmark_fichiers(self):
-        Logger().info("Demande le démarrage du benchmark fichiers")
+        Logger().info("Demande le démarrage du benchmark fichiers", "BenchmarkController")
         payload = RequestFactory.create_request_start_benchmark(BenchmarkId.FILES)
         self.mqtt_client.publish("{}/request".format(Topics.BENCHMARK), payload)
 
     ###
     # Fonctions exécutées sur sys-usb
     #
-    def execute_benchmark_inputs(self, emetteur:str):
-        Logger().info("Exécution du benchmark sur les entrées")
+    def execute_benchmark_inputs(self):
+        Logger().info("Exécution du benchmark sur les entrées", "BenchmarkController")
 
         start_ms = time.time()*1000
 
@@ -41,11 +41,11 @@ class ControleurBenchmark(metaclass=SingletonMeta):
 
         end_ms = time.time()*1000
         duration = int(end_ms-start_ms)
-        response = ResponseFactory.cree_reponse_benchmark_inputs(duration, iterations, emetteur)
+        response = ResponseFactory.cree_reponse_benchmark_inputs(duration, iterations)
         self.mqtt_client.publish("{}/response".format(Topics.BENCHMARK), response)
 
     def execute_benchmark_fichiers(self):
-        Logger().info("Exécution du benchmark sur les fichiers")
+        Logger().info("Exécution du benchmark sur les fichiers", "BenchmarkController")
 
         start_ms = time.time()*1000
 
@@ -66,12 +66,12 @@ class ControleurBenchmark(metaclass=SingletonMeta):
         # Cela permet d'éviter d'être perturbé par des demandes sans rapport avec le benchmark
         liste_disques = FichierHelper.get_disks_list()
         if len(liste_disques) == 0:
-            Logger().error("The benchmark cannot start because no external storage is connected")
+            Logger().error("The benchmark cannot start because no external storage is connected", "BenchmarkController")
             return #Fin 
 
         # On prend le premier disque disponible
         disque = liste_disques[0]
-        Logger().info("Le benchmark sera exécuté sur le disque {}".format(disque))
+        Logger().info("Le benchmark sera exécuté sur le disque {}".format(disque), "BenchmarkController")
 
         # On crée une structure pour conserver les métriques
         metrics = []
@@ -101,7 +101,7 @@ class ControleurBenchmark(metaclass=SingletonMeta):
         self.mqtt_client.publish("{}/response".format(Topics.BENCHMARK), response)
     
     def __execute_benchmark_fichiers(self, disque:str, taille_fichier_ko:int, quantite_fichiers:int, metrics:list):
-        Logger().info("Démarrage d'une itération de benchmark fichier pour {} fichiers de {} Ko".format(quantite_fichiers, taille_fichier_ko))
+        Logger().info("Démarrage d'une itération de benchmark fichier pour {} fichiers de {} Ko".format(quantite_fichiers, taille_fichier_ko), "BenchmarkController")
 
         point_montage = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)
 
@@ -110,19 +110,19 @@ class ControleurBenchmark(metaclass=SingletonMeta):
             filepath = "{}/{}/benchfile_{}ko_{}".format(point_montage, disque, taille_fichier_ko, n_fichier)                        
             
             try:
-                Logger().info("Etape 1 : Création du fichier {}".format(filepath))
+                Logger().info("Etape 1 : Création du fichier {}".format(filepath), "BenchmarkController")
                 start_ms = time.time()*1000
                 FichierHelper.create_file(filepath, taille_fichier_ko)
                 end_ms = time.time()*1000
                 metrics.append({"step": "write_on_disk", "size": taille_fichier_ko, "iteration": n_fichier, "duration_ms": end_ms-start_ms})                                
             except Exception as e:
-                Logger().error("Error during file creation: {}".format(str(e)))
+                Logger().error("Error during file creation: {}".format(str(e)), "BenchmarkController")
                 return
             
         # Step 2 : read files from disk
         for n_fichier in range(1, quantite_fichiers+1):
             filepath = "{}/{}/benchfile_{}ko_{}".format(point_montage, disque, taille_fichier_ko, n_fichier)
-            Logger().info("Etape 2 : Lecture du fichier {}".format(filepath))
+            Logger().info("Etape 2 : Lecture du fichier {}".format(filepath), "BenchmarkController")
             try:                
                 start_ms = time.time()*1000
                 
@@ -135,19 +135,19 @@ class ControleurBenchmark(metaclass=SingletonMeta):
                 end_ms = time.time()*1000
                 metrics.append({"step": "read_from_disk", "size": taille_fichier_ko, "iteration": n_fichier, "duration_ms": end_ms-start_ms})                                
             except Exception as e:                
-                Logger().error("Error during file read: {}".format(str(e)))
+                Logger().error("Error during file read: {}".format(str(e)), "BenchmarkController")
                 return
 
         # Step 3 : copy files to repository  
         for n_fichier in range(1, quantite_fichiers+1):
             filepath = "{}/{}/benchfile_{}ko_{}".format(point_montage, disque, taille_fichier_ko, n_fichier)
             footprint = ""
-            Logger().info("Etape 2 : Copie du fichier dans le dépôt")
+            Logger().info("Etape 2 : Copie du fichier dans le dépôt", "BenchmarkController")
             try:
                 start_ms = time.time()*1000
                 FichierHelper.copy_file_to_repository(filepath, footprint)
                 end_ms = time.time()*1000
                 metrics.append({"step": "copy_to_repository", "size": taille_fichier_ko, "iteration": n_fichier, "duration_ms": end_ms-start_ms})                                
             except Exception as e:
-                Logger().error("Error during copy to repository: {}".format(str(e)))
+                Logger().error("Error during copy to repository: {}".format(str(e)), "BenchmarkController")
                 return

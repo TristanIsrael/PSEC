@@ -54,13 +54,16 @@ class Api(metaclass=SingletonMeta):
         if callback_fn is not None:
             self.message_callbacks.append(callback_fn)
         else:
-            Logger().warn("WARNING: message callback function is None")
+            print("WARNING: message callback function is None")
 
     def add_ready_callback(self, callback_fn):
         if callback_fn is not None:
             self.ready_callbacks.append(callback_fn)
         else:
-            Logger().warn("WARNING: ready callback function is None")
+            print("WARNING: ready callback function is None")
+
+    def subscribe(self, topic:str):
+        self.mqtt_client.subscribe(topic)
 
     ####
     # Fonctions de journalisation
@@ -131,8 +134,11 @@ class Api(metaclass=SingletonMeta):
     # Fonctions privées
     #    
     def __on_mqtt_connected(self):
-        Logger().setup(self.mqtt_client)
-        self.mqtt_client.subscribe("system/+/+")
+        Logger().setup("Api", self.mqtt_client)
+        self.mqtt_client.subscribe("system/disks/+/response")
+        self.mqtt_client.subscribe("system/misc/+/response")
+        self.mqtt_client.subscribe("system/modules/+/response")
+        self.mqtt_client.subscribe("system/disks/+")
 
         for cb in self.ready_callbacks:
             cb()

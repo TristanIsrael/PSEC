@@ -4,6 +4,7 @@ from psec import Constantes, Cles
 broker_msg_socket = Constantes().constante(Cles.MQTT_MSG_BROKER_SOCKET)
 
 BUFFER_SIZE = 4096
+DEBUG = False
 
 def hexdump(data, prefix=""):
     """Print binary data in hexdump format."""
@@ -26,7 +27,8 @@ class UnixSocketTunneler:
         while not self.stop_event.is_set():
             try:
                 data = client_socket.recv(BUFFER_SIZE)
-                hexdump(data, prefix=f"{direction}> ")
+                if DEBUG:
+                    hexdump(data, prefix=f"{direction}> ")
                 if not data:  # Connection closed
                     print("Error: data empty")
                     break                

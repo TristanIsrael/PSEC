@@ -2,7 +2,7 @@ from PySide6.QtCore import QObject, Signal
 from PySide6.QtCore import QProcess, QTimer, QDir, Property, Slot, QPoint, QCoreApplication, Qt, QEvent, QSize
 from PySide6.QtGui import QMouseEvent, QCursor
 from PySide6.QtWidgets import QWidget
-from psec import Api, EtatDisque, Constantes, Topics, BenchmarkId
+from psec import Api, EtatDisque, Constantes, Topics, BenchmarkId, MqttClient, MqttFactory
 import threading
 
 class InterfaceSocle(QObject):
@@ -45,9 +45,11 @@ class InterfaceSocle(QObject):
 
     @Slot()
     def start(self, ready_callback):
+        self.mqtt_client = MqttFactory.create_mqtt_client_domu("Diag")
+
         Api().add_message_callback(self.__on_message_received)
         Api().add_ready_callback(ready_callback)
-        Api().start("Diag")
+        Api().start(self.mqtt_client)
 
     @Slot()
     def get_liste_disques(self):
@@ -82,9 +84,13 @@ class InterfaceSocle(QObject):
     ###
     # Fonctions privées
     #
-    def __on_message_received(self, topic:str, payload:dict):
-        Api().debug("Message reçu :")
-        Api().debug("topic: {}, payload: {}".format(topic, payload))
+    def __update_disks_files_list(self):
+        # Demande la liste des fichiers pour chaque disque
+        for disk in self.disks_:
+            self.get_contenu_disque(disk)
+
+    def __on_message_received(self, topic:str, payload:dict):        
+        print("topic: {}, payload: {}".format(topic, payload))
         
         if topic == Topics.DISK_STATE:
             disk = payload.get("disk")
@@ -98,6 +104,11 @@ class InterfaceSocle(QObject):
                 return
             
             self.diskChanged.emit(disk, state == "connected")
+            if state == "connected":
+                self.disks_.append(disk)
+                self.__update_disks_files_list()
+            else:
+                self.disks_.remove(disk)
         elif topic == "{}/response".format(Topics.LIST_DISKS):
             disks = payload.get("disks")
             if disks is None:
@@ -108,10 +119,7 @@ class InterfaceSocle(QObject):
             self.disks_.clear()
             self.disks_.extend(disks)
             self.disksChanged.emit()
-
-            # Demande la liste des fichiers pour chaque disque
-            for disk in disks:
-                self.get_contenu_disque(disk)
+            self.__update_disks_files_list()            
         elif topic == "{}/response".format(Topics.LIST_FILES):
             disk = payload.get("disk")
             files = payload.get("files")

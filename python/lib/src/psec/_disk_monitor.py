@@ -1,55 +1,5 @@
-import os
-from watchdog.observers.polling import PollingObserver
-from watchdog.events import LoggingEventHandler, FileSystemEventHandler, FileSystemEvent
-from . import Logger, NotificationFactory, EtatDisque, Parametres, MqttClient, Topics
-
-class DiskEventHandler(FileSystemEventHandler):
-    """ Gère les changements sur le point de montage des supports de stockage"""    
-
-    def __init__(self, mqtt_client:MqttClient) -> None:
-        super().__init__()        
-        self.mqtt_client = mqtt_client
-
-    def on_moved(self, event:FileSystemEvent) -> None:
-        super().on_moved(event)
-        # Evénement ignoré
-
-    def on_created(self, event:FileSystemEvent) -> None:
-        super().on_created(event)        
-
-        Logger().debug("{} has been added".format(event.src_path))
-        if event.is_directory:
-            nom_dossier = os.path.basename(event.src_path)
-            # Envoi de la notification
-            notif = NotificationFactory.create_notification_disk_state(nom_dossier, EtatDisque.PRESENT)            
-            self.mqtt_client.publish("{}/notification".format(Topics.DISK_STATE), notif)
-        else:
-            Logger().debug("{} ignored".format(event.src_path))
-
-    def on_deleted(self, event: FileSystemEvent) -> None:
-        super().on_deleted(event)
-
-        # Envoi de la notification
-        Logger().debug("{} has been removed".format(event.src_path))
-        if event.is_directory:
-            nom_dossier = os.path.basename(event.src_path)
-            # Envoi de la notification
-            notif = NotificationFactory.create_notification_disk_state(nom= nom_dossier, etat= EtatDisque.ABSENT)            
-            self.mqtt_client.publish("{}/notification".format(Topics.DISK_STATE), notif)
-        else:
-            Logger().debug("{} ignored".format(event.src_path))
-
-    def on_modified(self, event: FileSystemEvent) -> None:
-        super().on_modified(event)
-        # Evénement ignoré
-
-    def on_closed(self, event: FileSystemEvent) -> None:
-        super().on_closed(event)
-        # Evénement ignoré
-
-    def on_opened(self, event: FileSystemEvent) -> None:
-        super().on_opened(event)
-        # Evénement ignoré
+import os, pyudev
+from . import Logger, MqttClient, Topics, NotificationFactory
 
 class DiskMonitor():
     """ Cette classe surveille un répertoire afin de détecter les ajout et suppression de fichiers et dossiers.
@@ -69,16 +19,40 @@ class DiskMonitor():
     le répertoire /mnt. Dans ce cas, la notification SUPPORT_USB sera émise.
     """    
 
+    disks = {}
+
     def __init__(self, folder:str, mqtt_client:MqttClient):
         Logger().setup("Disk monitor", mqtt_client)
         self.folder = folder
         self.mqtt_client = mqtt_client
 
-    def demarre(self):
-        Logger().debug("Starting disks monitoring on mount point {}".format(self.folder))
+    def device_event(self, action, device):
+        if action == 'add':
+            if device.device_type == "partition":                
+                if device.get('ID_FS_LABEL'):
+                    mount_point = device.device_node
+                    disk_name = device.get('ID_FS_LABEL')
+                    Logger().info("USB Device connected. Partition detected: {} with name {}".format(mount_point, disk_name), "Disk monitor")
+                    self.disks[mount_point] = disk_name
 
-        event_handler = DiskEventHandler(self.mqtt_client)
-        observer = PollingObserver()
-        observer.schedule(event_handler, self.folder, recursive=False)
-        observer.start()
-        observer.join()
+                    payload = NotificationFactory.create_notification_disk_state(disk_name, "connected")
+                    self.mqtt_client.publish(Topics.DISK_STATE, payload)
+        elif action == 'remove':
+            if device.device_type == "partition":
+                mount_point = device.device_node
+                if mount_point in self.disks:
+                    Logger().info("USB Device disconnected on {}".format(device.device_node), "Disk monitor")
+                    disk_name = self.disks.pop(mount_point)
+
+                    payload = NotificationFactory.create_notification_disk_state(disk_name, "disconnected")
+                    self.mqtt_client.publish(Topics.DISK_STATE, payload)
+
+    def start(self):
+        Logger().debug("Starting disks monitoring on mount point {}".format(self.folder), "Disk monitor")
+
+        context = pyudev.Context()
+        monitor = pyudev.Monitor.from_netlink(context)
+        monitor.filter_by(subsystem='block')        
+
+        for device in iter(monitor.poll, None):
+            self.device_event(device.action, device)
