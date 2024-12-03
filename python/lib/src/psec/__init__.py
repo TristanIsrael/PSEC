@@ -1,5 +1,5 @@
 from ._singleton import SingletonMeta
-from ._constantes import Constantes, Cles, EtatDomu, EtatDisque, Domaine, BoutonSouris, TypeEntree, EtatFichier, BenchmarkId, EtatComposant
+from ._constantes import Constantes, Cles, BoutonSouris, TypeEntree, BenchmarkId, EtatComposant
 try:
     from ._keymap_fr import KeymapFR
 except Exception as e:
@@ -27,6 +27,8 @@ from ._api import Api
 from ._inputs_proxy import InputsProxy
 from ._dom0_controller import Dom0Controller
 from ._sys_usb_controller import SysUsbController
+from ._mqtt_helper import MqttHelper
+from ._components_helper import ComponentsHelper
 
 import logging
 from logging import NullHandler
@@ -36,8 +38,7 @@ __version__ = '1.0'
 
 __all__ = [
     "KeymapFR",
-    "TypeEntree", "BoutonSouris", "EtatFichier", "EtatComposant", "MouseMove",
-    "Constantes", "EtatDomu", "EtatDisque", "Domaine",
+    "TypeEntree", "BoutonSouris", "Constantes", "EtatComposant", "MouseMove",     
     "RequestFactory",
     #"Journal", "JournalProxy", "DemonProxyJournal",
     "Logger",
@@ -51,8 +52,9 @@ __all__ = [
     "ControleurBenchmark", "BenchmarkId",
     #"MockXenbus",
     "TaskRunner",
-    "MqttClient", "ConnectionType", "Topics", "MqttFactory", "SerialMQTTClient"
-    "Dom0Controller", "SysUsbController", "Api"
+    "MqttClient", "ConnectionType", "Topics", "MqttFactory", "SerialMQTTClient", "MqttHelper",
+    "Dom0Controller", "SysUsbController", "Api",
+    "ComponentsHelper"
 ]
 
 logging.getLogger(__name__).addHandler(NullHandler())

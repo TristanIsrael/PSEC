@@ -53,7 +53,7 @@ Liste des topics
 | TypeCommande.START_BENCHMARK | `system/misc/benchmark` | `{ 'module': '' }` | Demande le démarrage du processus de calcul des performances du système | `{ 'status': 'started\|error\|finished' }` | | 
 | TypeCommande.GET_FILE_FOOTPRINT | `system/disks/get_file_footprint` | `{ 'disk': 'nom', 'filepath': 'path' }` | Demande l'empreinte numérique d'un fichier | `{ 'footprint': 'xxxx' }` | |
 | TypeCommande.CREATE_FILE | `system/disks/create_file` | `{ 'disk': 'nom', 'filepath': 'path', 'data': 'contenu' }` | Demande la création d'un fichier sur un disque | `{ 'status': 'ok\|error' }` | |
-| TypeCommande.LISTE_COMPOSANTS | `system/topology/discover` | `{}` | Demande la liste des composants du système | `{ 'modules': [ { 'id': '', 'label': '' } ] }` | L'association entre un composant et le client est faite grâce à l'identifiant fournit dans le suffixe du topic |
+| TypeCommande.LISTE_COMPOSANTS | `system/components/discover` | `{}` | Demande la liste des composants du système | `{ 'components': [ { 'id': '', 'label': '', 'type': '' } ] }` | L'association entre un composant et le client est faite grâce à l'identifiant fournit dans le suffixe du topic |
 
 (*) la racine du topic doit être complétée par le suffixe de commande (`/request`) ou de réponse (`/response`).
 

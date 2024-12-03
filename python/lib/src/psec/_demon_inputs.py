@@ -289,12 +289,12 @@ class DemonInputs(metaclass=SingletonMeta):
         try:
             self.socket_xenbus = serial.Serial(port= self.chemin_socket_xenbus)
             self.interface_xenbus_prete = True            
-            Logger().info("Xenbus I/O channel {} is open".format(Parametres().identifiant_domaine()))  
+            Logger().info("I/O channel is open")
             return True          
         except serial.SerialException as e:
             self.socket_xenbus = None            
             Logger().error("Impossible to open the serial port {}".format(self.chemin_socket_xenbus))
-            Logger().error(e)
+            Logger().error(str(e))
             return False
         
     def __deconnecte_interface_xenbus(self):

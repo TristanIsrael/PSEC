@@ -1,4 +1,4 @@
-from . import Constantes, Domaine, Parametres, Cles
+from . import Constantes, Parametres, Cles
 
 class RequestFactory():
     ''' La classe MessageFactory permet de générer les notification, commandes et

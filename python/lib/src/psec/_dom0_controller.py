@@ -1,5 +1,5 @@
 from . import Constantes
-from . import Domaine, Logger, InputsProxy, FichierHelper, Parametres, Cles
+from . import Logger, InputsProxy, FichierHelper, Parametres, Cles
 from . import ResponseFactory
 from . import MqttClient, Topics
 import threading

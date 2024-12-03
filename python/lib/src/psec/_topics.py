@@ -1,24 +1,31 @@
 class Topics():
+    # Groups
+    SYSTEM = "system"
+    DISKS = "{}/disks".format(SYSTEM)
+    MISC = "{}/misc".format(SYSTEM)
+    EVENTS = "{}/events".format(SYSTEM)
+    DISCOVER = "{}/discover".format(SYSTEM)
+    
     # Requests
-    LIST_DISKS = "system/disks/list_disks"
-    LIST_FILES = "system/disks/list_files"    
-    READ_FILE = "system/disks/read_file"
-    COPY_FILE = "system/disks/copy_file"
-    DELETE_FILE = "system/disks/delete_file"
-    BENCHMARK = "system/misc/benchmark"
-    FILE_FOOTPRINT = "system/disks/file_footprint"
-    CREATE_FILE = "system/disks/create_file"    
-    DISCOVER_MODULES = "system/modules/discover"
+    LIST_DISKS = "{}/list_disks".format(DISKS)
+    LIST_FILES = "{}/list_files".format(DISKS)
+    READ_FILE = "{}/read_file".format(DISKS)
+    COPY_FILE = "{}/copy_file".format(DISKS)
+    DELETE_FILE = "{}/delete_file".format(DISKS)
+    BENCHMARK = "{}/benchmark".format(MISC)
+    FILE_FOOTPRINT = "{}/file_footprint".format(DISKS)
+    CREATE_FILE = "{}/create_file".format(DISKS)
+    DISCOVER_COMPONENTS = "{}/components".format(DISCOVER)
 
     # Notifications
-    NEW_FILE = "system/disks/new_file"
-    DISK_STATE = "system/disks/state"
+    NEW_FILE = "{}/new_file".format(DISKS)
+    DISK_STATE = "{}/state".format(DISKS)
 
     # Miscelaneous
     KEEPALIVE = "mics/ping"
 
     # Logging
-    ERROR = "system/events/error"
-    WARNING = "system/events/warning"
-    INFO = "system/events/info"
-    DEBUG = "system/events/debug"
+    ERROR = "{}/error".format(EVENTS)
+    WARNING = "{}/warning".format(EVENTS)
+    INFO = "{}/info".format(EVENTS)
+    DEBUG = "{}/debug".format(EVENTS)

@@ -1,12 +1,15 @@
+from enum import StrEnum
 import os, time, serial, json, threading, atexit, socket
+from typing import Literal, Callable, Optional
 import paho.mqtt.client as mqtt
 from . import Topics
 from paho.mqtt import client
-from paho.mqtt.client import CallbackAPIVersion, MQTTErrorCode
+from paho.mqtt.enums import CallbackAPIVersion, MQTTErrorCode
 
 DEBUG = False
+TYPE_CHECKING = True
 
-class ConnectionType():
+class ConnectionType(StrEnum):
     UNIX_SOCKET = "unix_socket"
     SERIAL_PORT = "serial_port"
     TCP_DEBUG = "tcp"
@@ -39,7 +42,10 @@ class SerialSocket():
     def send(self, buffer: bytes) -> int:        
         if self.serial is not None and self.serial.is_open:
             #print("send:{}".format(buffer))
-            return self.serial.write(buffer)
+            sent = self.serial.write(buffer)
+            return sent if sent is not None else 0
+        
+        return 0
 
     def close(self) -> None:        
         print("Close serial port")
@@ -55,7 +61,7 @@ class SerialSocket():
         pass
     
 class SerialMQTTClient(mqtt.Client):
-    sock_:SerialSocket = None
+    sock_:SerialSocket
 
     def __init__(self, path:str, baudrate:int, *args, **kwargs):
         super().__init__(callback_api_version=CallbackAPIVersion.VERSION2, *args, **kwargs)
@@ -66,11 +72,13 @@ class SerialMQTTClient(mqtt.Client):
         if self.sock_ is not None:
             self.sock_.close()        
     
-    def loop_start(self):   
+    def loop_start(self) -> MQTTErrorCode:   
         self._thread_terminate = False
         self._thread = threading.Thread(target=self.__do_loop)
         self._thread.daemon = True
         self._thread.start()
+
+        return MQTTErrorCode.MQTT_ERR_SUCCESS
 
     def __do_loop(self):
         rc = MQTTErrorCode.MQTT_ERR_SUCCESS
@@ -94,9 +102,13 @@ class SerialMQTTClient(mqtt.Client):
                         
         print("Loop ended")
 
-    def loop_stop(self):
+    def loop_stop(self) -> MQTTErrorCode:
         self._thread_terminate = True
-        self._thread.join()    
+        if self._thread is not None:
+            self._thread.join()
+            return MQTTErrorCode.MQTT_ERR_SUCCESS
+        else:
+            return MQTTErrorCode.MQTT_ERR_UNKNOWN
     
     def _create_socket(self):
         try:
@@ -106,14 +118,14 @@ class SerialMQTTClient(mqtt.Client):
             return self.sock_
         except:
             print("An error occured while opening the serial port")
-            return None    
+            return None
 
 class MqttClient():
     connection_type:ConnectionType = ConnectionType.UNIX_SOCKET
     connection_string:str = ""
     identifier:str = "unknown"
-    on_connected = None
-    on_message = None
+    on_connected: Optional[Callable[[], None]] = None
+    on_message: Optional[Callable[[str, dict], None]] = None
     connected = False
     is_starting = False    
 
@@ -179,13 +191,11 @@ class MqttClient():
     def publish(self, topic:str, payload:dict):
         self.mqtt_client.publish(topic=topic, payload=json.dumps(payload))
 
-    def __get_transport_type(self):
+    def __get_transport_type(self) -> Literal['tcp', 'unix']:
         if self.connection_type == ConnectionType.TCP_DEBUG:
             return "tcp"
-        elif self.connection_type == ConnectionType.UNIX_SOCKET:
-            return "unix"
-        
-        return "" 
+        else:
+            return "unix"                
      
     def __on_log(self, client, userdata, level, buf):
         print("[MQTT log]: {}".format(buf))
@@ -196,8 +206,9 @@ class MqttClient():
             try:
                 payload = json.loads(msg.payload.decode())
                 self.on_message(msg.topic, payload)
-            except:                
-                pass
+            except Exception as e:
+                print("Uncaught Exception when handling message:")
+                print(e)
         else:
             print("No message callback")
 

@@ -1,5 +1,5 @@
 import os.path, logging, json
-from . import SingletonMeta, Constantes, Cles, Domaine
+from . import SingletonMeta, Constantes, Cles
 
 class Parametres(metaclass=SingletonMeta):
     """Classe permettant de gérer les paramètres du système"""    
@@ -56,14 +56,7 @@ class Parametres(metaclass=SingletonMeta):
                 return None
 
     def set_parametre(self, cle, valeur):
-        self.params[cle] = valeur
-
-    def identifiant_domaine(self):
-        try:
-            return self.params[Cles.IDENTIFIANT_DOMAINE]
-        except KeyError:
-            print("AVERTISSEMENT : l'identifiant du domaine n'est pas défini.")
-            return Domaine.INDEFINI
+        self.params[cle] = valeur    
         
     @staticmethod
     def niveau_journalisation_from_string(niveau):

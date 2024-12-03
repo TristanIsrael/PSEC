@@ -1,4 +1,4 @@
-from . import Constantes, Domaine, Parametres, Cles, EtatComposant, BenchmarkId
+from . import EtatComposant, BenchmarkId
 
 class ResponseFactory():
     """ La classe ResponseFactory permet de générer les messages en réponse à certaines commandes.    

@@ -50,11 +50,11 @@ class FichierHelper():
 
         print("Récupération de la liste des fichiers pour le point de montage {}".format(chemin))
         fichiers = []
-        FichierHelper.__get_folder_contents(chemin, fichiers, len(chemin))
+        FichierHelper.get_folder_contents(chemin, fichiers, len(chemin))
         return fichiers
        
     @staticmethod
-    def __get_folder_contents(chemin, liste, decoupage = 0):
+    def get_folder_contents(chemin:str, liste:list, decoupage:int = 0):
         with os.scandir(chemin) as entrees:
             for entree in entrees:
                 filepath = chemin[decoupage:]
@@ -76,7 +76,7 @@ class FichierHelper():
                     }
 
                     liste.append(entryDict)
-                    FichierHelper.__get_folder_contents(entree.path, liste, decoupage)
+                    FichierHelper.get_folder_contents(entree.path, liste, decoupage)
 
     @staticmethod
     def split_filepath(file_path:str) -> tuple[str, str]:
@@ -100,6 +100,8 @@ class FichierHelper():
         except Exception as e:
             print("Erreur")
             print(e)
+
+        return ""
         
     @staticmethod
     def copy_file(source_filepath:str, destination_folder:str, footprint:str):

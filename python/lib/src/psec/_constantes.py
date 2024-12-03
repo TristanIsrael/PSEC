@@ -30,30 +30,6 @@ class Cles:
     MQTT_LOG_SOCKET_FILTER = "mqtt_log_socket_filter"
     XEN_SOCKETS_PATH = "xen_sockets_path"
 
-class EtatDomu:
-    INCONNU = 0
-    DEMARRE = 1
-    ARRETE = 2
-
-class EtatDisque:
-    INCONNU = "inconnu"
-    PRESENT = "présent"
-    ABSENT = "absent"
-
-class EtatFichier:
-     DISPONIBLE = "disponible"
-     ERREUR = "erreur"
-     COPIE = "copié"
-     SUPPRIME = "supprimé"
-
-class Domaine:
-    """Classe définissant le type de domaine (DomU ou Dom0)"""
-    INDEFINI = "indefini"
-    DOM0 = "Dom0"
-    SYS_USB = "sys-usb"
-    GUI = "gui"
-    TOUS = "tous"
-
 class TypeEntree():
     INDEFINI = "indefini"
     SOURIS = "souris"
@@ -71,11 +47,10 @@ class BenchmarkId():
     FILES = "files"
 
 class EtatComposant():
-    INCONNU = "inconnu"
-    DEMARRAGE = "demarrage"
-    OK = "ok"
-    ERREUR_SYSTEME = "erreur_systeme"
-    ERREUR_LOGICIELLE = "erreur_logicielle"    
+    UNKNOWN = "unknown"
+    STARTING = "starting"
+    READY = "ready"
+    ERROR = "error"
 
 class Constantes(metaclass=SingletonMeta):
     """Classe définissant des constantes pour le système"""        
@@ -122,3 +97,6 @@ class Constantes(metaclass=SingletonMeta):
         
     REPOSITORY = "__repository__"
     FOOTPRINT_METHOD = "md5"
+    PSEC_DISK_CONTROLLER = "psec_disk_controller"
+    PSEC_INPUT_CONTROLLER = "psec_input_controller"
+    PSEC_IO_BENCHMARK = "psec_io_benchmark"

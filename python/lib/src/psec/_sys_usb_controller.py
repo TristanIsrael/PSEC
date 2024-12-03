@@ -13,10 +13,6 @@ from . import NotificationFactory, FichierHelper
 import logging, threading, os, base64
 from pathlib import Path
 
-PSEC_DISK_CONTROLLER = "psec_disk_controller"
-PSEC_INPUT_CONTROLLER = "psec_input_controller"
-PSEC_IO_BENCHMARK = "psec_io_benchmark"
-
 class SysUsbController():
     """ Cette classe traite les messages échangés par la sys-usb avec le Dom0 ou les autres domaines. """
 
@@ -58,7 +54,7 @@ class SysUsbController():
         threading.Thread(target=self.disk_monitor.start).start()        
 
     def __on_mqtt_message(self, topic:str, payload:dict):
-        Logger().debug("Message received : topic={}, payload={}".format(topic, payload))
+        #Logger().debug("Message received : topic={}, payload={}".format(topic, payload))
 
         threading.Thread(target=self.__message_worker, args=(topic, payload,)).start()
 
@@ -85,8 +81,8 @@ class SysUsbController():
             self.__handle_file_footprint(base_topic, payload)
         elif base_topic == Topics.CREATE_FILE:            
             self.__handle_create_file(base_topic, payload)
-        elif base_topic == Topics.DISCOVER_MODULES:
-            self.__handle_discover_modules(base_topic)
+        elif base_topic == Topics.DISCOVER_COMPONENTS:
+            self.__handle_discover_components(base_topic, payload)
 
     ####
     # Traitement des commandes
@@ -280,12 +276,12 @@ class SysUsbController():
         response = ResponseFactory.create_response_create_file(filepath, disk, footprint, True)
         self.mqtt_client.publish("{}/response".format(topic), response)
 
-    def __handle_discover_modules(self, topic:str, payload:dict) -> None:
+    def __handle_discover_components(self, topic:str, payload:dict) -> None:
         response = {
-            "modules": [
-                { "id": PSEC_DISK_CONTROLLER, "label": "System disk controller" },
-                { "id": PSEC_INPUT_CONTROLLER, "label": "Input controller" },
-                { "id": PSEC_IO_BENCHMARK, "label": "System I/O benchmark" }
+            "components": [
+                { "id": Constantes.PSEC_DISK_CONTROLLER, "label": "System disk controller", "type": "core" },
+                { "id": Constantes.PSEC_INPUT_CONTROLLER, "label": "Input controller", "type": "core" },
+                { "id": Constantes.PSEC_IO_BENCHMARK, "label": "System I/O benchmark", "type": "core" }
             ]
         }
 

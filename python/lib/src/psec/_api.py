@@ -58,7 +58,7 @@ class Api(metaclass=SingletonMeta):
 
     def add_ready_callback(self, callback_fn):
         if callback_fn is not None:
-            self.ready_callbacks.append(callback_fn)
+            self.ready_callbacks.append(callback_fn)            
         else:
             print("WARNING: ready callback function is None")
 
@@ -116,8 +116,14 @@ class Api(metaclass=SingletonMeta):
         payload = RequestFactory.create_request_create_file(filepath, disk, contents)
         self.mqtt_client.publish("{}/request".format(Topics.CREATE_FILE), payload)
 
-    def discover_modules(self) -> None:        
-        self.mqtt_client.publish("{}/request".format(Topics.DISCOVER_MODULES), {})
+    def discover_components(self) -> None:        
+        self.mqtt_client.publish("{}/request".format(Topics.DISCOVER_COMPONENTS), {})
+
+    def publish_components(self, components:list) -> None:        
+        payload = {
+            "components": components
+        }
+        self.mqtt_client.publish("{}/response".format(Topics.DISCOVER_COMPONENTS), payload)
 
     ####
     # Fonctions de notification
@@ -130,15 +136,18 @@ class Api(metaclass=SingletonMeta):
         payload = NotificationFactory.create_notification_disk_state(disk, "diconnected")
         self.mqtt_client.publish("{}".format(Topics.DISK_STATE), payload)
 
+    def publish(self, topic:str, payload:dict):
+        self.mqtt_client.publish(topic, payload)
+
     ####
     # Fonctions privées
     #    
     def __on_mqtt_connected(self):
         Logger().setup("Api", self.mqtt_client)
-        self.mqtt_client.subscribe("system/disks/+/response")
-        self.mqtt_client.subscribe("system/misc/+/response")
-        self.mqtt_client.subscribe("system/modules/+/response")
-        self.mqtt_client.subscribe("system/disks/+")
+        self.mqtt_client.subscribe("{}/+".format(Topics.DISKS))
+        self.mqtt_client.subscribe("{}/+/response".format(Topics.DISKS))
+        self.mqtt_client.subscribe("{}/+/response".format(Topics.MISC))
+        self.mqtt_client.subscribe("{}/+/response".format(Topics.DISCOVER))        
 
         for cb in self.ready_callbacks:
             cb()

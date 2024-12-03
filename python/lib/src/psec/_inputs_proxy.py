@@ -1,5 +1,5 @@
 import threading, time, glob, socket, os
-from . import MqttClient, Logger, Parametres, Cles, Domaine, SingletonMeta
+from . import MqttClient, Logger, Parametres, Cles, SingletonMeta
 
 class InputsProxy(metaclass=SingletonMeta):
     """! La classe InputsProxy agit comme un proxy pour les informations sur les périphériques
@@ -18,7 +18,6 @@ class InputsProxy(metaclass=SingletonMeta):
 
     sys_gui_socket = None
     sys_usb_socket = None
-    domaine_gui = Domaine.INDEFINI
 
     def __init__(self, mqtt_client:MqttClient):
         Logger().setup("IO Proxy", mqtt_client)
