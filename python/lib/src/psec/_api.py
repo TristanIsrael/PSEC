@@ -23,9 +23,10 @@ class Api(metaclass=SingletonMeta):
     callback est la suivante : callback(message : Message) -> None
     """
 
-    ready_callbacks = list()
-    message_callbacks = list()
-    sock = None
+    __ready_callbacks = list()
+    __message_callbacks = list()
+    #__sock = None
+    __subscriptions = list()
 
     def start(self, mqtt_client:MqttClient):
         self.mqtt_client = mqtt_client
@@ -52,18 +53,19 @@ class Api(metaclass=SingletonMeta):
 
     def add_message_callback(self, callback_fn):
         if callback_fn is not None:
-            self.message_callbacks.append(callback_fn)
+            self.__message_callbacks.append(callback_fn)
         else:
             print("WARNING: message callback function is None")
 
     def add_ready_callback(self, callback_fn):
         if callback_fn is not None:
-            self.ready_callbacks.append(callback_fn)            
+            self.__ready_callbacks.append(callback_fn)            
         else:
             print("WARNING: ready callback function is None")
 
     def subscribe(self, topic:str):
-        self.mqtt_client.subscribe(topic)
+        if not topic in self.__subscriptions:
+            self.mqtt_client.subscribe(topic)
 
     ####
     # Fonctions de journalisation
@@ -144,14 +146,14 @@ class Api(metaclass=SingletonMeta):
     #    
     def __on_mqtt_connected(self):
         Logger().setup("Api", self.mqtt_client)
-        self.mqtt_client.subscribe("{}/+".format(Topics.DISKS))
-        self.mqtt_client.subscribe("{}/+/response".format(Topics.DISKS))
-        self.mqtt_client.subscribe("{}/+/response".format(Topics.MISC))
-        self.mqtt_client.subscribe("{}/+/response".format(Topics.DISCOVER))        
+        self.subscribe("{}/+".format(Topics.DISKS))
+        self.subscribe("{}/+/response".format(Topics.DISKS))
+        self.subscribe("{}/+/response".format(Topics.MISC))
+        self.subscribe("{}/+/response".format(Topics.DISCOVER))        
 
-        for cb in self.ready_callbacks:
+        for cb in self.__ready_callbacks:
             cb()
 
     def __on_message_received(self, topic:str, payload:dict):        
-        for cb in self.message_callbacks:
+        for cb in self.__message_callbacks:
             cb(topic, payload)

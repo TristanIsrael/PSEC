@@ -57,6 +57,9 @@ class FichierHelper():
     def get_folder_contents(chemin:str, liste:list, decoupage:int = 0):
         with os.scandir(chemin) as entrees:
             for entree in entrees:
+                if entree.is_symlink():
+                    continue
+                
                 filepath = chemin[decoupage:]
                 filename = entree.name
                 if entree.is_file():                    
@@ -122,7 +125,7 @@ class FichierHelper():
 
     @staticmethod
     def copy_file_to_repository(source_filepath:str, footprint:str):
-        repository_path = str(Parametres().parametre(Cles.CHEMIN_DEPOT_DOMU))
+        repository_path = str(Parametres().parametre(Cles.STORAGE_PATH_DOMU))
         FichierHelper.copy_file(source_filepath, repository_path, footprint)
 
     @staticmethod

@@ -19,8 +19,7 @@ class Cles:
     ACTIVE_JOURNAL_LOCAL = "active_journal_local"
     NOM_DOMAINE_GUI = "nom_domaine_gui"
     BENCHMARK_INPUTS_ITERATIONS = "benchmark_inputs_iterations"
-    CHEMIN_DEPOT_DOM0 = "chemin_depot_dom0"
-    CHEMIN_DEPOT_DOMU = "chemin_depot_domu"    
+    CHEMIN_DEPOT_DOM0 = "chemin_depot_dom0"        
 
     SERIAL_PORT_MSG = "serial_port_msg"
     SERIAL_PORT_LOG = "serial_port_log"
@@ -29,6 +28,7 @@ class Cles:
     MQTT_MSG_SOCKET_FILTER = "mqtt_msg_socket_filter"
     MQTT_LOG_SOCKET_FILTER = "mqtt_log_socket_filter"
     XEN_SOCKETS_PATH = "xen_sockets_path"
+    STORAGE_PATH_DOMU = "storage_path_domu"
 
 class TypeEntree():
     INDEFINI = "indefini"
@@ -85,7 +85,7 @@ class Constantes(metaclass=SingletonMeta):
         Cles.NOM_DOMAINE_GUI: "sys-gui",
         Cles.BENCHMARK_INPUTS_ITERATIONS: 1000,
         Cles.CHEMIN_DEPOT_DOM0: "/usr/lib/psec/storage",
-        Cles.CHEMIN_DEPOT_DOMU: "/mnt/storage"
+        Cles.STORAGE_PATH_DOMU: "/mnt/storage"
     }                
 
     def constante(self, cle):

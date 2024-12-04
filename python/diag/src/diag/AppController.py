@@ -133,7 +133,7 @@ class AppController(QObject):
 
             # 1 - Création d'un fichier sur le support USB            
             Api().info("Création d'un fichier aléatoire", "AppController")
-            repository_path = Parametres().parametre(Cles.CHEMIN_DEPOT_DOMU)
+            repository_path = Parametres().parametre(Cles.STORAGE_PATH_DOMU)
             filepath = '/test_file'.format(repository_path)                    
             contents = os.urandom(1024*1024)
 
