@@ -6,17 +6,17 @@ except Exception as e:
     print("La classe KeymapFR ne sera pas disponible")
     print(e)
 from ._topics import Topics
+from ._mqtt_helper import MqttHelper
 from ._mqtt_client import MqttClient, ConnectionType, SerialMQTTClient
-from ._logger import Logger
 from ._parametres import Parametres, Cles
 from ._request_factory import RequestFactory
 from ._notification_factory import NotificationFactory
+from ._logger import Logger
 from ._fichier_helper import FichierHelper
 from ._response_factory import ResponseFactory
 from ._disk_monitor import DiskMonitor
 from ._mouse import Mouse, MouseButton, MouseWheel, MouseMove
 from ._tasks_runner import TaskRunner
-from ._mqtt_factory import MqttFactory
 try:
     from ._demon_inputs import DemonInputs          
     from ._controleur_benchmark import ControleurBenchmark  
@@ -27,8 +27,8 @@ from ._api import Api
 from ._inputs_proxy import InputsProxy
 from ._dom0_controller import Dom0Controller
 from ._sys_usb_controller import SysUsbController
-from ._mqtt_helper import MqttHelper
 from ._components_helper import ComponentsHelper
+from ._mqtt_factory import MqttFactory
 
 import logging
 from logging import NullHandler

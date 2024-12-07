@@ -44,7 +44,7 @@ class Dom0Controller():
         if topic == Topics.LIST_FILES:
             self.__handle_list_files(topic, payload)
         elif topic == Topics.FILE_FOOTPRINT:
-            self.__handle_file_footprint(payload)
+            self.__handle_file_footprint(topic, payload)
 
     def __handle_list_files(self, topic:str, payload:dict) -> None:
         if not self.__is_storage_request(payload):

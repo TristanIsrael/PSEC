@@ -41,7 +41,7 @@ Exemple :
 
 Cela permet une communication *unicast* entre le demandeur et la VM qui va traiter cette demande (à savoir sys-usb) qui va répondre en précisant dans le topic l'identifiant du demandeur à qui la réponse est destinée, mais également une communication *multicast* permettant aux autres VM intéressées par la réponse de la recevoir en s'abonnant au même topic en réduisant le filtrage.
 
-Liste des topics
+Liste des commandes
 
 | Commande MVP | Topic racine* | Payload commande | Description commande | Payload réponse | Description réponse |
 |--|--|--|--|--|--|
@@ -52,8 +52,10 @@ Liste des topics
 | TypeCommande.SUPPRIME_FICHIER | `system/disks/remove_file` | `{ 'disk': 'nom', 'filepath': 'path' }` | Demande la suppression d'un fichier d'un disque | `{ 'status': 'ok\|error' }` | |
 | TypeCommande.START_BENCHMARK | `system/misc/benchmark` | `{ 'module': '' }` | Demande le démarrage du processus de calcul des performances du système | `{ 'status': 'started\|error\|finished' }` | | 
 | TypeCommande.GET_FILE_FOOTPRINT | `system/disks/get_file_footprint` | `{ 'disk': 'nom', 'filepath': 'path' }` | Demande l'empreinte numérique d'un fichier | `{ 'footprint': 'xxxx' }` | |
-| TypeCommande.CREATE_FILE | `system/disks/create_file` | `{ 'disk': 'nom', 'filepath': 'path', 'data': 'contenu' }` | Demande la création d'un fichier sur un disque | `{ 'status': 'ok\|error' }` | |
+| TypeCommande.CREATE_FILE | `system/disks/create_file` | `{ 'disk': 'nom', 'filepath': 'path', 'data': 'contenu', 'compressed': bool }` | Demande la création d'un fichier sur un disque | `{ 'status': 'ok\|error' }` | |
 | TypeCommande.LISTE_COMPOSANTS | `system/components/discover` | `{}` | Demande la liste des composants du système | `{ 'components': [ { 'id': '', 'label': '', 'type': '' } ] }` | L'association entre un composant et le client est faite grâce à l'identifiant fournit dans le suffixe du topic |
+| N/A | `system/events/set_loglevel` | `{ "level": "debug\|info\|warn\|error\|critical" }` | Définit le niveau de journalisation pour l'ensemble du système | Aucune | |
+| N/A | `system/events/save_log` | `{ "disk": "", "filename": "" }` | Enregistre le journal sur le disque | Aucune | |
 
 (*) la racine du topic doit être complétée par le suffixe de commande (`/request`) ou de réponse (`/response`).
 

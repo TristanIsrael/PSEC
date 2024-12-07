@@ -1,6 +1,6 @@
 from . import Constantes, Parametres, MqttClient, Topics
 from . import FichierHelper, ResponseFactory
-from . import Logger, Cles, BenchmarkId, MqttClient, DiskMonitor
+from . import Logger, Cles, BenchmarkId, MqttClient, DiskMonitor, MqttHelper
 from . import TaskRunner
 try:
     from . import DemonInputs
@@ -10,7 +10,7 @@ except:
     NO_INPUTS_MONITORING = True
     print("Importing ControleurVmSysUsb without inputs monitoring nor benchmarking capacity")
 from . import NotificationFactory, FichierHelper
-import logging, threading, os, base64
+import threading, os, base64, zlib
 from pathlib import Path
 
 class SysUsbController():
@@ -237,25 +237,29 @@ class SysUsbController():
 
 
     def __handle_create_file(self, topic:str, payload:dict):
-        disk = payload.get("disk")
-        filepath = payload.get("filepath")
-        base64_data = payload.get("data")
+        disk = payload.get("disk", "")
+        filepath = payload.get("filepath", "")
+        base64_data = payload.get("data", "")
 
-        if disk is not None and disk == Constantes.REPOSITORY:
+        if not MqttHelper.check_payload(payload, ["disk", "filepath", "data"]):
+            Logger().error("Missing argument in the create_file command")
+            return
+
+        if disk == Constantes.REPOSITORY:
             # Ignored
             return
 
-        if disk is None:
-            Logger().error("Argument missing: disk. Topic is {}".format(topic))
-            return        
-        
-        if filepath is None:
-            Logger().error("Argument missing: filepath. Topic is {}".format(topic))
-            return
+        decoded = base64.b64decode(base64_data)
+
+        # Check if data were compressed, and uncompress if needed
+        compressed = payload.get("compressed", False)
+        if compressed:
+            data = zlib.decompress(decoded)
+        else:
+            data = decoded
 
         mount_point = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)        
-        complete_filepath = "{}/{}/{}".format(mount_point, disk, filepath)
-        data = base64.b64decode(base64_data)
+        complete_filepath = "{}/{}/{}".format(mount_point, disk, filepath)        
         
         Logger().debug("Create a file {} of size {} octets on disk {}".format(filepath, len(data), disk))
 
@@ -265,7 +269,7 @@ class SysUsbController():
             f.close()            
         except Exception as e:
             Logger().error("An error occured while writing to file {}".format(complete_filepath))
-            Logger().error(e)
+            Logger().error(str(e))
             
             response = ResponseFactory.create_response_create_file(filepath, disk, "", False)
             self.mqtt_client.publish("{}/response".format(topic), response)
@@ -273,7 +277,7 @@ class SysUsbController():
 
         # On envoie la notification de succès
         footprint = FichierHelper.calculate_footprint(complete_filepath)
-        response = ResponseFactory.create_response_create_file(filepath, disk, footprint, True)
+        response = ResponseFactory.create_response_create_file(complete_filepath, disk, footprint, True)
         self.mqtt_client.publish("{}/response".format(topic), response)
 
     def __handle_discover_components(self, topic:str, payload:dict) -> None:

@@ -126,8 +126,10 @@ class MqttClient():
     identifier:str = "unknown"
     on_connected: Optional[Callable[[], None]] = None
     on_message: Optional[Callable[[str, dict], None]] = None
+    __message_callbacks = list()
+    __connected_callbacks = list()
     connected = False
-    is_starting = False    
+    is_starting = False
 
     def __init__(self, identifier:str, connection_type:ConnectionType = ConnectionType.UNIX_SOCKET, connection_string:str = ""):
         self.identifier = identifier
@@ -174,6 +176,12 @@ class MqttClient():
             print("The connection type {} is not handled".format(self.connection_type))
             return        
 
+    def add_connected_callback(self, callback):
+        self.__connected_callbacks.append(callback)
+
+    def add_message_callback(self, callback):
+        self.__message_callbacks.append(callback)
+
     def stop(self):
         if self.mqtt_client is not None:
             print("Quit Mqtt client")
@@ -202,15 +210,16 @@ class MqttClient():
     
     def __on_message(self, client:mqtt.Client, userdata, msg:mqtt.MQTTMessage):
         #print(f"[{userdata}] Message reçu sur {msg.topic}: {msg.payload.decode()}")
-        if self.on_message is not None:
-            try:
-                payload = json.loads(msg.payload.decode())
+        try:
+            payload = json.loads(msg.payload.decode())
+            if self.on_message is not None:
                 self.on_message(msg.topic, payload)
-            except Exception as e:
-                print("Uncaught Exception when handling message:")
-                print(e)
-        else:
-            print("No message callback")
+
+            for cb in self.__message_callbacks:
+                cb(msg.topic, payload)
+        except Exception as e:
+            print("Uncaught Exception when handling message:")
+            print(e)        
 
     def __on_connected(self, client:mqtt.Client, userdata, connect_flags, reason_code, properties):
         print("Connected to the MQTT broker")
@@ -218,6 +227,9 @@ class MqttClient():
         
         if self.on_connected is not None:
             self.on_connected()
+
+        for cb in self.__connected_callbacks:
+            cb()
     
         #if self.connection_type == ConnectionType.SERIAL_PORT:
         #    threading.Timer(interval=self.mqtt_client._keepalive, function=self.__keepalive).start()

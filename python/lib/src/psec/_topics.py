@@ -29,3 +29,5 @@ class Topics():
     WARNING = "{}/warning".format(EVENTS)
     INFO = "{}/info".format(EVENTS)
     DEBUG = "{}/debug".format(EVENTS)
+    SET_LOGLEVEL = "{}/set_loglevel".format(EVENTS)
+    SAVE_LOG = "{}/save_log".format(EVENTS)

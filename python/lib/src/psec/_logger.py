@@ -1,57 +1,100 @@
-from . import MqttClient, SingletonMeta
-import os
+from . import MqttClient, SingletonMeta, Topics, MqttHelper, RequestFactory
+import os, zlib, base64, logging
 from datetime import datetime
 
-class Logger(metaclass=SingletonMeta):
-    is_setup = False
+class FileHandler:
+    def __init__(self, file_path, mode='w'):
+        self.file_path = file_path
+        self.mode = mode
+        self.file = open(self.file_path, self.mode)
+        print(f"File {self.file_path} opened in {self.mode} mode.")
 
-    def setup(self, module_name:str, mqtt_client:MqttClient):
-        if self.is_setup:
+    def __del__(self):
+        if self.file and not self.file.closed:
+            self.file.close()
+            Logger().debug(f"File {self.file_path} closed.")
+
+    def write(self, data):
+        if 'w' in self.mode or 'a' in self.mode and self.file is not None:
+            self.file.write(data)
+        else:
+            Logger().error("File not opened in write mode.")
+
+    def flush(self):
+        if self.file is not None:
+            self.file.flush()
+
+    def read(self):
+        if 'r' in self.mode and self.file is not None:
+            return self.file.read()
+        else:
+            Logger().error("File not opened in read mode.")
+
+class Logger(metaclass=SingletonMeta):
+    __is_setup = False
+    __is_recording = False
+    __log_level = logging.INFO
+    __logfile = None
+
+    def setup(self, module_name:str, mqtt_client:MqttClient, log_level:int = logging.INFO, recording:bool=False, filename:str="/var/log/psec.log"):
+        if self.__is_setup:
             return
         
         self.domain_name = os.uname().nodename
         self.module_name = module_name
         self.mqtt_client = mqtt_client
-        self.is_setup = True
+
+        self.mqtt_client.add_connected_callback(self.__on_connected)        
+        self.mqtt_client.add_message_callback(self.__on_message)
+
+        self.__is_recording = recording        
+        self.__filename = filename
+
+        # We open the log file
+        if recording and self.__logfile is None:
+
+            self.__open_log_file()
+
+        self.__is_setup = True    
 
     def critical(self, description:str, module:str = ""):
-        if not self.is_setup:
+        if not self.__is_setup:
             return
         payload = self.__create_event(module, description)
         self.mqtt_client.publish("system/events/critical", payload)
 
     def error(self, description:str, module:str = ""):
-        if not self.is_setup:
+        if not self.__is_setup:
             return
         payload = self.__create_event(module, description)
         self.mqtt_client.publish("system/events/error", payload)
 
     def warning(self, description:str, module:str = ""):
-        if not self.is_setup:
+        if not self.__is_setup:
             return
         payload = self.__create_event(module, description)
         self.mqtt_client.publish("system/events/warning", payload)
 
     def warn(self, description:str, module:str = ""):
-        if not self.is_setup:
+        if not self.__is_setup:
             return
         self.warning(description, module)
 
     def info(self, description:str, module:str = ""):
-        if not self.is_setup:
+        if not self.__is_setup:
             return
         payload = self.__create_event(module, description)
         self.mqtt_client.publish("system/events/info", payload)
 
     def debug(self, description:str, module:str = ""):
-        if not self.is_setup:
+        if not self.__is_setup:
             return
         payload = self.__create_event(module, description)
         self.mqtt_client.publish("system/events/debug", payload)
 
     def __create_event(self, module:str, description:str) -> dict :
-        if not self.is_setup:
-            return
+        if not self.__is_setup:
+            return {}
         
         now = datetime.now()
         dt = now.strftime(f"%Y-%m-%d %H:%M:%S.{now.microsecond // 1000:03d}")
@@ -64,3 +107,83 @@ class Logger(metaclass=SingletonMeta):
         }
 
         return payload
+    
+    def __on_connected(self):
+        if self.__is_recording:
+            # We open the log file
+            if self.__logfile is None:
+                self.__open_log_file()
+
+            self.mqtt_client.subscribe("{}/#".format(Topics.EVENTS))        
+
+    def __on_message(self, topic:str, payload:dict):
+        if topic == Topics.SET_LOGLEVEL:
+            self.__log_level = payload.get("level", "info")
+        elif topic == Topics.SAVE_LOG and self.__is_recording:
+            if not MqttHelper.check_payload(payload, ["disk", "filename"]):
+                self.error("Missing required arguments: disk, filename")
+                return
+            
+            disk = payload.get("disk", "")
+            filename = payload.get("filename", "logfile.txt")
+            # Prepend filename with a / if needed
+            if not filename.startswith("/"):
+                filename = "/"+filename
+            
+            self.info("Copying the log file to {}:{}".format(disk, filename))
+            
+            # Read all the data
+            with open(self.__filename, "rb") as file:
+                content = file.read()
+
+            # Compress the data
+            compressed_data = zlib.compress(content, level=1)  # 1-9
+
+            # Create the file
+            request = RequestFactory.create_request_create_file(filename, disk, base64.b64encode(compressed_data), True)
+            self.mqtt_client.publish("{}/request".format(Topics.CREATE_FILE), request)
+             
+        elif self.__is_recording:
+            # Log message
+            self.__write_log(topic, payload)
+
+    def __write_log(self, topic:str, payload:dict):
+        if not self.__is_recording or self.__logfile is None:
+            return
+        
+        loglevel = "UNKNOWN"
+        logtxt = ""
+
+        # Extract the log level
+        spl = topic.split("/")
+        if len(spl) == 0:
+            return        
+        spl.reverse()
+        loglevel = spl[0]
+
+        if self.__log_level > self.__loglevel_value(loglevel):
+            return
+
+        # Craft the log text
+        # Fields are: module, datetime, level, description
+        logtxt = "[{}] [{}] {} - {}\n".format(payload.get("datetime"), loglevel, payload.get("module"), payload.get("description"))
+        #print(logtxt)
+        self.__logfile.write(logtxt)        
+        self.__logfile.flush()
+        
+    def __open_log_file(self):
+        self.__logfile = FileHandler(self.__filename, 'a') 
+
+    def __loglevel_value(self, level:str) -> int:
+        if level == "debug":
+            return logging.DEBUG
+        elif level == "info":
+            return logging.INFO
+        elif level == "warn" or level == "warning":
+            return logging.WARN
+        elif level == "error":
+            return logging.WARN
+        elif level == "critical":
+            return logging.CRITICAL
+        
+        return logging.NOTSET

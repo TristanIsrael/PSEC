@@ -82,9 +82,10 @@ class RequestFactory():
         }        
     
     @staticmethod
-    def create_request_create_file(filepath:str, disk:str, contents:bytes) -> dict:
+    def create_request_create_file(filepath:str, disk:str, contents:bytes, compressed:bool=False) -> dict:
         return {
             "filepath": filepath,
             "disk": disk,
-            "contents": contents
+            "contents": contents.decode("utf-8"),
+            "compressed": compressed
         }    
