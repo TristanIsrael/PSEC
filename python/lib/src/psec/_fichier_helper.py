@@ -1,4 +1,4 @@
-from . import Parametres, Cles, Constantes
+from . import Parametres, Cles, Constantes, Logger
 from pathlib import Path
 import os, hashlib, subprocess
 
@@ -25,7 +25,7 @@ class FichierHelper():
         return disques
 
     @staticmethod
-    def get_files_list(disk) -> list:
+    def get_files_list(disk:str, recursive:bool, from_dir:str="") -> list:
         """ Cette fonction renvoie l'arborescence complète d'un point de montage
         
             Le chemin utilisé est constitué par la concaténation du paramètre CHEMIN_MONTAGE_USB et 
@@ -50,17 +50,17 @@ class FichierHelper():
 
         print("Récupération de la liste des fichiers pour le point de montage {}".format(chemin))
         fichiers = []
-        FichierHelper.get_folder_contents(chemin, fichiers, len(chemin))
+        FichierHelper.get_folder_contents(chemin, fichiers, len(chemin), recursive, from_dir)
         return fichiers
        
     @staticmethod
-    def get_folder_contents(chemin:str, liste:list, decoupage:int = 0):
-        with os.scandir(chemin) as entrees:
+    def get_folder_contents(chemin:str, liste:list, decoupage:int = 0, recursif:bool = False, from_dir:str = ""):
+        with os.scandir("{}{}".format(chemin, from_dir)) as entrees:
             for entree in entrees:
                 if entree.is_symlink():
                     continue
                 
-                filepath = chemin[decoupage:]
+                filepath = "{}{}".format(chemin[decoupage:], from_dir)
                 filename = entree.name
                 if entree.is_file():                    
                     entryDict = {
@@ -79,7 +79,10 @@ class FichierHelper():
                     }
 
                     liste.append(entryDict)
-                    FichierHelper.get_folder_contents(entree.path, liste, decoupage)
+
+                    if recursif:
+                        FichierHelper.get_folder_contents(entree.path, liste, decoupage, recursif)                    
+
 
     @staticmethod
     def split_filepath(file_path:str) -> tuple[str, str]:
@@ -107,7 +110,7 @@ class FichierHelper():
         return ""
         
     @staticmethod
-    def copy_file(source_filepath:str, destination_folder:str, footprint:str):
+    def copy_file(source_location:str, filepath:str, destination_folder:str, source_footprint:str) -> str:
         ''' Copie le fichier source_filepath dans le répertoire destination_folder
 
         Le répertoire de destination doit exister.
@@ -117,16 +120,28 @@ class FichierHelper():
         La fonction renvoie vrai si la copie s'est bien déroulée et que les empreintes coincident.
         '''
         
-        cmd = ['cp', source_filepath, destination_folder]
+        cmd = ['cp', "{}/{}".format(source_location, filepath), destination_folder]
         print("Exécution de la commande {}".format(cmd))
         
-        result = subprocess.run(cmd, check= True, shell= False)        
-        return result.returncode == 0
+        proc = subprocess.run(cmd, check= True, shell= False)        
+        if proc.returncode != 0:
+            Logger().debug("The file {} could not be copied to {}. Error: {}".format(filepath, destination_folder, proc.stderr))
+            return ""
+        else:
+            # Calculate the new file's footprint
+            destination_file = "{}{}".format(destination_folder, filepath)
+            dest_footprint = FichierHelper.calculate_footprint(destination_file)
+
+            if source_footprint == dest_footprint:
+                return dest_footprint
+            else:
+                Logger().debug("The file {} has been copied to {} but the footprints differ".format(filepath, destination_folder))
+                return ""
 
     @staticmethod
-    def copy_file_to_repository(source_filepath:str, footprint:str):
+    def copy_file_to_repository(source_location:str, filepath:str, footprint:str):
         repository_path = str(Parametres().parametre(Cles.STORAGE_PATH_DOMU))
-        FichierHelper.copy_file(source_filepath, repository_path, footprint)
+        FichierHelper.copy_file(source_location, filepath, repository_path, footprint)
 
     @staticmethod
     def create_file(filepath:str, size_ko:int):

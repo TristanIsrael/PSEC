@@ -47,8 +47,8 @@ Liste des commandes
 |--|--|--|--|--|--|
 | TypeCommande.LISTE_DISQUES | `system/disks/list_disks` | `{}` | Demande la liste des disques connectés au système | `{ 'disks': [ { 'label': 'nom', 'id': 'identifier' } ] }` | |
 | TypeCommande.LISTE_FICHIERS | `system/disks/list_files` | `{ 'disk': 'identifier' }`| Demande la liste des fichiers d'un disque | `{ 'disk': 'identifier', 'files': [ { 'path': 'path', 'size': 0; 'name': '', 'type': '[file\|folder]' } ] }` | |
-| TypeCommande.LIT_FICHIER | `system/disks/read_file` | `{ 'source_disk': 'nom', 'filepath': 'path' }` | Demande la mise à disposition d'un fichier dans le dépôt local | `{ 'status': 'ok\|error' }` | |
-| TypeCommande.COPIE_FICHIER | `system/disks/copy_file` | `{ 'source_disk': 'nom', 'filepath': 'path', 'target_disk': 'nom' }` | Demande la copie d'un fichier d'un disque vers un autre | `{ 'status': 'ok\|error' }` | |
+| TypeCommande.LIT_FICHIER | `system/disks/read_file` | `{ 'source_disk': 'nom', 'filepath': 'path' }` | Demande la mise à disposition d'un fichier dans le dépôt local | `{ 'status': 'ok\|error', 'footprint', '' }` | |
+| TypeCommande.COPIE_FICHIER | `system/disks/copy_file` | `{ 'source_disk': 'nom', 'filepath': 'path', 'target_disk': 'nom' }` | Demande la copie d'un fichier d'un disque vers un autre | `{ 'status': 'ok\|error', 'footprint': '' }` | |
 | TypeCommande.SUPPRIME_FICHIER | `system/disks/remove_file` | `{ 'disk': 'nom', 'filepath': 'path' }` | Demande la suppression d'un fichier d'un disque | `{ 'status': 'ok\|error' }` | |
 | TypeCommande.START_BENCHMARK | `system/misc/benchmark` | `{ 'module': '' }` | Demande le démarrage du processus de calcul des performances du système | `{ 'status': 'started\|error\|finished' }` | | 
 | TypeCommande.GET_FILE_FOOTPRINT | `system/disks/get_file_footprint` | `{ 'disk': 'nom', 'filepath': 'path' }` | Demande l'empreinte numérique d'un fichier | `{ 'footprint': 'xxxx' }` | |

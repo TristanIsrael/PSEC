@@ -91,8 +91,8 @@ class Api(metaclass=SingletonMeta):
     def get_disks_list(self):
         self.mqtt_client.publish("{}/request".format(Topics.LIST_DISKS), {})
 
-    def get_files_list(self, disk: str):
-        payload = RequestFactory.create_request_files_list(disk)
+    def get_files_list(self, disk: str, recursive:bool = False, from_dir:str = ""):
+        payload = RequestFactory.create_request_files_list(disk, recursive, from_dir)
         self.mqtt_client.publish("{}/request".format(Topics.LIST_FILES), payload)
 
     def read_file(self, disk:str, filepath:str):

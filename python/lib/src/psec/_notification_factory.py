@@ -15,10 +15,12 @@ class NotificationFactory:
         return payload
 
     @staticmethod
-    def create_notification_new_file(disk:str, filepath:str) -> dict:
+    def create_notification_new_file(disk:str, filepath:str, source_footprint:str, dest_footprint:str) -> dict:
         payload = {            
             "disk": disk,
-            "filepath": filepath
+            "filepath": filepath,
+            "source_footprint": source_footprint,
+            "dest_footprint": dest_footprint
         }
         
         return payload

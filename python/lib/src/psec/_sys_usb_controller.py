@@ -69,8 +69,7 @@ class SysUsbController():
         elif base_topic == Topics.LIST_FILES:
             self.__handle_list_files(base_topic, payload)
         elif base_topic == Topics.COPY_FILE:
-            Logger().error("File copy is not implemented")
-            #self.__lit_fichier(commande)
+            self.__handle_copy_file(base_topic, payload)
         elif base_topic == Topics.READ_FILE:
             self.__handle_read_file(base_topic, payload)
         elif base_topic == Topics.DELETE_FILE:
@@ -101,17 +100,19 @@ class SysUsbController():
 
     def __handle_list_files(self, topic:str, payload: dict) -> None:
         # Vérifie les arguments de la commande        
-        disk = payload.get("disk")
-        if disk is None:
-            # S'il manque un argument on envoie une erreur
-            Logger().error("Argument missing: disk. Topic is {}".format(topic))
+        if not MqttHelper.check_payload(payload, ["disk", "recursive", "from_dir"]):
+            Logger().error("Missing arguments for {}".format(topic))
             return
+
+        disk = payload.get("disk", "")
+        recursive = payload.get("recursive", False)
+        from_dir = payload.get("from_dir", "")
 
         if disk == Constantes.REPOSITORY:
             return
 
         # Récupère la liste des fichiers        
-        fichiers = FichierHelper.get_files_list(disk)
+        fichiers = FichierHelper.get_files_list(disk, recursive, from_dir)
 
         # Génère la réponse
         response = ResponseFactory.create_response_list_files(disk, fichiers)
@@ -127,63 +128,63 @@ class SysUsbController():
         # Les arguments de la commande sont :
         # - nom_fichier au format disk:filename
         # - nom_disque_destination
-        source_disk = payload.get("source_disk")        
-        filepath = payload.get("filepath")        
-
-        if source_disk is None:
-            Logger().error("Argument missing: source_disk. Topic is {}".format(topic))
+        if not MqttHelper.check_payload(payload, ["source_disk", "filepath"]):
+            Logger().error("Missing argument(s) for the command {}".format(topic))
             return
         
-        if filepath is None:
-            Logger().error("Argument missing: filepath. Topic is {}".format(topic))
-            return
+        source_disk = payload.get("source_disk")        
+        filepath = payload.get("filepath")   
+        repository_path = Parametres().parametre(Cles.CHEMIN_DEPOT_DOM0)     
+    
+        source_location = "{}/{}".format(Parametres().parametre(Cles.CHEMIN_MONTAGE_USB), source_disk)
 
         try:                   
-            self.task_runner.run_task(self.__do_copy_file, args=(topic, payload,))
+            self.task_runner.run_task(self.__do_copy_file, args=(source_location, filepath, repository_path,))
         except Exception as e:
-            Logger().error("An error occured while reading the file {} on {}".format(filepath, source_disk))
+            Logger().error("An error occured while reading the file {} from {}".format(filepath, source_disk))
 
 
     def __handle_remove_file(self, topic:str, payload: dict):
-        Logger().debug("Remove file not implemented")
         Logger().error("The command remove file is not implemented")
         pass
 
 
-    def __do_copy_file(self, topic:str, payload:dict):
-        source_disk = payload.get("source_disk")
-        filepath = payload.get("filepath")
-        target_disk = payload.get("target_disk")
-
-        if source_disk is None:
-            Logger().error("Argument missing: source_disk. Topic is {}".format(topic))
+    def __handle_copy_file(self, topic:str, payload:dict):
+        if not MqttHelper.check_payload(payload, ["disk", "filepath", "destination"]):
+            Logger().error("Mising arguments for the request {}".format(topic))
             return
         
-        if filepath is None:
-            Logger().error("Argument missing: filepath. Topic is {}".format(topic))
-            return
+        source_disk = payload.get("disk", "")
+        filepath = payload.get("filepath", "")
+        target_disk = payload.get("destination", "")
+
+        source_location = "{}/{}".format(Parametres().parametre(Cles.CHEMIN_MONTAGE_USB), source_disk)
+        destination_location = "{}/{}".format(Parametres().parametre(Cles.CHEMIN_MONTAGE_USB), target_disk)
+
+        try:                   
+            self.task_runner.run_task(self.__do_copy_file, args=(source_location, filepath, target_disk, destination_location,))
+        except Exception as e:
+            Logger().error("An error occured while copying the file {} on {}".format(filepath, target_disk))
         
-        if target_disk is None:
-            Logger().error("Argument missing: filepath. Topic is {}".format(topic))
-            return
+        #FichierHelper.copy_file(disk, filepath, destination_folder)
 
-        source_filepath = "{}/{}/{}".format(Parametres().parametre(Cles.CHEMIN_MONTAGE_USB), source_disk, filepath)
-        source_footprint = FichierHelper.calculate_footprint(source_filepath)
 
-        repository_path = Parametres().parametre(Cles.CHEMIN_DEPOT_DOM0)
+    def __do_copy_file(self, source_location:str, filepath:str, target_disk: str, target_location:str):        
+        #source_filepath = "{}/{}/{}".format(Parametres().parametre(Cles.CHEMIN_MONTAGE_USB), source_disk, filepath)        
+        source_footprint = FichierHelper.calculate_footprint("{}/{}".format(source_location, filepath))
+        
         # Création du répertoire de destination si nécessaire
         parent_path = Path(filepath).parent
         if not parent_path.exists():
             print("Création du répertoire {} dans le dépôt".format(parent_path))
-            os.makedirs("{}/{}".format(repository_path, parent_path), exist_ok= True)
+            os.makedirs("{}/{}".format(target_location, parent_path), exist_ok= True)
 
-        destination = "{}/{}".format(repository_path, parent_path)
-
-        if FichierHelper.copy_file(source_filepath, destination, source_footprint) == True:
-            Logger().debug("The file {} has been copied into the storage. The footprint is {}".format(source_filepath, source_footprint))            
+        dest_footprint = FichierHelper.copy_file(source_location, filepath, target_location, source_footprint)
+        if dest_footprint != "":
+            Logger().debug("The file {} has been copied to {}. The footprint is {}".format(filepath, target_location, source_footprint))            
 
             # Envoi d'une notification pour informer de la présence d'un nouveau fichier
-            notif = NotificationFactory.create_notification_new_file(disk= target_disk, filepath= filepath)
+            notif = NotificationFactory.create_notification_new_file(disk= target_disk, filepath= filepath, source_footprint= source_footprint, dest_footprint= dest_footprint)
             self.mqtt_client.publish("{}/notification".format(Topics.NEW_FILE), notif)
 
             response = ResponseFactory.create_response_copy_file(True)            
@@ -191,7 +192,7 @@ class SysUsbController():
             response = ResponseFactory.create_response_copy_file(False)
             Logger().error("La copie du fichier {} dans le dépôt a échoué.".format(filepath))
 
-        self.mqtt_client.publish("{}/response".format(topic), response)
+        self.mqtt_client.publish("{}/response".format(Topics.COPY_FILE), response)
 
 
     def __handle_benchmark(self, topic:str, payload:dict):

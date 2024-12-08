@@ -39,9 +39,11 @@ class RequestFactory():
     '''    
 
     @staticmethod
-    def create_request_files_list(disk : str) -> dict:
+    def create_request_files_list(disk: str, recursive: bool = False, from_dir: str = "") -> dict:
         return { 
-            "disk": disk 
+            "disk": disk,
+            "recursive": recursive,
+            "from_dir": from_dir
             }
     
     @staticmethod
@@ -62,7 +64,7 @@ class RequestFactory():
         }        
     
     @staticmethod
-    def create_request_delete_file(filepath : str, disk : str = Constantes().constante(Cles.DEPOT_LOCAL)) -> dict:
+    def create_request_delete_file(filepath: str, disk: str = Constantes().constante(Cles.DEPOT_LOCAL)) -> dict:
         return {
             "filepath": filepath,
             "disk": disk
