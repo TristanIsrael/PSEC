@@ -83,8 +83,10 @@ class ResponseFactory():
         return payload
 
     @staticmethod
-    def create_response_copy_file(success:bool) -> dict:
+    def create_response_copy_file(filepath:str, disk:str, success:bool, footprint:str) -> dict:
         payload = {
-            "status": "ok" if success else "error"
+            "filepath": filepath,
+            "status": "ok" if success else "error",
+            "footprint": footprint
         }
         return payload

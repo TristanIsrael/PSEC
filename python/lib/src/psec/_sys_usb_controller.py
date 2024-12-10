@@ -187,9 +187,9 @@ class SysUsbController():
             notif = NotificationFactory.create_notification_new_file(disk= target_disk, filepath= filepath, source_footprint= source_footprint, dest_footprint= dest_footprint)
             self.mqtt_client.publish("{}/notification".format(Topics.NEW_FILE), notif)
 
-            response = ResponseFactory.create_response_copy_file(True)            
+            response = ResponseFactory.create_response_copy_file(filepath, True, dest_footprint)            
         else:
-            response = ResponseFactory.create_response_copy_file(False)
+            response = ResponseFactory.create_response_copy_file(filepath, False, dest_footprint)
             Logger().error("La copie du fichier {} dans le dépôt a échoué.".format(filepath))
 
         self.mqtt_client.publish("{}/response".format(Topics.COPY_FILE), response)

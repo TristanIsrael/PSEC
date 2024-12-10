@@ -55,7 +55,8 @@ class FichierHelper():
        
     @staticmethod
     def get_folder_contents(chemin:str, liste:list, decoupage:int = 0, recursif:bool = False, from_dir:str = ""):
-        with os.scandir("{}{}".format(chemin, from_dir)) as entrees:
+        _real_filepath = "{}{}".format(chemin, from_dir)
+        with os.scandir(_real_filepath) as entrees:
             for entree in entrees:
                 if entree.is_symlink():
                     continue
@@ -72,10 +73,15 @@ class FichierHelper():
 
                     liste.append(entryDict)
                 elif entree.is_dir():
+                    #is_bundle = False
+                    #if entree.name.endswith(".app"):
+                    #    is_bundle = FichierHelper.is_macos_bundle(_real_filepath)
+
                     entryDict = {
                         "type": "folder",
                         "path": "/" if filepath == "" else filepath,
                         "name": filename
+                        #"is_bundle": is_bundle
                     }
 
                     liste.append(entryDict)
@@ -147,4 +153,20 @@ class FichierHelper():
     def create_file(filepath:str, size_ko:int):
         with open(filepath, 'wb') as fout:
             fout.write(os.urandom(size_ko*1024))
-                        
+
+    '''
+    @staticmethod
+    def is_macos_bundle(disk:str, filepath:str):    
+        chemin:str = ""
+        if disk == Constantes.REPOSITORY:
+            chemin = Parametres().parametre(Cles.CHEMIN_DEPOT_DOM0)
+        else:
+            chemin_montage = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)
+            chemin = "{}/{}".format(chemin_montage, disk)
+
+        if not (os.path.isdir(chemin) and filepath.endswith(".app")):
+            return False
+        
+        info_plist_path = os.path.join(chemin, "Contents", "Info.plist")
+        return os.path.isfile(info_plist_path)
+    '''
