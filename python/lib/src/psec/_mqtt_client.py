@@ -61,7 +61,7 @@ class SerialSocket():
         pass
     
 class SerialMQTTClient(mqtt.Client):
-    sock_:SerialSocket
+    sock_ = None
 
     def __init__(self, path:str, baudrate:int, *args, **kwargs):
         super().__init__(callback_api_version=CallbackAPIVersion.VERSION2, *args, **kwargs)
@@ -186,11 +186,16 @@ class MqttClient():
         if self.mqtt_client is not None:
             print("Quit Mqtt client")
             try:
-                #self.mqtt_client.disconnect()
+                self.mqtt_client.disconnect()
                 self.mqtt_client.loop_stop()
+                if self.connection_type == ConnectionType.SERIAL_PORT:
+                    self.mqtt_client.close()
             except:
                 #Ignore exceptions when closing
                 pass
+            finally:
+                self.connected = False
+                self.is_starting = False
 
     def subscribe(self, topic:str):
         print("Subscribe to topic {}".format(topic))
@@ -224,6 +229,7 @@ class MqttClient():
     def __on_connected(self, client:mqtt.Client, userdata, connect_flags, reason_code, properties):
         print("Connected to the MQTT broker")
         self.connected = True
+        self.is_starting = False
         
         if self.on_connected is not None:
             self.on_connected()

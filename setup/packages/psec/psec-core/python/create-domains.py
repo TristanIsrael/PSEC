@@ -143,7 +143,6 @@ p9 = [
 channel = [
 'name=console, connection=pty',
 'name=sys-usb-msg, connection=socket, path=/var/run/sys-usb-msg.sock',
-'name=sys-usb-log, connection=socket, path=/var/run/sys-usb-log.sock',
 'name=sys-usb-input, connection=socket, path=/var/run/sys-usb-input.sock'
 ]
 '''.format(memory_in_mb, nb_cpus)
@@ -180,7 +179,6 @@ p9 = [
 channel = [
 'name=console, connection=pty',
 'name=sys-gui-msg, connection=socket, path=/var/run/sys-gui-msg.sock',
-'name=sys-gui-log, connection=socket, path=/var/run/sys-gui-log.sock',
 'name=sys-gui-input, connection=socket, path=/var/run/sys-gui-input.sock'
 ]
 vga = "stdvga"
@@ -226,7 +224,7 @@ disk = [
         channels = []
         channels.append("'name=console, connection=pty'") # /dev/hvc0
         channels.append("'name={}-msg, connection=socket, path=/var/run/{}-msg.sock'".format(domain_name, domain_name)) # /dev/hvc1
-        channels.append("'name={}-log, connection=socket, path=/var/run/{}-log.sock'".format(domain_name, domain_name)) # /dev/hvc2        
+        #channels.append("'name={}-log, connection=socket, path=/var/run/{}-log.sock'".format(domain_name, domain_name)) # /dev/hvc2        
         
         if len(channels) > 0:
             txt += "channel = [\n{}\n]\n".format(",\n".join(channels))        
