@@ -37,6 +37,7 @@ scripts/setup-xen-environment.sh
 scripts/get-sys-gui-domid.sh
 scripts/post-install.sh
 scripts/show-logs.sh
+scripts/show-messages.sh
 
 conf/constants.sh
 conf/psec.conf
@@ -114,6 +115,7 @@ package() {
     install -D -m755 "$srcdir"/get-sys-gui-domid.sh "$pkgdir/$PSEC_BINDIR"/get-sys-gui-domid.sh
     install -D -m644 "$srcdir"/write-screen-information-to-xenstore.py "$pkgdir/$PSEC_BINDIR"/write-screen-information-to-xenstore.py
     install -D -m755 "$srcdir"/show-logs.sh "$pkgdir/$PSEC_BINDIR"/show-logs.sh
+    install -D -m755 "$srcdir"/show-messages.sh "$pkgdir/$PSEC_BINDIR"/show-messages.sh
 
     install -D -m644 "$srcdir"/get-total-memory.py "$pkgdir/$PSEC_BINDIR"/get-total-memory.py
 

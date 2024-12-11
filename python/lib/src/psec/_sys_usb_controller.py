@@ -1,5 +1,5 @@
 from . import Constantes, Parametres, MqttClient, Topics
-from . import FichierHelper, ResponseFactory
+from . import FichierHelper, ResponseFactory, EtatComposant
 from . import Logger, Cles, BenchmarkId, MqttClient, DiskMonitor, MqttHelper
 from . import TaskRunner
 try:
@@ -44,14 +44,28 @@ class SysUsbController():
         DemonInputs(self.mqtt_client).stop()
 
     def __on_mqtt_connected(self):       
-        Logger().setup("USB controller", self.mqtt_client)
-        Logger().debug("Starting sys-usb controller")
-        self.mqtt_client.subscribe("system/+/+/request") # All the system requests
+        Logger().setup("Disk controller", self.mqtt_client)
+        Logger().debug("Starting PSEC disk controller")
+        self.mqtt_client.subscribe("{}/+/+/request".format(Topics.SYSTEM))
+        self.mqtt_client.subscribe("{}/+/request".format(Topics.DISCOVER))
 
         ControleurBenchmark().setup(self.mqtt_client)
 
         self.disk_monitor = DiskMonitor(Constantes().constante(Cles.CHEMIN_MONTAGE_USB), self.mqtt_client)
-        threading.Thread(target=self.disk_monitor.start).start()        
+        threading.Thread(target=self.disk_monitor.start).start()
+
+        payload = {
+            "components": [
+                {
+                "id": Constantes.PSEC_DISK_CONTROLLER,
+                "label": "System Disk controller",
+                "type": "core",
+                "state": EtatComposant.READY
+                }
+            ]
+        }
+        
+        self.mqtt_client.publish("{}/response".format(Topics.DISCOVER_COMPONENTS), payload)
 
     def __on_mqtt_message(self, topic:str, payload:dict):
         #Logger().debug("Message received : topic={}, payload={}".format(topic, payload))
@@ -128,21 +142,33 @@ class SysUsbController():
         # Les arguments de la commande sont :
         # - nom_fichier au format disk:filename
         # - nom_disque_destination
-        if not MqttHelper.check_payload(payload, ["source_disk", "filepath"]):
+        if not MqttHelper.check_payload(payload, ["disk", "filepath"]):
             Logger().error("Missing argument(s) for the command {}".format(topic))
             return
         
-        source_disk = payload.get("source_disk")        
-        filepath = payload.get("filepath")   
-        repository_path = Parametres().parametre(Cles.CHEMIN_DEPOT_DOM0)     
+        source_disk = payload.get("disk")        
+        filepath = payload.get("filepath", "")   
+        repository_path:str = Parametres().parametre(Cles.STORAGE_PATH_DOMU)     
     
-        source_location = "{}/{}".format(Parametres().parametre(Cles.CHEMIN_MONTAGE_USB), source_disk)
+        source_location = "{}/{}".format(Parametres().parametre(Cles.CHEMIN_MONTAGE_USB), source_disk) 
+        source_footprint = FichierHelper.calculate_footprint("{}/{}".format(source_location, filepath))     
 
+        dest_parent_path = Path("{}/{}".format(repository_path, filepath)).parent
+        if not dest_parent_path.exists():
+            print("Création du répertoire {} dans le dépôt".format(dest_parent_path))
+            os.makedirs(dest_parent_path.as_posix(), exist_ok= True)
+
+        dest_footprint = FichierHelper.copy_file(source_location, filepath, repository_path, source_footprint)
+        if dest_footprint != "":            
+            notif = NotificationFactory.create_notification_new_file(Constantes.REPOSITORY, filepath, source_footprint, dest_footprint)
+            self.mqtt_client.publish(Topics.NEW_FILE, notif)
+        
+        '''
         try:                   
-            self.task_runner.run_task(self.__do_copy_file, args=(source_location, filepath, repository_path,))
+            self.task_runner.run_task(self.__do_copy_file, args=(source_location, filepath, Constantes.REPOSITORY, repository_path,))
         except Exception as e:
             Logger().error("An error occured while reading the file {} from {}".format(filepath, source_disk))
-
+        '''
 
     def __handle_remove_file(self, topic:str, payload: dict):
         Logger().error("The command remove file is not implemented")
@@ -157,8 +183,8 @@ class SysUsbController():
         source_disk = payload.get("disk", "")
         filepath = payload.get("filepath", "")
         target_disk = payload.get("destination", "")
-
-        source_location = "{}/{}".format(Parametres().parametre(Cles.CHEMIN_MONTAGE_USB), source_disk)
+        
+        source_location = "{}/{}".format(Parametres().parametre(Cles.CHEMIN_MONTAGE_USB), source_disk)        
         destination_location = "{}/{}".format(Parametres().parametre(Cles.CHEMIN_MONTAGE_USB), target_disk)
 
         try:                   
@@ -187,9 +213,9 @@ class SysUsbController():
             notif = NotificationFactory.create_notification_new_file(disk= target_disk, filepath= filepath, source_footprint= source_footprint, dest_footprint= dest_footprint)
             self.mqtt_client.publish("{}/notification".format(Topics.NEW_FILE), notif)
 
-            response = ResponseFactory.create_response_copy_file(filepath, True, dest_footprint)            
+            response = ResponseFactory.create_response_copy_file(filepath, target_disk, True, dest_footprint)            
         else:
-            response = ResponseFactory.create_response_copy_file(filepath, False, dest_footprint)
+            response = ResponseFactory.create_response_copy_file(filepath, target_disk, False, dest_footprint)
             Logger().error("La copie du fichier {} dans le dépôt a échoué.".format(filepath))
 
         self.mqtt_client.publish("{}/response".format(Topics.COPY_FILE), response)

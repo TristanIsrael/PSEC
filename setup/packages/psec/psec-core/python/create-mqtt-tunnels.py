@@ -15,11 +15,12 @@ def hexdump(data, prefix=""):
         print(f"{prefix}{i:04x}: {hex_bytes:<48} {ascii_bytes}")
 
 class UnixSocketTunneler:
-    __connection_lost = threading.Event()
+    #__connection_lost = threading.Event()
 
-    def __init__(self, client_socket_path, broker_socket_path):
+    def __init__(self, client_socket_path, broker_socket_path, n_socket:int):
         self.client_socket_path = client_socket_path
         self.broker_socket_path = broker_socket_path
+        self.n_socket = n_socket
         self.stop_event = threading.Event()
 
 
@@ -30,27 +31,26 @@ class UnixSocketTunneler:
         client_socket.setblocking(False)
         broker_socket.setblocking(False)
 
-        while not self.__connection_lost.is_set():
+        while True:
             try:
                 data = client_socket.recv(BUFFER_SIZE)
 
-                # Verify if this is a disconnection frame
-                # if data == b'e000'
-
                 if DEBUG:
                     hexdump(data, prefix=f"{direction}> ")
+
                 if not data:  # Connection closed
                     print("Error: data empty")
-                    break                
+                    break
                 broker_socket.sendall(data)
             except BlockingIOError:
-                if self.__connection_lost.is_set():
-                    break
+                continue
             except (socket.error, BrokenPipeError) as e:                
-                print("handle_connection", e)                
-                break        
+                print("handle_connection", e)
+                break
+            finally:
+                client_socket.close()
+                broker_socket.close()
 
-        self.__connection_lost.set()
         print(f"Loop {direction} terminated")
 
     '''
@@ -75,37 +75,42 @@ class UnixSocketTunneler:
             print("The buffer of {} is empty".format(self.client_socket_path))        
     '''
 
+    def create_client_socket_and_wait_for_connection(self) -> socket.socket:
+        client_sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        client_sock.connect(self.client_socket_path)
+
+        print(f"Connected to {self.client_socket_path} and waiting for data")
+
+        ready_to_read, _, _ = select.select([client_sock], [], [])
+        if client_sock in ready_to_read:
+            print("Client has connected.")
+            return client_sock
+
     def tunnel(self):
         """
         Set up connections and manage bidirectional tunneling.
+        We need to connect to the broken only when there is an incoming connection from a client
         """
         while not self.stop_event.is_set():
             try:
-                # Create sockets
-                self.client_sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-                self.broker_sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+                # Create broker socket                
+                broker_sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
 
-                # Connect to the specified sockets
-                self.client_sock.connect(self.client_socket_path)
-                self.broker_sock.connect(self.broker_socket_path)
+                # Connect to the client and wait for data
+                client_sock = self.create_client_socket_and_wait_for_connection()
 
-                print(f"Connected: {self.client_socket_path} --> {self.broker_socket_path}")
-
-                # Purge the socket's buffer for the client
-                #self.purge_pv_channel(client_sock, 32)
-                # If the client has not disconnected properly we need to send
-                # the disconnection string to the MQTT broker
+                broker_socket_path = "/var/run/mosquitto/mqtt_msg_{}.sock".format(self.n_socket)
+                print("Connect to the broker on socket {}".format(broker_socket_path))                                
+                broker_sock.connect(broker_socket_path)                
 
                 # Start threads for bidirectional tunneling
-                thread1 = threading.Thread(target=self.handle_connection, args=(self.client_sock, self.broker_sock, "A->B"))
-                thread2 = threading.Thread(target=self.handle_connection, args=(self.broker_sock, self.client_sock, "B->A"))
+                thread1 = threading.Thread(target=self.handle_connection, args=(client_sock, broker_sock, "A->B"))
+                thread2 = threading.Thread(target=self.handle_connection, args=(broker_sock, client_sock, "B->A"))
 
                 thread1.start()
                 thread2.start()
 
-                # Wait for both threads to finish
-                #self.__connection_lost.wait()                
-                thread1.join()                
+                thread1.join()
                 thread2.join()
 
                 print(f"Tunnel {self.client_socket_path} <--> {self.broker_socket_path} is broken")
@@ -113,10 +118,9 @@ class UnixSocketTunneler:
                 print(f"{self.client_socket_path} --> {self.broker_socket_path}. Socket error: {e}.")
                 #time.sleep(5)  # Wait before retrying
             finally:
-                print("Close connections")
-                self.client_sock.close()
-                self.broker_sock.close()
-                self.__connection_lost.clear()
+                #print("Close connections")
+                client_sock.close()
+                broker_sock.close()
                 time.sleep(1)  # Wait before retrying
 
     def stop(self):
@@ -125,25 +129,32 @@ class UnixSocketTunneler:
         """
         self.stop_event.set()
 
-def create_msg_tunnel(client_socket:str):
-    tunneler = UnixSocketTunneler(client_socket, broker_msg_socket)
+def create_msg_tunnel(client_socket:str, n_socket:int):
+    tunneler = UnixSocketTunneler(client_socket, broker_msg_socket, n_socket)
     #threading.Thread(target=tunneler.tunnel).start()
     tunneler.tunnel()
 
 def wait_for_broker_socket() -> bool:
     print("Waiting for MQTT Broker sockets...")
     
+    cmd = "find /var/run/ -name '{}'".format(broker_msg_socket)
+
     while True:
-        if os.path.exists(broker_msg_socket):
-            return True
-        else:
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+        files = result.stdout.strip().split("\n")
+        
+        if len(files) == 0:
             time.sleep(1)
+        else:
+            print("Broker sockets ready")
+            return True
 
 def watch_msg_sockets():
     print("Looking for msg mqtt sockets")
 
     cmd = "find /var/run/ -name '*-msg.sock'"
     sockets = set()
+    n_socket = 1
 
     while True:
         result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
@@ -154,7 +165,8 @@ def watch_msg_sockets():
             if file == "":
                 continue
             print(f"New messaging socket found : {file}")
-            threading.Thread(target=create_msg_tunnel, args=(file,)).start()
+            threading.Thread(target=create_msg_tunnel, args=(file, n_socket)).start()
+            n_socket += 1
 
         sockets.update(files)
         time.sleep(1)

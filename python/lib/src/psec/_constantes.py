@@ -58,7 +58,7 @@ class Constantes(metaclass=SingletonMeta):
     constantes = {
         Cles.SERIAL_PORT_MSG: "/dev/hvc1",
         Cles.SERIAL_PORT_LOG: "/dev/hvc2",
-        Cles.MQTT_MSG_BROKER_SOCKET: "/var/run/mosquitto/mqtt_msg.sock",
+        Cles.MQTT_MSG_BROKER_SOCKET: "/var/run/mosquitto/mqtt_msg*.sock",
         Cles.MQTT_LOG_BROKER_SOCKET: "/var/run/mosquitto/mqtt_log.sock",
         Cles.MQTT_MSG_SOCKET_FILTER: "/var/run/*-msg.sock",
         Cles.MQTT_LOG_SOCKET_FILTER: "/var/run/*-log.sock",
@@ -66,7 +66,7 @@ class Constantes(metaclass=SingletonMeta):
 
         Cles.CHEMIN_FICHIER_CONFIG_GLOBAL: "/etc/psec/global.conf",        
         # Sockets pv channel entre Dom0 et DomU        
-        Cles.CHEMIN_SOCKET_INPUT_DOMU: "/dev/hvc3",
+        Cles.CHEMIN_SOCKET_INPUT_DOMU: "/dev/hvc2",
         #Cles.CHEMIN_SOCKET_API: "/run/panoptiscan.sock",
         Cles.TAILLE_TRAME: 1024,
         # Journalisations

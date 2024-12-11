@@ -110,7 +110,7 @@ class FichierHelper():
                 hash = hashlib.file_digest(f, Constantes.FOOTPRINT_METHOD)
                 return hash.hexdigest()                
         except Exception as e:
-            print("Erreur")
+            print("An error occured while calculating the footprint of the file {}".format(filepath))
             print(e)
 
         return ""

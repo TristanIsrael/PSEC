@@ -89,13 +89,13 @@ class SerialMQTTClient(mqtt.Client):
                     print("Read error {}".format(rc))
                     break
             
-            if self.want_write():
+            if self.want_write() or self.sock_.has_data_out():
                 rc = self.loop_write()
                 if rc != MQTTErrorCode.MQTT_ERR_SUCCESS:
                     print("Write error {}".format(rc))
                     break
-            
-            rc = self.loop_misc()            
+                        
+            rc = self.loop_misc()                        
             if rc != MQTTErrorCode.MQTT_ERR_SUCCESS:
                 print("Misc error {}".format(rc))
                 break
