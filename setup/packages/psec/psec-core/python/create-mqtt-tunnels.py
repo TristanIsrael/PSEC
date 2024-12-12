@@ -21,19 +21,18 @@ class UnixSocketTunneler:
         self.client_socket_path = client_socket_path
         self.broker_socket_path = broker_socket_path
         self.n_socket = n_socket
-        self.stop_event = threading.Event()
 
-
-    def handle_connection(self, client_socket:socket.socket, broker_socket:socket.socket, direction:str):
+    '''
+    def handle_connection(self, socket_left:socket.socket, socket_right:socket.socket, direction:str):
         """
         Continuously forward data from src_socket to dst_socket.
         """
-        client_socket.setblocking(False)
-        broker_socket.setblocking(False)
+        #client_socket.setblocking(False)
+        #broker_socket.setblocking(False)
 
         while True:
             try:
-                data = client_socket.recv(BUFFER_SIZE)
+                data = socket_left.recv(BUFFER_SIZE)
 
                 if DEBUG:
                     hexdump(data, prefix=f"{direction}> ")
@@ -41,38 +40,15 @@ class UnixSocketTunneler:
                 if not data:  # Connection closed
                     print("Error: data empty")
                     break
-                broker_socket.sendall(data)
-            except BlockingIOError:
-                continue
-            except (socket.error, BrokenPipeError) as e:                
-                print("handle_connection", e)
-                break
+                socket_right.sendall(data)            
+            except (socket.error, OSError) as e:                
+                print("Connection error:", e)
             finally:
-                client_socket.close()
-                broker_socket.close()
+                print("Close sockets")
+                socket_left.close()
+                socket_right.close()            
 
         print(f"Loop {direction} terminated")
-
-    '''
-    def purge_pv_channel(self, socket:socket.socket, nb_bytes:int=4096):        
-        #sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-        #sock.connect(sock_path)        
-
-        print("Clear the buffer for the socket {}".format(self.client_socket_path))        
-        bytes = 0
-        socket.setblocking(False) 
-
-        try:
-            while bytes < nb_bytes:
-                try:
-                    data = socket.recv(4096)
-                    if not data:
-                        break  
-                except BlockingIOError:
-                    break  # Buffer is empty
-        finally:
-            socket.setblocking(True)
-            print("The buffer of {} is empty".format(self.client_socket_path))        
     '''
 
     def create_client_socket_and_wait_for_connection(self) -> socket.socket:
@@ -86,12 +62,13 @@ class UnixSocketTunneler:
             print("Client has connected.")
             return client_sock
 
+
     def tunnel(self):
         """
         Set up connections and manage bidirectional tunneling.
         We need to connect to the broken only when there is an incoming connection from a client
         """
-        while not self.stop_event.is_set():
+        while True:
             try:
                 # Create broker socket                
                 broker_sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
@@ -99,10 +76,11 @@ class UnixSocketTunneler:
                 # Connect to the client and wait for data
                 client_sock = self.create_client_socket_and_wait_for_connection()
 
-                broker_socket_path = "/var/run/mosquitto/mqtt_msg_{}.sock".format(self.n_socket)
-                print("Connect to the broker on socket {}".format(broker_socket_path))                                
+                broker_socket_path = "/var/run/mosquitto/mqtt_msg_{}.sock".format(self.n_socket)                                       
                 broker_sock.connect(broker_socket_path)                
+                print("Connected to the broker on socket {}".format(broker_socket_path))         
 
+                '''
                 # Start threads for bidirectional tunneling
                 thread1 = threading.Thread(target=self.handle_connection, args=(client_sock, broker_sock, "A->B"))
                 thread2 = threading.Thread(target=self.handle_connection, args=(broker_sock, client_sock, "B->A"))
@@ -112,6 +90,53 @@ class UnixSocketTunneler:
 
                 thread1.join()
                 thread2.join()
+                '''
+
+                sockets = [client_sock, broker_sock]
+
+                while True:
+                    # Utiliser select pour attendre les sockets prêtes en lecture
+                    readable, writable, _ = select.select(sockets, sockets, [])
+
+                    # Lecture sur socket_left et écriture sur socket_right
+                    if client_sock in readable:
+                        try:
+                            data = client_sock.recv(4096)
+                            if data:
+                                if DEBUG:
+                                    hexdump(data, prefix=f"client>broker ")
+                                if broker_sock in writable:
+                                    broker_sock.sendall(data)
+                                else:
+                                    print("socket_right n'est pas prête à écrire.")
+                            else:
+                                print("socket_left s'est fermée.")
+                                break  # Sortir de la boucle si la socket est fermée
+                        except OSError as e:
+                            print(f"Erreur lors de la lecture sur socket_left : {e}")
+                            break
+
+                    # Lecture sur socket_right et écriture sur socket_left
+                    if broker_sock in readable:
+                        try:
+                            data = broker_sock.recv(4096)
+                            if data:
+                                if DEBUG:
+                                    hexdump(data, prefix=f"broker>client ")
+                                if client_sock in writable:
+                                    client_sock.sendall(data)
+                                else:
+                                    print("socket_left n'est pas prête à écrire.")
+                            else:
+                                print("socket_right s'est fermée.")
+                                break  # Sortir de la boucle si la socket est fermée
+                        except OSError as e:
+                            print(f"Erreur lors de la lecture sur socket_right : {e}")
+                            break
+
+                # Fermeture des sockets proprement
+                client_sock.close()
+                broker_sock.close()
 
                 print(f"Tunnel {self.client_socket_path} <--> {self.broker_socket_path} is broken")
             except socket.error as e:
@@ -123,16 +148,12 @@ class UnixSocketTunneler:
                 broker_sock.close()
                 time.sleep(1)  # Wait before retrying
 
-    def stop(self):
-        """
-        Stop the tunneling process.
-        """
-        self.stop_event.set()
 
 def create_msg_tunnel(client_socket:str, n_socket:int):
     tunneler = UnixSocketTunneler(client_socket, broker_msg_socket, n_socket)
     #threading.Thread(target=tunneler.tunnel).start()
     tunneler.tunnel()
+
 
 def wait_for_broker_socket() -> bool:
     print("Waiting for MQTT Broker sockets...")
@@ -148,6 +169,7 @@ def wait_for_broker_socket() -> bool:
         else:
             print("Broker sockets ready")
             return True
+
 
 def watch_msg_sockets():
     print("Looking for msg mqtt sockets")
@@ -170,6 +192,7 @@ def watch_msg_sockets():
 
         sockets.update(files)
         time.sleep(1)
+
 
 if __name__ == "__main__":
     wait_for_broker_socket()
