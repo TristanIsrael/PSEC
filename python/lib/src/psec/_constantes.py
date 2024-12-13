@@ -24,6 +24,7 @@ class Cles:
     SERIAL_PORT_MSG = "serial_port_msg"
     SERIAL_PORT_LOG = "serial_port_log"
     MQTT_MSG_BROKER_SOCKET = "mqtt_msg_broker_socket"    
+    MQTT_MSG_BROKER_SOCKETS = "mqtt_msg_broker_sockets"    
     MQTT_LOG_BROKER_SOCKET = "mqtt_log_broker_socket"
     MQTT_MSG_SOCKET_FILTER = "mqtt_msg_socket_filter"
     MQTT_LOG_SOCKET_FILTER = "mqtt_log_socket_filter"
@@ -58,7 +59,8 @@ class Constantes(metaclass=SingletonMeta):
     constantes = {
         Cles.SERIAL_PORT_MSG: "/dev/hvc1",
         Cles.SERIAL_PORT_LOG: "/dev/hvc2",
-        Cles.MQTT_MSG_BROKER_SOCKET: "/var/run/mosquitto/mqtt_msg*.sock",
+        Cles.MQTT_MSG_BROKER_SOCKET: "/var/run/mosquitto/mqtt_msg_dom0.sock",
+        Cles.MQTT_MSG_BROKER_SOCKETS: "/var/run/mosquitto/mqtt_msg*.sock",
         Cles.MQTT_LOG_BROKER_SOCKET: "/var/run/mosquitto/mqtt_log.sock",
         Cles.MQTT_MSG_SOCKET_FILTER: "/var/run/*-msg.sock",
         Cles.MQTT_LOG_SOCKET_FILTER: "/var/run/*-log.sock",

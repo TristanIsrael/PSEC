@@ -1,7 +1,7 @@
 import subprocess, os, time, threading, select, socket
 from psec import Constantes, Cles
 
-broker_msg_socket = Constantes().constante(Cles.MQTT_MSG_BROKER_SOCKET)
+broker_msg_socket = Constantes().constante(Cles.MQTT_MSG_BROKER_SOCKETS)
 
 BUFFER_SIZE = 4096
 DEBUG = True
