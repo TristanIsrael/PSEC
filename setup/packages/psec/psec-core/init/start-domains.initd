@@ -5,7 +5,7 @@ command_background="yes"
 pidfile="/var/run/start-domains.pid"
 
 depend() {    
-    after xen-pci
+    after start-x
 }
 
 start() {
