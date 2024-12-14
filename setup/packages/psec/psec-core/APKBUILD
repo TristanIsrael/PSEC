@@ -13,7 +13,7 @@ builddir="$srcdir/$pkgname-$pkgver"
 install="$pkgname.post-install $pkgname.pre-deinstall $pkgname.post-deinstall"
 checkdepends=""
 subpackages=""
-replaces="alpine-baselayout-data mosquitto"
+replaces="alpine-baselayout-data mosquitto grub openrc"
 options="!check"  # no tests provided
 
 source="
@@ -44,6 +44,8 @@ conf/psec.conf
 conf/10-energy-saving.conf
 conf/topology.json
 conf/mosquitto.conf
+conf/grub.default
+conf/rc.conf
 
 python/rotate-screen.py
 python/create-domains.py
@@ -100,13 +102,16 @@ package() {
     install -D -m755 "$srcdir"/splash.initd "$pkgdir"/etc/init.d/splash
     install -D -m755 "$srcdir"/start-domains.initd "$pkgdir"/etc/init.d/start-domains
     install -D -m755 "$srcdir"/psec-core-controller.initd "$pkgdir"/etc/init.d/psec-core-controller
+    install -D -m755 "$srcdir"/start-x.initd "$pkgdir"/etc/init.d/start-x
 
     install -D -m644 "$srcdir"/psec.conf "$pkgdir/etc/modules-load.d/psec.conf"
+    install -D -m644 "$srcdir"/10-energy-saving.conf "$pkgdir"/etc/X11/xorg.conf.d/10-energy-saving.conf
+    install -D -m644 "$srcdir"/grub.default "$pkgdir/etc/default/grub"
+    install -D -m644 "$srcdir"/rc.conf "$pkgdir/etc/rc.conf"
 
     #install -D -m644 "$srcdir"/sys-usb.conf "$pkgdir/$PSEC_CONFDIR/xen/sys-usb.conf"
     install -D -m644 "$srcdir"/topology.json "$pkgdir/$PSEC_CONFDIR"/topology.json
-
-    install -D -m755 "$srcdir"/start-x.initd "$pkgdir"/etc/init.d/start-x
+    
     install -D -m644 "$srcdir"/rotate-screen.py "$pkgdir/$PSEC_BINDIR"/rotate-screen.py
     install -D -m644 "$srcdir"/generate-x-config.py "$pkgdir/$PSEC_BINDIR"/generate-x-config.py
     #install -D -m755 "$srcdir"/connect-to-gui.initd "$pkgdir"/etc/init.d/connect-to-gui
@@ -117,14 +122,11 @@ package() {
     install -D -m755 "$srcdir"/show-logs.sh "$pkgdir/$PSEC_BINDIR"/show-logs.sh
     install -D -m755 "$srcdir"/show-messages.sh "$pkgdir/$PSEC_BINDIR"/show-messages.sh
 
-    install -D -m644 "$srcdir"/get-total-memory.py "$pkgdir/$PSEC_BINDIR"/get-total-memory.py
-
-    install -D -m644 "$srcdir"/10-energy-saving.conf "$pkgdir"/etc/X11/xorg.conf.d/10-energy-saving.conf
+    install -D -m644 "$srcdir"/get-total-memory.py "$pkgdir/$PSEC_BINDIR"/get-total-memory.py    
 
     install -D -m644 "$srcdir"/Splash_800_1280.ppm "$pkgdir"/boot/Splash_800_1280.ppm
 
     # Mosquitto
     install -D -m644 "$srcdir"/mosquitto.conf "$pkgdir"/etc/mosquitto/mosquitto.conf
     install -D -m755 "$srcdir"/create-mqtt-tunnels.initd "$pkgdir"/etc/init.d/create-mqtt-tunnels
-
 }

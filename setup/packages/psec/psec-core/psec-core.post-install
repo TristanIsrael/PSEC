@@ -12,6 +12,8 @@ hostname Core
 echo "**** Resizing shared memory"
 mount -o remount,size=16M /dev/shm
 
+rc-update add splash boot
+
 rc-service modules restart
 
 rc-service xenconsoled start
