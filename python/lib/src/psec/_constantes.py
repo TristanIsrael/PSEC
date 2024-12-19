@@ -31,11 +31,11 @@ class Cles:
     XEN_SOCKETS_PATH = "xen_sockets_path"
     STORAGE_PATH_DOMU = "storage_path_domu"
 
-class TypeEntree():
-    INDEFINI = "indefini"
-    SOURIS = "souris"
-    CLAVIER = "clavier"
-    TACTILE = "tactile"
+class TypeEntree:
+    INCONNU = 0
+    CLAVIER = 1
+    SOURIS = 2
+    TOUCH = 3
 
 class BoutonSouris():
     AUCUN = 0
@@ -59,9 +59,9 @@ class Constantes(metaclass=SingletonMeta):
     constantes = {
         Cles.SERIAL_PORT_MSG: "/dev/hvc1",
         Cles.SERIAL_PORT_LOG: "/dev/hvc2",
-        Cles.MQTT_MSG_BROKER_SOCKET: "/var/run/mosquitto/mqtt_msg_dom0.sock",
-        Cles.MQTT_MSG_BROKER_SOCKETS: "/var/run/mosquitto/mqtt_msg*.sock",
-        Cles.MQTT_LOG_BROKER_SOCKET: "/var/run/mosquitto/mqtt_log.sock",
+        Cles.MQTT_MSG_BROKER_SOCKET: "/tmp/mosquitto/mqtt_msg_dom0.sock",
+        Cles.MQTT_MSG_BROKER_SOCKETS: "/tmp/mosquitto/mqtt_msg*.sock",
+        Cles.MQTT_LOG_BROKER_SOCKET: "/tmp/mosquitto/mqtt_log.sock",
         Cles.MQTT_MSG_SOCKET_FILTER: "/var/run/*-msg.sock",
         Cles.MQTT_LOG_SOCKET_FILTER: "/var/run/*-log.sock",
         Cles.XEN_SOCKETS_PATH: "/var/run",

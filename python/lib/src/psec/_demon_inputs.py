@@ -1,4 +1,4 @@
-import sys, glob, threading, serial, time
+import sys, glob, threading, serial, time, struct, msgpack
 from typing import Optional
 from evdev import InputDevice, ecodes
 from . import Logger, Mouse, MouseButton, MouseWheel, MouseMove, Parametres, Cles, SingletonMeta
@@ -9,6 +9,9 @@ class TypeEntree:
     CLAVIER = 1
     SOURIS = 2
     TOUCH = 3
+
+INPUT_EVENT_FORMAT = "HHI"  # HH = type, code, I = value (unsigned int)
+INPUT_EVENT_SIZE = struct.calcsize(INPUT_EVENT_FORMAT)
 
 class DemonInputs(metaclass=SingletonMeta):
     """! Cette classe surveille les entrées des souris et clavier et transfère les informations au travers du XenBus 
@@ -40,7 +43,7 @@ class DemonInputs(metaclass=SingletonMeta):
 
     def start(self):
         Logger().info("Starting input daemon")
-        
+
         self.can_run = True
 
         # On démarre la messagerie si elle ne l'est pas déjà
@@ -57,13 +60,15 @@ class DemonInputs(metaclass=SingletonMeta):
         self.can_run = False
         self.__deconnecte_interface_xenbus()
 
-    def genere_evenement_souris(self, mouse:Mouse):
+    '''def genere_evenement_souris(self, mouse:Mouse):
         #Logger().info("Envoi d'un événement de souris par l'API")
         self.__envoie_evenement_souris(mouse)
+    '''
 
     ###
     # Fonctions privées
     #
+    '''
     def __on_move(self, axe, delta: float):
         if delta == 0:
             return
@@ -132,6 +137,7 @@ class DemonInputs(metaclass=SingletonMeta):
                 self.mouse.buttons &= ~MouseButton.RIGHT
 
         self.__envoie_evenement_souris()
+    '''
 
     def __recherche_souris(self):
         # This function is ran in a specific thread
@@ -180,12 +186,28 @@ class DemonInputs(metaclass=SingletonMeta):
             # Wait a little and start over
             time.sleep(0.5)
 
+    def __serialize_event(self, type_input, event):
+        """Sérialise un événement pour transmission."""
+        #data = [event.type, event.code, event.value]
+        #payload = self.__packer.pack(data)
+        #payload = struct.pack(INPUT_EVENT_FORMAT, event.type, event.code, event.value)
+        # event.type : unsigned 16bit
+        # event.code : unsigned 16bit
+        # event.value : signed 32bit
+        #payload = struct.pack('<BHHi', type_input, event.type, event.code, event.value)
+        payload = msgpack.packb([type_input, event.type, event.code, event.value])
+        return payload +b'\n'
+
     def __surveille_souris(self, input):
         Logger().info("Monitor the mouse {}".format(input.name))
 
         try:
-            for event in input.read_loop():                
-                if event.type == ecodes.EV_REL and (event.code == ecodes.REL_X or event.code == ecodes.REL_Y):
+            for event in input.read_loop():  
+                if event.type in [ecodes.EV_KEY, ecodes.EV_REL, ecodes.EV_ABS]:
+                    serialized = self.__serialize_event(TypeEntree.SOURIS, event)
+                    self.socket_xenbus.write(serialized)
+                    #print(f"Sent: {serialized.strip()}")
+                '''if event.type == ecodes.EV_REL and (event.code == ecodes.REL_X or event.code == ecodes.REL_Y):
                     axe = event.code
                     delta = event.value
                     self.__on_move(axe, delta)
@@ -196,6 +218,7 @@ class DemonInputs(metaclass=SingletonMeta):
                     bouton = event.code
                     etat = event.value
                     self.__on_click(bouton, etat)
+                '''
 
                 if not self.can_run:
                     return
@@ -222,7 +245,7 @@ class DemonInputs(metaclass=SingletonMeta):
                 # grâce à une règle de 3 prenant en compte la valeur max de ABS_MT_POSITION_X ou ABS_MT_POSITION_Y
                 # par l'application contrôleur ayant connaissance de la résolution de l'écran.
                 # Cette valeur max doit être transmise avec les coordonnées du toucher.
-                if event.type != ecodes.EV_ABS and event.type != ecodes.EV_KEY:
+                '''if event.type != ecodes.EV_ABS and event.type != ecodes.EV_KEY:
                     continue #ignoré               
                 elif event.type == ecodes.EV_ABS and event.code == ecodes.ABS_MT_POSITION_X:
                     abs_x = event.value                    
@@ -244,9 +267,14 @@ class DemonInputs(metaclass=SingletonMeta):
                         abs_x = -1
                         abs_y = -1    
                         btn_touch = -1
+                '''
+                if event.type in [ecodes.EV_KEY, ecodes.EV_MSC, ecodes.EV_ABS, ecodes.EV_SYN]:
+                    serialized = self.__serialize_event(TypeEntree.TOUCH, event)
+                    self.socket_xenbus.write(serialized)
+                    #print(f"Sent: {serialized.strip()}")
 
                 if not self.can_run:
-                    return
+                    return                
         except:
             Logger().debug("The touchscreen {} is not available anymore".format(input.name))
             self.monitored_inputs.remove(input.path)
@@ -302,7 +330,8 @@ class DemonInputs(metaclass=SingletonMeta):
             Logger().debug("Close Xenbus I/O socket")
             self.socket_xenbus.close()
         
-    def __envoie_evenement_souris(self, mouse: Optional[Mouse] = None):
+    '''def __envoie_evenement_souris(self, mouse: Optional[Mouse] = None):
         data = mouse.serialize() if mouse is not None else self.mouse.serialize()
         #Logger().debug(data)
         self.socket_xenbus.write(data +b'\n')
+    '''

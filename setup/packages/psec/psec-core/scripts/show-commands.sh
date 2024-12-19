@@ -1,3 +1,3 @@
 #!/bin/sh
 
-mosquitto_sub --unix /var/run/mosquitto/mqtt_msg_local.sock -t 'system/' --pretty -v
+mosquitto_sub --unix /tmp/mqtt_msg_local.sock -t 'system/' --pretty -v

@@ -3,3 +3,4 @@ joblib
 humanize
 paho-mqtt>=2.0.0
 pyudev
+msgpack

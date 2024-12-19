@@ -55,3 +55,4 @@ rm /etc/conf.d/xen-pci.orig
 mv /etc/conf.d/xen-pci /etc/conf.d/xen-pci.orig
 mv /usr/lib/psec/tmp/xen-pci /etc/conf.d/xen-pci
 
+exit 0

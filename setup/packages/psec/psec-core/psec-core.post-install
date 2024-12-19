@@ -9,38 +9,41 @@ echo
 
 hostname Core
 
+#mkdir -p /var/run/mosquitto
+#chown mosquitto:mosquitto /var/run/mosquitto
+
 echo "**** Resizing shared memory"
 mount -o remount,size=16M /dev/shm
 
 rc-update add splash boot
+rc-service splash start
 
 rc-service modules restart
 
 rc-service xenconsoled start
 rc-service xenstored start
-rc-update add xen-pci
-#rc-service xen-pci start
-#rc-service virtxend start
+#rc-update add xen-pci
 
-mkdir -p /var/run/mosquitto
-chown mosquitto:mosquitto /var/run/mosquitto
 rc-update add mosquitto
 rc-service mosquitto start
 
 rc-update add create-mqtt-tunnels
 rc-service create-mqtt-tunnels start
 
-rc-update add attach-pci-devices
+#rc-update add attach-pci-devices
 rc-update add psec-core-controller
 rc-service psec-core-controller start
+
+rc-update add orchestrator
+rc-service orchestrator start
 
 # finish-core-init est exécuté par le script post-install du produit...
 #/usr/lib/psec/bin/finish-core-init.sh
 rc-update add start-x
 rc-service start-x start
 
-rc-update add start-domains
-rc-service start-domains start
+#rc-update add start-domains
+#rc-service start-domains start
 
 # Transféré dans le script post-install qui sera appelé par le produit
 #rc-update add connect-to-gui

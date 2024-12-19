@@ -186,6 +186,8 @@ device_model_override = "/usr/local/lib/xen-4.19.0/usr/lib/xen/bin/qemu-system-i
 qemu_env = ['LD_LIBRARY_PATH=/usr/local/lib/xen-4.19.0/usr/lib'] 
 device_model_args = [
      '-display', 'gtk,show-tabs=off,show-cursor=off,window-close=off,show-menubar=off',
+     '-device', 'virtio-input-host,id=virtio-mouse,evdev=/dev/input/virtual_mouse',
+     '-device', 'virtio-input-host,id=virtio-touch,evdev=/dev/input/virtual_touch'
 ]
 acpi=0
 usb=0

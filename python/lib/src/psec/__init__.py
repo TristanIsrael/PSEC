@@ -24,7 +24,7 @@ except Exception as e:
     print("Les classes DemonInputs, ControleurVmSysUsb et ControleurBenchmark ne seront pas disponibles")
     print(e)
 from ._api import Api
-from ._inputs_proxy import InputsProxy
+#from ._inputs_proxy import InputsProxy
 from ._dom0_controller import Dom0Controller
 from ._sys_usb_controller import SysUsbController
 from ._components_helper import ComponentsHelper
@@ -48,7 +48,7 @@ __all__ = [
     "FichierHelper",    
     "SingletonMeta",
     "DemonInputs",
-    "Mouse", "MouseButton", "MouseWheel", "InputsProxy",
+    "Mouse", "MouseButton", "MouseWheel", #"InputsProxy",
     "ControleurBenchmark", "BenchmarkId",
     #"MockXenbus",
     "TaskRunner",

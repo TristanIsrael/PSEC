@@ -7,7 +7,7 @@ pkgdesc="PSEC - Core of the system"
 url="https://www.alefbet.net/"
 arch="noarch"
 license="MIT"
-depends="openrc cdrkit psec-lib xen xen-hypervisor xen-qemu xen-qemu-openrc abuild pciutils xorg-server xrandr font-terminus gtk+3.0 sdl2 sdl2_image mosquitto mosquitto-openrc mosquitto-clients socat"
+depends="openrc cdrkit psec-lib xen xen-hypervisor xen-qemu xen-qemu-openrc abuild pciutils xorg-server xrandr font-terminus gtk+3.0 sdl2 sdl2_image mosquitto mosquitto-openrc mosquitto-clients socat py3-evdev py3-udev"
 makedepends=""
 builddir="$srcdir/$pkgname-$pkgver"
 install="$pkgname.post-install $pkgname.pre-deinstall $pkgname.post-deinstall"
@@ -17,11 +17,9 @@ replaces="alpine-baselayout-data mosquitto grub openrc"
 options="!check"  # no tests provided
 
 source="
-init/attach-pci-devices.initd
 init/psec-core-controller.initd
-init/setup-pci.initd
 init/splash.initd
-init/start-domains.initd
+init/orchestrator.initd
 init/start-x.initd
 init/create-mqtt-tunnels.initd
 
@@ -38,6 +36,8 @@ scripts/get-sys-gui-domid.sh
 scripts/post-install.sh
 scripts/show-logs.sh
 scripts/show-messages.sh
+scripts/start-sys-gui.sh
+scripts/start-sys-usb.sh
 
 conf/constants.sh
 conf/psec.conf
@@ -96,13 +96,11 @@ package() {
     install -D -m755 "$srcdir"/finish-core-init.sh "$pkgdir/$PSEC_BINDIR"/finish-core-init.sh
     install -D -m755 "$srcdir"/start-psec-core-controller.py "$pkgdir/$PSEC_BINDIR"/start-psec-core-controller.py
     install -D -m755 "$srcdir"/create-mqtt-tunnels.py "$pkgdir/$PSEC_BINDIR"/create-mqtt-tunnels.py
-    
-    install -D -m755 "$srcdir"/attach-pci-devices.initd "$pkgdir"/etc/init.d/attach-pci-devices
-    install -D -m755 "$srcdir"/setup-pci.initd "$pkgdir"/etc/init.d/setup-pci
+        
     install -D -m755 "$srcdir"/splash.initd "$pkgdir"/etc/init.d/splash
-    install -D -m755 "$srcdir"/start-domains.initd "$pkgdir"/etc/init.d/start-domains
     install -D -m755 "$srcdir"/psec-core-controller.initd "$pkgdir"/etc/init.d/psec-core-controller
     install -D -m755 "$srcdir"/start-x.initd "$pkgdir"/etc/init.d/start-x
+    install -D -m755 "$srcdir"/orchestrator.initd "$pkgdir"/etc/init.d/orchestrator
 
     install -D -m644 "$srcdir"/psec.conf "$pkgdir/etc/modules-load.d/psec.conf"
     install -D -m644 "$srcdir"/10-energy-saving.conf "$pkgdir"/etc/X11/xorg.conf.d/10-energy-saving.conf
@@ -121,6 +119,8 @@ package() {
     install -D -m644 "$srcdir"/write-screen-information-to-xenstore.py "$pkgdir/$PSEC_BINDIR"/write-screen-information-to-xenstore.py
     install -D -m755 "$srcdir"/show-logs.sh "$pkgdir/$PSEC_BINDIR"/show-logs.sh
     install -D -m755 "$srcdir"/show-messages.sh "$pkgdir/$PSEC_BINDIR"/show-messages.sh
+    install -D -m755 "$srcdir"/start-sys-usb.sh "$pkgdir/$PSEC_BINDIR"/start-sys-usb.sh
+    install -D -m755 "$srcdir"/start-sys-gui.sh "$pkgdir/$PSEC_BINDIR"/start-sys-gui.sh
 
     install -D -m644 "$srcdir"/get-total-memory.py "$pkgdir/$PSEC_BINDIR"/get-total-memory.py    
 

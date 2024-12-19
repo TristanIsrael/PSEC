@@ -1,0 +1,32 @@
+#!/sbin/openrc-run
+
+name="orchestrator"
+command_background="yes"
+pidfile="/var/run/orchestrator.pid"
+
+depend() {    
+    after start-x
+}
+
+start() {
+    modprobe uinput
+    
+    # Write screen information in the Xenstore for sys-gui
+    ebegin "Store screen information"
+    sysguiid="$(/usr/lib/psec/bin/get-sys-gui-domid.sh)"
+    screen_size=`cat /sys/class/graphics/fb0/virtual_size`    
+    xenstore-write /local/domain/$sysguiid/screen_size $screen_size            
+    python3 /usr/lib/psec/bin/write-screen-information-to-xenstore.py $sysguiid
+    eend $?
+
+    ebegin "Starting PSEC orchestrator"
+    start-stop-daemon --start --make-pidfile --exec /usr/bin/python3 --pidfile /var/run/$name.pid --background -- /usr/lib/psec/bin/orchestrator.py
+    eend $?
+}
+
+stop() {
+    ebegin "Stopping orchestrator"
+    kill -9 $(cat /var/run/$name.pid)
+    eend $?
+
+}

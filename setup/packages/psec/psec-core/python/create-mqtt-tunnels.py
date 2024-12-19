@@ -76,7 +76,7 @@ class UnixSocketTunneler:
                 # Connect to the client and wait for data
                 client_sock = self.create_client_socket_and_wait_for_connection()
 
-                broker_socket_path = "/var/run/mosquitto/mqtt_msg_{}.sock".format(self.n_socket)                                       
+                broker_socket_path = "/tmp/mqtt_msg_{}.sock".format(self.n_socket)                                       
                 broker_sock.connect(broker_socket_path)                
                 print("Connected to the broker on socket {}".format(broker_socket_path))         
 
