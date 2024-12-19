@@ -13,13 +13,26 @@ FRAME_FORMAT = "<BHHi"  # 'B': uint8, 'H': uint16, 'I': int32
 FRAME_SIZE = struct.calcsize(FRAME_FORMAT)  # Taille attendue de la trame (9 octets)
 
 # Configuration pour le périphérique uinput
-capabilities = {
+mouse_capabilities = {
     ecodes.EV_KEY: [ecodes.BTN_LEFT, ecodes.BTN_RIGHT],  # Boutons de souris
     ecodes.EV_REL: [ecodes.REL_X, ecodes.REL_Y],        # Mouvements relatifs
 }
 
+touch_capabilities = {
+    ecodes.EV_ABS: {
+        ecodes.ABS_X: AbsInfo(0, 0, 1920, 0, 0, 10),  # Plage pour l'axe X
+        ecodes.ABS_Y: AbsInfo(0, 0, 1080, 0, 0, 10),  # Plage pour l'axe Y
+        ecodes.ABS_MT_POSITION_X: AbsInfo(0, 0, 1920, 0, 0, 10),
+        ecodes.ABS_MT_POSITION_Y: AbsInfo(0, 0, 1080, 0, 0, 10),
+        ecodes.ABS_MT_SLOT: AbsInfo(0, 0, 10, 0, 0, 0),  # Multi-touch slots
+        ecodes.ABS_MT_TRACKING_ID: AbsInfo(0, 0, 65535, 0, 0, 0),
+    },
+    ecodes.EV_KEY: [ecodes.BTN_TOUCH],  # Bouton tactile
+    ecodes.EV_SYN: [],  # Synchronisation
+}
+
 # Créer un périphérique avec un nom unique
-ui = UInput(capabilities, name="CustomMouseDevice")
+ui = UInput(mouse_capabilities, name="CustomMouseDevice")
 print(f"Created uinput device: {ui.devnode}")
 
 buffer = bytearray()

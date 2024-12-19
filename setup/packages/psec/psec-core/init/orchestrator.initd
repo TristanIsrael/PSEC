@@ -16,7 +16,7 @@ start() {
     #sysguiid="$(/usr/lib/psec/bin/get-sys-gui-domid.sh)"
     screen_size=`cat /sys/class/graphics/fb0/virtual_size`    
     xenstore-write /local/domain/system/screen_size $screen_size            
-    python3 /usr/lib/psec/bin/write-screen-information-to-xenstore.py $sysguiid    
+    python3 /usr/lib/psec/bin/write-screen-information-to-xenstore.py
     eend $?    
 
     /usr/lib/psec/bin/set-xenstore-permissions.sh

@@ -1,12 +1,7 @@
 import sys, json, subprocess
 
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Error: missing argument domid")
-        exit(1)
-
-    domid = sys.argv[1]
-    print("Write screen information into Xenstore for domain {}".format(domid))
+if __name__ == "__main__":    
+    print("Write screen information into Xenstore")
 
     # Rotation is defined in topology.json
     topology_file="/etc/psec/topology.json"

@@ -195,7 +195,7 @@ class DemonInputs(metaclass=SingletonMeta):
         # event.code : unsigned 16bit
         # event.value : signed 32bit
         #payload = struct.pack('<BHHi', type_input, event.type, event.code, event.value)
-        print("Event : Type={}, Code={}, Value={}".format(ecodes.EV[event.type], ecodes.bytype[event.type][event.code], event.value))
+        #print("Event : Type={}, Code={}, Value={}".format(ecodes.EV[event.type], ecodes.bytype[event.type][event.code], event.value))
         payload = msgpack.packb([type_input, event.type, event.code, event.value])
         return payload +b'\n'
 
@@ -247,7 +247,7 @@ class DemonInputs(metaclass=SingletonMeta):
                     serialized = self.__serialize_event(TypeEntree.TOUCH, event)
                     self.socket_xenbus.write(serialized)
                     #print(f"Sent: {serialized.strip()}")
-                    if event.code == ecodes.ABS_X:
+                    '''if event.code == ecodes.ABS_X:
                         event2 = InputEvent(time.time(), time.time_ns()%1_000_000_000, ecodes.EV_ABS, ecodes.ABS_MT_POSITION_X, event.value)
                         serialized = self.__serialize_event(TypeEntree.TOUCH, event2)
                         self.socket_xenbus.write(serialized)
@@ -255,7 +255,7 @@ class DemonInputs(metaclass=SingletonMeta):
                         event2 = InputEvent(time.time(), time.time_ns()%1_000_000_000, ecodes.EV_ABS, ecodes.ABS_MT_POSITION_Y, event.value)
                         serialized = self.__serialize_event(TypeEntree.TOUCH, event2)
                         self.socket_xenbus.write(serialized)
-
+                    '''
 
                 if not self.can_run:
                     return                
