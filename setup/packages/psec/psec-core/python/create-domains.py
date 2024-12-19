@@ -147,6 +147,7 @@ channel = [
 ]
 '''.format(memory_in_mb, nb_cpus)
         
+        '''
         parser=ConfigParser()
         with open("/etc/conf.d/xen-pci") as stream:
             parser.read_string("[none]\n" +stream.read())
@@ -157,7 +158,8 @@ channel = [
 
                 if devs != "" and devs != None:
                     txt += "pci = [{}]\n".format(devs.replace(' ', '","'))
-
+        '''
+        
         return txt
 
     def __create_domain_sys_gui(self, memory_in_mb:int, nb_cpus:int) -> None:

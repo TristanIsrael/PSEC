@@ -194,9 +194,9 @@ class InterfaceInputs(QObject):
     
     def __get_screen_rotation(self) -> int:
         try:
-            result = subprocess.run(["/usr/bin/xenstore-read", "domid"], capture_output=True, text=True)
-            domid = result.stdout.strip()
-            result = subprocess.run(["/usr/bin/xenstore-read", "/local/domain/{}/screen_rotation".format(domid)], capture_output=True, text=True)
+            #result = subprocess.run(["/usr/bin/xenstore-read", "domid"], capture_output=True, text=True)
+            #domid = result.stdout.strip()
+            result = subprocess.run(["/usr/bin/xenstore-read", "/local/domain/system/screen_rotation"], capture_output=True, text=True)
             orientation = int(result.stdout)
 
             return orientation

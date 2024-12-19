@@ -22,7 +22,7 @@
     echo Create XEN Domains
     /usr/bin/python3 /usr/lib/psec/bin/create-domains.py $ALPINE_LOCAL_REPOSITORY/`uname -m`
 
-    rc-service xen-pci start
+    #rc-service xen-pci start
     #rc-service attach-pci-devices start    
     #rc-service start-domains start
 #fi

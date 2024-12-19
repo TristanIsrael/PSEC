@@ -29,8 +29,6 @@ scripts/generate-pgp-keys.sh
 scripts/provision-domain.sh
 scripts/reindex-and-sign-repository.sh
 scripts/setup-alpine-repositories.sh
-scripts/setup-pci-usb-controllers.sh 
-scripts/setup-pci-vga-controller.sh
 scripts/setup-xen-environment.sh
 scripts/get-sys-gui-domid.sh
 scripts/post-install.sh
@@ -38,6 +36,7 @@ scripts/show-logs.sh
 scripts/show-messages.sh
 scripts/start-sys-gui.sh
 scripts/start-sys-usb.sh
+scripts/set-xenstore-permissions.sh
 
 conf/constants.sh
 conf/psec.conf
@@ -54,8 +53,12 @@ python/write-screen-information-to-xenstore.py
 python/generate-x-config.py
 python/get-total-memory.py
 python/create-mqtt-tunnels.py
+python/orchestrator.py
 
 boot/Splash_800_1280.ppm
+boot/Splash_800_1280.png
+boot/Splash_1024_768.ppm
+boot/Splash_1024_768.png
 "
 
 PSEC_CONFDIR="etc/psec"
@@ -90,13 +93,14 @@ package() {
     install -D -m755 "$srcdir"/generate-pgp-keys.sh "$pkgdir/$PSEC_BINDIR"/generate-pgp-keys.sh    
     install -D -m755 "$srcdir"/reindex-and-sign-repository.sh "$pkgdir/$PSEC_BINDIR"/reindex-and-sign-repository.sh
     install -D -m755 "$srcdir"/setup-alpine-repositories.sh "$pkgdir/$PSEC_BINDIR"/setup-alpine-repositories.sh        
-    install -D -m755 "$srcdir"/setup-pci-usb-controllers.sh "$pkgdir/$PSEC_BINDIR"/setup-pci-usb-controllers.sh 
-    install -D -m755 "$srcdir"/setup-pci-vga-controller.sh "$pkgdir/$PSEC_BINDIR"/setup-pci-vga-controller.sh
+    #install -D -m755 "$srcdir"/setup-pci-usb-controllers.sh "$pkgdir/$PSEC_BINDIR"/setup-pci-usb-controllers.sh 
+    #install -D -m755 "$srcdir"/setup-pci-vga-controller.sh "$pkgdir/$PSEC_BINDIR"/setup-pci-vga-controller.sh
     install -D -m755 "$srcdir"/setup-xen-environment.sh "$pkgdir/$PSEC_BINDIR"/setup-xen-environment.sh
     install -D -m755 "$srcdir"/finish-core-init.sh "$pkgdir/$PSEC_BINDIR"/finish-core-init.sh
     install -D -m755 "$srcdir"/start-psec-core-controller.py "$pkgdir/$PSEC_BINDIR"/start-psec-core-controller.py
     install -D -m755 "$srcdir"/create-mqtt-tunnels.py "$pkgdir/$PSEC_BINDIR"/create-mqtt-tunnels.py
-        
+    install -D -m755 "$srcdir"/set-xenstore-permissions.sh "$pkgdir/$PSEC_BINDIR"/set-xenstore-permissions.sh
+
     install -D -m755 "$srcdir"/splash.initd "$pkgdir"/etc/init.d/splash
     install -D -m755 "$srcdir"/psec-core-controller.initd "$pkgdir"/etc/init.d/psec-core-controller
     install -D -m755 "$srcdir"/start-x.initd "$pkgdir"/etc/init.d/start-x
@@ -123,8 +127,12 @@ package() {
     install -D -m755 "$srcdir"/start-sys-gui.sh "$pkgdir/$PSEC_BINDIR"/start-sys-gui.sh
 
     install -D -m644 "$srcdir"/get-total-memory.py "$pkgdir/$PSEC_BINDIR"/get-total-memory.py    
+    install -D -m644 "$srcdir"/orchestrator.py "$pkgdir/$PSEC_BINDIR"/orchestrator.py
 
     install -D -m644 "$srcdir"/Splash_800_1280.ppm "$pkgdir"/boot/Splash_800_1280.ppm
+    install -D -m644 "$srcdir"/Splash_800_1280.png "$pkgdir"/boot/Splash_800_1280.png
+    install -D -m644 "$srcdir"/Splash_1024_768.ppm "$pkgdir"/boot/Splash_1024_768.ppm
+    install -D -m644 "$srcdir"/Splash_1024_768.png "$pkgdir"/boot/Splash_1024_768.png
 
     # Mosquitto
     install -D -m644 "$srcdir"/mosquitto.conf "$pkgdir"/etc/mosquitto/mosquitto.conf

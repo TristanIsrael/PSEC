@@ -46,6 +46,6 @@ if __name__ == "__main__":
     if rotation is None:
         rotation = 0
 
-    command = "xenstore-write /local/domain/{}/screen_rotation {}".format(domid, rotation)
+    command = "xenstore-write /local/domain/system/screen_rotation {}".format(rotation)
 
     subprocess.run(command, shell=True, check=True)

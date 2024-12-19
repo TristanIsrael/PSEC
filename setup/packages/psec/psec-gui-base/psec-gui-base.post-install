@@ -1,16 +1,20 @@
 #!/bin/sh
 
+rc-service udev start
+rc-service udev-postmount start
+rc-service udev-trigger start
+
 echo "**** Starting X server"
 X &
 
 echo "**** Setting graphical mode"
 
 # Read screen size
-domid=`xenstore-read domid`
-screen_size=`xenstore-read /local/domain/$domid/screen_size`
+#domid=`xenstore-read domid`
+screen_size=`xenstore-read /local/domain/system/screen_size`
 
 # Read screen orientation
-screen_rotation=`xenstore-read /local/domain/$domid/screen_rotation`
+screen_rotation=`xenstore-read /local/domain/system/screen_rotation`
 
 # Compute the resolution with the orientation
 normalized_rotation=$(( (screen_rotation % 360 + 360) % 360 ))

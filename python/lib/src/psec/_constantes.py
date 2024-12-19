@@ -59,9 +59,9 @@ class Constantes(metaclass=SingletonMeta):
     constantes = {
         Cles.SERIAL_PORT_MSG: "/dev/hvc1",
         Cles.SERIAL_PORT_LOG: "/dev/hvc2",
-        Cles.MQTT_MSG_BROKER_SOCKET: "/tmp/mosquitto/mqtt_msg_dom0.sock",
-        Cles.MQTT_MSG_BROKER_SOCKETS: "/tmp/mosquitto/mqtt_msg*.sock",
-        Cles.MQTT_LOG_BROKER_SOCKET: "/tmp/mosquitto/mqtt_log.sock",
+        Cles.MQTT_MSG_BROKER_SOCKET: "/tmp/mqtt_msg_dom0.sock",
+        Cles.MQTT_MSG_BROKER_SOCKETS: "/tmp/mqtt_msg*.sock",
+        Cles.MQTT_LOG_BROKER_SOCKET: "/tmp/mqtt_log.sock",
         Cles.MQTT_MSG_SOCKET_FILTER: "/var/run/*-msg.sock",
         Cles.MQTT_LOG_SOCKET_FILTER: "/var/run/*-log.sock",
         Cles.XEN_SOCKETS_PATH: "/var/run",

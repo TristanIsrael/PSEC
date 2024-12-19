@@ -1,6 +1,6 @@
 import sys, glob, threading, serial, time, struct, msgpack
 from typing import Optional
-from evdev import InputDevice, ecodes
+from evdev import InputDevice, ecodes, InputEvent
 from . import Logger, Mouse, MouseButton, MouseWheel, MouseMove, Parametres, Cles, SingletonMeta
 from . import MqttClient, Topics
 
@@ -195,6 +195,7 @@ class DemonInputs(metaclass=SingletonMeta):
         # event.code : unsigned 16bit
         # event.value : signed 32bit
         #payload = struct.pack('<BHHi', type_input, event.type, event.code, event.value)
+        print("Event : Type={}, Code={}, Value={}".format(ecodes.EV[event.type], ecodes.bytype[event.type][event.code], event.value))
         payload = msgpack.packb([type_input, event.type, event.code, event.value])
         return payload +b'\n'
 
@@ -227,51 +228,34 @@ class DemonInputs(metaclass=SingletonMeta):
             self.monitored_inputs.remove(input.path)
 
     def __surveille_tactile(self, input):        
-        Logger().info("Monitor the touchscreen {}".format(input.name))
-        
-        abs_x = -1
-        abs_y = -1
-        btn_touch = -1
+        Logger().info("Monitor the touchscreen {}".format(input.name))        
+
+        filtered_events = [
+            ecodes.EV_KEY, 
+            ecodes.EV_MSC, 
+            ecodes.EV_ABS, 
+            ecodes.EV_SYN,
+            ecodes.ABS_MT_SLOT, 
+            ecodes.ABS_MT_POSITION_X, 
+            ecodes.ABS_MT_POSITION_Y, 
+            ecodes.ABS_MT_TRACKING_ID
+        ]
 
         try:
-            for event in input.read_loop():
-                # Dans l'ordre, les événements reçus sont :
-                # - BTN_TOUCH = 1
-                # - ABS_X
-                # - ABS_Y
-                # - BTN_TOUCH = 0
-                # 
-                # La surface tactile a sa propre résolution. La position du point peut être calculée
-                # grâce à une règle de 3 prenant en compte la valeur max de ABS_MT_POSITION_X ou ABS_MT_POSITION_Y
-                # par l'application contrôleur ayant connaissance de la résolution de l'écran.
-                # Cette valeur max doit être transmise avec les coordonnées du toucher.
-                '''if event.type != ecodes.EV_ABS and event.type != ecodes.EV_KEY:
-                    continue #ignoré               
-                elif event.type == ecodes.EV_ABS and event.code == ecodes.ABS_MT_POSITION_X:
-                    abs_x = event.value                    
-                elif event.type == ecodes.EV_ABS and event.code == ecodes.ABS_MT_POSITION_Y:
-                    abs_y = event.value                  
-                elif event.type == ecodes.EV_ABS and event.code == ecodes.ABS_X: 
-                    abs_x = event.value                    
-                elif event.type == ecodes.EV_ABS and event.code == ecodes.ABS_Y:
-                    abs_y = event.value
-                elif event.type == ecodes.EV_KEY and event.code == ecodes.BTN_TOUCH:
-                    btn_touch = event.value
-                           
-                # On envoie la position absolue
-                if abs_x > -1 and abs_y > -1 and btn_touch > -1:
-                    self.__on_position(abs_x, abs_y, btn_touch)
-
-                    if btn_touch == 0:
-                        # Après le relâchement on réinitialise le contexte
-                        abs_x = -1
-                        abs_y = -1    
-                        btn_touch = -1
-                '''
-                if event.type in [ecodes.EV_KEY, ecodes.EV_MSC, ecodes.EV_ABS, ecodes.EV_SYN]:
+            for event in input.read_loop():               
+                if event.type in filtered_events:                                            
                     serialized = self.__serialize_event(TypeEntree.TOUCH, event)
                     self.socket_xenbus.write(serialized)
                     #print(f"Sent: {serialized.strip()}")
+                    if event.code == ecodes.ABS_X:
+                        event2 = InputEvent(time.time(), time.time_ns()%1_000_000_000, ecodes.EV_ABS, ecodes.ABS_MT_POSITION_X, event.value)
+                        serialized = self.__serialize_event(TypeEntree.TOUCH, event2)
+                        self.socket_xenbus.write(serialized)
+                    elif event.code == ecodes.ABS_Y:
+                        event2 = InputEvent(time.time(), time.time_ns()%1_000_000_000, ecodes.EV_ABS, ecodes.ABS_MT_POSITION_Y, event.value)
+                        serialized = self.__serialize_event(TypeEntree.TOUCH, event2)
+                        self.socket_xenbus.write(serialized)
+
 
                 if not self.can_run:
                     return                

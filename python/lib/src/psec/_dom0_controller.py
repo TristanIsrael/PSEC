@@ -1,5 +1,5 @@
 from . import Constantes
-from . import Logger, InputsProxy, FichierHelper, Parametres, Cles
+from . import Logger, FichierHelper, Parametres, Cles
 from . import ResponseFactory
 from . import MqttClient, Topics
 import threading
@@ -28,7 +28,7 @@ class Dom0Controller():
     def __on_mqtt_connected(self):
         Logger().debug("Starting Dom0 controller")        
         self.mqtt_client.subscribe("system/+/+/request") # All the system requests
-        InputsProxy(self.mqtt_client).demarre()
+        #InputsProxy(self.mqtt_client).demarre()
 
     def __on_mqtt_message(self, topic:str, payload:dict):
         base_topic, _ = topic.rsplit("/", 1)
