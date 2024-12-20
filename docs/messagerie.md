@@ -56,6 +56,8 @@ Liste des commandes
 | TypeCommande.LISTE_COMPOSANTS | `system/components/discover` | `{}` | Demande la liste des composants du système | `{ 'components': [ { 'id': '', 'label': '', 'type': '' } ] }` | L'association entre un composant et le client est faite grâce à l'identifiant fournit dans le suffixe du topic |
 | N/A | `system/events/set_loglevel` | `{ "level": "debug\|info\|warn\|error\|critical" }` | Définit le niveau de journalisation pour l'ensemble du système | Aucune | |
 | N/A | `system/events/save_log` | `{ "disk": "", "filename": "" }` | Enregistre le journal sur le disque | Aucune | |
+| N/A | `system/workflow/shutdown` | `{}` | Asks the system to shutdown | `{ "state": "accepted\|refused}` | |
+| N/A | `system/workflow/restart_domain` | `{}` | Asks the system to restart a domain | `{ "state": "accepted\|refused, "reason": "" }` | |
 
 (*) la racine du topic doit être complétée par le suffixe de commande (`/request`) ou de réponse (`/response`).
 

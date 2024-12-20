@@ -36,14 +36,12 @@ class DemonInputs(metaclass=SingletonMeta):
     last_x = 0
     last_y = 0
     can_run = True
-    
-    def __init__(self, mqtt_client: MqttClient):
-        self.mqtt_client = mqtt_client
-        Logger().setup("Input daemon", mqtt_client)
 
-    def start(self):
-        Logger().info("Starting input daemon")
 
+    def start(self, mqtt_client: MqttClient):
+        self.mqtt_client = mqtt_client                
+        #Logger().setup("Input daemon", mqtt_client)
+        Logger().info("Starting input daemon", "Input daemon")
         self.can_run = True
 
         # On démarre la messagerie si elle ne l'est pas déjà
@@ -141,7 +139,7 @@ class DemonInputs(metaclass=SingletonMeta):
 
     def __recherche_souris(self):
         # This function is ran in a specific thread
-        Logger().info("Looking for a mouse...")
+        Logger().info("Looking for a mouse...", "Input daemon")
 
         while True:
             inputs = glob.glob("/dev/input/event*")
@@ -160,7 +158,7 @@ class DemonInputs(metaclass=SingletonMeta):
             time.sleep(0.5)
 
     def __recherche_tactile(self):
-        Logger().info("Looking for a touchscreen...")
+        Logger().info("Looking for a touchscreen...", "Input daemon")
 
         while self.can_run:
             inputs = glob.glob("/dev/input/event*")
@@ -200,7 +198,7 @@ class DemonInputs(metaclass=SingletonMeta):
         return payload +b'\n'
 
     def __surveille_souris(self, input):
-        Logger().info("Monitor the mouse {}".format(input.name))
+        Logger().info("Monitor the mouse {}".format(input.name), "Input daemon")
 
         try:
             for event in input.read_loop():  
@@ -224,11 +222,11 @@ class DemonInputs(metaclass=SingletonMeta):
                 if not self.can_run:
                     return
         except:
-            Logger().debug("The mouse {} is not available anymore".format(input.name))
+            Logger().debug("The mouse {} is not available anymore".format(input.name), "Input daemon")
             self.monitored_inputs.remove(input.path)
 
     def __surveille_tactile(self, input):        
-        Logger().info("Monitor the touchscreen {}".format(input.name))        
+        Logger().info("Monitor the touchscreen {}".format(input.name), "Input daemon")        
 
         filtered_events = [
             ecodes.EV_KEY, 
@@ -260,7 +258,7 @@ class DemonInputs(metaclass=SingletonMeta):
                 if not self.can_run:
                     return                
         except:
-            Logger().debug("The touchscreen {} is not available anymore".format(input.name))
+            Logger().debug("The touchscreen {} is not available anymore".format(input.name), "Input daemon")
             self.monitored_inputs.remove(input.path)
 
     #def __recherche_claviers(self):
@@ -296,22 +294,22 @@ class DemonInputs(metaclass=SingletonMeta):
     
     def __connecte_interface_xenbus(self) -> bool:
         #Ouvre le flux avec la socket
-        Logger().debug("Open Xenbus I/O channel {}".format(self.chemin_socket_xenbus))
+        Logger().debug("Open Xenbus I/O channel {}".format(self.chemin_socket_xenbus), "Input daemon")
 
         try:
             self.socket_xenbus = serial.Serial(port= self.chemin_socket_xenbus)
             self.interface_xenbus_prete = True            
-            Logger().info("I/O channel is open")
+            Logger().info("I/O channel is open", "Input daemon")
             return True          
         except serial.SerialException as e:
             self.socket_xenbus = None            
-            Logger().error("Impossible to open the serial port {}".format(self.chemin_socket_xenbus))
-            Logger().error(str(e))
+            Logger().error("Impossible to open the serial port {}".format(self.chemin_socket_xenbus), "Input daemon")
+            Logger().error(str(e), "Input daemon")
             return False
         
     def __deconnecte_interface_xenbus(self):
         if self.socket_xenbus is not None:
-            Logger().debug("Close Xenbus I/O socket")
+            Logger().debug("Close Xenbus I/O socket", "Input daemon")
             self.socket_xenbus.close()
         
     '''def __envoie_evenement_souris(self, mouse: Optional[Mouse] = None):

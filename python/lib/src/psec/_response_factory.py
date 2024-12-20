@@ -90,3 +90,13 @@ class ResponseFactory():
             "footprint": footprint
         }
         return payload
+    
+    
+    @staticmethod
+    def create_response_shutdown(accepted:bool):
+        payload = {
+            "state": "accepted" if accepted else "refused",
+            "reason": ""
+        }
+
+        return payload

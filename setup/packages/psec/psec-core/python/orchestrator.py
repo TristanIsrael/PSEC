@@ -1,4 +1,4 @@
-from psec import MqttFactory, Logger, TypeEntree
+from psec import MqttFactory, Logger, TypeEntree, Topics, ResponseFactory
 import os
 import glob
 import subprocess
@@ -51,8 +51,8 @@ def get_device_path(devname:str) -> str:
 
 def create_virtual_mouse():
     capabilities = {
-        ecodes.EV_KEY: [ecodes.BTN_LEFT, ecodes.BTN_RIGHT],  # Boutons de souris
-        ecodes.EV_REL: [ecodes.REL_X, ecodes.REL_Y],        # Mouvements relatifs
+        ecodes.EV_KEY: [ecodes.BTN_LEFT, ecodes.BTN_RIGHT],
+        ecodes.EV_REL: [ecodes.REL_X, ecodes.REL_Y, ecodes.REL_WHEEL, ecodes.REL_WHEEL_HI_RES],
     }
 
     input = UInput(capabilities, name=MOUSE_NAME)
@@ -188,9 +188,52 @@ def patch_sys_usb_conf(usb_devs:list):
         file.writelines(filtered_lines)
 
 
+def start_business_domains():
+    try:
+        with open('/etc/psec/topology.json', 'r') as f:
+            data = json.loads(f.read())
+            f.close()
+            
+        json_business = data.get("business", {})
+        json_domains = json_business.get("domains", [])
+        for domain in json_domains:
+            domain_name = domain.get("name", "")
+            if domain_name == "":
+                continue 
+
+            cmd = ["/usr/lib/psec/bin/start-business-domain.sh", domain_name]
+            res = subprocess.run(cmd)
+
+            if res == 0:
+                Logger().info("Started Domain {}".format(domain_name))  
+            else:                
+                Logger().critical("Domain {} did not start".format(domain_name))            
+
+    except Exception as e:
+        print("An error occured while reading the file /etc/psec/topology.json")
+        print(e)
+        Logger().critical("Could not read the topology to start business Domains")
+
+
+def on_mqtt_message(topic:str, payload:dict):
+    if topic == "{}/request".format(Topics.SHUTDOWN):
+        Logger().warn("System shutdown requested!")
+
+        # There is currently no rule for the shutdown, so we accept it
+        response = ResponseFactory.create_response_shutdown(True)
+        mqtt.publish("{}/response".format(Topics.SHUTDOWN), response)
+
+        # Then we whut the system down
+        cmd = ["halt", "-d", "5"]
+        subprocess.run(cmd)
+
+
 def on_mqtt_ready():
     Logger().setup("Orchestrator", mqtt)
     Logger().info("Starting Orchestrator")
+
+    mqtt.add_message_callback(on_mqtt_message)
+    mqtt.subscribe("{}/+/request".format(Topics.WORKFLOW))    
 
     # Create virtual input devices
     virtual_mouse = create_virtual_mouse()
@@ -230,18 +273,21 @@ def on_mqtt_ready():
         res = subprocess.run(cmd)
 
         if res == 0:
-            Logger().info("Started sys-usb")  
+            Logger().info("Started Domain sys-usb")  
         else:
-            Logger().critical("sys-usb did not start")  
+            Logger().critical("Domain sys-usb did not start")  
 
         # Start sys-gui
         cmd = ["/usr/lib/psec/bin/start-sys-gui.sh"]
         res = subprocess.run(cmd)
 
         if res == 0:
-            Logger().info("Started sys-gui") 
+            Logger().info("Started Domain sys-gui") 
         else:
-            Logger().critical("sys-gui did not start")
+            Logger().critical("Domain sys-gui did not start")
+
+        # Start all other domains
+        start_business_domains()
 
         # Wait for the inputs socket to be ready
         wait_for_file(INPUTS_SOCKET)

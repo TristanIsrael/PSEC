@@ -22,8 +22,10 @@ class SysUsbController():
     def __init__(self, mqtt_client:MqttClient):
         self.mqtt_client = mqtt_client
 
+
     def __del__(self):
-        self.task_runner.stop()        
+        self.task_runner.stop()  
+
 
     def start(self):
         self.mqtt_client.on_connected = self.__on_mqtt_connected
@@ -34,20 +36,23 @@ class SysUsbController():
         # Démarre du worker 
         self.task_runner.start()
 
-        # Démarrage de la surveillance des entrées
-        if NO_INPUTS_MONITORING != True:
-            DemonInputs(self.mqtt_client).start()
-            #threading.Thread(target= DemonInputs().demarre()).start()        
-
+        
     def stop(self):
         self.task_runner.stop()
-        DemonInputs(self.mqtt_client).stop()
+        DemonInputs().stop()
+
 
     def __on_mqtt_connected(self):       
-        Logger().setup("Disk controller", self.mqtt_client)
+        Logger().setup("USB controller", self.mqtt_client)
         Logger().debug("Starting PSEC disk controller")
+
         self.mqtt_client.subscribe("{}/+/+/request".format(Topics.SYSTEM))
         self.mqtt_client.subscribe("{}/+/request".format(Topics.DISCOVER))
+
+        # Démarrage de la surveillance des entrées
+        if not NO_INPUTS_MONITORING:
+            DemonInputs().start()
+            #threading.Thread(target= DemonInputs().demarre()).start()        
 
         ControleurBenchmark().setup(self.mqtt_client)
 

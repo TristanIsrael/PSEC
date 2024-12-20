@@ -5,6 +5,7 @@ class Topics():
     MISC = "{}/misc".format(SYSTEM)
     EVENTS = "{}/events".format(SYSTEM)
     DISCOVER = "{}/discover".format(SYSTEM)
+    WORKFLOW = "{}/workflow".format(SYSTEM)
     
     # Requests
     LIST_DISKS = "{}/list_disks".format(DISKS)
@@ -16,6 +17,7 @@ class Topics():
     FILE_FOOTPRINT = "{}/file_footprint".format(DISKS)
     CREATE_FILE = "{}/create_file".format(DISKS)
     DISCOVER_COMPONENTS = "{}/components".format(DISCOVER)
+    SHUTDOWN = "{}/shutdown".format(WORKFLOW)
 
     # Notifications
     NEW_FILE = "{}/new_file".format(DISKS)
