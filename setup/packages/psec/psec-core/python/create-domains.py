@@ -127,8 +127,8 @@ class DomainsFactory:
         txt = '''
 type = "pv"
 name = "sys-usb"
-kernel = "/var/lib/xen/boot/vmlinuz-virt"
-ramdisk = "/var/lib/xen/boot/initramfs-virt"
+kernel = "/var/lib/xen/boot/vmlinuz-lts"
+ramdisk = "/var/lib/xen/boot/initramfs-lts"
 extra = "modules=loop,squashfs,iso9660 console=hvc0"
 memory={}
 vcpus = {}

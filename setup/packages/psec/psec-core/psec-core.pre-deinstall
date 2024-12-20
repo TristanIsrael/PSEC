@@ -6,5 +6,6 @@ rc-service create-mqtt-tunnels stop
 rc-service mosquitto stop
 rc-service attach-pci-devices stop
 rc-service start-x stop
+rc-service orchestrator stop
 
 exit 0
