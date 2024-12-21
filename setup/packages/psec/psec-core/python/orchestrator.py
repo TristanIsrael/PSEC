@@ -216,24 +216,14 @@ def start_business_domains():
 
 
 def on_mqtt_message(topic:str, payload:dict):
-    if topic == "{}/request".format(Topics.SHUTDOWN):
-        Logger().warn("System shutdown requested!")
-
-        # There is currently no rule for the shutdown, so we accept it
-        response = ResponseFactory.create_response_shutdown(True)
-        mqtt.publish("{}/response".format(Topics.SHUTDOWN), response)
-
-        # Then we whut the system down
-        cmd = ["halt", "-d", "5"]
-        subprocess.run(cmd)
+    pass
 
 
 def on_mqtt_ready():
     Logger().setup("Orchestrator", mqtt)
     Logger().info("Starting Orchestrator")
 
-    mqtt.add_message_callback(on_mqtt_message)
-    mqtt.subscribe("{}/+/request".format(Topics.WORKFLOW))    
+    mqtt.add_message_callback(on_mqtt_message)    
 
     # Create virtual input devices
     virtual_mouse = create_virtual_mouse()
@@ -292,8 +282,8 @@ def on_mqtt_ready():
         # Wait for the inputs socket to be ready
         wait_for_file(INPUTS_SOCKET)
 
-    # Start listening for events from sys-usb
-    start_events_listener(virtual_mouse, virtual_touch)
+        # Start listening for events from sys-usb
+        start_events_listener(virtual_mouse, virtual_touch)
 
 
 if __name__ == "__main__":

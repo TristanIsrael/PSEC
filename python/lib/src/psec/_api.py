@@ -27,6 +27,7 @@ class Api(metaclass=SingletonMeta):
     __message_callbacks = list()
     #__sock = None
     __subscriptions = list()
+    __shutdown_callbaks = list()
 
 
     def start(self, mqtt_client:MqttClient):
@@ -58,6 +59,13 @@ class Api(metaclass=SingletonMeta):
             self.__ready_callbacks.append(callback_fn)            
         else:
             print("WARNING: ready callback function is None")
+
+
+    def add_shutdown_callback(self, callback_fn):
+        if callback_fn is not None:
+            self.__shutdown_callbaks.append(callback_fn)            
+        else:
+            print("WARNING: shutdown callback function is None")
 
 
     def subscribe(self, topic:str):
@@ -172,11 +180,18 @@ class Api(metaclass=SingletonMeta):
         self.subscribe("{}/+/response".format(Topics.DISKS))
         self.subscribe("{}/+/response".format(Topics.MISC))
         self.subscribe("{}/+/response".format(Topics.DISCOVER))        
+        self.subscribe("{}/+/response".format(Topics.SHUTDOWN)) 
 
         for cb in self.__ready_callbacks:
             cb()
 
 
-    def __on_message_received(self, topic:str, payload:dict):        
+    def __on_message_received(self, topic:str, payload:dict):  
+        # Intercept shutdown response
+        if topic == "{}/response".format(Topics.SHUTDOWN):
+            for cb in self.__shutdown_callbaks:
+                cb()
+            return # Stop here
+
         for cb in self.__message_callbacks:
             cb(topic, payload)

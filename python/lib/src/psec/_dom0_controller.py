@@ -3,6 +3,7 @@ from . import Logger, FichierHelper, Parametres, Cles
 from . import ResponseFactory
 from . import MqttClient, Topics
 import threading
+import subprocess
 
 class Dom0Controller():
     """ Cette classe traite les commandes envoyées par les Domaines et qui concernent le dépôt local et le 
@@ -21,30 +22,35 @@ class Dom0Controller():
         
         Logger().setup("System controller", mqtt_client)
 
+
     def start(self):                
         self.mqtt_client.start()
         self.mqtt_lock.wait()
     
+
     def __on_mqtt_connected(self):
         Logger().debug("Starting Dom0 controller")        
-        self.mqtt_client.subscribe("system/+/+/request") # All the system requests
+        self.mqtt_client.subscribe("{}/+/+/request".format(Topics.SYSTEM)) # All the system requests
         #InputsProxy(self.mqtt_client).demarre()
 
+
     def __on_mqtt_message(self, topic:str, payload:dict):
-        base_topic, _ = topic.rsplit("/", 1)
+        #base_topic, _ = topic.rsplit("/", 1)
 
         # The message will be handled in a thread        
-        threading.Thread(target=self.__message_worker, args=(base_topic,payload,)).start()
+        threading.Thread(target=self.__message_worker, args=(topic, payload, )).start()
+
 
     def __message_worker(self, topic:str, payload:dict):
         """ Cette fonction traite uniquement les messages destinés au Dom0 """
         
-        Logger().debug("Handle message on Dom0")        
-
-        if topic == Topics.LIST_FILES:
+        if topic == "{}/request".format(Topics.LIST_FILES):
             self.__handle_list_files(topic, payload)
-        elif topic == Topics.FILE_FOOTPRINT:
+        elif topic == "{}/request".format(Topics.FILE_FOOTPRINT):
             self.__handle_file_footprint(topic, payload)
+        elif topic == "{}/request".format(Topics.SHUTDOWN):
+            self.__handle_shutdown(topic, payload)
+
 
     def __handle_list_files(self, topic:str, payload:dict) -> None:
         if not self.__is_storage_request(payload):
@@ -56,6 +62,7 @@ class Dom0Controller():
         # Génère la réponse
         response = ResponseFactory.create_response_list_files(Constantes.REPOSITORY, fichiers)
         self.mqtt_client.publish("{}/response".format(topic), response)
+
 
     def __handle_file_footprint(self, topic:str, payload:dict) -> None:
         if not self.__is_storage_request(payload):
@@ -78,6 +85,20 @@ class Dom0Controller():
         # Génère la réponse
         response = ResponseFactory.create_response_file_footprint(filepath, disk, footprint)
         self.mqtt_client.publish("{}/response".format(topic), response)
+
+
+    def __handle_shutdown(self, topic:str, message:dict):
+        if topic == "{}/request".format(Topics.SHUTDOWN):
+            Logger().warn("System shutdown requested!")
+
+            # There is currently no rule for the shutdown, so we accept it
+            response = ResponseFactory.create_response_shutdown(True)
+            self.mqtt_client.publish("{}/response".format(Topics.SHUTDOWN), response)
+
+            # Then we whut the system down
+            cmd = ["halt", "-d", "5"]
+            subprocess.run(cmd)
+
 
     def __is_storage_request(self, payload:dict) -> bool:
         if payload.get("disk") is not None:

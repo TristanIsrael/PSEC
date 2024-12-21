@@ -51,7 +51,7 @@ class SysUsbController():
 
         # Démarrage de la surveillance des entrées
         if not NO_INPUTS_MONITORING:
-            DemonInputs().start()
+            DemonInputs().start(self.mqtt_client)
             #threading.Thread(target= DemonInputs().demarre()).start()        
 
         ControleurBenchmark().setup(self.mqtt_client)
@@ -78,10 +78,9 @@ class SysUsbController():
         threading.Thread(target=self.__message_worker, args=(topic, payload,)).start()
 
     def __message_worker(self, topic:str, payload:dict):
-        Logger().debug("Handle message {}".format(topic))
+        #Logger().debug("Handle message {}".format(topic))
 
         base_topic, _ = topic.rsplit("/", 1)
-        print(base_topic)
 
         if base_topic == Topics.LIST_DISKS:
             self.__handle_list_disks(base_topic)
