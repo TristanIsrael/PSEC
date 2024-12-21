@@ -11,7 +11,8 @@ class Dom0Controller():
 
     """    
 
-    mqtt_lock = threading.Event()
+    __mqtt_lock = threading.Event()
+    __is_shutting_down = False
 
     def __init__(self, mqtt_client: MqttClient):
         self.mqtt_client = mqtt_client
@@ -25,7 +26,7 @@ class Dom0Controller():
 
     def start(self):                
         self.mqtt_client.start()
-        self.mqtt_lock.wait()
+        self.__mqtt_lock.wait()
     
 
     def __on_mqtt_connected(self):
@@ -54,7 +55,7 @@ class Dom0Controller():
 
     def __handle_list_files(self, topic:str, payload:dict) -> None:
         if not self.__is_storage_request(payload):
-                return 
+            return 
 
         # Récupère la liste des fichiers                    
         fichiers = FichierHelper.get_files_list(Constantes.REPOSITORY)
@@ -89,7 +90,11 @@ class Dom0Controller():
 
     def __handle_shutdown(self, topic:str, message:dict):
         if topic == "{}/request".format(Topics.SHUTDOWN):
+            if self.__is_shutting_down:
+                return
+            
             Logger().warn("System shutdown requested!")
+            self.__is_shutting_down = True
 
             # There is currently no rule for the shutdown, so we accept it
             response = ResponseFactory.create_response_shutdown(True)
