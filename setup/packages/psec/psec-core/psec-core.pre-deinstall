@@ -1,10 +1,8 @@
 #!/bin/sh
 
-rc-service start-domains stop
 rc-service psec-core-controller stop
 rc-service create-mqtt-tunnels stop
 rc-service mosquitto stop
-rc-service attach-pci-devices stop
 rc-service start-x stop
 rc-service orchestrator stop
 
