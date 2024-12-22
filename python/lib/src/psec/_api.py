@@ -196,8 +196,8 @@ class Api(metaclass=SingletonMeta):
             cb(topic, payload)
 
     def __on_shutdown(self, payload:dict):
-        success = payload.get("state", "") == "accepted"        
+        success = payload.get("state", "") == "accepted"   
+        reason = payload.get("reason", "")     
 
         for cb in self.__shutdown_callbaks:
-            cb(success)        
-            
+            cb(success, reason)        

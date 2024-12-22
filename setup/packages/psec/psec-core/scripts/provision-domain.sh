@@ -8,18 +8,37 @@ export LOCAL_PGP_PUBKEY="/etc/apk/keys/local.rsa.pub"
 ## Local variables
 export WORKDIR="/usr/lib/psec/tmp/domu.tmp"
 
-if [ $# -lt 2 ]; then
+if [ $# -lt 3 ]; then
   echo "Mandatory arguments missing."
-  echo $0 DOMAIN_NAME MAIN_PACKAGE
+  echo "$0 [Domain name] [Main package] [Alpine branch (virt|lts)]"
   exit 1
 fi
 
 DOMAIN=$1
 MAIN_PACKAGE=$2
+ALPINE_BRANCH=$3
+ALPINE_BRANCH=${ALPINE_BRANCH:-virt}
+
+# Vérifier la valeur de $ALPINE_BRANCH et définir $BOOTISO_FILENAME en conséquence
+case "$ALPINE_BRANCH" in
+  lts)
+    export ALPINE_ISO_LOCAL=$ALPINE_LTS_ISO_LOCAL
+    ;;
+  virt)
+    export ALPINE_ISO_LOCAL=$ALPINE_VIRT_ISO_LOCAL
+    ;;
+  *)
+    echo "Valeur inconnue pour ALPINE_BRANCH : $ALPINE_BRANCH"
+    exit 1
+    ;;
+esac
+
 export BOOTISO_FILENAME="bootiso-$DOMAIN.iso"
 
 echo Create new XEN User Domain $DOMAIN 
 echo - main package : $MAIN_PACKAGE
+echo - Alpine branch : $ALPINE_BRANCH
+echo - Alpine ISO comes from : $ALPINE_ISO_LOCAL
 
 modprobe iso9660
 

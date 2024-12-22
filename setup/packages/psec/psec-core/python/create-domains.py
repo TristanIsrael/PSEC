@@ -4,18 +4,18 @@ from configparser import ConfigParser
 class DomainsFactory:
     topology:dict = None
     xen_conn = None
-    alpine_repo = ""
+    #alpine_repo = ""
 
-    def __init__(self, topology:dict, alpine_repo:str):
+    def __init__(self, topology:dict):
         self.topology = topology    
-        self.alpine_repo = alpine_repo
+        #self.alpine_repo = alpine_repo
 
     def create_domains(self):
         print("Start creating domains from topology")
 
         usb = self.topology.get("usb")
         if usb != None and usb.get("use") == 1:
-            self.__provision_domain("sys-usb", "psec-sys-usb")
+            self.__provision_domain("sys-usb", "psec-sys-usb", "lts")
             self.__create_domd_usb()
 
         gui = self.topology.get("gui")
@@ -235,11 +235,11 @@ disk = [
 
         return txt
 
-    def __provision_domain(self, domain_name:str, main_package:str):
+    def __provision_domain(self, domain_name:str, main_package:str, alpine_branch:str = "virt"):
         cmd = "/usr/lib/psec/bin/provision-domain.sh"
 
         try:
-            subprocess.run([cmd, domain_name, main_package], check=True)
+            subprocess.run([cmd, domain_name, main_package, alpine_branch], check=True)
         except Exception as e:
             print("An error occured during domain provisioning")
             print(e)    
@@ -251,7 +251,7 @@ disk = [
 
         subprocess.run(
             args= ["apk", "fetch", "-R", package], 
-            cwd= alpine_repo,
+            cwd= "/usr/lib/psec/packages/alpine/x86_64",
             check= True
         )
 
@@ -307,9 +307,9 @@ def decode_topology_data(data:str) -> dict:
 if __name__ == "__main__":
     print("Starting Domains creation process")
 
-    if len(sys.argv) < 2:
+    '''if len(sys.argv) < 2:
         print("Error: missing argument alpine_repository_location")
-        exit(2)
+        exit(2)'''
 
     print("Open topology file")
     f = read_topology_file()
@@ -318,6 +318,6 @@ if __name__ == "__main__":
     topology = decode_topology_data(f)
 
     print("Start topology factory")
-    alpine_repo = sys.argv[1]
-    factory = DomainsFactory(topology, alpine_repo)
+    #alpine_repo = sys.argv[1]
+    factory = DomainsFactory(topology)
     factory.create_domains()

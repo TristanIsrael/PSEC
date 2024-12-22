@@ -4,6 +4,7 @@ from . import ResponseFactory
 from . import MqttClient, Topics
 import threading
 import subprocess
+import time
 
 class Dom0Controller():
     """ Cette classe traite les commandes envoyées par les Domaines et qui concernent le dépôt local et le 
@@ -100,8 +101,11 @@ class Dom0Controller():
             response = ResponseFactory.create_response_shutdown(True)
             self.mqtt_client.publish("{}/response".format(Topics.SHUTDOWN), response)
 
-            # Then we whut the system down
-            cmd = ["halt", "-d", "5"]
+            # We wait 5 seconds to let the GUIs and clients acknowledge the information
+            time.sleep(5)
+
+            # Then we shut the system down
+            cmd = ["poweroff"]
             subprocess.run(cmd)
 
 
