@@ -4,7 +4,7 @@ from psec import Constantes, Cles
 broker_msg_socket = Constantes().constante(Cles.MQTT_MSG_BROKER_SOCKETS)
 
 BUFFER_SIZE = 4096
-DEBUG = True
+DEBUG = False
 
 def hexdump(data, prefix=""):
     """Print binary data in hexdump format."""

@@ -18,6 +18,7 @@ class Topics():
     CREATE_FILE = "{}/create_file".format(DISKS)
     DISCOVER_COMPONENTS = "{}/components".format(DISCOVER)
     SHUTDOWN = "{}/shutdown".format(WORKFLOW)
+    RESTART_DOMAIN = "{}/restart_domain".format(WORKFLOW)
 
     # Notifications
     NEW_FILE = "{}/new_file".format(DISKS)

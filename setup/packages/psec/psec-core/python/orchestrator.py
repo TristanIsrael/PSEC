@@ -1,4 +1,4 @@
-from psec import MqttFactory, Logger, TypeEntree, Topics, ResponseFactory
+from psec import MqttFactory, Logger, TypeEntree, Topics, MqttHelper
 import os
 import glob
 import subprocess
@@ -40,6 +40,7 @@ def find_touchscreen() -> InputDevice:
 
     return None
 
+
 def get_device_path(devname:str) -> str:
     for device_path in evdev.list_devices():
         device = evdev.InputDevice(device_path)
@@ -48,6 +49,7 @@ def get_device_path(devname:str) -> str:
             return device.path
         
     return ""
+
 
 def create_virtual_mouse():
     capabilities = {
@@ -59,10 +61,12 @@ def create_virtual_mouse():
     Logger().debug("Created virtual mouse {}".format(input.name))
     return input
 
+
 def create_virtual_touch(touch_device) -> InputDevice:
     virtual_touch = UInput.from_device(touch_device, name=TOUCH_NAME)
     Logger().debug("Created virtual touchscreen {}".format(virtual_touch.name))
     return virtual_touch
+
 
 def start_events_listener(virtual_mouse, virtual_touch):
     Logger().debug("Start input listener")
@@ -73,7 +77,11 @@ def start_events_listener(virtual_mouse, virtual_touch):
     sock.connect(INPUTS_SOCKET)
     while True:
         raw_data = sock.recv(128)
-        buffer.extend(raw_data)
+        if not raw_data:
+            print("Connection with inputs socket lost")
+            return
+        
+        buffer.extend(raw_data)        
 
         while b'\n' in buffer:
             # Trouver la première occurrence du délimiteur '\n'
@@ -106,8 +114,9 @@ def start_events_listener(virtual_mouse, virtual_touch):
             except Exception as e:
                 print(f"Erreur lors du traitement de la trame : {e}")
 
+
 def wait_for_file(filepath):
-    print("Wait for the domains to be created")
+    print("Wait for the file {} to be available")
 
     while not os.path.exists(filepath):
         time.sleep(0.5)
@@ -215,15 +224,32 @@ def start_business_domains():
         Logger().critical("Could not read the topology to start business Domains")
 
 
+def reboot_domain(domain_name:str):    
+    cmd = ["xl", "reboot", domain_name]
+    res = subprocess.run(cmd)
+
+    if res.returncode == 0:
+        Logger().info("Rebooting domain {}".format(domain_name))
+    else:
+        Logger().error("The domain {} won't reboot".format(domain_name))
+
+
 def on_mqtt_message(topic:str, payload:dict):
-    pass
+    if topic == "{}/request".format(Topics.RESTART_DOMAIN):
+        if not MqttHelper.check_payload(payload, ["domain_name"]):
+            Logger().error("Missing argument domain_name in the topic {}".format(Topics.RESTART_DOMAIN))
+            return
+        
+        domain_name = payload.get("domain_name", "")
+        reboot_domain(domain_name)
 
 
 def on_mqtt_ready():
     Logger().setup("Orchestrator", mqtt)
     Logger().info("Starting Orchestrator")
 
-    mqtt.add_message_callback(on_mqtt_message)    
+    mqtt.add_message_callback(on_mqtt_message)
+    mqtt.subscribe("{}/request".format(Topics.RESTART_DOMAIN))
 
     # Create virtual input devices
     virtual_mouse = create_virtual_mouse()
@@ -279,11 +305,14 @@ def on_mqtt_ready():
         # Start all other domains
         start_business_domains()
 
-        # Wait for the inputs socket to be ready
-        wait_for_file(INPUTS_SOCKET)
+        # When the domain sys-usb is rebooted, the socket is list
+        # so we need to loop
+        while True:
+            # Wait for the inputs socket to be ready
+            wait_for_file(INPUTS_SOCKET)
 
-        # Start listening for events from sys-usb
-        start_events_listener(virtual_mouse, virtual_touch)
+            # Start listening for events from sys-usb
+            start_events_listener(virtual_mouse, virtual_touch)
 
 
 if __name__ == "__main__":

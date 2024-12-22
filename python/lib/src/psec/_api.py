@@ -27,7 +27,7 @@ class Api(metaclass=SingletonMeta):
     __message_callbacks = list()
     #__sock = None
     __subscriptions = list()
-    __shutdown_callbaks = list()
+    __shutdown_callbacks = list()
 
 
     def start(self, mqtt_client:MqttClient):
@@ -38,7 +38,7 @@ class Api(metaclass=SingletonMeta):
 
         self.mqtt_client.start()
 
-
+    
     def stop(self):
         self.mqtt_client.stop()
 
@@ -63,7 +63,7 @@ class Api(metaclass=SingletonMeta):
 
     def add_shutdown_callback(self, callback_fn):
         if callback_fn is not None:
-            self.__shutdown_callbaks.append(callback_fn)            
+            self.__shutdown_callbacks.append(callback_fn)            
         else:
             print("WARNING: shutdown callback function is None")
 
@@ -165,6 +165,10 @@ class Api(metaclass=SingletonMeta):
         self.mqtt_client.publish(topic, payload)
 
 
+    def restart_domain(self, domain_name:str):
+        payload = RequestFactory.create_request_restart_domain(domain_name)
+        self.mqtt_client.publish("{}/request".format(Topics.RESTART_DOMAIN), payload)
+
     ####
     # Workflow functions
     #
@@ -180,7 +184,7 @@ class Api(metaclass=SingletonMeta):
         self.subscribe("{}/+/response".format(Topics.DISKS))
         self.subscribe("{}/+/response".format(Topics.MISC))
         self.subscribe("{}/+/response".format(Topics.DISCOVER))        
-        self.subscribe("{}/+/response".format(Topics.SHUTDOWN)) 
+        self.subscribe("{}/response".format(Topics.SHUTDOWN)) 
 
         for cb in self.__ready_callbacks:
             cb()
@@ -199,5 +203,5 @@ class Api(metaclass=SingletonMeta):
         success = payload.get("state", "") == "accepted"   
         reason = payload.get("reason", "")     
 
-        for cb in self.__shutdown_callbaks:
+        for cb in self.__shutdown_callbacks:
             cb(success, reason)        

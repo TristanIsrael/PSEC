@@ -91,3 +91,9 @@ class RequestFactory():
             "contents": contents.decode("utf-8"),
             "compressed": compressed
         }    
+
+    @staticmethod
+    def create_request_restart_domain(domain_name:str):
+        return {
+            "domain_name": domain_name
+        }    

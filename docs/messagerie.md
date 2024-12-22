@@ -57,7 +57,7 @@ Liste des commandes
 | N/A | `system/events/set_loglevel` | `{ "level": "debug\|info\|warn\|error\|critical" }` | Définit le niveau de journalisation pour l'ensemble du système | Aucune | |
 | N/A | `system/events/save_log` | `{ "disk": "", "filename": "" }` | Enregistre le journal sur le disque | Aucune | |
 | N/A | `system/workflow/shutdown` | `{}` | Asks the system to shutdown | `{ "state": "accepted\|refused}` | |
-| N/A | `system/workflow/restart_domain` | `{}` | Asks the system to restart a domain | `{ "state": "accepted\|refused, "reason": "" }` | |
+| N/A | `system/workflow/restart_domain` | `{ "domain_name": "" }` | Asks the system to restart a domain | `{ "state": "accepted\|refused, "reason": "" }` | |
 
 (*) la racine du topic doit être complétée par le suffixe de commande (`/request`) ou de réponse (`/response`).
 
