@@ -53,7 +53,7 @@ Liste des commandes
 | TypeCommande.START_BENCHMARK | `system/misc/benchmark` | `{ 'module': '' }` | Demande le démarrage du processus de calcul des performances du système | `{ 'status': 'started\|error\|finished' }` | | 
 | TypeCommande.GET_FILE_FOOTPRINT | `system/disks/get_file_footprint` | `{ 'disk': 'nom', 'filepath': 'path' }` | Demande l'empreinte numérique d'un fichier | `{ 'footprint': 'xxxx' }` | |
 | TypeCommande.CREATE_FILE | `system/disks/create_file` | `{ 'disk': 'nom', 'filepath': 'path', 'data': 'contenu', 'compressed': bool }` | Demande la création d'un fichier sur un disque | `{ 'status': 'ok\|error' }` | |
-| TypeCommande.LISTE_COMPOSANTS | `system/components/discover` | `{}` | Demande la liste des composants du système | `{ 'components': [ { 'id': '', 'label': '', 'type': '' } ] }` | L'association entre un composant et le client est faite grâce à l'identifiant fournit dans le suffixe du topic |
+| TypeCommande.LISTE_COMPOSANTS | `system/components/discover` | `{}` | Demande la liste des composants du système | `{ 'components': [ { 'id': '', "domain_name": "", 'label': '', 'type': '' } ] }` | L'association entre un composant et le client est faite grâce à l'identifiant fournit dans le suffixe du topic |
 | N/A | `system/events/set_loglevel` | `{ "level": "debug\|info\|warn\|error\|critical" }` | Définit le niveau de journalisation pour l'ensemble du système | Aucune | |
 | N/A | `system/events/save_log` | `{ "disk": "", "filename": "" }` | Enregistre le journal sur le disque | Aucune | |
 | N/A | `system/workflow/shutdown` | `{}` | Asks the system to shutdown | `{ "state": "accepted\|refused}` | |

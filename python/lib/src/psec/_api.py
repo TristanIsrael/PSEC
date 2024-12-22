@@ -28,6 +28,7 @@ class Api(metaclass=SingletonMeta):
     #__sock = None
     __subscriptions = list()
     __shutdown_callbacks = list()
+    __restart_callbacks = list()
 
 
     def start(self, mqtt_client:MqttClient):
@@ -64,6 +65,13 @@ class Api(metaclass=SingletonMeta):
     def add_shutdown_callback(self, callback_fn):
         if callback_fn is not None:
             self.__shutdown_callbacks.append(callback_fn)            
+        else:
+            print("WARNING: shutdown callback function is None")
+
+
+    def add_restart_callback(self, callback_fn):
+        if callback_fn is not None:
+            self.__restart_callbacks.append(callback_fn)            
         else:
             print("WARNING: shutdown callback function is None")
 
@@ -205,9 +213,19 @@ class Api(metaclass=SingletonMeta):
         for cb in self.__message_callbacks:
             cb(topic, payload)
 
+
     def __on_shutdown(self, payload:dict):
         success = payload.get("state", "") == "accepted"   
         reason = payload.get("reason", "")     
 
         for cb in self.__shutdown_callbacks:
             cb(success, reason)        
+
+
+    def __on_restart_domain(self, payload:dict):
+        success = payload.get("state", "") == "accepted"   
+        domain_name = payload.get("domain_name", "")
+        reason = payload.get("reason", "")
+
+        for cb in self.__restart_callbacks:
+            cb(domain_name, success, reason)

@@ -37,8 +37,8 @@ rc-service psec-core-controller start
 rc-update add start-x
 rc-service start-x start
 
-rc-update add orchestrator
-rc-service orchestrator start
+#rc-update add orchestrator
+#rc-service orchestrator start
 
 # finish-core-init est exécuté par le script post-install du produit...
 #/usr/lib/psec/bin/finish-core-init.sh

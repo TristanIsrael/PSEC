@@ -63,6 +63,7 @@ class SysUsbController():
             "components": [
                 {
                 "id": Constantes.PSEC_DISK_CONTROLLER,
+                "domain_name": "sys-usb",
                 "label": "System Disk controller",
                 "type": "core",
                 "state": EtatComposant.READY
@@ -314,9 +315,9 @@ class SysUsbController():
     def __handle_discover_components(self, topic:str, payload:dict) -> None:
         response = {
             "components": [
-                { "id": Constantes.PSEC_DISK_CONTROLLER, "label": "System disk controller", "type": "core" },
-                { "id": Constantes.PSEC_INPUT_CONTROLLER, "label": "Input controller", "type": "core" },
-                { "id": Constantes.PSEC_IO_BENCHMARK, "label": "System I/O benchmark", "type": "core" }
+                { "id": Constantes.PSEC_DISK_CONTROLLER, "domain_name": "sys-usb", "label": "System disk controller", "type": "core" },
+                { "id": Constantes.PSEC_INPUT_CONTROLLER, "domain_name": "sys-usb", "label": "Input controller", "type": "core" },
+                { "id": Constantes.PSEC_IO_BENCHMARK, "domain_name": "sys-usb", "label": "System I/O benchmark", "type": "core" }
             ]
         }
 
