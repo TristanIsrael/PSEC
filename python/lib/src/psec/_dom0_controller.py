@@ -1,7 +1,7 @@
 from . import Constantes
 from . import Logger, FichierHelper, Parametres, Cles
 from . import ResponseFactory
-from . import MqttClient, Topics
+from . import MqttClient, Topics, MqttHelper
 import threading
 import subprocess
 import time
@@ -47,14 +47,16 @@ class Dom0Controller():
         """ Cette fonction traite uniquement les messages destinés au Dom0 """
         
         if topic == "{}/request".format(Topics.LIST_FILES):
-            self.__handle_list_files(topic, payload)
+            self.__handle_list_files(payload)
         elif topic == "{}/request".format(Topics.FILE_FOOTPRINT):
-            self.__handle_file_footprint(topic, payload)
+            self.__handle_file_footprint(payload)
         elif topic == "{}/request".format(Topics.SHUTDOWN):
-            self.__handle_shutdown(topic, payload)
+            self.__handle_shutdown(payload)
+        elif topic == "{}/request".format(Topics.RESTART_DOMAIN):
+            self.__handle_restart_domain(payload)
 
 
-    def __handle_list_files(self, topic:str, payload:dict) -> None:
+    def __handle_list_files(self, payload:dict) -> None:
         if not self.__is_storage_request(payload):
             return 
 
@@ -63,10 +65,10 @@ class Dom0Controller():
 
         # Génère la réponse
         response = ResponseFactory.create_response_list_files(Constantes.REPOSITORY, fichiers)
-        self.mqtt_client.publish("{}/response".format(topic), response)
+        self.mqtt_client.publish("{}/response".format(Topics.LIST_FILES), response)
 
 
-    def __handle_file_footprint(self, topic:str, payload:dict) -> None:
+    def __handle_file_footprint(self, payload:dict) -> None:
         if not self.__is_storage_request(payload):
             return 
                     
@@ -86,27 +88,35 @@ class Dom0Controller():
         
         # Génère la réponse
         response = ResponseFactory.create_response_file_footprint(filepath, disk, footprint)
-        self.mqtt_client.publish("{}/response".format(topic), response)
+        self.mqtt_client.publish("{}/response".format(Topics.FILE_FOOTPRINT), response)
 
 
-    def __handle_shutdown(self, topic:str, message:dict):
-        if topic == "{}/request".format(Topics.SHUTDOWN):
-            if self.__is_shutting_down:
-                return
-            
-            Logger().warn("System shutdown requested!")
-            self.__is_shutting_down = True
+    def __handle_shutdown(self, payload:dict):
+        if self.__is_shutting_down:
+            return
+        
+        Logger().warn("System shutdown requested!")
+        self.__is_shutting_down = True
 
-            # There is currently no rule for the shutdown, so we accept it
-            response = ResponseFactory.create_response_shutdown(True)
-            self.mqtt_client.publish("{}/response".format(Topics.SHUTDOWN), response)
+        # There is currently no rule for the shutdown, so we accept it
+        response = ResponseFactory.create_response_shutdown(True)
+        self.mqtt_client.publish("{}/response".format(Topics.SHUTDOWN), response)
 
-            # We wait 5 seconds to let the GUIs and clients acknowledge the information
-            time.sleep(5)
+        # We wait 5 seconds to let the GUIs and clients acknowledge the information
+        time.sleep(5)
 
-            # Then we shut the system down
-            cmd = ["poweroff"]
-            subprocess.run(cmd)
+        # Then we shut the system down
+        cmd = ["poweroff"]
+        subprocess.run(cmd)
+
+
+    def __handle_restart_domain(self, payload:dict):
+        if not MqttHelper.check_payload(payload, ["domain_name"]):
+            Logger().error("Missing argument domain_name in the topic {}".format(Topics.RESTART_DOMAIN))
+            return
+        
+        domain_name = payload.get("domain_name", "")
+        self.__reboot_domain(domain_name)
 
 
     def __is_storage_request(self, payload:dict) -> bool:
@@ -114,3 +124,17 @@ class Dom0Controller():
             return payload.get("disk") == Constantes.REPOSITORY
         else:
             return False
+        
+    
+    def __reboot_domain(self, domain_name:str):    
+        cmd = ["xl", "reboot", domain_name]
+        res = subprocess.run(cmd)
+
+        if res.returncode == 0:
+            Logger().info("Rebooting domain {}".format(domain_name))
+            response = ResponseFactory.create_response_restart_domain(domain_name, True)
+            self.mqtt_client.publish("{}/response".format(Topics.RESTART_DOMAIN), response)
+        else:
+            Logger().error("The domain {} won't reboot".format(domain_name))
+            response = ResponseFactory.create_response_restart_domain(domain_name, False)
+            self.mqtt_client.publish("{}/response".format(Topics.RESTART_DOMAIN), response)

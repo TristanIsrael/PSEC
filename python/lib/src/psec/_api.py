@@ -185,6 +185,7 @@ class Api(metaclass=SingletonMeta):
         self.subscribe("{}/+/response".format(Topics.MISC))
         self.subscribe("{}/+/response".format(Topics.DISCOVER))        
         self.subscribe("{}/response".format(Topics.SHUTDOWN)) 
+        self.subscribe("{}/response".format(Topics.RESTART_DOMAIN)) 
 
         for cb in self.__ready_callbacks:
             cb()
@@ -194,6 +195,11 @@ class Api(metaclass=SingletonMeta):
         # Intercept shutdown response
         if topic == "{}/response".format(Topics.SHUTDOWN):
             self.__on_shutdown(payload)
+            return # Stop here
+        
+        # Intercept restart domain response
+        if topic == "{}/response".format(Topics.RESTART_DOMAIN):
+            self.__on_restart_domain(payload)
             return # Stop here
 
         for cb in self.__message_callbacks:

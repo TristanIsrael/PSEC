@@ -1,4 +1,4 @@
-from psec import MqttFactory, Logger, TypeEntree, Topics, MqttHelper
+from psec import MqttFactory, Logger, TypeEntree, Topics, MqttHelper, ResponseFactory
 import os
 import glob
 import subprocess
@@ -116,7 +116,7 @@ def start_events_listener(virtual_mouse, virtual_touch):
 
 
 def wait_for_file(filepath):
-    print("Wait for the file {} to be available")
+    print("Wait for the file {} to be available".format(filepath))
 
     while not os.path.exists(filepath):
         time.sleep(0.5)
@@ -224,24 +224,8 @@ def start_business_domains():
         Logger().critical("Could not read the topology to start business Domains")
 
 
-def reboot_domain(domain_name:str):    
-    cmd = ["xl", "reboot", domain_name]
-    res = subprocess.run(cmd)
-
-    if res.returncode == 0:
-        Logger().info("Rebooting domain {}".format(domain_name))
-    else:
-        Logger().error("The domain {} won't reboot".format(domain_name))
-
-
 def on_mqtt_message(topic:str, payload:dict):
-    if topic == "{}/request".format(Topics.RESTART_DOMAIN):
-        if not MqttHelper.check_payload(payload, ["domain_name"]):
-            Logger().error("Missing argument domain_name in the topic {}".format(Topics.RESTART_DOMAIN))
-            return
-        
-        domain_name = payload.get("domain_name", "")
-        reboot_domain(domain_name)
+    pass
 
 
 def on_mqtt_ready():
@@ -249,7 +233,6 @@ def on_mqtt_ready():
     Logger().info("Starting Orchestrator")
 
     mqtt.add_message_callback(on_mqtt_message)
-    mqtt.subscribe("{}/request".format(Topics.RESTART_DOMAIN))
 
     # Create virtual input devices
     virtual_mouse = create_virtual_mouse()
