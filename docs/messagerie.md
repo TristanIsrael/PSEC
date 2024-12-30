@@ -70,5 +70,6 @@ Liste des notifications
 |--|--|--|--|
 | TypeEvenement.FICHIER | `system/disk/new_file` | `{ 'disk': '', 'filepath': 'path', 'size_in_bytes': 0}` | Indique qu'un nouveau fichier est disponible dans le dépôt local ou sur un disque |
 | TypeEvenement.ERREUR | `system/events/error` | `{ 'module':'', 'datetime': '', 'level': 0, 'description'; ''}` | Indique qu'une erreur s'est produite dans un module |
+| N/A | `system/workflow/gui_ready` | `{}` | Indique que l'interface graphique du système est prête, PSEC lui donnera alors la main. |
 
 (*) la racine du topic doit être complétée par le suffixe de notification (`/notification`).

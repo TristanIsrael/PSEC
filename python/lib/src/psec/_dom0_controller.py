@@ -33,6 +33,7 @@ class Dom0Controller():
     def __on_mqtt_connected(self):
         Logger().debug("Starting Dom0 controller")        
         self.mqtt_client.subscribe("{}/+/+/request".format(Topics.SYSTEM)) # All the system requests
+        self.mqtt_client.subscribe("{}".format(Topics.GUI_READY))
         #InputsProxy(self.mqtt_client).demarre()
 
 
@@ -54,6 +55,8 @@ class Dom0Controller():
             self.__handle_shutdown(payload)
         elif topic == "{}/request".format(Topics.RESTART_DOMAIN):
             self.__handle_restart_domain(payload)
+        elif topic == "{}".format(Topics.GUI_READY):
+            self.__handle_gui_ready(payload)
 
 
     def __handle_list_files(self, payload:dict) -> None:
@@ -118,6 +121,11 @@ class Dom0Controller():
         domain_name = payload.get("domain_name", "")
         self.__reboot_domain(domain_name)
 
+
+    def __handle_gui_ready(self, paylaod:dict):
+        # When GUI is ready we hide the splash screen
+        cmd = ["killall", "feh"]
+        subprocess.run(cmd)
 
     def __is_storage_request(self, payload:dict) -> bool:
         if payload.get("disk") is not None:

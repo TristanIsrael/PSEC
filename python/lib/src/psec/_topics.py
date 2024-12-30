@@ -23,6 +23,7 @@ class Topics():
     # Notifications
     NEW_FILE = "{}/new_file".format(DISKS)
     DISK_STATE = "{}/state".format(DISKS)
+    GUI_READY = "{}/gui_ready".format(WORKFLOW)
 
     # Miscelaneous
     KEEPALIVE = "mics/ping"

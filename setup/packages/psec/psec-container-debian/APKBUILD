@@ -1,0 +1,56 @@
+# Contributor:
+# Maintainer: Tristan Israël <tristan.israel@alefbet.net>
+pkgname=psec-container-debian
+pkgver=1.0
+pkgrel=1
+pkgdesc="PSEC - LXC Container based on Debian"
+url="https://www.alefbet.net/"
+arch="x86_64"
+license="MIT"
+depends="lxc lxc-download lxc-templates lxc-bridge iptables"
+makedepends=""
+builddir="$srcdir/$pkgname-$pkgver"
+checkdepends=""
+install="$pkgname.post-install"
+subpackages=""
+replaces=""
+options="!check"  # no tests provided
+_distro="debian"
+_release="bookworm"
+_arch="amd64"
+
+clean() {
+    sudo rm -rf "$srcdir" 
+    sudo rm -rf "$pkgdir"
+    sudo rm -rf "$builddir"
+}
+
+build() {     
+    # Create a new container
+    sudo lxc-create -n "$pkgname" -t download -P "$srcdir" -- --dist $_distro --release $_release --arch $_arch
+
+    # Inject python into the container
+    #sudo service dnsmasq.lxcbr0 start
+    #sudo lxc-start -P "$srcdir" -n "$pkgname"
+    #sudo lxc-attach -P "$srcdir" -n "$pkgname" -- apt update && apt upgrade
+        
+    # Stop the container
+    #sudo lxc-stop -P "$srcdir" -n "$pkgname"
+
+    # Disable networking in the container
+    sed -i 's/^lxc\.net/#&/' "$srcdir/$pkgname"/config
+}
+
+package() {
+    mkdir -p "$pkgdir"/var/lib/lxc/
+
+    # Tar container
+    sudo tar cf "$pkgdir"/var/lib/lxc/"$pkgname".tar -C "$srcdir" .
+    sudo chown $USER "$pkgdir"/var/lib/lxc/"$pkgname".tar
+
+    # Compress archive
+    bzip2 "$pkgdir"/var/lib/lxc/"$pkgname".tar
+
+    # Clean the environment because abuild won't be able
+    sudo rm -rf "$srcdir/$pkgname"
+}

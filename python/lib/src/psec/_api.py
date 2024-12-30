@@ -81,6 +81,10 @@ class Api(metaclass=SingletonMeta):
             self.mqtt_client.subscribe(topic)
 
 
+    def publish(self, topic:str, payload:dict):
+        self.mqtt_client.publish(topic, payload)
+
+
     ####
     # Fonctions de journalisation
     #
@@ -169,19 +173,21 @@ class Api(metaclass=SingletonMeta):
         self.mqtt_client.publish("{}".format(Topics.DISK_STATE), payload)
 
 
-    def publish(self, topic:str, payload:dict):
-        self.mqtt_client.publish(topic, payload)
+    def notify_gui_ready(self) -> None:
+        self.mqtt_client.publish("{}".format(Topics.GUI_READY), {})
 
-
-    def restart_domain(self, domain_name:str):
-        payload = RequestFactory.create_request_restart_domain(domain_name)
-        self.mqtt_client.publish("{}/request".format(Topics.RESTART_DOMAIN), payload)
 
     ####
     # Workflow functions
     #
     def shutdown(self):        
         self.mqtt_client.publish("{}/request".format(Topics.SHUTDOWN), {})
+
+
+    def restart_domain(self, domain_name:str):
+        payload = RequestFactory.create_request_restart_domain(domain_name)
+        self.mqtt_client.publish("{}/request".format(Topics.RESTART_DOMAIN), payload)
+
 
     ####
     # Fonctions privées

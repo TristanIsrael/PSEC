@@ -16,8 +16,8 @@ start() {
 
     start-stop-daemon --start --make-pidfile --exec X --pidfile /var/run/$name.pid --background -- -config /etc/X11/xorg.conf
 
-    # Rotate the screen if needed
-    #/usr/bin/python3 /usr/lib/psec/bin/rotate-screen.py
+    # Show splash
+    DISPLAY=:0 feh --fullscreen --zoom fill /boot/Splash.png
 
     eend $?
 }

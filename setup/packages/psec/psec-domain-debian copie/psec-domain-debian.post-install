@@ -1,0 +1,4 @@
+#!/bin/sh
+
+#tar xjf /usr/lib/psec/tmp/psec-domain-debian.tar.bz2 -C /var/lib/lxc
+#rm -rf /usr/lib/psec/tmp/psec-domain-debian.tar.bz2
