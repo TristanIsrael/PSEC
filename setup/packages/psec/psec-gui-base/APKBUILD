@@ -21,7 +21,6 @@ xorg.conf.d/10-layout.conf
 xorg.conf.d/20-glx.conf
 xorg.conf.d/20-paths.conf
 xorg.conf.d/30-keyboard.conf
-xorg.conf.d/30-mouse.conf
 xorg.conf.d/30-touchscreen.conf
 xorg.conf.d/40-monitor.conf
 xorg.conf.d/50-card.conf
@@ -35,7 +34,7 @@ package() {
     install -D -m644 "$srcdir"/20-glx.conf "$pkgdir"/etc/X11/xorg.conf.d/20-glx.conf
     install -D -m644 "$srcdir"/20-paths.conf "$pkgdir"/etc/X11/xorg.conf.d/30-paths.conf
     install -D -m644 "$srcdir"/30-keyboard.conf "$pkgdir"/etc/X11/xorg.conf.d/30-keyboard.conf
-    install -D -m644 "$srcdir"/30-mouse.conf "$pkgdir"/etc/X11/xorg.conf.d/30-mouse.conf
+    #install -D -m644 "$srcdir"/30-mouse.conf "$pkgdir"/etc/X11/xorg.conf.d/30-mouse.conf
     install -D -m644 "$srcdir"/30-touchscreen.conf "$pkgdir"/etc/X11/xorg.conf.d/30-touchscreen.conf
     install -D -m644 "$srcdir"/40-monitor.conf "$pkgdir"/etc/X11/xorg.conf.d/40-monitor.conf
     install -D -m644 "$srcdir"/50-card.conf "$pkgdir"/etc/X11/xorg.conf.d/50-card.conf
