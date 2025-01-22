@@ -2,8 +2,8 @@ from PySide6.QtCore import QObject, Signal
 from PySide6.QtCore import QProcess, QTimer, QDir, Property, Slot, QPoint, QCoreApplication, Qt, QEvent, QSize
 from PySide6.QtGui import QMouseEvent, QCursor
 from PySide6.QtWidgets import QWidget
-from psec import Api, EtatDisque, Constantes, Topics, BenchmarkId, MqttClient, MqttFactory
-import threading
+from psec import Api, Constantes, Topics, BenchmarkId, MqttClient, MqttFactory
+import os
 
 class InterfaceSocle(QObject):
     """! Cette classe surveille le XenBus pour échanger des messages avec les autres composants du système.    
@@ -38,32 +38,39 @@ class InterfaceSocle(QObject):
     filesChanged = Signal()    
     benchmarkDataChanged = Signal()
     fileCreated = Signal(str, str, str) # filepath, disk, footprint
-    error = Signal(str)
+    error = Signal(str)    
 
     def __init__(self, parent=None):
         QObject.__init__(self, parent)
+        self.is_dev_mode = os.getenv("DEVMODE") is not None
 
     @Slot()
     def start(self, ready_callback):
-        self.mqtt_client = MqttFactory.create_mqtt_client_domu("Diag")
+        print("Starting InterfaceSocle")
+        print("DEV mode is {}".format("ON" if self.is_dev_mode else "OFF"))
+
+        if self.is_dev_mode:
+            self.mqtt_client = MqttFactory.create_mqtt_network_dev("Diag")
+        else:
+            self.mqtt_client = MqttFactory.create_mqtt_client_domu("Diag")
 
         Api().add_message_callback(self.__on_message_received)
         Api().add_ready_callback(ready_callback)
         Api().start(self.mqtt_client)
 
     @Slot()
-    def get_liste_disques(self):
+    def get_disks_list(self):
         print("Get list disks")
         Api().debug("Get disks list")
         return Api().get_disks_list()
 
     @Slot()
-    def get_contenu_disque(self, nom):
+    def get_disks_content(self, nom):
         return Api().get_files_list(nom)
 
     @Slot()
-    def get_contenu_depot(self):
-        return self.get_contenu_disque(Constantes.REPOSITORY)
+    def get_storage_content(self):
+        return self.get_disks_content(Constantes.REPOSITORY)
 
     def get_disks(self):
         return self.disks_
@@ -87,7 +94,7 @@ class InterfaceSocle(QObject):
     def __update_disks_files_list(self):
         # Demande la liste des fichiers pour chaque disque
         for disk in self.disks_:
-            self.get_contenu_disque(disk)
+            self.get_disks_content(disk)
 
     def __on_message_received(self, topic:str, payload:dict):        
         print("topic: {}, payload: {}".format(topic, payload))
@@ -113,6 +120,7 @@ class InterfaceSocle(QObject):
                 self.disksChanged.emit()
                 self.files_.clear()
                 self.filesChanged.emit()
+
         elif topic == "{}/response".format(Topics.LIST_DISKS):
             disks = payload.get("disks")
             if disks is None:
@@ -121,9 +129,11 @@ class InterfaceSocle(QObject):
                         
             Api().debug("Disks list received : {}".format(disks))
             self.disks_.clear()
+            self.disks_.extend(["__repository__"])
             self.disks_.extend(disks)            
             self.disksChanged.emit()
-            self.__update_disks_files_list()            
+            self.__update_disks_files_list()     
+
         elif topic == "{}/response".format(Topics.LIST_FILES):
             disk = payload.get("disk")
             files = payload.get("files")
@@ -145,6 +155,7 @@ class InterfaceSocle(QObject):
             self.files_.extend(files)            
             #self.files_[disk_name] = files
             self.filesChanged.emit()
+
         elif topic == "{}/response".format(Topics.BENCHMARK):            
             Api().debug("Received benchmark data: {}".format(payload))
 
@@ -174,6 +185,7 @@ class InterfaceSocle(QObject):
                     metrics = payload.get("metrics")
                     if metrics != None and len(metrics) > 0:
                         self.__analyze_benchmark_files_metrics(metrics)
+
         elif topic == "{}/response".format(Topics.CREATE_FILE):
             Api().debug("File creation response: {}".format(payload))
             success = payload.get("success")
@@ -186,6 +198,7 @@ class InterfaceSocle(QObject):
                 return 
         
             self.fileCreated.emit(filepath, disk, footprint)
+
         elif topic == Topics.DISK_STATE:
             disk = payload.get("disk")
             state = payload.get("state")

@@ -1,12 +1,8 @@
-from PySide6.QtCore import QObject, QPoint, Signal, Slot, Property, QCoreApplication, QEvent, Qt, QThread, QTimer
-from PySide6.QtGui import QCursor, QScreen, QGuiApplication
+from PySide6.QtCore import QObject, Signal, Slot
 from PySide6.QtWidgets import QWidget
-from PySide6.QtGui import QHoverEvent, QMouseEvent
-from MousePointer import MousePointer
-from InterfaceInputs import InterfaceInputs
 from InterfaceSocle import InterfaceSocle
 from hashlib import md5
-from psec import MouseWheel, Api, Parametres, Cles
+from psec import Api, Parametres, Cles
 import os
 try:
     from psec import ControleurBenchmark
@@ -15,24 +11,11 @@ except:
 
 class AppController(QObject):
 
-    _mouse_x = 0
-    _mouse_y = 0
-    _clic_x = 0
-    _clic_y = 0
-    _wheel = MouseWheel.NO_MOVE
-    _follow_mouse_cursor = False
     fenetre_app:QWidget = None
-    mousePointer:MousePointer = MousePointer()
-    interfaceInputs = None
     interface_socle:InterfaceSocle
 
-    mouseXChanged = Signal()
-    mouseYChanged = Signal()
-    clicXChanged = Signal()
-    clicYChanged = Signal()
-    wheelChanged = Signal()
-    testFinished = Signal(bool, str) # success, error
-    followMouseCursorChanged = Signal()
+    # Signals    
+    testFinished = Signal(bool, str) # success, error    
     workerThread = None
     test_step = 0
     testfile_footprint = ""
@@ -40,56 +23,15 @@ class AppController(QObject):
     def __init__(self, parent = QObject()):
         QObject.__init__(self, parent)
 
-    def __mouse_x(self):
-        return self._mouse_x
-    
-    def set_mouse_x(self, x:int):
-        self._mouse_x = x
-        self.mouseXChanged.emit()
-    
-    def __mouse_y(self):
-        return self._mouse_y
-    
-    def set_mouse_y(self, y:int):
-        self._mouse_y = y
-        self.mouseYChanged.emit()
-    
-    def __clic_x(self):
-        return self._clic_x
-    
-    def set_clic_x(self, x:int):
-        self._clic_x = x
-        self.clicXChanged.emit()
-    
-    def __clic_y(self):
-        return self._clic_y
-    
-    def set_clic_y(self, y:int):
-        self._clic_y = y
-        self.clicYChanged.emit()
-
-    def __wheel(self):
-        return self._wheel
-
-    def set_wheel(self, wheel:MouseWheel):
-        self._wheel = wheel
-        self.wheelChanged.emit()
-
-    def __follow_mouse_cursor(self):
-        return self._follow_mouse_cursor
-
-    def set_follow_mouse_cursor(self, follow:bool):
-        self._follow_mouse_cursor = follow
-        self.followMouseCursorChanged.emit()
 
     def set_fenetre_app(self, fenetre:QWidget):
         self.fenetre_app = fenetre
-        self.mousePointer = MousePointer(fenetre.contentItem())
-        self.demarre_surveillance_inputs()
+
 
     def set_interface_socle(self, interface_socle:InterfaceSocle):
         self.interface_socle = interface_socle
         self.interface_socle.fileCreated.connect(self.__on_file_created)
+
 
     @Slot(str)
     @Slot(str, str)
@@ -97,29 +39,35 @@ class AppController(QObject):
         print(message, module)
         Api().debug(message, module)
 
+
     @Slot(str)
     @Slot(str, str)
     def info(self, message:str, module:str = ""):
         Api().info(message, module)
+
 
     @Slot(str)
     @Slot(str, str)
     def warn(self, message:str, module:str = ""):
         Api().warn(message, module)
 
+
     @Slot(str)
     @Slot(str, str)
     def error(self, message:str, module:str = ""):
         Api().error(message, module)
 
+
     @Slot()
     def start_benchmark_inputs(self):
         ControleurBenchmark().demarre_benchmark_inputs()
+
 
     @Slot()
     def start_benchmark_files(self):
         ControleurBenchmark().demarre_benchmark_fichiers()
         
+
     @Slot()
     def start_test(self, step=0, args = {}):
         if len(self.interface_socle.disks) == 0:
@@ -145,6 +93,7 @@ class AppController(QObject):
 
             # Next step after the confirmation of writing
             self.test_step = 1 
+
         elif step == 2:
             Api().info("Démarrage de l'étape 2", "AppController")
 
@@ -161,6 +110,7 @@ class AppController(QObject):
 
             # Next step after the confirmation of writing
             self.test_step = 2
+
         elif step == 3:
             Api().info("Démarrage de l'étape 3", "AppController")            
 
@@ -177,6 +127,7 @@ class AppController(QObject):
 
             # Next step after the confirmation of writing
             self.test_step = 3
+
         elif step == 4:
             Api().info("Démarrage de l'étape 4", "AppController")
 
@@ -189,86 +140,7 @@ class AppController(QObject):
             
             Api().info("Les tests sont terminés et réussis", "AppController")
             self.testFinished(True, "")
-    
-    @Slot()
-    def on_wheel(self, wheel:MouseWheel):
-        self.set_wheel(wheel)
-        
-    cibleGlob = QPoint(530, 143) # en coordonnées globales    
-    currentPos = QPoint(0, 0) 
-    
-    @Slot()
-    def __do_simule_souris(self):
-        #print("Démarre la simulation")
 
-        if self.currentPos.x() < self.cibleGlob.x():
-            self.currentPos.setX(self.currentPos.x()+1)
-            localPos = self.fenetre_app.mapFromGlobal(self.currentPos)
-            event = QMouseEvent(QEvent.MouseMove, localPos, self.currentPos, Qt.NoButton, Qt.NoButton, Qt.NoModifier)
-            QCoreApplication.sendEvent(self.fenetre_app, event)            
-            self._mouse_x = localPos.x()
-            self._mouse_y = localPos.y()
-            self.mousePointer.on_nouvelle_position(localPos)        
-
-        if self.currentPos.y() < self.cibleGlob.y():
-            self.currentPos.setY(self.currentPos.y()+1)   
-            localPos = self.fenetre_app.mapFromGlobal(self.currentPos)
-            event = QMouseEvent(QEvent.MouseMove, localPos, self.currentPos, Qt.NoButton, Qt.NoButton, Qt.NoModifier)
-            QCoreApplication.sendEvent(self.fenetre_app, event)
-            self._mouse_x = localPos.x()
-            self._mouse_y = localPos.y()
-            self.mousePointer.on_nouvelle_position(localPos)
-
-        if self.currentPos.x() < self.cibleGlob.x() or self.currentPos.y() < self.cibleGlob.y():
-            QTimer.singleShot(1, self.__do_simule_souris)
-        else:
-            print("Clic sur le composant")
-            event = QMouseEvent(QEvent.MouseButtonPress, localPos, self.currentPos, Qt.LeftButton, Qt.LeftButton, Qt.NoModifier)
-            QCoreApplication.sendEvent(self.fenetre_app, event)
-            event = QMouseEvent(QEvent.MouseButtonRelease, localPos, self.currentPos, Qt.LeftButton, Qt.NoButton, Qt.NoModifier)
-            QCoreApplication.sendEvent(self.fenetre_app, event)
-            
-            print("déplacement")
-            self.currentPos.setY(self.currentPos.y()+30)   
-            localPos = self.fenetre_app.mapFromGlobal(self.currentPos)
-            event = QMouseEvent(QEvent.MouseMove, localPos, self.currentPos, Qt.NoButton, Qt.NoButton, Qt.NoModifier)
-            QCoreApplication.sendEvent(self.fenetre_app, event)
-            self._mouse_x = localPos.x()
-            self._mouse_y = localPos.y()
-            self.mousePointer.on_nouvelle_position(localPos)
-
-
-    @Slot()
-    def simule_souris(self):    
-        self.workerThread = QThread()
-        self.moveToThread(self.workerThread)                        
-        self.workerThread.start()
-        QTimer.singleShot(1, self.__do_simule_souris)
-
-    @Slot(QPoint)
-    def on_nouvelle_position(self, position:QPoint):
-        self.mousePointer.on_nouvelle_position(position)
-
-        if self.followMouseCursor:           
-            self.set_mouse_x(position.x())
-            self.set_mouse_y(position.y())
-
-    @Slot(QPoint)
-    def on_clicked(self, position:QPoint):
-        self.set_clic_x(position.x())
-        self.set_clic_y(position.y())
-
-    @Slot() 
-    def demarre_surveillance_inputs(self):
-        Api().debug("Démarrage de la surveillance des entrées", "AppController")
-        self.interfaceInputs = InterfaceInputs(self.fenetre_app)  
-        self.workerThread = QThread()        
-        self.interfaceInputs.moveToThread(self.workerThread)  
-        self.workerThread.start()
-        self.interfaceInputs.nouvellePosition.connect(self.on_nouvelle_position)
-        self.interfaceInputs.clicked.connect(self.on_clicked)
-        self.interfaceInputs.wheel.connect(self.on_wheel)
-        QTimer.singleShot(1, self.interfaceInputs.demarre_surveillance)    
 
     @Slot(str, str, str)
     def __on_file_created(self, filepath, disk, footprint):
@@ -283,12 +155,4 @@ class AppController(QObject):
         elif self.test_step == 3:
             Api().debug("Réponse étape 3 reçue")
             self.start_test(4, { "filepath": filepath, "disk": disk, "footprint": footprint }, "AppController")
-
-    mouseX = Property(int, __mouse_x, notify=mouseXChanged)
-    mouseY = Property(int, __mouse_y, notify=mouseYChanged)
-    clicX = Property(int, __clic_x, notify=clicXChanged)
-    clicY = Property(int, __clic_y, notify=clicYChanged)
-    wheel = Property(int, __wheel, notify=wheelChanged)
-    followMouseCursor = Property(bool, __follow_mouse_cursor, set_follow_mouse_cursor, notify=followMouseCursorChanged)
-    
-    
+   

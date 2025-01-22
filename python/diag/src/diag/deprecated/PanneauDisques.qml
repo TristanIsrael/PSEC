@@ -1,7 +1,7 @@
 import QtQuick
 import net.alefbet
 
-PanneauDisquesUi {
+StoragePanelUi {
     id: root
 
     /** Slots */

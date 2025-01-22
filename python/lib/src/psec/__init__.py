@@ -29,6 +29,7 @@ from ._dom0_controller import Dom0Controller
 from ._sys_usb_controller import SysUsbController
 from ._components_helper import ComponentsHelper
 from ._mqtt_factory import MqttFactory
+from ._mock_sys_usb_controller import MockSysUsbController
 
 import logging
 from logging import NullHandler
@@ -54,7 +55,8 @@ __all__ = [
     "TaskRunner",
     "MqttClient", "ConnectionType", "Topics", "MqttFactory", "SerialMQTTClient", "MqttHelper",
     "Dom0Controller", "SysUsbController", "Api",
-    "ComponentsHelper"
+    "ComponentsHelper",
+    "MockSysUsbController"
 ]
 
 logging.getLogger(__name__).addHandler(NullHandler())

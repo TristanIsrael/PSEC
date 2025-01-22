@@ -150,14 +150,21 @@ class MqttClient():
         if self.connection_type != ConnectionType.SERIAL_PORT:            
             self.mqtt_client = mqtt.Client(callback_api_version=CallbackAPIVersion.VERSION2, client_id=self.identifier, transport=self.__get_transport_type(), reconnect_on_failure=True)
             self.mqtt_client.on_connect = self.__on_connected
-            self.mqtt_client.on_message = self.__on_message
-            
-            if self.connection_type == ConnectionType.TCP_DEBUG:
-                self.mqtt_client.connect(host="localhost", keepalive=30)
-            elif self.connection_type == ConnectionType.UNIX_SOCKET:
-                self.mqtt_client.connect(host=self.connection_string, port=1, keepalive=30)
-            else:
-                print("The connection type {} is not handled".format(self.connection_type))
+            self.mqtt_client.on_message = self.__on_message            
+
+            mqtt_host = "undefined"
+            try:
+                if self.connection_type == ConnectionType.TCP_DEBUG:
+                    mqtt_host = "localhost"
+                    self.mqtt_client.connect(host=mqtt_host, keepalive=30)
+                elif self.connection_type == ConnectionType.UNIX_SOCKET:
+                    mqtt_host = self.connection_string
+                    self.mqtt_client.connect(host=mqtt_host, port=1, keepalive=30)
+                else:
+                    print("The connection type {} is not handled".format(self.connection_type))
+                    return
+            except:
+                print("Could not connect to the MQTT broker on {}".format(mqtt_host))
                 return
             
             self.mqtt_client.loop_start()

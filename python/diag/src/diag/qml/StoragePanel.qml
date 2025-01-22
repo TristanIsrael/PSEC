@@ -1,9 +1,12 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import net.alefbet
 
-Rectangle {
+StoragePanelUi {
+
+}
+
+/*Rectangle {
     id: root
     color: "#ddd"
     radius: 3
@@ -108,4 +111,4 @@ Rectangle {
             root.selectedFile = ""
         }
     }
-}
+}*/

@@ -1,10 +1,23 @@
 import QtQuick
+import QtQuick.Controls
 import net.alefbet
 
-EcranPrincipal {
+ApplicationWindow {
     id: window
 
-    /** Slots */
+    property bool mode_paysage: width < height
+
+    width: 1280
+    height: 800
+    visible: true    
+
+    font.family: "Roboto"
+    font.pointSize: 18
+
+    EcranPrincipal {
+        anchors.fill: parent
+    }
+
     Component.onCompleted: {
         if(force_paysage) {
             mode_paysage = force_paysage
@@ -19,11 +32,10 @@ EcranPrincipal {
             console.log("Bascule automatique en mode paysage")
             mode_paysage = true   
         }
-    }
+    }  
 
     onVisibilityChanged: {  
         if(visible)      
             AppController.debug("Résolution : " +Qt.application.screens[0].width +"x" +Qt.application.screens[0].height)
     }
-
 }

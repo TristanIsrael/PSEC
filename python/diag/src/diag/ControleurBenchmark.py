@@ -1,5 +1,9 @@
-from . import SingletonMeta, Logger, RequestFactory, BenchmarkId, Parametres, Cles
-from . import DemonInputs, Mouse, MouseButton, ResponseFactory, FichierHelper, MqttClient, Topics
+from psec import SingletonMeta, Logger, RequestFactory, BenchmarkId, Parametres, Cles
+try:
+    from psec import DemonInputs
+except:
+    print("DemonInputs not available")
+from psec import Mouse, MouseButton, ResponseFactory, FichierHelper, MqttClient, Topics
 import random, time
 
 class ControleurBenchmark(metaclass=SingletonMeta):

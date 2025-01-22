@@ -10,13 +10,13 @@ PanneauInputsUi {
         }
     }
 
-    Connections {
+    /*Connections {
         target: btnStartBenchmark
         function onClicked() {
             AppController.info(qsTr("L'utilisateur demande le démarrage du benchmark inputs"))
             AppController.start_benchmark_inputs()
         }
-    }
+    }*/
 
     Connections {
         target: InterfaceSocle

@@ -12,13 +12,13 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QComboBox
 from PySide6.QtQuickControls2 import QQuickStyle
 from PySide6.QtGui import QHoverEvent, QMouseEvent
 from InterfaceSocle import InterfaceSocle
-from InterfaceInputs import InterfaceInputs
+from python.diag.src.diag.deprecated.InterfaceInputs import InterfaceInputs
 import rc_ressources
 from AppController import AppController
-from MousePointer import MousePointer
+from python.diag.src.diag.deprecated.MousePointer import MousePointer
 from DiskModel import DiskModel
 from DiskProxyModel import DiskProxyModel
-from MousePointer import MousePointer
+from python.diag.src.diag.deprecated.MousePointer import MousePointer
 
 class EvtFilter(QObject):
     def eventFilter(self, obj, event):              

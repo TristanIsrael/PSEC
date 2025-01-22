@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "psec"
-version = "0.10"
+version = "1.0"
 authors = [ 
     { name="Tristan Israël", email="tristan.israel@alefbet.net" }, 
 ]
@@ -15,6 +15,14 @@ classifiers = [
     "Development Status :: 3 - Alpha",
     "Programming Language :: Python :: 3",
     "Operating System :: POSIX :: Linux",
+]
+dependencies = [
+    "pyserial",
+    "joblib",
+    "humanize",
+    "paho-mqtt>=2.0.0",
+    "pyudev",
+    "msgpack"
 ]
 
 [project.urls]
