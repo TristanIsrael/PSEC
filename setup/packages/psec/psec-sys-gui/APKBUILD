@@ -13,7 +13,7 @@ builddir="$srcdir/$pkgname-$pkgver"
 checkdepends=""
 install=""
 subpackages=""
-replaces="psec-core"
+replaces="psec-core alpine-baselayout alpine-baselayout-data"
 options="!check"  # no tests provided
 source="modules"
 
