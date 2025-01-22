@@ -99,6 +99,8 @@ compile_commands.json
 # Icon must end with two \r
 Icon
 
+__pycache__/
+
 # Thumbnails
 ._*
 
