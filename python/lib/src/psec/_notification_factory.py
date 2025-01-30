@@ -25,3 +25,12 @@ class NotificationFactory:
         
         return payload
      
+    @staticmethod
+    def create_notification_error(disk:str, filepath:str, error:str):
+        payload = {
+            "disk": disk,
+            "filepath": filepath,
+            "error": error
+        }
+
+        return payload

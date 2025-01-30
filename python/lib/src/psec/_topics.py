@@ -1,7 +1,7 @@
 class Topics():
     # Groups
     SYSTEM = "system"
-    DISKS = "{}/disks".format(SYSTEM)
+    DISKS = f"{SYSTEM}/disks"
     MISC = "{}/misc".format(SYSTEM)
     EVENTS = "{}/events".format(SYSTEM)
     DISCOVER = "{}/discover".format(SYSTEM)
@@ -23,7 +23,7 @@ class Topics():
     # Notifications
     NEW_FILE = "{}/new_file".format(DISKS)
     DISK_STATE = "{}/state".format(DISKS)
-    GUI_READY = "{}/gui_ready".format(WORKFLOW)
+    GUI_READY = f"{WORKFLOW}/gui_ready"
 
     # Miscelaneous
     KEEPALIVE = "mics/ping"

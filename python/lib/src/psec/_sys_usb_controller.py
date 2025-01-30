@@ -73,10 +73,12 @@ class SysUsbController():
         
         self.mqtt_client.publish("{}/response".format(Topics.DISCOVER_COMPONENTS), payload)
 
+
     def __on_mqtt_message(self, topic:str, payload:dict):
         #Logger().debug("Message received : topic={}, payload={}".format(topic, payload))
 
         threading.Thread(target=self.__message_worker, args=(topic, payload,)).start()
+
 
     def __message_worker(self, topic:str, payload:dict):
         #Logger().debug("Handle message {}".format(topic))
@@ -151,7 +153,7 @@ class SysUsbController():
             Logger().error("Missing argument(s) for the command {}".format(topic))
             return
         
-        source_disk = payload.get("disk")        
+        source_disk = payload.get("disk", "")        
         filepath = payload.get("filepath", "")   
         repository_path:str = Parametres().parametre(Cles.STORAGE_PATH_DOMU)     
     
@@ -167,7 +169,10 @@ class SysUsbController():
         if dest_footprint != "":            
             notif = NotificationFactory.create_notification_new_file(Constantes.REPOSITORY, filepath, source_footprint, dest_footprint)
             self.mqtt_client.publish(Topics.NEW_FILE, notif)
-        
+        else:
+            notif = NotificationFactory.create_notification_error(source_disk, filepath, "The file could not be copied")
+            self.mqtt_client.publish(Topics.ERROR, notif)
+
         '''
         try:                   
             self.task_runner.run_task(self.__do_copy_file, args=(source_location, filepath, Constantes.REPOSITORY, repository_path,))

@@ -9,7 +9,7 @@ Rectangle {
     property string selectedFile
     property alias listView: listView
 
-    signal itemClicked(int row)
+    signal itemClicked(int row, string fileType, string path, string fileName)
 
     implicitWidth: 800
     implicitHeight: 600
@@ -86,7 +86,7 @@ Rectangle {
                 Connections {
                     function onClicked() {
                         root.selectedFile = fileName
-                        root.itemClicked(index)
+                        root.itemClicked(index, fileType, path, fileName)
                     }
                 }
             }

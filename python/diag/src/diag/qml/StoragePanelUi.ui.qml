@@ -14,6 +14,7 @@ Rectangle {
             top: parent.top
             topMargin: 10
             right: parent.right
+            rightMargin: 10
             bottom: pnlActions.top
             bottomMargin: 10
         }

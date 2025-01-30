@@ -16,6 +16,7 @@ class MockSysUsbController():
         self.mqtt_client.on_message = self.__on_mqtt_message
         self.mqtt_client.start()
 
+
     def __on_mqtt_connected(self):
         self.__debug("MQTT client connected")
         self.mqtt_client.subscribe("{}/+/+/request".format(Topics.SYSTEM))
@@ -25,6 +26,7 @@ class MockSysUsbController():
         self.__handle_discover_components()
 
         #threading.Timer(10.0, self.__connect_destination).start()
+
 
     def __on_mqtt_message(self, topic:str, payload:dict):
         #self.__debug("Message received on topic {}".format(topic))
@@ -56,6 +58,7 @@ class MockSysUsbController():
 
             response = ResponseFactory.create_response_list_files("SAPHIR", files)
             self.mqtt_client.publish("{}/response".format(Topics.LIST_FILES), response)
+
 
         elif topic == "{}/request".format(Topics.READ_FILE):
             if not MqttHelper.check_payload(payload, ["disk", "filepath"]):
@@ -90,10 +93,14 @@ class MockSysUsbController():
                 self.mqtt_client.publish(Topics.NEW_FILE, notif)
             except Exception as e:
                 self.__debug("Error during copy: {}".format(e))
+                notif = NotificationFactory.create_notification_error(disk, filepath, "The file could not be copied")
+                self.mqtt_client.publish(Topics.ERROR, notif)
                 return
             
+
         elif topic == "{}/request".format(Topics.DISCOVER_COMPONENTS):
             self.__handle_discover_components()
+
 
         elif topic == "{}/request".format(Topics.COPY_FILE):
             if not MqttHelper.check_payload(payload, ["disk", "filepath", "destination"]):
@@ -124,7 +131,8 @@ class MockSysUsbController():
                 response = ResponseFactory.create_response_copy_file(filepath, disk, source_footprint == dest_footprint, source_footprint)
                 self.mqtt_client.publish("{}/response".format(Topics.COPY_FILE), response)
             except: 
-                pass
+                notif = NotificationFactory.create_notification_error(disk, filepath, "The file could not be copied")
+                self.mqtt_client.publish(Topics.ERROR, notif)
 
             source_footprint = FichierHelper.calculate_footprint(source_path)
 

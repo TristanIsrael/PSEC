@@ -42,10 +42,10 @@ class DiskModel(QAbstractListModel):
         row = index.row()-1
         files = self.__all_files()
         # TODO: vérifier la taille de la liste
-        file = files[row]        
-
+        file = files[row]
+        
         if role == self.RoleDisk:
-            return file.get("disk") 
+            return file.get("disk")
         elif role == self.RolePath:
             return file.get("path")
         elif role == self.RoleFileType:
@@ -55,7 +55,7 @@ class DiskModel(QAbstractListModel):
         elif role == self.RoleFileSize:
             return file.get("size")
         
-        return "inconnu"
+        return "unknown"
 
     def rowCount(self, parent=QModelIndex()):        
         length = len(self.__all_files())

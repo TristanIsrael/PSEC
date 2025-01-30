@@ -200,6 +200,7 @@ class Api(metaclass=SingletonMeta):
         self.subscribe("{}/+/response".format(Topics.DISCOVER))        
         self.subscribe("{}/response".format(Topics.SHUTDOWN)) 
         self.subscribe("{}/response".format(Topics.RESTART_DOMAIN)) 
+        self.subscribe("{}".format(Topics.ERROR))
 
         for cb in self.__ready_callbacks:
             cb()

@@ -17,19 +17,21 @@ FilesListUi {
         root.selectedFile = ""
     }
 
-    onItemClicked: function(row) {
+    onItemClicked: function(row, fileType, path, fileName) {
+        console.debug(fileType)
+
         if (fileType === "special_up") {
             AppController.debug("Up")
-            lv.model.go_up()
+            listViewModel.go_up()
             selectedFile = ""
-        } else if (fileType === "folder") {
-            AppController.debug("Afficher %1".arg(
-                                    lblFilename.text))
-            lv.model.folder = lblFilename.text
-            currentFolder = lv.model.folder
+        } else if (fileType === "folder") {       
+            //const filePath = "%1/%2".arg(path === "/" ? "" : path).arg(fileName)     
+            AppController.debug("Afficher %1".arg(fileName))
+            listViewModel.folder = fileName
+            //currentFolder = listViewModel.folder
             selectedFile = ""
         } else if (fileType === "file") {
-            selectedFile = lblFilename.text
+            selectedFile = fileName
         }
     }
     

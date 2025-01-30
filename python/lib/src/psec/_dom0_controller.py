@@ -122,7 +122,7 @@ class Dom0Controller():
         self.__reboot_domain(domain_name)
 
 
-    def __handle_gui_ready(self, paylaod:dict):
+    def __handle_gui_ready(self, payload:dict):
         # When GUI is ready we hide the splash screen
         cmd = ["killall", "feh"]
         subprocess.run(cmd)

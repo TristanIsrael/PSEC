@@ -54,15 +54,15 @@ class DiskProxyModel(QSortFilterProxyModel):
         folder = self.sourceModel().data(index, DiskModel.RolePath)
         #filename = self._sourceModel().data(index, DiskModel.RoleFileName)
 
+        #print("index: {}, disk: {}, folder: {}, filter: {}{}".format(index, disk, folder, self.disk_name_, self.folder_))
+
         if self.disk_name_ != "":
             if self.disk_name_ != disk:
                 return False
         
         if self.folder_ != "":
             if self.folder_ != folder:
-                return False
-
-        #print("index: {}, disk: {}, folder: {}, filter: {}{}, name:{}".format(index, disk, folder, self.disk_name_, self.folder_, filename))
+                return False        
 
         return True
 
