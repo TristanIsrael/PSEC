@@ -36,6 +36,13 @@ The default typical `topology.json` is:
         "use": 1,
         "app-package": "saphir-gui"
     },
+    "network": {
+        "repositories": [
+            "http://192.168.2.1/depots/alpine/main",
+            "http://192.168.2.1/depots/alpine/community"
+        ],
+        "releases": "http://192.168.2.1/isos/"
+    }
     "business": {
         "repository": "https://repository.local/myrepo",
         "domains": [

@@ -17,7 +17,7 @@ start() {
     start-stop-daemon --start --make-pidfile --exec X --pidfile /var/run/$name.pid --background -- -config /etc/X11/xorg.conf
 
     # Show splash
-    DISPLAY=:0 feh --fullscreen --zoom fill /boot/Splash.png
+    DISPLAY=:0 feh --fullscreen --zoom fill /boot/Splash.png &
 
     eend $?
 }

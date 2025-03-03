@@ -2,7 +2,7 @@
 
 This package provides an isolated access to the graphical device. The Graphical User Interface of your product must be constructed on top of this package.
 
-As a result, a new VM `sys-gui` is automatically create and started when the system boots up.
+As a result, a new VM `sys-gui` is automatically created and started when the system boots up.
 
 **The `sys-gui` VM is created only if this package is added to your product as a dependency.**
 

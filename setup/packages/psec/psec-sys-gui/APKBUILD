@@ -2,7 +2,7 @@
 # Maintainer: Tristan Israël <tristan.israel@alefbet.net>
 pkgname=psec-sys-gui
 pkgver=1.0
-pkgrel=1
+pkgrel=2
 pkgdesc="PSEC - GUI virtual machine"
 url="https://www.alefbet.net/"
 arch="noarch"

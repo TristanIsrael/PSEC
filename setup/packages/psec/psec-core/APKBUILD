@@ -7,7 +7,7 @@ pkgdesc="PSEC - Core of the system"
 url="https://www.alefbet.net/"
 arch="noarch"
 license="MIT"
-depends="openrc cdrkit psec-lib xen xen-hypervisor xen-qemu xen-qemu-openrc abuild pciutils xorg-server xrandr font-terminus gtk+3.0 sdl2 sdl2_image mosquitto mosquitto-openrc mosquitto-clients socat py3-evdev py3-udev feh"
+depends="openrc cdrkit psec-lib xen xen-hypervisor xen-qemu xen-qemu-openrc abuild pciutils xorg-server xrandr font-terminus gtk+3.0 sdl2 sdl2_image mosquitto mosquitto-openrc mosquitto-clients socat py3-evdev py3-udev feh jq"
 makedepends=""
 builddir="$srcdir/$pkgname-$pkgver"
 install="$pkgname.post-install $pkgname.pre-deinstall $pkgname.post-deinstall"
@@ -44,8 +44,10 @@ conf/psec.conf
 conf/10-energy-saving.conf
 conf/topology.json
 conf/mosquitto.conf
-conf/grub.default
 conf/rc.conf
+
+conf/grub/grub.default
+conf/grub/grub.cfg-durabook-r8
 
 python/rotate-screen.py
 python/create-domains.py
@@ -98,6 +100,7 @@ package() {
     install -D -m644 "$srcdir"/psec.conf "$pkgdir/etc/modules-load.d/psec.conf"
     install -D -m644 "$srcdir"/10-energy-saving.conf "$pkgdir"/etc/X11/xorg.conf.d/10-energy-saving.conf
     install -D -m644 "$srcdir"/grub.default "$pkgdir/etc/default/grub"
+    install -D -m644 "$srcdir"/grub.cfg-durabook-r8 "$pkgdir"/boot/grub/grub.cfg
     install -D -m644 "$srcdir"/rc.conf "$pkgdir/etc/rc.conf"
     install -D -m644 "$srcdir"/constants.sh "$pkgdir/$PSEC_CONFDIR"/constants.sh
         

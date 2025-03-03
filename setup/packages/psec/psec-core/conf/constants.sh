@@ -17,7 +17,8 @@ ARCH=`uname -m`
 RELEASES_ALPINE="$ALPINE_PUBLIC_ROOT/v$ALPINE_VERSION/releases"
 export ALPINE_VIRT_ISO_URL="$RELEASES_ALPINE/$ARCH/alpine-virt-$ALPINE_RELEASE-$ARCH.iso"
 export ALPINE_VIRT_ISO_LOCAL=/var/lib/xen/images/alpine-virt.iso
-export ALPINE_LTS_ISO_URL="$RELEASES_ALPINE/$ARCH/alpine-standard-$ALPINE_RELEASE-$ARCH.iso"
+export ALPINE_VIRT_ISO_FILENAME="alpine-standard-$ALPINE_RELEASE-$ARCH.iso"
+export ALPINE_LTS_ISO_URL="$RELEASES_ALPINE/$ARCH/$ALPINE_VIRT_ISO_FILENAME"
 export ALPINE_LTS_ISO_LOCAL=/var/lib/xen/images/alpine-standard.iso
 
 export LOCAL_PGP_PUBKEY=/etc/apk/keys/local.rsa.pub

@@ -131,7 +131,7 @@ insmod gzio
 ```
 
 ### UEFI
-Dans le BIOS désactiver la fonctionnalité `VMD` sinon le système ne démarrera pas.
+Dans le BIOS désactiver la fonctionnalité `VMD` sinon le système ne démarrera pas (`Boot > VMD setup menu`).
 
 ### Disque NVME
 Pour utiliser le disque NVME, l'option `pci=nomsi` est nécessaire.
@@ -141,6 +141,7 @@ L'ajout de `edd=off no-real-mode` sur la ligne de commande de Xen `multiboot2` p
 
 La configuration fonctionnelle est la suivante: 
 ```
+menuentry 'Saphir' --class gnu-linux --class gnu --class os --class xen $menuentry_id_option 'xen-gnulinux-6.6.68-0-lts-advanced-00f8468a-bc98-4837-abb2-a5c9971c {
     load_video
     set gfxpayload=keep
     insmod gzio
@@ -153,4 +154,5 @@ La configuration fonctionnelle est la suivante:
 	module2	/boot/vmlinuz-lts placeholder root=UUID=767befbd-ce80-44ec-a659-76526ca10e00 ro fbcon=rotate:3 modules=sd-mod,usb-storage,ext4,nvme rootfstype=ext4
 	echo	'Loading initial ramdisk ...'
 	module2	--nounzip   /boot/initramfs-lts
+}
 ```

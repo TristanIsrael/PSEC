@@ -26,6 +26,7 @@ rc-service modules restart
 
 rc-service xenconsoled start
 rc-service xenstored start
+rc-service xenqemu start
 #rc-update add xen-pci
 
 rc-update add mosquitto
