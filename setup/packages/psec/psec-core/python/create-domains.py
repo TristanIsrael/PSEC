@@ -185,6 +185,7 @@ channel = [
 ]
 vga = "stdvga"
 device_model_override = "/usr/bin/qemu-system-x86_64"
+device_model_version = "qemu-xen"
 device_model_args = [
      '-display', 'gtk,show-tabs=off,show-cursor=off,window-close=off,show-menubar=off',
      '-device', 'virtio-input-host,id=virtio-mouse,evdev=/dev/input/virtual_mouse',
