@@ -137,7 +137,8 @@ Dans le BIOS désactiver la fonctionnalité `VMD` sinon le système ne démarrer
 Pour utiliser le disque NVME, l'option `pci=nomsi` est nécessaire.
 
 ### Analyse des paramètres grub et kernel
-L'ajout de `edd=off no-real-mode` sur la ligne de commande de Xen `multiboot2` provoque une extinction de l'écran intégré de la tablette.
+
+** VERIFIER la présence des options no-real-mode et edd=off **
 
 La configuration fonctionnelle est la suivante: 
 ```
@@ -147,12 +148,50 @@ menuentry 'Saphir' --class gnu-linux --class gnu --class os --class xen $menuent
     insmod gzio
 	insmod part_gpt
 	insmod ext2
-	search --no-floppy --fs-uuid --set=root 767befbd-ce80-44ec-a659-76526ca10e00
+	
 	echo	'Loading Xen xen ...'    
-	multiboot2	/boot/xen.gz placeholder dom0_mem=1024M,max:1024M
+	multiboot2	/boot/xen.gz placeholder loglevel=0 console=null no-real-mode edd=off
 	echo	'Loading Linux lts ...'
-	module2	/boot/vmlinuz-lts placeholder root=UUID=767befbd-ce80-44ec-a659-76526ca10e00 ro fbcon=rotate:3 modules=sd-mod,usb-storage,ext4,nvme rootfstype=ext4
+	module2	/boot/vmlinuz-lts placeholder root=/dev/nvme0n1p3 ro quiet fbcon=rotate:3 modules=sd-mod,usb-storage,ext4,nvme rootfstype=ext4 ipv6.disable=1
 	echo	'Loading initial ramdisk ...'
 	module2	--nounzip   /boot/initramfs-lts
 }
 ```
+
+### Réseau
+
+L'interface LAN du dock est `eth1`.
+
+Device tree :
+
+PCI 0000:00:0d.0 -> blacklisté
+  - Bus USB 1
+  - Bus USB 2
+
+PCI 0000:00:0d.2
+
+PCI 0000:00:14.0 (USB Controller Alder Lake PCH USB 3.2 xHCI)
+  - Bus USB 3
+    - Dev 002 : 
+    - Dev 003 :
+    - Dev 004 : port USB Type A dock
+    - Dev 005 : 
+    - Dev 006 : Touchpad
+    - Dev 007 : UART 
+    - Dev 008 : 
+    - Dev 009 : Webcam
+    - Dev 010 : UART
+    - Dev 011 : Port USB Type A dock
+    - Dev 012 : Rearcam
+    - Dev 013 : Smartcard Reader
+    - Dev 014 : 
+    
+  - Bus USB 4
+    - Ports USB 
+    - Displaylink dock display
+    - Device 004 = LAN 10/100/1000
+    - Device 006 = LAN 10/100/1000
+
+PCI 0000:00:14.3 Contrôleur WLAN
+
+* Les ports USB-C de la tablette sont sur le bus 1, 2, 3 ou 4 en fonction du protocole utilisé (si Thunderbolt 4, alors usb 1-2) *

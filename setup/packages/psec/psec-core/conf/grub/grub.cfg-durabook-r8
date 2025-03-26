@@ -8,12 +8,12 @@ menuentry 'Saphir' {
 	insmod part_gpt
 	insmod ext2
 
-    background_image /boot/splash_800_1280.tga
+    # background_image /boot/splash_800_1280.tga
 
 	echo	'Loading Xen kernel ...'    
 	multiboot2	/boot/xen.gz placeholder dom0_mem=128M,max:1024M
 	echo	'Loading Linux lts kernel ...'
-	module2	/boot/vmlinuz-lts placeholder root=/dev/nvme0n1p1 ro fbcon=rotate:3 modules=sd-mod,usb-storage,ext4,nvme rootfstype=ext4
+	module2	/boot/vmlinuz-lts placeholder root=/dev/nvme0n1p3 ro fbcon=rotate:3 modules=sd-mod,usb-storage,ext4,nvme rootfstype=ext4 no-real-mode edd=off
 	echo	'Loading initial ramdisk ...'
 	module2	--nounzip   /boot/initramfs-lts
 }
