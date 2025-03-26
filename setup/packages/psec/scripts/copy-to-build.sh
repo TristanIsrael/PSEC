@@ -8,7 +8,7 @@ LIST=("[y]es" "[n]o")
 select CHOICE in "${LIST[@]}"; do
     case $REPLY in
         1|y)
-        rsync -a $PWD/ $REMOTE_USER@$REMOTE_IP:$REMOTE_SRC_DIR/psec
+        echo Taper : rsync -a $PWD/ $REMOTE_USER@$REMOTE_IP:$REMOTE_SRC_DIR/psec
         break
         ;;
         2|n)
