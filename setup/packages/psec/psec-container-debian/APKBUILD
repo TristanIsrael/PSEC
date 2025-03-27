@@ -16,7 +16,7 @@ subpackages=""
 replaces=""
 options="!check"  # no tests provided
 _distro="debian"
-_release="bookworm"
+_release="buster"
 _arch="amd64"
 
 clean() {
@@ -38,7 +38,9 @@ build() {
     #sudo lxc-stop -P "$srcdir" -n "$pkgname"
 
     # Disable networking in the container
-    sed -i 's/^lxc\.net/#&/' "$srcdir/$pkgname"/config
+    sudo sed -i 's/^lxc\.net/#&/' "$srcdir/$pkgname"/config
+
+    sudo lxc-stop "$pkgname"
 }
 
 package() {

@@ -145,6 +145,8 @@ channel = [
 'name=sys-usb-msg, connection=socket, path=/var/run/sys-usb-msg.sock',
 'name=sys-usb-input, connection=socket, path=/var/run/sys-usb-input.sock'
 ]
+device_model_override = "/usr/bin/qemu-system-x86_64"
+device_model_version = "qemu-xen"
 '''.format(memory_in_mb, nb_cpus)
         
         '''
@@ -191,7 +193,6 @@ device_model_args = [
      '-device', 'virtio-input-host,id=virtio-mouse,evdev=/dev/input/virtual_mouse',
      '-device', 'virtio-input-host,id=virtio-touch,evdev=/dev/input/virtual_touch'
 ]
-acpi=0
 usb=0
 vif=[]
 '''.format(memory_in_mb, nb_cpus)
@@ -210,6 +211,8 @@ vcpus = {}
 disk = [
 	'format=raw, vdev=xvdc, access=r, devtype=cdrom, target=/usr/lib/psec/system/{}'
 ]
+device_model_override = "/usr/bin/qemu-system-x86_64"
+device_model_version = "qemu-xen"
 '''.format(domain_name, memory_in_mb, nb_cpus, boot_iso_location)
         
         # Add P9 shares
