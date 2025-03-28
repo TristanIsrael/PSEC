@@ -261,7 +261,7 @@ def on_mqtt_ready():
             if os.path.exists(VIRTUAL_TOUCH_PATH) or os.path.islink(VIRTUAL_TOUCH_PATH):
                 os.remove(VIRTUAL_TOUCH_PATH)
                 time.sleep(0.1)
-            os.symlink(touch_path, "/dev/input/virtual_touch")    
+            os.symlink(touch_path, "/dev/input/virtual_touch")
 
     # Attach PCI devices
     expose_pci_devices() 

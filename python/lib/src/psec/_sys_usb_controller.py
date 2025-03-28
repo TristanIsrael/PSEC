@@ -4,7 +4,7 @@ from . import Logger, Cles, BenchmarkId, MqttClient, DiskMonitor, MqttHelper
 from . import TaskRunner
 try:
     from . import DemonInputs
-    from . import ControleurBenchmark
+    #from . import ControleurBenchmark
     NO_INPUTS_MONITORING = False
 except:
     NO_INPUTS_MONITORING = True
@@ -54,7 +54,7 @@ class SysUsbController():
             DemonInputs().start(self.mqtt_client)
             #threading.Thread(target= DemonInputs().demarre()).start()        
 
-        ControleurBenchmark().setup(self.mqtt_client)
+        #ControleurBenchmark().setup(self.mqtt_client)
 
         self.disk_monitor = DiskMonitor(Constantes().constante(Cles.CHEMIN_MONTAGE_USB), self.mqtt_client)
         threading.Thread(target=self.disk_monitor.start).start()
@@ -238,12 +238,13 @@ class SysUsbController():
             Logger().error("Argument missing: module. Topic is {}".format(topic))
             return
 
-        if module == BenchmarkId.INPUTS:
+        '''if module == BenchmarkId.INPUTS:
             ControleurBenchmark().execute_benchmark_inputs()
         elif module == BenchmarkId.FILES:
             ControleurBenchmark().execute_benchmark_fichiers()
         else:
-            Logger().error("The benchmark cannot be started. Unknown module {}.".format(module))
+            Logger().error("The benchmark cannot be started. Unknown module {}.".format(module))'
+        '''
 
 
     def __handle_file_footprint(self, topic:str, payload:dict):

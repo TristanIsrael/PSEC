@@ -19,7 +19,7 @@ from ._mouse import Mouse, MouseButton, MouseWheel, MouseMove
 from ._tasks_runner import TaskRunner
 try:
     from ._demon_inputs import DemonInputs          
-    from ._controleur_benchmark import ControleurBenchmark  
+    #from ._controleur_benchmark import ControleurBenchmark  
 except Exception as e:
     print("Les classes DemonInputs, ControleurVmSysUsb et ControleurBenchmark ne seront pas disponibles")
     print(e)

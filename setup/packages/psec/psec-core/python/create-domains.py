@@ -147,6 +147,7 @@ channel = [
 ]
 device_model_override = "/usr/bin/qemu-system-x86_64"
 device_model_version = "qemu-xen"
+vnc=0
 '''.format(memory_in_mb, nb_cpus)
         
         '''
@@ -194,6 +195,7 @@ device_model_args = [
      '-device', 'virtio-input-host,id=virtio-touch,evdev=/dev/input/virtual_touch'
 ]
 usb=0
+vnc=0
 vif=[]
 '''.format(memory_in_mb, nb_cpus)
 
@@ -213,6 +215,7 @@ disk = [
 ]
 device_model_override = "/usr/bin/qemu-system-x86_64"
 device_model_version = "qemu-xen"
+vnc=0
 '''.format(domain_name, memory_in_mb, nb_cpus, boot_iso_location)
         
         # Add P9 shares
