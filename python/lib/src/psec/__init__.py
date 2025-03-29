@@ -35,7 +35,7 @@ import logging
 from logging import NullHandler
 
 __author__ = "Tristan Israël (tristan.israel@alefbet.net)"
-__version__ = '1.0'
+__version__ = '1.1'
 
 __all__ = [
     "KeymapFR",
@@ -50,7 +50,8 @@ __all__ = [
     "SingletonMeta",
     "DemonInputs",
     "Mouse", "MouseButton", "MouseWheel", #"InputsProxy",
-    "ControleurBenchmark", "BenchmarkId",
+    #"ControleurBenchmark", 
+    "BenchmarkId",
     #"MockXenbus",
     "TaskRunner",
     "MqttClient", "ConnectionType", "Topics", "MqttFactory", "SerialMQTTClient", "MqttHelper",
