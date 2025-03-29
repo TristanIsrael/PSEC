@@ -1,8 +1,8 @@
 # Contributor:
 # Maintainer: Tristan Isra..l <tristan.israel@alefbet.net>
 pkgname=psec-lib
-pkgver=1.0
-pkgrel=3
+pkgver=1.1
+pkgrel=0
 pkgdesc="PSEC - Python library"
 url="https://www.alefbet.net/"
 arch="noarch"
