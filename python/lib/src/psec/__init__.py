@@ -8,7 +8,7 @@ except Exception as e:
 from ._topics import Topics
 from ._mqtt_helper import MqttHelper
 from ._mqtt_client import MqttClient, ConnectionType, SerialMQTTClient
-from ._parametres import Parametres, Cles
+from ._parametres import Parametres
 from ._request_factory import RequestFactory
 from ._notification_factory import NotificationFactory
 from ._logger import Logger
