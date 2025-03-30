@@ -30,7 +30,11 @@ def find_touchscreen() -> InputDevice:
             caps = dev.capabilities()
             #print(caps)
             
-            if ecodes.EV_ABS in caps:                            
+            if ecodes.EV_ABS in caps:
+                # On filtre au cas où le périphérique n'aurait pas les capacités nécessaires
+                if not any(t[0] == ecodes.ABS_MT_POSITION_X for t in caps[ecodes.EV_ABS]):
+                    continue
+                
                 # We get all the capabilities
                 Logger().debug("Found a touchscreen: {}".format(dev.name))
                 return dev
@@ -247,8 +251,8 @@ def on_mqtt_ready():
         os.symlink(mouse_path, VIRTUAL_MOUSE_PATH)
 
     # Find touch screen and keep capabilities
-    touch_device = find_touchscreen()    
-    if touch_device == None:
+    touch_device = find_touchscreen()
+    if touch_device is None:
         Logger().info("No touchscreen found on the system")
         virtual_touch = None
     else:

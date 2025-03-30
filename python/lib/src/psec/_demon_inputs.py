@@ -58,85 +58,6 @@ class DemonInputs(metaclass=SingletonMeta):
         self.can_run = False
         self.__deconnecte_interface_xenbus()
 
-    '''def genere_evenement_souris(self, mouse:Mouse):
-        #Logger().info("Envoi d'un événement de souris par l'API")
-        self.__envoie_evenement_souris(mouse)
-    '''
-
-    ###
-    # Fonctions privées
-    #
-    '''
-    def __on_move(self, axe, delta: float):
-        if delta == 0:
-            return
-        
-        delta_x = 0 if axe != ecodes.REL_X else delta
-        delta_y = 0 if axe != ecodes.REL_Y else delta
-
-        #Logger().debug("Le mouvement du pointeur est {},{}".format(delta_x, delta_y))
-
-        self.mouse.move = MouseMove.RELATIVE
-        self.mouse.x = int(delta_x)
-        self.mouse.y = int(delta_y)
-        self.mouse.wheel = MouseWheel.NO_MOVE
-        self.__envoie_evenement_souris()
-
-    def __on_position(self, x:int, y:int, touched:int):
-        #Logger().debug("Les coordonnées du pointeur sont {},{}".format(x, y))
-
-        self.mouse.move = MouseMove.ABSOLUTE
-        if touched > 0:
-            self.mouse.buttons |= MouseButton.LEFT
-        else:
-            self.mouse.buttons &= ~MouseButton.LEFT
-
-        self.mouse.x = int(x / self.mouse_max_x*100)
-        self.mouse.y = int(y / self.mouse_max_y*100)
-        self.mouse.wheel = MouseWheel.NO_MOVE
-        
-        if self.last_x != self.mouse.x or self.last_y != self.mouse.y or touched == 0:
-            self.__envoie_evenement_souris()            
-            self.last_x = self.mouse.x
-            self.last_y = self.mouse.y        
-
-    def __on_wheel(self, delta: int):
-        if delta == 0:
-            return 
-        
-        self.mouse.wheel = delta
-        #Logger().debug("Actionnement de la molette : {}".format(self.mouse.wheel))                
-        self.mouse.x = 0
-        self.mouse.y = 0        
-        self.__envoie_evenement_souris()
-
-        # On réinitialise la molette
-        self.mouse.wheel = MouseWheel.NO_MOVE
-
-    def __on_click(self, bouton, etat):
-        #Logger().debug("L'état du bouton {} de la souris est {}".format(bouton, etat))
-        self.mouse.x = 0
-        self.mouse.y = 0
-
-        if bouton == ecodes.BTN_LEFT:
-            if etat > 0:
-                self.mouse.buttons |= MouseButton.LEFT
-            else:
-                self.mouse.buttons &= ~MouseButton.LEFT
-        elif bouton == ecodes.BTN_MIDDLE:
-            if etat > 0:
-                self.mouse.buttons |= MouseButton.MIDDLE
-            else:
-                self.mouse.buttons &= ~MouseButton.MIDDLE
-        elif bouton == ecodes.BTN_RIGHT:
-            if etat > 0:
-                self.mouse.buttons |= MouseButton.RIGHT
-            else:
-                self.mouse.buttons &= ~MouseButton.RIGHT
-
-        self.__envoie_evenement_souris()
-    '''
-
     def __recherche_souris(self):
         # This function is ran in a specific thread
         Logger().info("Looking for a mouse...", "Input daemon")
@@ -151,7 +72,7 @@ class DemonInputs(metaclass=SingletonMeta):
                     if type_input == TypeEntree.SOURIS and input not in self.monitored_inputs:
                         threading.Thread(target= self.__surveille_souris, args=(dev,)).start()
                         self.monitored_inputs.append(input)
-                except:
+                except Exception:
                     pass # Ignore all errors silently
             
             # Wait a little and start over
@@ -162,15 +83,22 @@ class DemonInputs(metaclass=SingletonMeta):
 
         while self.can_run:
             inputs = glob.glob("/dev/input/event*")
+
             for input in inputs:
-                #Logger().debug("Fichier {}".format(input))  
+                #Logger().debug("Fichier {}".format(input))
                 
                 try:          
                     dev = InputDevice(input)
                     type_input = self.__type_entree(dev)
+
                     if type_input == TypeEntree.TOUCH and input not in self.monitored_inputs:
                         # On récupère les valeurs max x et y pour connaître la résolution
                         caps = dev.capabilities()
+
+                        # On filtre au cas où le périphérique n'aurait pas les capacités nécessaires
+                        if not any(t[0] == ecodes.ABS_MT_POSITION_X for t in caps[ecodes.EV_ABS]):
+                            continue
+
                         self.mouse_max_x = caps[ecodes.EV_ABS][ecodes.ABS_X][1].max
                         self.mouse_max_y = caps[ecodes.EV_ABS][ecodes.ABS_Y][1].max
 
@@ -206,18 +134,6 @@ class DemonInputs(metaclass=SingletonMeta):
                     serialized = self.__serialize_event(TypeEntree.SOURIS, event)
                     self.socket_xenbus.write(serialized)
                     #print(f"Sent: {serialized.strip()}")
-                '''if event.type == ecodes.EV_REL and (event.code == ecodes.REL_X or event.code == ecodes.REL_Y):
-                    axe = event.code
-                    delta = event.value
-                    self.__on_move(axe, delta)
-                elif event.type == ecodes.EV_REL and (event.code == ecodes.REL_WHEEL):
-                    delta = event.value
-                    self.__on_wheel(delta)
-                elif event.type == ecodes.EV_KEY:
-                    bouton = event.code
-                    etat = event.value
-                    self.__on_click(bouton, etat)
-                '''
 
                 if not self.can_run:
                     return
@@ -225,38 +141,29 @@ class DemonInputs(metaclass=SingletonMeta):
             Logger().debug("The mouse {} is not available anymore".format(input.name), "Input daemon")
             self.monitored_inputs.remove(input.path)
 
-    def __surveille_tactile(self, input):        
-        Logger().info("Monitor the touchscreen {}".format(input.name), "Input daemon")        
+    def __surveille_tactile(self, input):
+        Logger().info("Monitor the touchscreen {}".format(input.name), "Input daemon")
 
         filtered_events = [
-            ecodes.EV_KEY, 
-            ecodes.EV_MSC, 
-            ecodes.EV_ABS, 
+            ecodes.EV_KEY,
+            ecodes.EV_MSC,
+            ecodes.EV_ABS,
             ecodes.EV_SYN,
-            ecodes.ABS_MT_SLOT, 
-            ecodes.ABS_MT_POSITION_X, 
-            ecodes.ABS_MT_POSITION_Y, 
+            ecodes.ABS_MT_SLOT,
+            ecodes.ABS_MT_POSITION_X,
+            ecodes.ABS_MT_POSITION_Y,
             ecodes.ABS_MT_TRACKING_ID
         ]
 
         try:
-            for event in input.read_loop():               
-                if event.type in filtered_events:                                            
+            for event in input.read_loop():
+                if event.type in filtered_events:
                     serialized = self.__serialize_event(TypeEntree.TOUCH, event)
                     self.socket_xenbus.write(serialized)
                     #print(f"Sent: {serialized.strip()}")
-                    '''if event.code == ecodes.ABS_X:
-                        event2 = InputEvent(time.time(), time.time_ns()%1_000_000_000, ecodes.EV_ABS, ecodes.ABS_MT_POSITION_X, event.value)
-                        serialized = self.__serialize_event(TypeEntree.TOUCH, event2)
-                        self.socket_xenbus.write(serialized)
-                    elif event.code == ecodes.ABS_Y:
-                        event2 = InputEvent(time.time(), time.time_ns()%1_000_000_000, ecodes.EV_ABS, ecodes.ABS_MT_POSITION_Y, event.value)
-                        serialized = self.__serialize_event(TypeEntree.TOUCH, event2)
-                        self.socket_xenbus.write(serialized)
-                    '''
 
                 if not self.can_run:
-                    return                
+                    return
         except:
             Logger().debug("The touchscreen {} is not available anymore".format(input.name), "Input daemon")
             self.monitored_inputs.remove(input.path)
@@ -282,7 +189,7 @@ class DemonInputs(metaclass=SingletonMeta):
         caps = entree.capabilities()
         keys = caps.get(ecodes.EV_KEY)
 
-        if keys == None:
+        if keys is None:
             return TypeEntree.INCONNU
         
         if ecodes.KEY_ESC in keys:
