@@ -13,9 +13,6 @@ echo
 
 hostname Core
 
-#mkdir -p /var/run/mosquitto
-#chown mosquitto:mosquitto /var/run/mosquitto
-
 echo "**** Resizing shared memory"
 mount -o remount,size=16M /dev/shm
 
