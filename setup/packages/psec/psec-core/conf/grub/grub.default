@@ -4,7 +4,7 @@ GRUB_DISABLE_SUBMENU=y
 GRUB_DISABLE_RECOVERY=true
 GRUB_CMDLINE_LINUX_DEFAULT="modules=sd-mod,usb-storage,ext4,nvme quiet rootfstype=ext4 ipv6.disable=1 fbcon=rotate:3"
 GRUB_DEFAULT=1
-GRUB_BACKGROUND="/boot/splash_800_1280.tga"
+#GRUB_BACKGROUND="/boot/splash_800_1280.tga"
 GRUB_TERMINAL_OUTPUT="gfxterm"
 GRUB_GFXMODE=800x1280
 GRUB_PRELOAD_MODULES="all_video gfxterm png"

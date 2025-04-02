@@ -102,7 +102,7 @@ type = "pv"
 name = "sys-usb"
 kernel = "/var/lib/xen/boot/vmlinuz-lts"
 ramdisk = "/var/lib/xen/boot/initramfs-lts"
-extra = "modules=loop,squashfs,iso9660 console=hvc0 module_blacklist=network,video,sound,drm,snd,snd_hda_intel,bluetooth,btusb,r8153_ecm,r8152,usbnet,uvcvideo,pcspkr,videobuf2_v4l2,joydev,videodev,videobuf2_common,libphy,mc,mii"
+extra = "modules=loop,squashfs,iso9660 console=hvc0 module_blacklist=af_packet,network,video,sound,drm,snd,snd_hda_intel,bluetooth,btusb,r8153_ecm,r8152,usbnet,uvcvideo,pcspkr,videobuf2_v4l2,joydev,videodev,videobuf2_common,libphy,mc,mii"
 memory={}
 vcpus = {}
 disk = [
@@ -167,7 +167,7 @@ type = "pv"
 name = "{}"
 kernel = "/var/lib/xen/boot/vmlinuz-virt"
 ramdisk = "/var/lib/xen/boot/initramfs-virt"
-extra = "modules=loop,squashfs,iso9660 console=hvc0"
+extra = "modules=loop,squashfs,iso9660 console=hvc0  module_blacklist=af_packet,network,video,sound,drm,snd,snd_hda_intel,bluetooth,btusb,r8153_ecm,r8152,usbnet,uvcvideo,pcspkr,videobuf2_v4l2,joydev,videodev,videobuf2_common,libphy,mc,mii"
 memory={}
 vcpus = {}
 disk = [
