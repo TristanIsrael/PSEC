@@ -1,0 +1,7 @@
+#!/bin/sh
+
+rm -rf /var/lib/xen/images/alpine-virt.iso
+ln -s $(ls alpine-virt-*.iso) alpine-virt.iso
+
+rm -rf /var/lib/xen/images/alpine-standard.iso
+ln -s $(ls alpine-standard-*.iso) alpine-standard.iso

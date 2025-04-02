@@ -12,7 +12,7 @@ from PySide6.QtGui import QGuiApplication, QCursor, QMouseEvent
 from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterType, qmlRegisterSingletonType, qmlRegisterUncreatableType, qmlRegisterSingletonInstance
 from PySide6.QtCore import QObject, QCoreApplication, Qt, QEvent, QThread, QPoint, QSize
 from PySide6.QtQuickControls2 import QQuickStyle
-from psec import Api
+from psec import Api, System
 from ControleurBenchmark import ControleurBenchmark
 
 from InterfaceSocle import InterfaceSocle
@@ -57,6 +57,8 @@ if __name__ == '__main__':
 
     qml_root = engine.rootObjects()[0]     
     if os.getenv("DEVMODE") is None:
+        qml_root.width = System().get_screen_width()
+        qml_root.height = System().get_screen_height()
         qml_root.showFullScreen()
 
     # Intégration avec le socle
