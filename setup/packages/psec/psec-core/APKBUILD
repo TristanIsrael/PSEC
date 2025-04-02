@@ -135,6 +135,7 @@ package() {
     install -D -m644 "$srcdir"/generate-x-config.py "$pkgdir/$PSEC_BINDIR"/generate-x-config.py
     install -D -m644 "$srcdir"/create-domains.py "$pkgdir/$PSEC_BINDIR"/create-domains.py
     install -D -m755 "$srcdir"/start-psec-core-controller.py "$pkgdir/$PSEC_BINDIR"/start-psec-core-controller.py 
+    install -D -m755 "$srcdir"/create-mqtt-tunnels.py "$pkgdir/$PSEC_BINDIR"/create-mqtt-tunnels.py 
 
     # Misc
     install -D -m644 "$srcdir"/Splash_800_1280.ppm "$pkgdir"/boot/Splash_800_1280.ppm
@@ -144,5 +145,5 @@ package() {
 
     # Mosquitto
     install -D -m644 "$srcdir"/mosquitto.conf "$pkgdir"/etc/mosquitto/mosquitto.conf
-    install -D -m755 "$srcdir"/create-mqtt-tunnels.initd "$pkgdir"/etc/init.d/create-mqtt-tunnels
+    install -D -m755 "$srcdir"/create-mqtt-tunnels.initd "$pkgdir"/etc/init.d/create-mqtt-tunnels    
 }
