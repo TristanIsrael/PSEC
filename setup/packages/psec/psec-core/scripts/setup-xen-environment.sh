@@ -19,9 +19,12 @@ if grep -q "PANOPTISCAN_CONFIG=nomade" "/proc/cmdline"; then
 else
     if [ -f $ALPINE_VIRT_ISO_LOCAL ]
     then 
-        echo "... Alpine ISO image already downloaded"        
+        echo "... Alpine virt ISO image is PRESENT"
     else
-        echo "... Download Alpine ISO image"
+        echo "... Alpine virt ISO image is MISSING"
+        exit 1
+
+    :'    echo "... Download Alpine ISO image"
         mkdir -p /var/lib/xen/images 
 
         if [ -n "$CONFIG_RELEASES" ] && [ "$CONFIG_RELEASES" != "null" ]
@@ -32,8 +35,9 @@ else
             echo "    Source : $ALPINE_VIRT_ISO_URL"
             wget $ALPINE_VIRT_ISO_URL -O $ALPINE_VIRT_ISO_LOCAL
         fi
+    '
 
-        echo "... Download boot files (kernel, initrd)"
+        echo "... Extract boot files (kernel, initrd)"
         mkdir -p /var/lib/xen/boot
         mkdir -p /usr/lib/psec/tmp/alpine-virt
         modprobe iso9660
@@ -46,9 +50,12 @@ else
 
     if [ -f $ALPINE_LTS_ISO_LOCAL ]
     then 
-        echo "... Alpine ISO image already downloaded"        
+        echo "... Alpine standard ISO image is PRESENT"
     else
-        echo "... Download Alpine ISO image"
+        echo "... Alpine standard ISO image is MISSING"
+        exit 1
+
+    :'
         mkdir -p /var/lib/xen/images 
 
         if [ -n "$CONFIG_RELEASES" ] && [ "$CONFIG_RELEASES" != "null" ]
@@ -59,8 +66,9 @@ else
             echo "    Source : $ALPINE_LTS_ISO_URL"
             wget $ALPINE_LTS_ISO_URL -O $ALPINE_LTS_ISO_LOCAL             
         fi
+    '
 
-        echo "... Download boot files (kernel, initrd)"
+        echo "... Extract boot files (kernel, initrd)"
         mkdir -p /var/lib/xen/boot
         mkdir -p /usr/lib/psec/tmp/alpine-standard
         modprobe iso9660
