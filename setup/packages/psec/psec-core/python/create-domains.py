@@ -36,18 +36,7 @@ class DomainsFactory:
     def __create_domd_usb(self):
         print("Create Driver Domain USB")
 
-        '''conf = self.__create_new_domain(
-            domain_name="sys-usb", 
-            memory_in_mb=400,
-            nb_cpus=1, 
-            boot_iso_location="bootiso-sys-usb.iso",
-            share_packages=True,
-            share_storage=True,
-            share_system=True,
-            rxtx_inputs=True,
-            pci_passthrough=True
-        )'''
-        conf = self.__create_domain_sys_usb(memory_in_mb=400, nb_cpus=1)
+        conf = self.__create_domain_sys_usb(memory_in_mb=500, nb_cpus=1)
 
         if conf is not None:
             with open('/etc/psec/xen/sys-usb.conf', 'w') as f:
@@ -64,23 +53,7 @@ class DomainsFactory:
             if json_memory != None:
                 memory = json_memory
                 print("Setting {} MB for memory".format(memory))
-            #json_screen = json_gui.get("screen")
-            #if json_screen != None:
-            #    rotation = json_screen.get("rotation")  
-            #    print("Rotate screen with {} degrees".format(rotation))
 
-        '''conf = self.__create_new_domain(
-            domain_name= "sys-gui", 
-            memory_in_mb= memory,
-            nb_cpus= 1, 
-            boot_iso_location= "bootiso-sys-gui.iso",
-            share_packages= True,
-            share_storage= True,
-            share_system= True,
-            rxtx_inputs= True,
-            pci_passthrough= False,
-            provides_gui= True
-        )'''
         conf = self.__create_domain_sys_gui(memory_in_mb=memory, nb_cpus=1)
 
         if conf is not None:
@@ -129,7 +102,7 @@ type = "pv"
 name = "sys-usb"
 kernel = "/var/lib/xen/boot/vmlinuz-lts"
 ramdisk = "/var/lib/xen/boot/initramfs-lts"
-extra = "modules=loop,squashfs,iso9660 console=hvc0"
+extra = "modules=loop,squashfs,iso9660 console=hvc0 module_blacklist=network,video,sound,drm,snd,snd_hda_intel,bluetooth,btusb,r8153_ecm,r8152,usbnet,uvcvideo,pcspkr,videobuf2_v4l2,joydev,videodev,videobuf2_common,libphy,mc,mii"
 memory={}
 vcpus = {}
 disk = [
@@ -149,20 +122,7 @@ device_model_override = "/usr/bin/qemu-system-x86_64"
 device_model_version = "qemu-xen"
 vnc=0
 '''.format(memory_in_mb, nb_cpus)
-        
-        '''
-        parser=ConfigParser()
-        with open("/etc/conf.d/xen-pci") as stream:
-            parser.read_string("[none]\n" +stream.read())
 
-            # Add PCI passthrough
-            if parser["none"]["DEVICES"] != None:
-                devs = parser["none"]["DEVICES"].strip()
-
-                if devs != "" and devs != None:
-                    txt += "pci = [{}]\n".format(devs.replace(' ', '","'))
-        '''
-        
         return txt
 
     def __create_domain_sys_gui(self, memory_in_mb:int, nb_cpus:int) -> None:
@@ -312,10 +272,6 @@ def decode_topology_data(data:str) -> dict:
 ### Entry point
 if __name__ == "__main__":
     print("Starting Domains creation process")
-
-    '''if len(sys.argv) < 2:
-        print("Error: missing argument alpine_repository_location")
-        exit(2)'''
 
     print("Open topology file")
     f = read_topology_file()

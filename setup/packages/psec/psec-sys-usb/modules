@@ -3,6 +3,7 @@
 9p
 exfat
 vfat
+ntfs3
 usbcore
 usb-storage
 ehci_hcd

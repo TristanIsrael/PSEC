@@ -4,7 +4,7 @@ mkdir -p /var/log/psec
 
 modprobe exfat
 modprobe vfat
-modprobe ntfs
+modprobe ntfs3
 
 rc-update add psec-sys-usb-controller
 rc-service psec-sys-usb-controller start
