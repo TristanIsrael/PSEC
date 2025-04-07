@@ -8,11 +8,11 @@
 #rc-service connect-to-gui start
 
 
-echo ***************************************
-echo ******          SAPHIR           ******
-echo ******          ------           ******
-echo ******                           ******
-echo ******   Installation terminée   ******
-echo ******    Veuillez redémarrer    ******
-echo ******                           ******
-echo ***************************************
+echo "***************************************"
+echo "******          SAPHIR           ******"
+echo "******          ------           ******"
+echo "******                           ******"
+echo "******   Installation terminée   ******"
+echo "******    Veuillez redémarrer    ******"
+echo "******                           ******"
+echo "***************************************"
