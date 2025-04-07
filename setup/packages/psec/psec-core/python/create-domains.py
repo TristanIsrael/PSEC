@@ -75,7 +75,9 @@ class DomainsFactory:
                     memory = domain.get("memory")
                 
                 cpus = 1
-                cpu_rate = domain.get("cpu")
+                cpu_rate = domain.get("cpu", 1)
+                if cpu_rate > 1:
+                    cpu_rate = 1
                 cpu_count = multiprocessing.cpu_count()
                 cpus = round(cpu_count*cpu_rate)
 
