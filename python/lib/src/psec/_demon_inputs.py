@@ -130,7 +130,7 @@ class DemonInputs(metaclass=SingletonMeta):
 
         try:
             for event in input.read_loop():  
-                if event.type in [ecodes.EV_KEY, ecodes.EV_REL, ecodes.EV_ABS]:
+                if event.type in [ecodes.EV_KEY, ecodes.EV_REL, ecodes.EV_ABS, ecodes.EV_SYN]:
                     serialized = self.__serialize_event(TypeEntree.SOURIS, event)
                     self.socket_xenbus.write(serialized)
                     #print(f"Sent: {serialized.strip()}")
@@ -144,7 +144,7 @@ class DemonInputs(metaclass=SingletonMeta):
     def __surveille_tactile(self, input):
         Logger().info("Monitor the touchscreen {}".format(input.name), "Input daemon")
 
-        filtered_events = [
+        '''filtered_events = [
             ecodes.EV_KEY,
             ecodes.EV_MSC,
             ecodes.EV_ABS,
@@ -153,14 +153,14 @@ class DemonInputs(metaclass=SingletonMeta):
             ecodes.ABS_MT_POSITION_X,
             ecodes.ABS_MT_POSITION_Y,
             ecodes.ABS_MT_TRACKING_ID
-        ]
+        ]'''
 
         try:
             for event in input.read_loop():
-                if event.type in filtered_events:
-                    serialized = self.__serialize_event(TypeEntree.TOUCH, event)
-                    self.socket_xenbus.write(serialized)
-                    #print(f"Sent: {serialized.strip()}")
+                #if event.type in filtered_events:
+                serialized = self.__serialize_event(TypeEntree.TOUCH, event)
+                self.socket_xenbus.write(serialized)
+                #print(f"Sent: {serialized.strip()}")
 
                 if not self.can_run:
                     return

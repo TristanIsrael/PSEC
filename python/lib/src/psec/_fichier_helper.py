@@ -126,7 +126,7 @@ class FichierHelper():
         La fonction renvoie vrai si la copie s'est bien déroulée et que les empreintes coincident.
         '''
         
-        cmd = ['cp', "{}/{}".format(source_location, filepath), destination_folder]
+        cmd = ['cp', "{}/{}".format(source_location, filepath), "{}/{}".format(destination_folder, filepath)]
         print("Exécution de la commande {}".format(cmd))
         
         proc = subprocess.run(cmd, check= True, shell= False)        

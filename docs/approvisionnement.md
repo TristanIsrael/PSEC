@@ -38,5 +38,7 @@ L'approvisionnement manuel consiste à dérouler un processus d'installation pas
   - Taper la commande `$ sudo apk add xen xen-hypervisor`
   - Taper la commande `$ sudo reboot`
   - Au redémarrage, séletionner dans GRUB la première entrée contenant le libellé `Xen`
+  - A la fin du démarrage se logger en tant que `root`
+  - Taper la commande `# rc-service xenstored start`
 
 9 - Installer le produit en suivant la documentation fournie.

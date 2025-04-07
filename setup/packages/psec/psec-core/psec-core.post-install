@@ -11,7 +11,7 @@ echo ---        script post-install.sh        ---
 echo --------------------------------------------
 echo
 
-hostname Core
+hostname psec.local
 
 echo "**** Resizing shared memory"
 mount -o remount,size=16M /dev/shm
@@ -22,8 +22,10 @@ rc-service splash start
 rc-service modules restart
 
 rc-service xenconsoled start
+rc-update add xenconsoled
 rc-service xenstored start
-rc-service xenqemu start
+rc-update add xenstored
+#rc-service xenqemu start
 #rc-update add xen-pci
 
 rc-update add mosquitto

@@ -105,15 +105,15 @@ def start_events_listener(virtual_mouse, virtual_touch):
                 device_type, event_type, event_code, event_value = data
 
                 if device_type == TypeEntree.SOURIS:
-                    input = virtual_mouse
+                    device = virtual_mouse
                 elif device_type == TypeEntree.TOUCH and virtual_touch is not None:
-                    input = virtual_touch
+                    device = virtual_touch
                 else:
-                    input = None
+                    device = None
 
-                if input is not None:
-                    input.write(event_type, event_code, event_value)                
-                    input.syn()
+                if device is not None:
+                    device.write(event_type, event_code, event_value)
+                    #device.syn()
 
             except Exception as e:
                 print(f"Erreur lors du traitement de la trame : {e}")
@@ -212,14 +212,14 @@ def start_business_domains():
         for domain in json_domains:
             domain_name = domain.get("name", "")
             if domain_name == "":
-                continue 
+                continue
 
             cmd = ["/usr/lib/psec/bin/start-business-domain.sh", domain_name]
             res = subprocess.run(cmd)
 
             if res == 0:
                 Logger().info("Started Domain {}".format(domain_name))  
-            else:                
+            else:
                 Logger().critical("Domain {} did not start".format(domain_name))            
 
     except Exception as e:

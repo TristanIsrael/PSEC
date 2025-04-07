@@ -17,6 +17,9 @@ if grep -q "PANOPTISCAN_CONFIG=nomade" "/proc/cmdline"; then
         exit 1
     fi
 else
+    rm -rf /var/lib/xen/boot
+    rm -rf /usr/lib/psec/tmp/alpine-virt
+
     if [ -f $ALPINE_VIRT_ISO_LOCAL ]
     then 
         echo "... Alpine virt ISO image is PRESENT"
@@ -36,17 +39,17 @@ else
             wget $ALPINE_VIRT_ISO_URL -O $ALPINE_VIRT_ISO_LOCAL
         fi
     '
-
-        echo "... Extract boot files (kernel, initrd)"
-        mkdir -p /var/lib/xen/boot
-        mkdir -p /usr/lib/psec/tmp/alpine-virt
-        modprobe iso9660
-        mount -o loop $ALPINE_VIRT_ISO_LOCAL /media/cdrom
-        cp /media/cdrom/boot/vmlinuz-* /var/lib/xen/boot
-        cp /media/cdrom/boot/modloop-* /var/lib/xen/boot
-        cp /media/cdrom/boot/initramfs-* /var/lib/xen/boot
-        umount /media/cdrom
     fi
+    
+    echo "... Extract boot files (kernel, initrd)"    
+    mkdir -p /var/lib/xen/boot
+    mkdir -p /usr/lib/psec/tmp/alpine-virt
+    modprobe iso9660
+    mount -o loop $ALPINE_VIRT_ISO_LOCAL /media/cdrom
+    cp /media/cdrom/boot/vmlinuz-* /var/lib/xen/boot
+    cp /media/cdrom/boot/modloop-* /var/lib/xen/boot
+    cp /media/cdrom/boot/initramfs-* /var/lib/xen/boot
+    umount /media/cdrom
 
     if [ -f $ALPINE_LTS_ISO_LOCAL ]
     then 
@@ -67,17 +70,17 @@ else
             wget $ALPINE_LTS_ISO_URL -O $ALPINE_LTS_ISO_LOCAL             
         fi
     '
-
-        echo "... Extract boot files (kernel, initrd)"
-        mkdir -p /var/lib/xen/boot
-        mkdir -p /usr/lib/psec/tmp/alpine-standard
-        modprobe iso9660
-        mount -o loop $ALPINE_LTS_ISO_LOCAL /media/cdrom
-        cp /media/cdrom/boot/vmlinuz-* /var/lib/xen/boot
-        cp /media/cdrom/boot/modloop-* /var/lib/xen/boot
-        cp /media/cdrom/boot/initramfs-* /var/lib/xen/boot
-        umount /media/cdrom
     fi
+
+    echo "... Extract boot files (kernel, initrd)"    
+    mkdir -p /var/lib/xen/boot
+    mkdir -p /usr/lib/psec/tmp/alpine-standard
+    modprobe iso9660
+    mount -o loop $ALPINE_LTS_ISO_LOCAL /media/cdrom
+    cp /media/cdrom/boot/vmlinuz-* /var/lib/xen/boot
+    cp /media/cdrom/boot/modloop-* /var/lib/xen/boot
+    cp /media/cdrom/boot/initramfs-* /var/lib/xen/boot
+    umount /media/cdrom    
 fi
 
 echo Terminé
