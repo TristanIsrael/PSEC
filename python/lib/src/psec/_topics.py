@@ -6,6 +6,7 @@ class Topics():
     EVENTS = "{}/events".format(SYSTEM)
     DISCOVER = "{}/discover".format(SYSTEM)
     WORKFLOW = "{}/workflow".format(SYSTEM)
+    ENERGY = "{}/energy".format(SYSTEM)
     
     # Requests
     LIST_DISKS = "{}/list_disks".format(DISKS)
@@ -24,6 +25,7 @@ class Topics():
     NEW_FILE = "{}/new_file".format(DISKS)
     DISK_STATE = "{}/state".format(DISKS)
     GUI_READY = f"{WORKFLOW}/gui_ready"
+    ENERGY_STATE = "{}/state".format(ENERGY)
 
     # Miscelaneous
     KEEPALIVE = "mics/ping"

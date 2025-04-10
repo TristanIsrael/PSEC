@@ -1,3 +1,4 @@
+import psutil
 
 class NotificationFactory:
     """ Cette classe permet de créer des notifications simmplement.
@@ -6,7 +7,7 @@ class NotificationFactory:
     """
 
     @staticmethod
-    def create_notification_disk_state(disk:str, state:str):
+    def create_notification_disk_state(disk:str, state:str) -> dict:
         payload = {
             "disk": disk, 
             "state": state
@@ -26,11 +27,20 @@ class NotificationFactory:
         return payload
      
     @staticmethod
-    def create_notification_error(disk:str, filepath:str, error:str):
+    def create_notification_error(disk:str, filepath:str, error:str) -> dict:
         payload = {
             "disk": disk,
             "filepath": filepath,
             "error": error
+        }
+
+        return payload
+    
+    @staticmethod
+    def create_notification_energy_state(battery:psutil._common.sbattery) -> dict:
+        payload = {
+            "battery_level": battery.percent,
+            "plugged": 1 if battery.power_plugged else 0
         }
 
         return payload

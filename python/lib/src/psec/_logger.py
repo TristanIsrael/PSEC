@@ -92,6 +92,24 @@ class Logger(metaclass=SingletonMeta):
         payload = self.__create_event(module, description)
         self.mqtt_client.publish("system/events/debug", payload)
 
+    @staticmethod
+    def loglevel_from_topic(topic:str) -> int:
+        if not topic.startswith("{}".format(Topics.EVENTS)):
+            return
+        
+        if topic.endswith("debug"):
+            return logging.DEBUG
+        elif topic.endswith("info"):
+            return logging.INFO
+        elif topic.endswith("warning"):
+            return logging.WARN
+        elif topic.endswith("error"):
+            return logging.ERROR
+        elif topic.endswith("critical"):
+            return logging.CRITICAL
+        
+        return logging.DEBUG
+
     def __create_event(self, module:str, description:str) -> dict :
         if not self.__is_setup:
             return {}

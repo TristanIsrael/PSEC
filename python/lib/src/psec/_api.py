@@ -159,6 +159,8 @@ class Api(metaclass=SingletonMeta):
         }
         self.mqtt_client.publish("{}/response".format(Topics.DISCOVER_COMPONENTS), payload)
 
+    def request_energy_state(self) -> None:
+        self.mqtt_client.publish("{}/request".format(Topics.ENERGY_STATE), {})
 
     ####
     # Fonctions de notification
@@ -222,11 +224,11 @@ class Api(metaclass=SingletonMeta):
 
 
     def __on_shutdown(self, payload:dict):
-        success = payload.get("state", "") == "accepted"   
-        reason = payload.get("reason", "")     
+        success = payload.get("state", "") == "accepted"
+        reason = payload.get("reason", "")
 
         for cb in self.__shutdown_callbacks:
-            cb(success, reason)        
+            cb(success, reason)
 
 
     def __on_restart_domain(self, payload:dict):

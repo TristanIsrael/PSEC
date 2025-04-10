@@ -1,10 +1,11 @@
 from . import Constantes
 from . import Logger, FichierHelper, Parametres, Cles
 from . import ResponseFactory
-from . import MqttClient, Topics, MqttHelper
+from . import MqttClient, Topics, MqttHelper, NotificationFactory
 import threading
 import subprocess
 import time
+import psutil
 
 class Dom0Controller():
     """ Cette classe traite les commandes envoyées par les Domaines et qui concernent le dépôt local et le 
@@ -25,7 +26,7 @@ class Dom0Controller():
         Logger().setup("System controller", mqtt_client)
 
 
-    def start(self):                
+    def start(self):
         self.mqtt_client.start()
         self.__mqtt_lock.wait()
     
@@ -34,7 +35,6 @@ class Dom0Controller():
         Logger().debug("Starting Dom0 controller")        
         self.mqtt_client.subscribe("{}/+/+/request".format(Topics.SYSTEM)) # All the system requests
         self.mqtt_client.subscribe("{}".format(Topics.GUI_READY))
-        #InputsProxy(self.mqtt_client).demarre()
 
 
     def __on_mqtt_message(self, topic:str, payload:dict):
@@ -57,6 +57,8 @@ class Dom0Controller():
             self.__handle_restart_domain(payload)
         elif topic == "{}".format(Topics.GUI_READY):
             self.__handle_gui_ready(payload)
+        elif topic == "{}/request".format(Topics.ENERGY_STATE):
+            self.__handle_energy_state()
 
 
     def __handle_list_files(self, payload:dict) -> None:
@@ -127,6 +129,7 @@ class Dom0Controller():
         cmd = ["killall", "feh"]
         subprocess.run(cmd)
 
+
     def __is_storage_request(self, payload:dict) -> bool:
         if payload.get("disk") is not None:
             return payload.get("disk") == Constantes.REPOSITORY
@@ -146,3 +149,11 @@ class Dom0Controller():
             Logger().error("The domain {} won't reboot".format(domain_name))
             response = ResponseFactory.create_response_restart_domain(domain_name, False)
             self.mqtt_client.publish("{}/response".format(Topics.RESTART_DOMAIN), response)
+
+
+    def __handle_energy_state(self):
+        battery = psutil.sensors_battery()
+
+        if battery:
+            payload = NotificationFactory.create_notification_energy_state(battery)
+            self.mqtt_client.publish("{}/response".format(Topics.ENERGY_STATE), payload)
