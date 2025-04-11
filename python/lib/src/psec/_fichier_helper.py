@@ -56,6 +56,8 @@ class FichierHelper():
     @staticmethod
     def get_folder_contents(chemin:str, liste:list, decoupage:int = 0, recursif:bool = False, from_dir:str = ""):
         _real_filepath = "{}{}".format(chemin, from_dir)
+
+        #print("get_folder_contents : {} ({})".format(from_dir, _real_filepath))
         with os.scandir(_real_filepath) as entrees:
             for entree in entrees:
                 if entree.is_symlink():
@@ -63,7 +65,7 @@ class FichierHelper():
                 
                 filepath = "{}{}".format(chemin[decoupage:], from_dir)
                 filename = entree.name
-                if entree.is_file():                    
+                if entree.is_file():
                     entryDict = {
                         "type": "file",
                         "path": "/" if filepath == "" else filepath,
@@ -87,7 +89,7 @@ class FichierHelper():
                     liste.append(entryDict)
 
                     if recursif:
-                        FichierHelper.get_folder_contents(entree.path, liste, decoupage, recursif)                    
+                        FichierHelper.get_folder_contents(entree.path, liste, decoupage, recursif)
 
 
     @staticmethod

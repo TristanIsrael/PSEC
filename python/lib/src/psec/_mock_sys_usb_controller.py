@@ -1,10 +1,12 @@
 import os, shutil
 from psec import MqttClient, ConnectionType, Topics, ResponseFactory, FichierHelper, MqttHelper, NotificationFactory, Constantes
+from concurrent.futures import ThreadPoolExecutor
 
 class MockSysUsbController():
 
     def __init__(self):
-        pass
+        self.__thread_pool = ThreadPoolExecutor(max_workers=1)
+
 
     def start(self, source_disk_path:str, storage_path:str, destination_disk_path:str):
         self.source_disk_path = source_disk_path
@@ -31,34 +33,15 @@ class MockSysUsbController():
     def __on_mqtt_message(self, topic:str, payload:dict):
         #self.__debug("Message received on topic {}".format(topic))
 
+        self.__thread_pool.submit(self.__message_worker, topic, payload)
+
+    def __message_worker(self, topic:str, payload:dict):
         if topic == "{}/request".format(Topics.LIST_DISKS):
             response = ResponseFactory.create_response_disks_list(["SAPHIR"])
             self.mqtt_client.publish("{}/response".format(Topics.LIST_DISKS), response)
 
         elif topic == "{}/request".format(Topics.LIST_FILES):            
-            if not MqttHelper.check_payload(payload, ["disk", "recursive", "from_dir"]):
-                self.__debug("Missing arguments")
-                return
-
-            disk = payload.get("disk")
-            recursive = payload.get("recursive", False)
-            from_dir = payload.get("from_dir", "")
-
-            if disk != "SAPHIR":
-                self.__debug("The disk {} does not exist".format(disk))
-                return
-            
-            root_path = self.source_disk_path
-            if not os.path.exists(root_path):
-                self.__debug("The folder {} does not exist".format(root_path))
-                return                
-
-            files = list()
-            FichierHelper.get_folder_contents(root_path, files, len(root_path), recursive, from_dir)
-
-            response = ResponseFactory.create_response_list_files("SAPHIR", files)
-            self.mqtt_client.publish("{}/response".format(Topics.LIST_FILES), response)
-
+            self.__handle_list_files(payload)
 
         elif topic == "{}/request".format(Topics.READ_FILE):
             if not MqttHelper.check_payload(payload, ["disk", "filepath"]):
@@ -147,6 +130,30 @@ class MockSysUsbController():
         }
 
         self.mqtt_client.publish("{}/response".format(Topics.DISCOVER_COMPONENTS), response)
+
+    def __handle_list_files(self, payload:dict):
+        if not MqttHelper.check_payload(payload, ["disk", "recursive", "from_dir"]):
+            self.__debug("Missing arguments")
+            return
+
+        disk = payload.get("disk")
+        recursive = payload.get("recursive", False)
+        from_dir = payload.get("from_dir", "")
+
+        if disk != "SAPHIR":
+            self.__debug("The disk {} does not exist".format(disk))
+            return
+        
+        root_path = self.source_disk_path
+        if not os.path.exists(root_path):
+            self.__debug("The folder {} does not exist".format(root_path))
+            return                
+
+        files = list()
+        FichierHelper.get_folder_contents(root_path, files, len(root_path), recursive, from_dir)
+
+        response = ResponseFactory.create_response_list_files("SAPHIR", files)
+        self.mqtt_client.publish("{}/response".format(Topics.LIST_FILES), response)
 
 
     def __connect_destination(self):        

@@ -12,6 +12,7 @@ except:
 from . import NotificationFactory, FichierHelper
 import threading, os, base64, zlib
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
 
 class SysUsbController():
     """ Cette classe traite les messages échangés par la sys-usb avec le Dom0 ou les autres domaines. """
@@ -21,10 +22,11 @@ class SysUsbController():
 
     def __init__(self, mqtt_client:MqttClient):
         self.mqtt_client = mqtt_client
+        self.__thread_pool = ThreadPoolExecutor(max_workers=1)
 
 
     def __del__(self):
-        self.task_runner.stop()  
+        self.task_runner.stop()
 
 
     def start(self):
@@ -77,7 +79,8 @@ class SysUsbController():
     def __on_mqtt_message(self, topic:str, payload:dict):
         #Logger().debug("Message received : topic={}, payload={}".format(topic, payload))
 
-        threading.Thread(target=self.__message_worker, args=(topic, payload,)).start()
+        #threading.Thread(target=self.__message_worker, args=(topic, payload,)).start()
+        self.__thread_pool.submit(self.__message_worker, topic, payload)
 
 
     def __message_worker(self, topic:str, payload:dict):
@@ -119,7 +122,7 @@ class SysUsbController():
         self.mqtt_client.publish("{}/response".format(topic), response)
 
 
-    def __handle_list_files(self, topic:str, payload: dict) -> None:
+    def __handle_list_files(self, topic:str, payload: dict) -> None:        
         # Vérifie les arguments de la commande        
         if not MqttHelper.check_payload(payload, ["disk", "recursive", "from_dir"]):
             Logger().error("Missing arguments for {}".format(topic))
@@ -132,7 +135,7 @@ class SysUsbController():
         if disk == Constantes.REPOSITORY:
             return
 
-        # Récupère la liste des fichiers        
+        # Récupère la liste des fichiers
         fichiers = FichierHelper.get_files_list(disk, recursive, from_dir)
 
         # Génère la réponse
