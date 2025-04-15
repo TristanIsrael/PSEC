@@ -159,8 +159,14 @@ class Api(metaclass=SingletonMeta):
         }
         self.mqtt_client.publish("{}/response".format(Topics.DISCOVER_COMPONENTS), payload)
 
+
     def request_energy_state(self) -> None:
         self.mqtt_client.publish("{}/request".format(Topics.ENERGY_STATE), {})
+
+
+    def request_system_info(self) -> None:
+        self.mqtt_client.publish("{}/request".format(Topics.SYSTEM_INFO), {})
+
 
     ####
     # Fonctions de notification

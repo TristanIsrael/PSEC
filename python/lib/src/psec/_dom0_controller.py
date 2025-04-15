@@ -1,11 +1,13 @@
-from . import Constantes
-from . import Logger, FichierHelper, Parametres, Cles
-from . import ResponseFactory
-from . import MqttClient, Topics, MqttHelper, NotificationFactory
+import platform
 import threading
 import subprocess
 import time
 import psutil
+import os
+from . import Constantes, __version__
+from . import Logger, FichierHelper, Parametres, Cles
+from . import ResponseFactory
+from . import MqttClient, Topics, MqttHelper, NotificationFactory
 
 class Dom0Controller():
     """ Cette classe traite les commandes envoyées par les Domaines et qui concernent le dépôt local et le 
@@ -59,6 +61,8 @@ class Dom0Controller():
             self.__handle_gui_ready(payload)
         elif topic == "{}/request".format(Topics.ENERGY_STATE):
             self.__handle_energy_state()
+        elif topic == f"{Topics.SYSTEM_INFO}/request":
+            self.__handle_system_info()
 
 
     def __handle_list_files(self, payload:dict) -> None:
@@ -135,9 +139,9 @@ class Dom0Controller():
             return payload.get("disk") == Constantes.REPOSITORY
         else:
             return False
-        
-    
-    def __reboot_domain(self, domain_name:str):    
+
+
+    def __reboot_domain(self, domain_name:str):
         cmd = ["xl", "reboot", domain_name]
         res = subprocess.run(cmd)
 
@@ -157,3 +161,46 @@ class Dom0Controller():
         if battery:
             payload = NotificationFactory.create_notification_energy_state(battery)
             self.mqtt_client.publish("{}/response".format(Topics.ENERGY_STATE), payload)
+
+
+    def __handle_system_info(self):
+        payload = {
+            "core": {
+                "version": __version__
+            },
+            "system": {
+                "os" : {
+                    "name": platform.system(),
+                    "release": platform.release(),
+                    "version": platform.version()
+                },
+                "machine": {
+                    "arch": platform.machine(),
+                    "processor": platform.processor(),
+                    "platform": platform.platform(),
+                    "cpu": {
+                        "count": psutil.cpu_count(),
+                        "freq_current": psutil.cpu_freq().current,
+                        "freq_min": psutil.cpu_freq().min,
+                        "freq_max": psutil.cpu_freq().max,
+                        "percent": psutil.cpu_percent()
+                    },
+                    "memory": {
+                        "total": psutil.virtual_memory().total,
+                        "available": psutil.virtual_memory().available,
+                        "percent": psutil.virtual_memory().percent,
+                        "used": psutil.virtual_memory().used,
+                        "free": psutil.virtual_memory().free
+                    },
+                    "load": {
+                        "1": os.getloadavg()[0],
+                        "5": os.getloadavg()[1],
+                        "15": os.getloadavg()[2]
+                    }
+                },
+                "boot_time": psutil.boot_time()
+            }
+        }
+
+        self.mqtt_client.publish(f"{Topics.SYSTEM_INFO}/response", payload)
+

@@ -25,10 +25,11 @@ class Topics():
     NEW_FILE = "{}/new_file".format(DISKS)
     DISK_STATE = "{}/state".format(DISKS)
     GUI_READY = f"{WORKFLOW}/gui_ready"
-    ENERGY_STATE = "{}/state".format(ENERGY)
 
     # Miscelaneous
-    KEEPALIVE = "mics/ping"
+    KEEPALIVE = "{}/ping".format(MISC)
+    ENERGY_STATE = "{}/state".format(ENERGY)
+    SYSTEM_INFO = f"{SYSTEM}/info"
 
     # Logging
     ERROR = "{}/error".format(EVENTS)

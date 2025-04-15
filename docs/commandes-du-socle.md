@@ -20,6 +20,7 @@ Les notifications suivants sont gérées par le socle :
 | TypeEvenement.DISQUE | Etat d'un disque | `vm-sys-usb` | Tous | `{ "nom" : nom_disque, "connecte": booléen }` |
 | TypeEvenement.FICHIER | Etat d'un fichier | `Dom0` | Tous | `{ "fichier" : nom_fichier, "etat": "disponible\|erreur\|copié\|supprimé" }` |
 | TypeEvenement.INPUT | Etat d'une entrée clavier, touch ou souris | `vm-sys-usb` | Tous | *Voir la description détaillée* |
+| ENERGY_STATE | Etat de la batterie et de l'alimentation | Dom0 | Tous | `{"battery_level": valeur%, "plugged": booléen }` |
 
 ### Commandes 
 
@@ -32,6 +33,8 @@ Les commandes suivantes sont gérées par le socle :
 | TypeCommande.LIT_FICHIER | `Api.lit_fichier(nom_disque, nom_fichier)` | Copie un fichier depuis un disque vers le dépôt interne | DomU | vm-sys-usb | Notification |
 | TypeCommande.COPIE_FICHIER | `Api.copie_fichier(nom_fichier, nom_disque_destination)` | Copie un fichier depuis le dépôt interne vers le disque de destination | DomU | vm-sys-usb | Notification |
 | TypeCommande.SUPPRIME_FICHIER | `Api.supprime_fichier(nom_fichier, nom_du_disque = Constantes.DEPOT_LOCAL)` | Supprime un fichier sur un support de stockage (`local` pour le dépôt local) | DomU | Dom0 si local, vm-sys-usb sinon | Notification |
+| ENERGY_STATE | `Api.request_energy_state()` | Demande l'état de la batterie et de l'alimentation secteur | DomU | Dom0 | Notification |
+| SYSTEM_INFO | `Api.request_system_info()` | Demande les informations technique sur le système et le socle | DomU | Dom0 | Réponse |
 
 ### Réponses
 
@@ -41,6 +44,7 @@ Les messages suivants sont émis en réponse à leurs commandes respectives :
 |---|---|---|---|---|
 | TypeReponse.LISTE_DISQUES | Retourne la liste des disques connectés | Un tableau JSON contenant les noms des disques connectés. | vm-sys-usb | Le domaine émetteur de la commande |
 | TypeReponse.LISTE_FICHIERS | Retourne la liste des fichiers d'un disque | Un tableau JSON contenant les chemin et nom des fichiers du disque | vm-sys-usb | Le domaine émetteur de la commande |
+| SYSTEM_INFO | Retourne les informations sur le système et le socle | Une structure JSON contenant les informations sur le système et le socle | Dom0 | Le domaine émetteur de la commande |
 
 ## Description détaillée des commandes
 

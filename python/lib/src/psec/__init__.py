@@ -1,3 +1,6 @@
+__author__ = "Tristan Israël (tristan.israel@alefbet.net)"
+__version__ = '1.1'
+
 from ._singleton import SingletonMeta
 from ._constantes import Constantes, Cles, BoutonSouris, TypeEntree, BenchmarkId, EtatComposant
 try:
@@ -35,9 +38,6 @@ from ._system import System
 import logging
 from logging import NullHandler
 
-__author__ = "Tristan Israël (tristan.israel@alefbet.net)"
-__version__ = '1.1'
-
 __all__ = [
     "KeymapFR",
     "TypeEntree", "BoutonSouris", "Constantes", "EtatComposant", "MouseMove",     
@@ -59,7 +59,8 @@ __all__ = [
     "Dom0Controller", "SysUsbController", "Api",
     "ComponentsHelper",
     "MockSysUsbController",
-    "System"
+    "System",
+    "__version__"
 ]
 
 logging.getLogger(__name__).addHandler(NullHandler())
