@@ -52,7 +52,7 @@ class DiskMonitor():
 
         context = pyudev.Context()
         monitor = pyudev.Monitor.from_netlink(context)
-        monitor.filter_by(subsystem='block')        
+        monitor.filter_by(subsystem='block')
 
         for device in iter(monitor.poll, None):
             self.device_event(device.action, device)

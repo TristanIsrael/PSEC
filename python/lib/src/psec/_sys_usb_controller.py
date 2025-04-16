@@ -22,7 +22,7 @@ class SysUsbController():
 
     def __init__(self, mqtt_client:MqttClient):
         self.mqtt_client = mqtt_client
-        self.__thread_pool = ThreadPoolExecutor(max_workers=1)
+        #self.__thread_pool = ThreadPoolExecutor(max_workers=1)
 
 
     def __del__(self):
@@ -79,8 +79,8 @@ class SysUsbController():
     def __on_mqtt_message(self, topic:str, payload:dict):
         #Logger().debug("Message received : topic={}, payload={}".format(topic, payload))
 
-        #threading.Thread(target=self.__message_worker, args=(topic, payload,)).start()
-        self.__thread_pool.submit(self.__message_worker, topic, payload)
+        threading.Thread(target=self.__message_worker, args=(topic, payload,)).start()
+        #self.__thread_pool.submit(self.__message_worker, topic, payload)
 
 
     def __message_worker(self, topic:str, payload:dict):
@@ -119,13 +119,13 @@ class SysUsbController():
 
         # Génère la réponse
         response = ResponseFactory.create_response_disks_list(disks)
-        self.mqtt_client.publish("{}/response".format(topic), response)
+        self.mqtt_client.publish(f"{topic}/response", response)
 
 
     def __handle_list_files(self, topic:str, payload: dict) -> None:        
         # Vérifie les arguments de la commande        
         if not MqttHelper.check_payload(payload, ["disk", "recursive", "from_dir"]):
-            Logger().error("Missing arguments for {}".format(topic))
+            Logger().error(f"Missing arguments for {topic}")
             return
 
         disk = payload.get("disk", "")
@@ -140,7 +140,7 @@ class SysUsbController():
 
         # Génère la réponse
         response = ResponseFactory.create_response_list_files(disk, fichiers)
-        self.mqtt_client.publish("{}/response".format(topic), response)
+        self.mqtt_client.publish(f"{topic}/response", response)
 
 
     def __handle_read_file(self, topic:str, payload: dict):

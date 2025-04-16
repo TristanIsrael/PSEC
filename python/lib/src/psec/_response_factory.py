@@ -17,7 +17,7 @@ class ResponseFactory():
         payload = {
             "disk": disk,
             "files": files
-        }        
+        }
         return payload
 
     @staticmethod

@@ -231,7 +231,7 @@ class MqttClient():
                 cb(msg.topic, payload)
         except Exception as e:
             print("Uncaught Exception when handling message:")
-            print(e)        
+            print(e)
 
     def __on_connected(self, client:mqtt.Client, userdata, connect_flags, reason_code, properties):
         print("Connected to the MQTT broker")
