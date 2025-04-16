@@ -1,6 +1,8 @@
 import os, shutil
 from psec import MqttClient, ConnectionType, Topics, ResponseFactory, FichierHelper, MqttHelper, NotificationFactory, Constantes
 from concurrent.futures import ThreadPoolExecutor
+import base64, zlib
+
 
 class MockSysUsbController():
 
@@ -78,12 +80,10 @@ class MockSysUsbController():
                 self.__debug("Error during copy: {}".format(e))
                 notif = NotificationFactory.create_notification_error(disk, filepath, "The file could not be copied")
                 self.mqtt_client.publish(Topics.ERROR, notif)
-                return
+                return            
             
-
         elif topic == "{}/request".format(Topics.DISCOVER_COMPONENTS):
             self.__handle_discover_components()
-
 
         elif topic == "{}/request".format(Topics.COPY_FILE):
             if not MqttHelper.check_payload(payload, ["disk", "filepath", "destination"]):
@@ -118,7 +118,8 @@ class MockSysUsbController():
                 self.mqtt_client.publish(Topics.ERROR, notif)
 
             source_footprint = FichierHelper.calculate_footprint(source_path)
-
+        elif topic == f"{Topics.CREATE_FILE}/request":
+            self.__handle_create_file(topic, payload)
 
     def __handle_discover_components(self):
         response = {
@@ -154,6 +155,49 @@ class MockSysUsbController():
 
         response = ResponseFactory.create_response_list_files("SAPHIR", files)
         self.mqtt_client.publish("{}/response".format(Topics.LIST_FILES), response)
+
+    def __handle_create_file(self, topic:str, payload:dict):
+        disk = payload.get("disk", "")
+        filepath = payload.get("filepath", "")
+        base64_data = payload.get("data", "")
+
+        if not MqttHelper.check_payload(payload, ["disk", "filepath", "data"]):
+            self.__debug("Missing argument in the create_file command")
+            return
+
+        if disk == Constantes.REPOSITORY:
+            # Ignored
+            return
+
+        decoded = base64.b64decode(base64_data)
+
+        # Check if data were compressed, and uncompress if needed
+        compressed = payload.get("compressed", False)
+        if compressed:
+            data = zlib.decompress(decoded)
+        else:
+            data = decoded
+
+        complete_filepath = "{}/{}".format(self.destination_disk_path, filepath)
+        
+        self.__debug("Create a file {} of size {} octets on disk {}".format(filepath, len(data), disk))
+
+        try:
+            with open(complete_filepath, 'wb') as f:
+                f.write(data)
+            f.close()            
+        except Exception as e:
+            self.__debug("An error occured while writing to file {}".format(complete_filepath))
+            self.__debug(str(e))
+            
+            response = ResponseFactory.create_response_create_file(filepath, disk, "", False)
+            self.mqtt_client.publish("{}/response".format(topic), response)
+            return
+
+        # On envoie la notification de succès
+        footprint = FichierHelper.calculate_footprint(complete_filepath)
+        response = ResponseFactory.create_response_create_file(complete_filepath, disk, footprint, True)
+        self.mqtt_client.publish("{}/response".format(topic), response)
 
 
     def __connect_destination(self):        

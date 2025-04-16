@@ -1,5 +1,9 @@
 from . import Constantes, RequestFactory, Topics, NotificationFactory
 from . import Logger, MqttClient, ConnectionType, Cles, SingletonMeta
+import tempfile
+import os
+import zlib
+import base64
 
 class Api(metaclass=SingletonMeta):
     """ Cette classe permet à un programme tiers d'envoyer des commandes ou recevoir des 
@@ -29,23 +33,26 @@ class Api(metaclass=SingletonMeta):
     __subscriptions = list()
     __shutdown_callbacks = list()
     __restart_callbacks = list()
+    __recording = False
 
 
-    def start(self, mqtt_client:MqttClient):
-        self.mqtt_client = mqtt_client
+    def start(self, mqtt_client:MqttClient, recording = False, logfile = os.path.join(tempfile.gettempdir(), "journal.log")):
+        self.__mqtt_client = mqtt_client
+        self.__recording = recording
+        self.__logfile = logfile
 
-        self.mqtt_client.on_connected = self.__on_mqtt_connected
-        self.mqtt_client.on_message = self.__on_message_received
+        self.__mqtt_client.on_connected = self.__on_mqtt_connected
+        self.__mqtt_client.on_message = self.__on_message_received
 
-        self.mqtt_client.start()
+        self.__mqtt_client.start()
 
-    
+
     def stop(self):
-        self.mqtt_client.stop()
+        self.__mqtt_client.stop()
 
 
     def get_mqtt_client(self):
-        return self.mqtt_client
+        return self.__mqtt_client
 
 
     def add_message_callback(self, callback_fn):
@@ -78,11 +85,11 @@ class Api(metaclass=SingletonMeta):
 
     def subscribe(self, topic:str):
         if not topic in self.__subscriptions:
-            self.mqtt_client.subscribe(topic)
+            self.__mqtt_client.subscribe(topic)
 
 
     def publish(self, topic:str, payload:dict):
-        self.mqtt_client.publish(topic, payload)
+        self.__mqtt_client.publish(topic, payload)
 
 
     ####
@@ -112,22 +119,22 @@ class Api(metaclass=SingletonMeta):
     # Fonctions de gestion des supports de stockage
     #
     def get_disks_list(self):
-        self.mqtt_client.publish("{}/request".format(Topics.LIST_DISKS), {})
+        self.__mqtt_client.publish("{}/request".format(Topics.LIST_DISKS), {})
 
 
     def get_files_list(self, disk: str, recursive:bool = False, from_dir:str = ""):
         payload = RequestFactory.create_request_files_list(disk, recursive, from_dir)
-        self.mqtt_client.publish("{}/request".format(Topics.LIST_FILES), payload)
+        self.__mqtt_client.publish("{}/request".format(Topics.LIST_FILES), payload)
 
 
     def read_file(self, disk:str, filepath:str):
         payload = RequestFactory.create_request_read_file(disk, filepath)
-        self.mqtt_client.publish("{}/request".format(Topics.READ_FILE), payload)
+        self.__mqtt_client.publish("{}/request".format(Topics.READ_FILE), payload)
 
 
     def copy_file(self, source_disk:str, filepath:str, destination_disk:str):
         payload = RequestFactory.create_request_copy_file(source_disk, filepath, destination_disk)
-        self.mqtt_client.publish("{}/request".format(Topics.COPY_FILE), payload)
+        self.__mqtt_client.publish("{}/request".format(Topics.COPY_FILE), payload)
 
 
     def copy_file_to_storage(self, source_disk:str, filepath:str):        
@@ -136,36 +143,37 @@ class Api(metaclass=SingletonMeta):
 
     def delete_file(self, filepath:str, disk:str):
         payload = RequestFactory.create_request_delete_file(filepath, disk)
-        self.mqtt_client.publish("{}/request".format(Topics.DELETE_FILE), payload)
+        self.__mqtt_client.publish("{}/request".format(Topics.DELETE_FILE), payload)
 
 
     def get_file_footprint(self, filepath:str, disk:str):
         payload = RequestFactory.create_request_get_file_footprint(filepath, disk)
-        self.mqtt_client.publish("{}/request".format(Topics.FILE_FOOTPRINT), payload)
+        self.__mqtt_client.publish("{}/request".format(Topics.FILE_FOOTPRINT), payload)
 
 
-    def create_file(self, filepath:str, disk:str, contents:bytes):
-        payload = RequestFactory.create_request_create_file(filepath, disk, contents)
-        self.mqtt_client.publish("{}/request".format(Topics.CREATE_FILE), payload)
+    def create_file(self, filepath:str, disk:str, contents:bytes, binary=False):
+        data = contents if not binary else zlib.compress(contents, level=1)
+        payload = RequestFactory.create_request_create_file(filepath, disk, base64.b64encode(data), binary)
+        self.__mqtt_client.publish("{}/request".format(Topics.CREATE_FILE), payload)
 
 
     def discover_components(self) -> None:        
-        self.mqtt_client.publish("{}/request".format(Topics.DISCOVER_COMPONENTS), {})
+        self.__mqtt_client.publish("{}/request".format(Topics.DISCOVER_COMPONENTS), {})
 
 
     def publish_components(self, components:list) -> None:        
         payload = {
             "components": components
         }
-        self.mqtt_client.publish("{}/response".format(Topics.DISCOVER_COMPONENTS), payload)
+        self.__mqtt_client.publish("{}/response".format(Topics.DISCOVER_COMPONENTS), payload)
 
 
     def request_energy_state(self) -> None:
-        self.mqtt_client.publish("{}/request".format(Topics.ENERGY_STATE), {})
+        self.__mqtt_client.publish("{}/request".format(Topics.ENERGY_STATE), {})
 
 
     def request_system_info(self) -> None:
-        self.mqtt_client.publish("{}/request".format(Topics.SYSTEM_INFO), {})
+        self.__mqtt_client.publish("{}/request".format(Topics.SYSTEM_INFO), {})
 
 
     ####
@@ -173,41 +181,41 @@ class Api(metaclass=SingletonMeta):
     #
     def notify_disk_added(self, disk):
         payload = NotificationFactory.create_notification_disk_state(disk, "connected")
-        self.mqtt_client.publish("{}".format(Topics.DISK_STATE), payload)
+        self.__mqtt_client.publish("{}".format(Topics.DISK_STATE), payload)
     
 
     def notify_disk_removed(self, disk):
         payload = NotificationFactory.create_notification_disk_state(disk, "diconnected")
-        self.mqtt_client.publish("{}".format(Topics.DISK_STATE), payload)
+        self.__mqtt_client.publish("{}".format(Topics.DISK_STATE), payload)
 
 
     def notify_gui_ready(self) -> None:
-        self.mqtt_client.publish("{}".format(Topics.GUI_READY), {})
+        self.__mqtt_client.publish("{}".format(Topics.GUI_READY), {})
 
 
     ####
     # Workflow functions
     #
     def shutdown(self):        
-        self.mqtt_client.publish("{}/request".format(Topics.SHUTDOWN), {})
+        self.__mqtt_client.publish("{}/request".format(Topics.SHUTDOWN), {})
 
 
     def restart_domain(self, domain_name:str):
         payload = RequestFactory.create_request_restart_domain(domain_name)
-        self.mqtt_client.publish("{}/request".format(Topics.RESTART_DOMAIN), payload)
+        self.__mqtt_client.publish("{}/request".format(Topics.RESTART_DOMAIN), payload)
 
 
     ####
     # Fonctions privées
     #    
     def __on_mqtt_connected(self):
-        Logger().setup("Api", self.mqtt_client)
+        Logger().setup("Api", mqtt_client=self.__mqtt_client, recording=self.__recording, filename=self.__logfile)
         self.subscribe("{}/+".format(Topics.DISKS))
         self.subscribe("{}/+/response".format(Topics.DISKS))
         self.subscribe("{}/+/response".format(Topics.MISC))
-        self.subscribe("{}/+/response".format(Topics.DISCOVER))        
-        self.subscribe("{}/response".format(Topics.SHUTDOWN)) 
-        self.subscribe("{}/response".format(Topics.RESTART_DOMAIN)) 
+        self.subscribe("{}/+/response".format(Topics.DISCOVER))
+        self.subscribe("{}/response".format(Topics.SHUTDOWN))
+        self.subscribe("{}/response".format(Topics.RESTART_DOMAIN))
         self.subscribe("{}".format(Topics.ERROR))
 
         for cb in self.__ready_callbacks:
@@ -238,7 +246,7 @@ class Api(metaclass=SingletonMeta):
 
 
     def __on_restart_domain(self, payload:dict):
-        success = payload.get("state", "") == "accepted"   
+        success = payload.get("state", "") == "accepted"
         domain_name = payload.get("domain_name", "")
         reason = payload.get("reason", "")
 

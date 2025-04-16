@@ -1,5 +1,6 @@
 from . import SingletonMeta
 import subprocess
+import platform
 
 class System(metaclass=SingletonMeta):
 
@@ -65,3 +66,34 @@ class System(metaclass=SingletonMeta):
         
         return self._DEFAULT_SCREEN_SIZE
     
+    def get_system_uuid(self):
+        system = platform.system().lower()
+        
+        if system == 'linux':
+            try:
+                with open('/sys/class/dmi/id/product_uuid', 'r') as f:
+                    return f.read().strip()
+            except FileNotFoundError:
+                return None  # UUID non disponible sur cette machine Linux
+        
+        elif system == 'windows':
+            try:
+                output = subprocess.check_output('wmic csproduct get uuid', shell=True)
+                lines = output.decode().split('\n')
+                uuid = [line.strip() for line in lines if line.strip() and "UUID" not in line]
+                return uuid[0] if uuid else None
+            except subprocess.CalledProcessError:
+                return None  # Erreur lors de l'exécution de wmic
+        
+        elif system == 'darwin':  # macOS
+            try:
+                output = subprocess.check_output('ioreg -rd1 -c IOPlatformExpertDevice', shell=True)
+                for line in output.decode().split('\n'):
+                    if 'IOPlatformUUID' in line:
+                        return line.split('"')[-2]
+                return None
+            except subprocess.CalledProcessError:
+                return None  # Erreur lors de l'exécution de ioreg
+        
+        else:
+            return None  # Système non supporté

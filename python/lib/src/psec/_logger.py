@@ -40,40 +40,40 @@ class Logger(metaclass=SingletonMeta):
         if self.__is_setup:
             return
         
-        self.domain_name = os.uname().nodename
-        self.module_name = module_name
-        self.mqtt_client = mqtt_client
+        self.__domain_name = os.uname().nodename
+        self.__module_name = module_name
+        self.__mqtt_client = mqtt_client
 
-        self.mqtt_client.add_connected_callback(self.__on_connected)        
-        self.mqtt_client.add_message_callback(self.__on_message)
+        #self.__mqtt_client.add_connected_callback(self.__on_connected)
+        self.__mqtt_client.add_message_callback(self.__on_message)
 
-        self.__is_recording = recording        
+        self.__is_recording = recording
         self.__filename = filename
 
         # We open the log file
         if recording and self.__logfile is None:
-
             self.__open_log_file()
+            self.__mqtt_client.subscribe(f"{Topics.EVENTS}/#")
 
-        self.__is_setup = True    
+        self.__is_setup = True
 
     def critical(self, description:str, module:str = ""):
         if not self.__is_setup:
             return
         payload = self.__create_event(module, description)
-        self.mqtt_client.publish("system/events/critical", payload)
+        self.__mqtt_client.publish("system/events/critical", payload)
 
     def error(self, description:str, module:str = ""):
         if not self.__is_setup:
             return
         payload = self.__create_event(module, description)
-        self.mqtt_client.publish("system/events/error", payload)
+        self.__mqtt_client.publish("system/events/error", payload)
 
     def warning(self, description:str, module:str = ""):
         if not self.__is_setup:
             return
         payload = self.__create_event(module, description)
-        self.mqtt_client.publish("system/events/warning", payload)
+        self.__mqtt_client.publish("system/events/warning", payload)
 
     def warn(self, description:str, module:str = ""):
         if not self.__is_setup:
@@ -84,13 +84,13 @@ class Logger(metaclass=SingletonMeta):
         if not self.__is_setup:
             return
         payload = self.__create_event(module, description)
-        self.mqtt_client.publish("system/events/info", payload)
+        self.__mqtt_client.publish("system/events/info", payload)
 
     def debug(self, description:str, module:str = ""):
         if not self.__is_setup:
             return
         payload = self.__create_event(module, description)
-        self.mqtt_client.publish("system/events/debug", payload)
+        self.__mqtt_client.publish("system/events/debug", payload)
 
     @staticmethod
     def loglevel_from_topic(topic:str) -> int:
@@ -108,7 +108,7 @@ class Logger(metaclass=SingletonMeta):
         elif topic.endswith("critical"):
             return logging.CRITICAL
         
-        return logging.DEBUG
+        return logging.DEBUG    
 
     def __create_event(self, module:str, description:str) -> dict :
         if not self.__is_setup:
@@ -118,21 +118,13 @@ class Logger(metaclass=SingletonMeta):
         dt = now.strftime(f"%Y-%m-%d %H:%M:%S.{now.microsecond // 1000:03d}")
 
         payload = {
-            "component": self.domain_name,
-            "module": module if module != "" else self.module_name,
+            "component": self.__domain_name,
+            "module": module if module != "" else self.__module_name,
             "datetime": dt,
             "description": description
         }
 
-        return payload
-    
-    def __on_connected(self):
-        if self.__is_recording:
-            # We open the log file
-            if self.__logfile is None:
-                self.__open_log_file()
-
-            self.mqtt_client.subscribe("{}/#".format(Topics.EVENTS))        
+        return payload    
 
     def __on_message(self, topic:str, payload:dict):
         if topic == Topics.SET_LOGLEVEL:
@@ -159,7 +151,7 @@ class Logger(metaclass=SingletonMeta):
 
             # Create the file
             request = RequestFactory.create_request_create_file(filename, disk, base64.b64encode(compressed_data), True)
-            self.mqtt_client.publish("{}/request".format(Topics.CREATE_FILE), request)
+            self.__mqtt_client.publish("{}/request".format(Topics.CREATE_FILE), request)
              
         elif self.__is_recording:
             # Log message
@@ -190,7 +182,8 @@ class Logger(metaclass=SingletonMeta):
         self.__logfile.flush()
         
     def __open_log_file(self):
-        self.__logfile = FileHandler(self.__filename, 'a') 
+        self.__logfile = FileHandler(self.__filename, 'a')
+        print(f"Le journal sera enregistré dans le fichier {self.__filename}")
 
     def __loglevel_value(self, level:str) -> int:
         if level == "debug":

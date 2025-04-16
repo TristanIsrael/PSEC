@@ -88,7 +88,7 @@ class RequestFactory():
         return {
             "filepath": filepath,
             "disk": disk,
-            "contents": contents.decode("utf-8"),
+            "data": contents.decode("utf-8"),
             "compressed": compressed
         }    
 

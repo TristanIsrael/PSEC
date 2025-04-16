@@ -2,6 +2,7 @@ __author__ = "Tristan Israël (tristan.israel@alefbet.net)"
 __version__ = '1.1'
 
 from ._singleton import SingletonMeta
+from ._system import System
 from ._constantes import Constantes, Cles, BoutonSouris, TypeEntree, BenchmarkId, EtatComposant
 try:
     from ._keymap_fr import KeymapFR
@@ -33,12 +34,12 @@ from ._sys_usb_controller import SysUsbController
 from ._components_helper import ComponentsHelper
 from ._mqtt_factory import MqttFactory
 from ._mock_sys_usb_controller import MockSysUsbController
-from ._system import System
 
 import logging
 from logging import NullHandler
 
 __all__ = [
+    "__version__",
     "KeymapFR",
     "TypeEntree", "BoutonSouris", "Constantes", "EtatComposant", "MouseMove",     
     "RequestFactory",
@@ -59,8 +60,7 @@ __all__ = [
     "Dom0Controller", "SysUsbController", "Api",
     "ComponentsHelper",
     "MockSysUsbController",
-    "System",
-    "__version__"
+    "System"    
 ]
 
 logging.getLogger(__name__).addHandler(NullHandler())

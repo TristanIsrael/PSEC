@@ -8,6 +8,7 @@ from . import Constantes, __version__
 from . import Logger, FichierHelper, Parametres, Cles
 from . import ResponseFactory
 from . import MqttClient, Topics, MqttHelper, NotificationFactory
+from . import System
 
 class Dom0Controller():
     """ Cette classe traite les commandes envoyées par les Domaines et qui concernent le dépôt local et le 
@@ -35,8 +36,9 @@ class Dom0Controller():
 
     def __on_mqtt_connected(self):
         Logger().debug("Starting Dom0 controller")        
-        self.mqtt_client.subscribe("{}/+/+/request".format(Topics.SYSTEM)) # All the system requests
-        self.mqtt_client.subscribe("{}".format(Topics.GUI_READY))
+        self.mqtt_client.subscribe(f"{Topics.SYSTEM}/+/+/request") # All the system requests
+        self.mqtt_client.subscribe(Topics.GUI_READY)
+        self.mqtt_client.subscribe(Topics.SYSTEM_INFO)
 
 
     def __on_mqtt_message(self, topic:str, payload:dict):
@@ -198,7 +200,8 @@ class Dom0Controller():
                         "15": os.getloadavg()[2]
                     }
                 },
-                "boot_time": psutil.boot_time()
+                "boot_time": psutil.boot_time(),
+                "uuid": System().get_system_uuid()
             }
         }
 
