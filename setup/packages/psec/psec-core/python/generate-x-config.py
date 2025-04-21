@@ -1,5 +1,6 @@
 import json, subprocess
 
+
 def angle_to_rotate(angle):
     mapping = {
         0: "normal",
@@ -9,30 +10,9 @@ def angle_to_rotate(angle):
     }
     return mapping.get(angle, "normal")
 
-'''
-def compute_resolution(resolution, angle):
-    # Extraire la largeur et la hauteur de la chaîne de résolution
-    largeur, hauteur = map(int, resolution.split('x'))
-    
-    # Calculer la nouvelle résolution en fonction de l'angle
-    if angle == 90 or angle == -270:
-        # Rotation de 90° ou -270° : échange largeur et hauteur
-        nouvelle_resolution = f"{hauteur}x{largeur}"
-    elif angle == 180 or angle == -180:
-        # Rotation de 180° : la résolution reste la même
-        nouvelle_resolution = f"{largeur}x{hauteur}"
-    elif angle == 270 or angle == -90:
-        # Rotation de 270° ou -90° : échange largeur et hauteur
-        nouvelle_resolution = f"{hauteur}x{largeur}"
-    else:
-        # Pour les autres angles (0° ou multiples de 360°), la résolution reste la même
-        nouvelle_resolution = f"{largeur}x{hauteur}"
-    
-    return nouvelle_resolution
-'''
 
 def write_monitor_section(angle:int) -> None:
-    filepath = "/etc/X11/xorg.conf.d/10-monitor.conf"    
+    filepath = "/etc/X11/xorg.conf.d/10-monitor.conf"
 
     # Lecture de la résolution normale
     with open('/sys/class/graphics/fb0/virtual_size', 'r') as fichier:

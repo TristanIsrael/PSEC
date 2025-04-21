@@ -631,6 +631,37 @@ $ cd src/tools/qemu-xen
 $ ./configure --enable-gtk --enable-sdl --enable-sdl-image
 ```
 
+## Affichage accéléré 2D/3D
+
+Sur le Dom0 :
+- installer  qemu-hw-display-virtio-gpu-pci-gl, qemu-ui-gtk, qemu-ui-opengl et virglrenderer
+
+Configurer le DomU :
+```
+device_model_override = "/usr/bin/qemu-system-x86_64"
+device_model_version = "qemu-xen"
+device_model_args = [
+     '-device', 'virtio-gpu-gl',
+     '-display', 'gtk,show-tabs=off,show-cursor=off,window-close=off,show-menubar=off,gl=on'
+]
+vnc=0
+```
+
+Sur le DomU, installer le mode `virtio-gpu` et.
+Installer également les drivers opengl.
+
+Performances :
+- device virtio-gpu-pci, display gtk,gl=off : 415 fps. 110 en plein écran.
+- device virtio-gpu-pci, display gtk,gl=on : 250 fps. 113 en plein écran.
+
+### Drivers graphiques sous QEMU
+
+https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/
+
+- Préferer vhost-user virtio pour la sécurité
+- sinon Virtio-gpu (qemu: -device virtio-gpu-pci)
+  - This device has (optional) hardware-assisted opengl acceleration support. This can be enabled using the virgl=on property, which in turn needs opengl support enabled (gl=on) in the qemu display.
+
 ## Mosquitto
 
 Démarrer Mosquitto sur macOS : `mosquitto -c ~/mosquitto-multiple.conf`

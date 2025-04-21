@@ -4,4 +4,8 @@ echo Clean system
 rm -rf /etc/psec
 rm -rf /usr/lib/psec
 
+# Reset QEMU binary files
+rm /usr/bin/qemu-system-x86_64 /usr/bin/qemu-system-x86_64.cmd
+mv /usr/bin/qemu-system-x86_64.real /usr/bin/qemu-system-x86_64
+
 exit 0

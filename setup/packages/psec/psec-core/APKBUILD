@@ -7,7 +7,7 @@ pkgdesc="PSEC - Core of the system"
 url="https://www.alefbet.net/"
 arch="noarch"
 license="MIT"
-depends="openrc cdrkit psec-lib xen xen-hypervisor qemu-system-x86_64 qemu-ui-gtk seabios abuild pciutils xorg-server xrandr font-terminus gtk+3.0 sdl2 sdl2_image mosquitto mosquitto-openrc mosquitto-clients socat py3-evdev py3-udev feh jq psec-alpine-iso"
+depends="openrc cdrkit psec-lib xen xen-hypervisor qemu-system-x86_64 qemu-ui-gtk seabios abuild pciutils xorg-server xrandr font-terminus gtk+3.0 sdl2 sdl2_image mosquitto mosquitto-openrc mosquitto-clients socat py3-evdev py3-udev feh jq psec-alpine-iso xdotool"
 makedepends=""
 builddir="$srcdir/$pkgname-$pkgver"
 install="$pkgname.pre-install $pkgname.post-install $pkgname.pre-deinstall $pkgname.post-deinstall"
@@ -62,6 +62,8 @@ boot/Splash_800_1280.ppm
 boot/Splash_800_1280.png
 boot/Splash_1024_768.ppm
 boot/Splash_1024_768.png
+
+misc/qemu-system-x86_64.cmd
 "
 
 PSEC_CONFDIR="etc/psec"
@@ -142,8 +144,9 @@ package() {
     install -D -m644 "$srcdir"/Splash_800_1280.png "$pkgdir"/boot/Splash_800_1280.png
     install -D -m644 "$srcdir"/Splash_1024_768.ppm "$pkgdir"/boot/Splash_1024_768.ppm
     install -D -m644 "$srcdir"/Splash_1024_768.png "$pkgdir"/boot/Splash_1024_768.png
+    install -D -m755 "$srcdir"/qemu-system-x86_64.cmd "$pkgdir"/usr/bin/qemu-system-x86_64.cmd
 
     # Mosquitto
     install -D -m644 "$srcdir"/mosquitto.conf "$pkgdir"/etc/mosquitto/mosquitto.conf
-    install -D -m755 "$srcdir"/create-mqtt-tunnels.initd "$pkgdir"/etc/init.d/create-mqtt-tunnels    
+    install -D -m755 "$srcdir"/create-mqtt-tunnels.initd "$pkgdir"/etc/init.d/create-mqtt-tunnels        
 }

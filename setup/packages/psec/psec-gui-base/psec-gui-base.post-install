@@ -1,5 +1,7 @@
 #!/bin/sh
 
+export DISPLAY=:0
+
 rc-service udev start
 rc-service udev-postmount start
 rc-service udev-trigger start

@@ -268,7 +268,7 @@ def on_mqtt_ready():
             os.symlink(touch_path, "/dev/input/virtual_touch")
 
     # Attach PCI devices
-    expose_pci_devices() 
+    expose_pci_devices()
 
     # Start sys-usb
     if CREATE_DOMAINS:
@@ -276,16 +276,16 @@ def on_mqtt_ready():
         res = subprocess.run(cmd)
 
         if res == 0:
-            Logger().info("Started Domain sys-usb")  
+            Logger().info("Started Domain sys-usb")
         else:
-            Logger().critical("Domain sys-usb did not start")  
+            Logger().critical("Domain sys-usb did not start")
 
         # Start sys-gui
         cmd = ["/usr/lib/psec/bin/start-sys-gui.sh"]
         res = subprocess.run(cmd)
 
         if res == 0:
-            Logger().info("Started Domain sys-gui") 
+            Logger().info("Started Domain sys-gui")
         else:
             Logger().critical("Domain sys-gui did not start")
 

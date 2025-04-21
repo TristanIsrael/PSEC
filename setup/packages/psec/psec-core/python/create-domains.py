@@ -148,11 +148,12 @@ channel = [
 'name=sys-gui-msg, connection=socket, path=/var/run/sys-gui-msg.sock',
 'name=sys-gui-input, connection=socket, path=/var/run/sys-gui-input.sock'
 ]
-vga = "stdvga"
+vga = "none"
 device_model_override = "/usr/bin/qemu-system-x86_64"
 device_model_version = "qemu-xen"
 device_model_args = [
-     '-display', 'gtk,show-tabs=off,show-cursor=off,window-close=off,show-menubar=off',
+     '-device', 'virtio-gpu-pci',
+     '-display', 'gtk,full-screen=on,zoom-to-fit=on,gl=on',
      '-device', 'virtio-input-host,id=virtio-mouse,evdev=/dev/input/virtual_mouse',
      '-device', 'virtio-input-host,id=virtio-touch,evdev=/dev/input/virtual_touch'
 ]
