@@ -38,7 +38,7 @@ DISPLAY=:0 xl create -f /etc/psec/xen/sys-gui.conf
 sleep 1
 
 # Resize GTK window to fill the display
-xdotool windowsize `xdotool search --name "sys-gui"` $new_width $new_height
+DISPLAY=:0 xdotool windowsize `DISPLAY=:0 xdotool search --name "sys-gui"` $new_width $new_height
 
 # We show the splash back
 DISPLAY=:0 feh --fullscreen --zoom fill /boot/Splash.png &

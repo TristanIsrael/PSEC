@@ -37,8 +37,8 @@ class Dom0Controller():
     def __on_mqtt_connected(self):
         Logger().debug("Starting Dom0 controller")        
         self.mqtt_client.subscribe(f"{Topics.SYSTEM}/+/+/request") # All the system requests
-        self.mqtt_client.subscribe(Topics.GUI_READY)
-        self.mqtt_client.subscribe(Topics.SYSTEM_INFO)
+        self.mqtt_client.subscribe(f"{Topics.GUI_READY}/request")
+        self.mqtt_client.subscribe(f"{Topics.SYSTEM_INFO}/request")
 
 
     def __on_mqtt_message(self, topic:str, payload:dict):

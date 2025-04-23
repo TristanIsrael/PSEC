@@ -44,6 +44,7 @@ rc-update add start-x
 
 # Setup the replacement script for qemu-system to patch the command
 # line sent by XEN
+rm -f /usr/bin/qemu-system-x86_64.real /usr/bin/qemu-system-x86_64.cmd
 mv /usr/bin/qemu-system-x86_64 /usr/bin/qemu-system-x86_64.real
 ln -s /usr/bin/qemu-system-x86_64.cmd /usr/bin/qemu-system-x86_64
 

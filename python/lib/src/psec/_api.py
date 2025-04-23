@@ -210,13 +210,15 @@ class Api(metaclass=SingletonMeta):
     #    
     def __on_mqtt_connected(self):
         Logger().setup("Api", mqtt_client=self.__mqtt_client, recording=self.__recording, filename=self.__logfile)
-        self.subscribe("{}/+".format(Topics.DISKS))
-        self.subscribe("{}/+/response".format(Topics.DISKS))
-        self.subscribe("{}/+/response".format(Topics.MISC))
-        self.subscribe("{}/+/response".format(Topics.DISCOVER))
-        self.subscribe("{}/response".format(Topics.SHUTDOWN))
-        self.subscribe("{}/response".format(Topics.RESTART_DOMAIN))
-        self.subscribe("{}".format(Topics.ERROR))
+        self.subscribe(f"{Topics.DISKS}/+")
+        self.subscribe(f"{Topics.DISKS}/+/response")
+        self.subscribe(f"{Topics.MISC}/+/response")
+        self.subscribe(f"{Topics.DISCOVER}/+/response")
+        self.subscribe(f"{Topics.SHUTDOWN}/response")
+        self.subscribe(f"{Topics.ENERGY_STATE}/response")
+        self.subscribe(f"{Topics.RESTART_DOMAIN}/response")
+        self.subscribe(f"{Topics.SYSTEM_INFO}/response")
+        self.subscribe(Topics.ERROR)
 
         for cb in self.__ready_callbacks:
             cb()
