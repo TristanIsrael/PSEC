@@ -12,4 +12,7 @@ xl list | tail -n +3 | awk '{print $1}' | while read -r dom; do
     xl destroy "$dom"
 done
 
+mv /usr/bin/qemu-system-x86_64 /usr/bin/qemu-system-x86_64.cmd
+mv /usr/bin/qemu-system-x86_64.real /usr/bin/qemu-system-x86_64
+
 exit 0

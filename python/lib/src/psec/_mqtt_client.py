@@ -191,7 +191,7 @@ class MqttClient():
             self.mqtt_client = SerialMQTTClient(client_id=self.identifier, path=self.connection_string, baudrate=115200, reconnect_on_failure=False)
             self.mqtt_client.on_connect = self.__on_connected
             self.mqtt_client.on_message = self.__on_message
-            self.mqtt_client.on_disconnect = self.mqtt_client.close
+            self.mqtt_client.on_disconnect = self.__on_disconnected
 
             if DEBUG:
                 self.mqtt_client.on_log = self.__on_log
@@ -266,3 +266,13 @@ class MqttClient():
 
         for cb in self.__connected_callbacks:
             cb()
+
+    def __on_disconnected(self, *args):
+        print("Disconnection from the MQTT broker asked by the client")
+        print("Arguments:")
+        for arg in args:
+            print(arg)
+
+        print("Disconnect from the broker")
+        self.mqtt_client.close()
+        

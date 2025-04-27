@@ -1,86 +1,108 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import net.alefbet
 
 Rectangle {
     color: Colors.background
 
-    RowLayout {
-        id: pnlSelection
+    ColumnLayout {
+        anchors.fill: parent
+    
+        Rectangle {
+            Layout.preferredWidth: parent.width
+            Layout.preferredHeight: lblDescription.height *2
+            color: Colors.black
 
-        anchors {
-            left: parent.left
-            leftMargin: 10
-            top: parent.top
-            topMargin: 10
-            right: parent.right
-            rightMargin: 10
-            bottom: pnlActions.top
-            bottomMargin: 10
-        }
+            PText {
+                id: lblDescription
+                anchors.centerIn: parent
+                font.pixelSize: 20
 
-        DisksList {
-            id: pnlDisks
-            Layout.preferredWidth: parent.width * 0.3
-            Layout.preferredHeight: parent.height
+                text: qsTr("This panel offers a file browser to test PSEC storage capabilities.")
+            }
         }
-
-        FilesList {
-            id: pnlFiles
-            selectedDisk: pnlDisks.selectedDisk
-            Layout.fillWidth: true
-            Layout.preferredHeight: parent.height
-        }
-    }
-
-    Rectangle {
-        id: pnlActions
-        anchors {
-            bottom: parent.bottom
-            left: parent.left
-            right: parent.right
-        }
-        height: pnlActionsContent.height * 1.5
 
         RowLayout {
-            id: pnlActionsContent
+            id: pnlSelection
 
-            anchors {
-                verticalCenter: parent.verticalCenter
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            /*anchors {
                 left: parent.left
                 leftMargin: 10
+                top: parent.top
+                topMargin: 10
                 right: parent.right
                 rightMargin: 10
+                bottom: pnlActions.top
+                bottomMargin: 10
+            }*/
+
+            DisksList {
+                id: pnlDisks
+                Layout.preferredWidth: parent.width * 0.3
+                Layout.fillHeight: true
             }
 
-            spacing: 15
-
-            PButton {
-                id: btnStartBenchmark
-                enabled: InterfaceSocle.disks.length > 1
-                text: qsTr("Run benchmark")
-            }
-
-            PButton {
-                id: btnGetFile
-                enabled: pnlFiles.selectedFile !== "" && (pnlDisks.selectedDisk !== "__repository__" && pnlDisks.selectedDisk !== "")
-                text: qsTr("Get file")
-            }
-
-            PButton {
-                id: btnPutFile
-                enabled: pnlFiles.selectedFile !== "" && (pnlDisks.selectedDisk !== "__repository__" && pnlDisks.selectedDisk !== "")                
-                text: qsTr("Put file")
-            }
-
-            PButton {
-                id: btnDeleteFile
-                enabled: pnlFiles.selectedFile !== "" && pnlDisks.selectedDisk !== ""
-                text: qsTr("Delete file")
-            }
-
-            Item {
+            FilesList {
+                id: pnlFiles
+                selectedDisk: pnlDisks.selectedDisk
                 Layout.fillWidth: true
+                Layout.fillHeight: true
+            }
+        }
+
+        Rectangle {
+            id: pnlActions
+            /*anchors {
+                bottom: parent.bottom
+                left: parent.left
+                right: parent.right
+            }*/
+            Layout.fillWidth: true
+            Layout.preferredHeight: pnlActionsContent.height * 1.5
+
+            RowLayout {
+                id: pnlActionsContent
+
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                    left: parent.left
+                    leftMargin: 10
+                    right: parent.right
+                    rightMargin: 10
+                }
+
+                spacing: 15
+
+                PButton {
+                    id: btnStartBenchmark
+                    enabled: false //InterfaceSocle.disks.length > 1
+                    text: qsTr("Run benchmark")
+                }
+
+                PButton {
+                    id: btnGetFile
+                    enabled: pnlFiles.selectedFile !== "" && (pnlDisks.selectedDisk !== "__repository__" && pnlDisks.selectedDisk !== "")
+                    text: qsTr("Get file")
+                }
+
+                PButton {
+                    id: btnPutFile
+                    enabled: pnlFiles.selectedFile !== "" && (pnlDisks.selectedDisk !== "__repository__" && pnlDisks.selectedDisk !== "")                
+                    text: qsTr("Put file")
+                }
+
+                PButton {
+                    id: btnDeleteFile
+                    enabled: pnlFiles.selectedFile !== "" && pnlDisks.selectedDisk !== ""
+                    text: qsTr("Delete file")
+                }
+
+                Item {
+                    Layout.fillWidth: true
+                }
             }
         }
     }

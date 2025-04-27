@@ -20,6 +20,7 @@ Rectangle {
 
     ColumnLayout {
         id: lyt
+
         anchors {
             fill: parent
             margins: 10
@@ -30,19 +31,20 @@ Rectangle {
         spacing: 10
 
         Repeater {
-            anchors.fill: parent
+            Layout.fillHeight: true
+            Layout.preferredWidth: parent.width
             model: InterfaceSocle.disks
             //model: [ "__repository__", "Disk 1", "Disk 2", "Disk 3" ]
 
             Rectangle {
                 width: parent.width
-                height: txt.implicitHeight
+                height: txt.height
                 color: modelData === root.selectedDisk ? Colors.cyan : "transparent"
 
                 PText {
                     id: txt
                     color: modelData === root.selectedDisk ? Colors.black : Colors.cyan
-                    text: modelData === "__repository__" ? qsTr("Local Storage") : modelData
+                    text: modelData === "__repository__" ? qsTr("Repository") : modelData
                     font {
                         family: "Courier"
                         weight: Font.Bold
@@ -53,7 +55,7 @@ Rectangle {
                 MouseArea {
                     anchors.fill: parent 
 
-                    onClicked: function() {
+                    onClicked: function() {                        
                         root.selectedDisk = modelData
                     }
                 }
@@ -70,7 +72,7 @@ Rectangle {
 
         function onDisksChanged() {
             AppController.debug("Disks list changed")
-            AppController.debug(InterfaceSocle.disks)
+            //AppController.debug(InterfaceSocle.disks)
             root.selectedDisk = InterfaceSocle.disks[0]
         }
 

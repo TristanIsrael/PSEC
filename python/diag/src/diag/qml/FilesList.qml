@@ -13,8 +13,12 @@ FilesListUi {
     }
 
     onSelectedDiskChanged: function() {
-        console.debug("Update files list for", root.selectedDisk)
+        console.debug("Update files list for", root.selectedDisk)        
         root.selectedFile = ""
+    }
+
+    onSelectedFileChanged: function() {
+        InterfaceSocle.get_disk_content(root.selectedDisk, root.selectedFile)
     }
 
     onItemClicked: function(row, fileType, path, fileName) {
@@ -26,13 +30,14 @@ FilesListUi {
             selectedFile = ""
         } else if (fileType === "folder") {       
             //const filePath = "%1/%2".arg(path === "/" ? "" : path).arg(fileName)     
-            AppController.debug("Afficher %1".arg(fileName))
+            AppController.debug("Dossier sélectionné: %1".arg(fileName))
             listViewModel.folder = fileName
             //currentFolder = listViewModel.folder
             selectedFile = ""
         } else if (fileType === "file") {
+            AppController.debug("Fichier sélectionné: %1".arg(fileName))
             selectedFile = fileName
         }
-    }
+    }   
     
 }

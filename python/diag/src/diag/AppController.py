@@ -112,7 +112,7 @@ class AppController(QObject):
             self.test_step = 2
 
         elif step == 3:
-            Api().info("Démarrage de l'étape 3", "AppController")            
+            Api().info("Démarrage de l'étape 3", "AppController")
 
             # Vérification de l'étape précédente
             if self.testfile_footprint != args.get("footprint"):

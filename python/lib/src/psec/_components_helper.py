@@ -11,7 +11,7 @@ class ComponentsHelper():
         for update in updates:
             if update["id"] in components_dict:
                 # Si l'id existe, mettre à jour uniquement le champ 'state'
-                components_dict[update["id"]]["state"] = update["state"]
+                components_dict[update["id"]]["state"] = update.get("state", EtatComposant.UNKNOWN)
             else:
                 # Si l'id n'existe pas, ajouter l'entrée
                 self.__components.append(update)

@@ -14,7 +14,7 @@ ApplicationWindow {
     font.family: "Roboto"
     font.pointSize: 18
 
-    EcranPrincipal {
+    MainScreen {
         anchors.fill: parent
     }
 

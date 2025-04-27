@@ -44,9 +44,9 @@ Rectangle {
     TabBar {
         id: tabs
 
-        background: Item {}
-
         height: 35
+        background: Item {}
+        
         anchors {
             left: frame.left
             leftMargin: 5
@@ -83,7 +83,7 @@ Rectangle {
         }
         currentIndex: tabs.currentIndex
 
-        Item {//Compatibility
+        CompatibilityPanel {//Compatibility
         }
 
         StoragePanel {

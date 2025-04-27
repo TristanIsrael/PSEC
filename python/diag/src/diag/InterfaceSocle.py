@@ -64,13 +64,13 @@ class InterfaceSocle(QObject):
         Api().debug("Get disks list")
         return Api().get_disks_list()
 
-    @Slot()
-    def get_disks_content(self, nom):
-        return Api().get_files_list(nom)
-
+    @Slot(str, str)
+    def get_disk_content(self, disk, from_dir=""):
+        return Api().get_files_list(disk, False, from_dir)
+    
     @Slot()
     def get_storage_content(self):
-        return self.get_disks_content(Constantes.REPOSITORY)
+        return self.get_disk_content(Constantes.REPOSITORY)
 
     def get_disks(self):
         return self.disks_
@@ -94,10 +94,10 @@ class InterfaceSocle(QObject):
     def __update_disks_files_list(self):
         # Demande la liste des fichiers pour chaque disque
         for disk in self.disks_:
-            self.get_disks_content(disk)
+            self.get_disk_content(disk)
 
     def __on_message_received(self, topic:str, payload:dict):        
-        print("topic: {}, payload: {}".format(topic, payload))
+        #print("topic: {}, payload: {}".format(topic, payload))
         
         if topic == Topics.DISK_STATE:
             disk = payload.get("disk")
@@ -207,11 +207,11 @@ class InterfaceSocle(QObject):
                 Api().warn("The disks state notification is malformed.")
                 return
             
-            if state == EtatDisque.PRESENT and disk not in self.disks_:
+            if state == "connected" and disk not in self.disks_:
                 print("disk added:{}".format(disk))
                 self.disks_.extend(disk)
                 self.disksChanged.emit()
-            elif state == EtatDisque.ABSENT and disk in self.disks_:
+            elif state == "disconnected" and disk in self.disks_:
                 print("disk removed:{}".format(disk))
                 self.disks_.remove(disk)
                 self.diskChanged.emit()

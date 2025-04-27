@@ -1,6 +1,7 @@
 #!/bin/sh
 
-export DISPLAY=:0
+echo "" >> /etc/profile
+echo "export DISPLAY=:0" >> /etc/profile
 
 rc-service udev start
 rc-service udev-postmount start

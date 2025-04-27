@@ -4,6 +4,12 @@
 
 echo Setup XEN environment
 
+# Setup the replacement script for qemu-system to patch the command
+# line sent by XEN
+# Setup QEMU proxy for XEN display
+mv /usr/bin/qemu-system-x86_64 /usr/bin/qemu-system-x86_64.real
+ln -s /usr/bin/qemu-system-x86_64.cmd /usr/bin/qemu-system-x86_64
+
 CONFIG_REPO=`jq -r '.network.repository' /etc/psec/topology.json`
 CONFIG_RELEASES=`jq -r '.network.releases' /etc/psec/topology.json`
 

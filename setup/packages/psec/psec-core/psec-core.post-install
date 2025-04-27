@@ -12,7 +12,8 @@ echo --------------------------------------------
 echo
 
 hostname psec.local
-export DISPLAY=:0
+echo "" >> /etc/profile
+echo "export DISPLAY=:0" >> /etc/profile
 
 echo "**** Resizing shared memory"
 mount -o remount,size=16M /dev/shm
@@ -41,12 +42,6 @@ rc-update add psec-core-controller
 
 rc-update add start-x
 #rc-service start-x start
-
-# Setup the replacement script for qemu-system to patch the command
-# line sent by XEN
-rm -f /usr/bin/qemu-system-x86_64.real /usr/bin/qemu-system-x86_64.cmd
-mv /usr/bin/qemu-system-x86_64 /usr/bin/qemu-system-x86_64.real
-ln -s /usr/bin/qemu-system-x86_64.cmd /usr/bin/qemu-system-x86_64
 
 rc-update add orchestrator
 #rc-service orchestrator start
