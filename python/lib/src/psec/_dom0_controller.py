@@ -51,20 +51,23 @@ class Dom0Controller():
     def __message_worker(self, topic:str, payload:dict):
         """ Cette fonction traite uniquement les messages destinés au Dom0 """
         
-        if topic == "{}/request".format(Topics.LIST_FILES):
+        if topic == f"{Topics.LIST_FILES}/request":
             self.__handle_list_files(payload)
-        elif topic == "{}/request".format(Topics.FILE_FOOTPRINT):
+        elif topic == f"{Topics.FILE_FOOTPRINT}/request":
             self.__handle_file_footprint(payload)
-        elif topic == "{}/request".format(Topics.SHUTDOWN):
+        elif topic == f"{Topics.SHUTDOWN}/request":
             self.__handle_shutdown(payload)
-        elif topic == "{}/request".format(Topics.RESTART_DOMAIN):
+        elif topic == f"{Topics.RESTART_DOMAIN}/request":
             self.__handle_restart_domain(payload)
-        elif topic == "{}".format(Topics.GUI_READY):
+        elif topic == f"{Topics.GUI_READY}":
             self.__handle_gui_ready(payload)
-        elif topic == "{}/request".format(Topics.ENERGY_STATE):
+        elif topic == f"{Topics.ENERGY_STATE}/request":
             self.__handle_energy_state()
         elif topic == f"{Topics.SYSTEM_INFO}/request":
             self.__handle_system_info()
+        elif topic == f"{Topics.DELETE_FILE}/request":
+            self.__handle_delete_file(payload)
+
 
 
     def __handle_list_files(self, payload:dict) -> None:
@@ -76,30 +79,30 @@ class Dom0Controller():
 
         # Génère la réponse
         response = ResponseFactory.create_response_list_files(Constantes.REPOSITORY, fichiers)
-        self.mqtt_client.publish("{}/response".format(Topics.LIST_FILES), response)
+        self.mqtt_client.publish(f"{Topics.LIST_FILES}/response", response)
 
 
     def __handle_file_footprint(self, payload:dict) -> None:
         if not self.__is_storage_request(payload):
-            return 
+            return
                     
         filepath = payload.get("filepath")
         disk = payload.get("disk")
 
-        if filepath == None or disk == None:
+        if filepath is None or disk is None:
             # S'il manque un argument on envoie une erreur
-            Logger().error("La commande est incomplète : il manque le nom du disque et/ou le chemin du fichier")            
+            Logger().error("La commande est incomplète : il manque le nom du disque et/ou le chemin du fichier")
             return
         
         # Calcule l'empreinte
         repository_path = Parametres().parametre(Cles.CHEMIN_DEPOT_DOM0)
-        footprint = FichierHelper.calculate_footprint("{}/{}".format(repository_path, filepath))
+        footprint = FichierHelper.calculate_footprint(f"{repository_path}/{filepath}")
 
-        Logger().info("Footprint = {}".format(footprint))
+        Logger().info(f"Footprint = {footprint}")
         
         # Génère la réponse
         response = ResponseFactory.create_response_file_footprint(filepath, disk, footprint)
-        self.mqtt_client.publish("{}/response".format(Topics.FILE_FOOTPRINT), response)
+        self.mqtt_client.publish(f"{Topics.FILE_FOOTPRINT}/response", response)
 
 
     def __handle_shutdown(self, payload:dict):
@@ -111,7 +114,7 @@ class Dom0Controller():
 
         # There is currently no rule for the shutdown, so we accept it
         response = ResponseFactory.create_response_shutdown(True)
-        self.mqtt_client.publish("{}/response".format(Topics.SHUTDOWN), response)
+        self.mqtt_client.publish(f"{Topics.SHUTDOWN}/response", response)
 
         # We wait 5 seconds to let the GUIs and clients acknowledge the information
         time.sleep(5)
@@ -123,7 +126,7 @@ class Dom0Controller():
 
     def __handle_restart_domain(self, payload:dict):
         if not MqttHelper.check_payload(payload, ["domain_name"]):
-            Logger().error("Missing argument domain_name in the topic {}".format(Topics.RESTART_DOMAIN))
+            Logger().error(f"Missing argument domain_name in the topic {Topics.RESTART_DOMAIN}")
             return
         
         domain_name = payload.get("domain_name", "")
@@ -148,13 +151,13 @@ class Dom0Controller():
         res = subprocess.run(cmd)
 
         if res.returncode == 0:
-            Logger().info("Rebooting domain {}".format(domain_name))
+            Logger().info(f"Rebooting domain {domain_name}")
             response = ResponseFactory.create_response_restart_domain(domain_name, True)
-            self.mqtt_client.publish("{}/response".format(Topics.RESTART_DOMAIN), response)
+            self.mqtt_client.publish(f"{Topics.RESTART_DOMAIN}/response", response)
         else:
-            Logger().error("The domain {} won't reboot".format(domain_name))
+            Logger().error(f"The domain {domain_name} won't reboot")
             response = ResponseFactory.create_response_restart_domain(domain_name, False)
-            self.mqtt_client.publish("{}/response".format(Topics.RESTART_DOMAIN), response)
+            self.mqtt_client.publish(f"{Topics.RESTART_DOMAIN}/response", response)
 
 
     def __handle_energy_state(self):
@@ -162,7 +165,7 @@ class Dom0Controller():
 
         if battery:
             payload = NotificationFactory.create_notification_energy_state(battery)
-            self.mqtt_client.publish("{}/response".format(Topics.ENERGY_STATE), payload)
+            self.mqtt_client.publish(f"{Topics.ENERGY_STATE}/response", payload)
 
 
     def __handle_system_info(self):
@@ -207,3 +210,23 @@ class Dom0Controller():
 
         self.mqtt_client.publish(f"{Topics.SYSTEM_INFO}/response", payload)
 
+    def __handle_delete_file(self, payload:dict):
+        if not MqttHelper.check_payload(payload, ["disk", "filepath"]):
+            Logger().error(f"The command {Topics.DELETE_FILE} misses argument(s)", "Dom0")
+            return
+
+        disk = payload["disk"]
+
+        if disk != Constantes.REPOSITORY:
+            # This file is not stored in the repository so we ignore it
+            return
+
+        filepath = payload["filepath"]
+        repository_path = Parametres().parametre(Cles.CHEMIN_DEPOT_DOM0)
+        storage_filepath = f"{repository_path}/{filepath}"
+
+        if not FichierHelper().remove_file(storage_filepath):
+            Logger().error(f"Removal of file {filepath} from repository failed")
+        else:
+            Logger().info(f"Removed file {filepath} from repository")
+        

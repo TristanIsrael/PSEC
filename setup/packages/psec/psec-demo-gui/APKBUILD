@@ -1,0 +1,48 @@
+# Contributor:
+# Maintainer: Tristan Israël <tristan.israel@alefbet.net>
+pkgname=psec-demo-gui
+pkgver=1.0
+pkgrel=1
+pkgdesc="PSEC - Demonstration application GUI"
+url="https://www.alefbet.net/"
+arch="noarch"
+license="MIT"
+depends="psec-lib psec-gui-base python3 py3-pyside6 py3-psutil py3-humanize fontconfig freetype font-roboto"
+makedepends="python3-dev py3-build py3-installer git"
+builddir="$srcdir/$pkgname-$pkgver"
+checkdepends=""
+install="$pkgname.post-install"
+subpackages=""
+replaces=""
+options="!check"  # no tests provided
+psec_branch="1.0"
+giturl="https://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@github.com/tibsys/psec"
+gitbranch=""
+source="start-gui.initd"
+
+prepare() {
+    mkdir -p "$builddir"
+    cd "$builddir"
+    if [ -z "$gitbranch" ]; then
+        echo Using main branch
+        git clone "$giturl" .    
+    else
+        echo Using branch "$gitbranch"
+        git clone --branch "$gitbranch" "$giturl" .
+    fi
+}
+
+build() {
+    cd "$builddir/python/demo"
+    python3 -m build
+}
+
+package() {
+    cd "$builddir/python/demo/dist"
+    mkdir -p "$pkgdir/usr/lib/psec"
+    tar xvzf *.tar.gz -C "$pkgdir/usr/lib/psec"
+    cd "$pkgdir/usr/lib/psec"
+    ln -s "demo-$psec_branch" demo
+
+    install -D -m755 "$srcdir"/start-gui.initd "$pkgdir"/etc/init.d/start-gui
+}

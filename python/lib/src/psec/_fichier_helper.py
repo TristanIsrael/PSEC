@@ -156,19 +156,11 @@ class FichierHelper():
         with open(filepath, 'wb') as fout:
             fout.write(os.urandom(size_ko*1024))
 
-    '''
     @staticmethod
-    def is_macos_bundle(disk:str, filepath:str):    
-        chemin:str = ""
-        if disk == Constantes.REPOSITORY:
-            chemin = Parametres().parametre(Cles.CHEMIN_DEPOT_DOM0)
-        else:
-            chemin_montage = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)
-            chemin = "{}/{}".format(chemin_montage, disk)
-
-        if not (os.path.isdir(chemin) and filepath.endswith(".app")):
+    def remove_file(filepath:str) -> bool:
+        try:
+            os.remove(filepath)
+            return True
+        except Exception:
             return False
         
-        info_plist_path = os.path.join(chemin, "Contents", "Info.plist")
-        return os.path.isfile(info_plist_path)
-    '''

@@ -118,6 +118,7 @@ class MockSysUsbController():
                 self.mqtt_client.publish(Topics.ERROR, notif)
 
             source_footprint = FichierHelper.calculate_footprint(source_path)
+            
         elif topic == f"{Topics.CREATE_FILE}/request":
             self.__handle_create_file(topic, payload)
 

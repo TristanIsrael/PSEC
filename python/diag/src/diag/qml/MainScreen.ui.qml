@@ -1,8 +1,12 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Components
 
 Rectangle {
+    implicitWidth: 800
+    implicitHeight: 600
+
     color: Colors.background
 
     anchors {
@@ -41,87 +45,52 @@ Rectangle {
         font.pixelSize: 18
     }
 
-    TabBar {
-        id: tabs
-
-        height: 35
-        background: Item {}
-        
+    Item {
         anchors {
             left: frame.left
-            leftMargin: 5
             right: frame.right
-            rightMargin: 5
             top: title.bottom
-            topMargin: 10
-        }
-
-        PTabButton {
-            text: qsTr("Compatibility")
-        }
-
-        PTabButton {
-            text: qsTr("Storage")
-        }
-
-        PTabButton {
-            text: qsTr("Performance")
-        }
-
-        PTabButton {
-            text: qsTr("Input")
-        }
-    }
-
-    StackLayout {
-        anchors {
-            left: frame.left
-            right: frame.right
             bottom: frame.bottom
-            top: tabs.bottom
-            margins: 5
-        }
-        currentIndex: tabs.currentIndex
-
-        CompatibilityPanel {//Compatibility
+            margins: 10
         }
 
-        StoragePanel {
-            /*Layout.preferredWidth: parent.width
-            Layout.preferredHeight: (parent.height - pnlInputs.height) / 2*/
+        Rectangle {
+            id: rctDescription
+            anchors {
+                top: parent.top
+                left: parent.left
+                right: parent.right
+            }
+            color: Colors.black
+            height: lblDescription.height
+
+            PText {
+                id: lblDescription
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                    top: parent.top
+                }
+
+                font.pixelSize: 20
+                wrapMode: Text.WordWrap
+                padding: 10
+                text: qsTr("This tool diagnoses the hardware and verifies whether it allows a product based on PSEC to run with different levels of capabilities and security.")
+            }
         }
 
-        /*BenchmarkPanel {//Performances
-        }
+        RowLayout {
+            anchors {
+                top: rctDescription.bottom
+                topMargin: 20
+                left: parent.left
+                right: parent.right
+                bottom: parent.bottom
+            }
 
-        PanneauInputs {//Layout.preferredWidth: parent.width
-        }*/
+            HardwareCapabilities {}
+
+            SecurityCapabilities {}
+        }
     }
-
-
-    /*ColumnLayout {
-        anchors {
-            fill: parent
-            margins: 20
-        }
-        spacing: 10
-
-        PanneauInputs {
-            id: pnlInputs
-            Layout.preferredWidth: parent.width
-        }
-
-        PanneauDisques {
-            id: pnlDisks
-            Layout.preferredWidth: parent.width
-            Layout.preferredHeight: (parent.height-pnlInputs.height)/2
-        }
-
-        PanneauDepot {
-            id: pnlRepository
-            Layout.preferredWidth: parent.width
-            Layout.preferredHeight: (parent.height-pnlInputs.height)/2
-        }
-
-    }*/
 }

@@ -1,0 +1,3 @@
+module Panels.Storage
+
+StoragePanel 1.0 StoragePanel.qml

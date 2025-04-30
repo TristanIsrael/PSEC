@@ -665,3 +665,392 @@ https://www.kraxel.org/blog/2019/09/display-devices-in-qemu/
 ## Mosquitto
 
 Démarrer Mosquitto sur macOS : `mosquitto -c ~/mosquitto-multiple.conf`
+
+## Débogage sur port série
+
+Vous voulez :
+
+- Vous connecter physiquement via un câble USB-série depuis un PC vers un DomU (par exemple sys-usb, qui capte le port /dev/ttyUSB0) ;
+- Et que ce DomU redirige le flux série (entrée/sortie) vers un shell vivant dans le Dom0, de façon totalement transparente et interactive ;
+- Donc le terminal ouvert sur /dev/ttyUSB0 côté PC, via minicom, devrait afficher un shell du Dom0, pas du DomU.
+
+Autrement dit :
+
+📦 PC → (USB série) → DomU → (virtio/pvchannel) → Dom0 shell
+
+⸻
+
+✅ Solution : Tunnel série ↔ shell Dom0 via virtio-serial
+
+Vous pouvez parfaitement réaliser cela avec :
+ 1.	Un DomU (sys-usb) qui lit et écrit vers /dev/ttyUSB0 (port série physique) ;
+ 2.	Un canal virtio-série entre ce DomU et le Dom0, qui transporte les données de manière bidirectionnelle ;
+ 3.	Un getty sur le Dom0 branché à ce canal, pour offrir un vrai shell du Dom0.
+
+### Étapes détaillées
+
+🔹 1. Dans le DomU (sys-usb) : capture du port série USB
+
+Le périphérique physique (vu depuis le DomU) est probablement /dev/ttyUSB0.
+Vous devez transférer le flux série à travers le canal vers Dom0 :
+
+Lancer un relais :
+```
+socat /dev/ttyUSB0,raw,echo=0 \
+      /dev/vport0p1,raw,echo=0
+```
+
+Cela relie le port série physique au canal virtio connecté au Dom0.
+
+Alternative : script Python si vous voulez gérer des détails (ex : login binaire, séquences d’échappement).
+
+⸻
+
+🔹 2. Dans la config Xen du DomU : canal virtio-série
+
+Ajoutez dans la config de sys-usb :
+```
+device_model_args_hvm = [
+  "-chardev", "socket,id=fromusb,path=/tmp/dom0shell,server,nowait",
+  "-device", "virtserialport,chardev=fromusb,name=com.relay.shell"
+]
+```
+
+Cela crée dans Dom0 le socket /tmp/dom0shell.
+
+⸻
+
+🔹 3. Dans le Dom0 : fournir un shell sur le socket
+
+Option simple : agetty directement sur le socket
+```
+agetty -L -8 115200 /tmp/dom0shell
+```
+
+⚠️ Cela fonctionne uniquement si agetty accepte un Unix socket (ce n’est pas toujours le cas). Sinon :
+
+Option propre : créer un pseudotty avec socat ou ncat :
+```
+socat UNIX-CONNECT:/tmp/dom0shell PTY,link=/dev/pts/dom0shell,raw,echo=0
+```
+
+Puis :
+```
+agetty -L -8 115200 /dev/pts/dom0shell vt100
+```
+
+🔹 4. Depuis votre PC
+
+Lancez un terminal série classique :
+```
+minicom -D /dev/ttyUSB0
+```
+
+Vous obtenez alors un shell du Dom0, via un tunnel DomU ↔ Dom0.
+Pour vous, cela se comporte comme si le Dom0 était directement relié au port série.
+
+⸻
+
+✅ Résultat
+| Etape | Action | 
+|--|--|
+| PC | Envoie des caractères sur /dev/ttyUSB0 |
+| DomU (sys-usb) | Relaye /dev/ttyUSB0 à /dev/vport0p1 |
+| Dom0 | Reçoit via /tmp/dom0shell -> agetty |
+
+
+🔐 Sécurité et robustesse
+	•	Vous pouvez restreindre le shell à un utilisateur non-root dans agetty.
+	•	Utilisez systemd ou supervisord pour relancer socat/agetty si besoin.
+	•	Ajoutez un handshake (par ex. mot de passe en premier) si exposition possible.
+
+
+## Sortie XL 
+
+`xl info`
+
+```
+host                   : saphir.local
+release                : 6.12.20-0-lts
+version                : #1-Alpine SMP PREEMPT_DYNAMIC 2025-03-24 08:09:11
+machine                : x86_64
+nr_cpus                : 12
+max_cpu_id             : 11
+nr_nodes               : 1
+cores_per_socket       : 6
+threads_per_core       : 2
+cpu_mhz                : 1689.603
+hw_caps                : bfebfbff:77faf3ff:2c100800:00000121:0000000f:239c27eb:9840078c:00000100
+virt_caps              : pv hvm hvm_directio pv_directio hap shadow iommu_hap_pt_share vmtrace gnttab-v1 gnttab-v2
+total_memory           : 7933
+free_memory            : 2341
+sharing_freed_memory   : 0
+sharing_used_memory    : 0
+outstanding_claims     : 0
+free_cpus              : 0
+xen_major              : 4
+xen_minor              : 19
+xen_extra              : .1
+xen_version            : 4.19.1
+xen_caps               : xen-3.0-x86_64 hvm-3.0-x86_32 hvm-3.0-x86_32p hvm-3.0-x86_64
+xen_scheduler          : credit2
+xen_pagesize           : 4096
+platform_params        : virt_start=0xffff800000000000
+xen_changeset          :
+xen_commandline        : placeholder loglevel=0 console=null dom0_mem=512M,max:1024M no-real-mode edd=off
+cc_compiler            : gcc (Alpine 14.2.0) 14.2.0
+cc_compile_by          : buildozer
+cc_compile_domain      :
+cc_compile_date        : Thu Dec  5 07:41:26 UTC 2024
+build_id               : 15af702fbe87428a0a43890ac319043c8d0ec991
+xend_config_format     : 4
+```
+
+`xl dmesg`
+
+```
+(XEN) parameter "loglevel" unknown!
+(XEN) Bad console= option 'null'
+ Xen 4.19.1
+(XEN) Xen version 4.19.1 (buildozer@) (gcc (Alpine 14.2.0) 14.2.0) debug=n Thu Dec  5 07:41:26 UTC 2024
+(XEN) Latest ChangeSet:
+(XEN) build-id: 15af702fbe87428a0a43890ac319043c8d0ec991
+(XEN) Bootloader: GRUB 2.12
+(XEN) Command line: placeholder loglevel=0 console=null dom0_mem=512M,max:1024M no-real-mode edd=off
+(XEN) Xen image load base address: 0x56400000
+(XEN) Video information:
+(XEN)  VGA is graphics mode 800x1280, 32 bpp
+(XEN)  VBE/DDC methods: none; EDID transfer time: 0 seconds
+(XEN) Disc information:
+(XEN)  Found 0 MBR signatures
+(XEN)  Found 1 EDD information structures
+(XEN) CPU Vendor: Intel, Family 6 (0x6), Model 154 (0x9a), Stepping 4 (raw 000906a4)
+(XEN) Enabling Supervisor Shadow Stacks
+(XEN) Enabling Indirect Branch Tracking
+(XEN)   - IBT disabled in UEFI Runtime Services
+(XEN) EFI RAM map:
+(XEN)  [0000000000000000, 000000000009dfff] (usable)
+(XEN)  [000000000009e000, 000000000009efff] (reserved)
+(XEN)  [000000000009f000, 000000000009ffff] (usable)
+(XEN)  [00000000000a0000, 00000000000fffff] (reserved)
+(XEN)  [0000000000100000, 000000005821cfff] (usable)
+(XEN)  [000000005821d000, 000000005b31cfff] (reserved)
+(XEN)  [000000005b31d000, 000000005b3f9fff] (ACPI data)
+(XEN)  [000000005b3fa000, 000000005b4b9fff] (ACPI NVS)
+(XEN)  [000000005b4ba000, 000000005befefff] (reserved)
+(XEN)  [000000005beff000, 000000005befffff] (usable)
+(XEN)  [000000005bf00000, 0000000061ffffff] (reserved)
+(XEN)  [0000000062600000, 00000000627fffff] (reserved)
+(XEN)  [0000000063000000, 00000000683fffff] (reserved)
+(XEN)  [00000000c0000000, 00000000cfffffff] (reserved)
+(XEN)  [00000000fe000000, 00000000fe010fff] (reserved)
+(XEN)  [00000000fec00000, 00000000fec00fff] (reserved)
+(XEN)  [00000000fed00000, 00000000fed00fff] (reserved)
+(XEN)  [00000000fed20000, 00000000fed7ffff] (reserved)
+(XEN)  [00000000fee00000, 00000000fee00fff] (reserved)
+(XEN)  [00000000ff000000, 00000000ffffffff] (reserved)
+(XEN)  [0000000100000000, 0000000297bfffff] (usable)
+(XEN) BSP microcode revision: 0x00000430
+(XEN) ACPI: RSDP 5B3F9014, 0024 (r2 THOA21)
+(XEN) ACPI: XSDT 5B3F8728, 011C (r1 THOA21 THOA21TB  1072009 AMI   1000013)
+(XEN) ACPI: FACP 5B3F5000, 0114 (r6 THOA21 THOA21TB  1072009 AMI   1000013)
+(XEN) ACPI: DSDT 5B388000, 6CDF7 (r2 THOA21 THOA21TB  1072009 INTL 20200717)
+(XEN) ACPI: FACS 5B4B8000, 0040
+(XEN) ACPI: SSDT 5B3F6000, 1459 (r2 DptfTb DptfTabl     1000 INTL 20200717)
+(XEN) ACPI: FIDT 5B387000, 009C (r1 THOA21 THOA21TB  1072009 AMI     10013)
+(XEN) ACPI: MSDM 5B386000, 0055 (r3 THOA21 THOA21TB  1072009 AMI   1000013)
+(XEN) ACPI: SLIC 5B385000, 0176 (r1 THOA21 THOA21TB  1072009 AMI   1000013)
+(XEN) ACPI: SSDT 5B384000, 038C (r2 PmaxDv Pmax_Dev        1 INTL 20200717)
+(XEN) ACPI: SSDT 5B37E000, 5D0B (r2 CpuRef  CpuSsdt     3000 INTL 20200717)
+(XEN) ACPI: SSDT 5B37B000, 2AA1 (r2 SaSsdt  SaSsdt      3000 INTL 20200717)
+(XEN) ACPI: SSDT 5B377000, 33D3 (r2 INTEL  IgfxSsdt     3000 INTL 20200717)
+(XEN) ACPI: SSDT 5B369000, D39F (r2 INTEL  TcssSsdt     1000 INTL 20200717)
+(XEN) ACPI: HPET 5B368000, 0038 (r1 THOA21 THOA21TB  1072009 AMI   1000013)
+(XEN) ACPI: APIC 5B367000, 01DC (r5 THOA21 THOA21TB  1072009 AMI   1000013)
+(XEN) ACPI: MCFG 5B366000, 003C (r1 THOA21 THOA21TB  1072009 AMI   1000013)
+(XEN) ACPI: SSDT 5B364000, 1F1A (r2 THOA21 Ther_Rvp     1000 INTL 20200717)
+(XEN) ACPI: UEFI 5B43D000, 0048 (r1 THOA21 THOA21TB  1072009 AMI   1000013)
+(XEN) ACPI: NHLT 5B363000, 002D (r0 THOA21 THOA21TB  1072009 AMI   1000013)
+(XEN) ACPI: LPIT 5B362000, 00CC (r1 THOA21 THOA21TB  1072009 AMI   1000013)
+(XEN) ACPI: SSDT 5B35E000, 2A83 (r2 THOA21 PtidDevc     1000 INTL 20200717)
+(XEN) ACPI: SSDT 5B35B000, 2357 (r2 THOA21 TbtTypeC        0 INTL 20200717)
+(XEN) ACPI: DBGP 5B35A000, 0034 (r1 THOA21 THOA21TB  1072009 AMI   1000013)
+(XEN) ACPI: DBG2 5B359000, 0054 (r0 THOA21 THOA21TB  1072009 AMI   1000013)
+(XEN) ACPI: SSDT 5B357000, 110B (r2 THOA21 UsbCTabl     1000 INTL 20200717)
+(XEN) ACPI: DMAR 5B356000, 0088 (r2 INTEL  EDK2            2       1000013)
+(XEN) ACPI: SSDT 5B355000, 0571 (r2  INTEL xh_adl_M        0 INTL 20200717)
+(XEN) ACPI: SSDT 5B351000, 3AEA (r2 SocGpe  SocGpe      3000 INTL 20200717)
+(XEN) ACPI: SSDT 5B34D000, 35A2 (r2 SocCmn  SocCmn      3000 INTL 20200717)
+(XEN) ACPI: SSDT 5B34C000, 0144 (r2 Intel  ADebTabl     1000 INTL 20200717)
+(XEN) ACPI: ASF! 5B34B000, 0074 (r32 THOA21 THOA21TB  1072009 AMI   1000013)
+(XEN) ACPI: PHAT 5B34A000, 0631 (r1 THOA21 THOA21TB        5 MSFT  100000D)
+(XEN) ACPI: WSMT 5B361000, 0028 (r1 THOA21 THOA21TB  1072009 AMI     10013)
+(XEN) ACPI: FPDT 5B349000, 0044 (r1 THOA21   A M I   1072009 AMI   1000013)
+(XEN) System RAM: 7933MB (8124148kB)
+(XEN) No NUMA configuration found
+(XEN) Faking a node at 0000000000000000-0000000297c00000
+(XEN) Domain heap initialised
+(XEN) SMBIOS 3.4 present.
+(XEN) Using APIC driver default
+(XEN) ACPI: PM-Timer IO Port: 0x1808 (24 bits)
+(XEN) ACPI: v5 SLEEP INFO: control[0:0], status[0:0]
+(XEN) ACPI: SLEEP INFO: pm1x_cnt[1:1804,1:0], pm1x_evt[1:1800,1:0]
+(XEN) ACPI: 32/64X FACS address mismatch in FADT - 5b4b8000/0000000000000000, using 32
+(XEN) ACPI:             wakeup_vec[5b4b800c], vec_size[20]
+(XEN) Overriding APIC driver with bigsmp
+(XEN) ACPI: IOAPIC (id[0x02] address[0xfec00000] gsi_base[0])
+(XEN) IOAPIC[0]: apic_id 2, version 32, address 0xfec00000, GSI 0-119
+(XEN) ACPI: INT_SRC_OVR (bus 0 bus_irq 0 global_irq 2 dfl dfl)
+(XEN) ACPI: INT_SRC_OVR (bus 0 bus_irq 9 global_irq 9 high level)
+(XEN) ACPI: HPET id: 0x8086a201 base: 0xfed00000
+(XEN) PCI: MCFG configuration 0: base c0000000 segment 0000 buses 00 - ff
+(XEN) PCI: MCFG area at c0000000 reserved in E820
+(XEN) PCI: Using MCFG for segment 0000 bus 00-ff
+(XEN) Using ACPI (MADT) for SMP configuration information
+(XEN) SMP: Allowing 12 CPUs (0 hotplug CPUs)
+(XEN) IRQ limits: 120 GSI, 2376 MSI/MSI-X
+(XEN) Switched to APIC driver x2apic_mixed
+(XEN) CPU0: invalid PERF_GLOBAL_CTRL: 0 adjusting to 0x3f
+(XEN) CPU0: TSC: 38400000 Hz * 88 / 2 = 1689600000 Hz
+(XEN) CPU0: bus: 100 MHz base: 1700 MHz max: 4400 MHz
+(XEN) CPU0: 400 ... 1700 MHz
+(XEN) xstate: size: 0xa88 and states: 0x207
+(XEN) CPU0: Intel machine check reporting enabled
+(XEN) Unrecognised CPU model 0x9a - assuming vulnerable to LazyFPU
+(XEN) Speculative mitigation facilities:
+(XEN)   Hardware hints: RDCL_NO EIBRS RRSBA SKIP_L1DFL MDS_NO TAA_NO SBDR_SSDP_NO FBSDP_NO PSDP_NO
+(XEN)   Hardware features: IBPB IBRS STIBP SSBD PSFD L1D_FLUSH MD_CLEAR
+(XEN)   Compiled-in support: INDIRECT_THUNK SHADOW_PAGING HARDEN_ARRAY HARDEN_BRANCH HARDEN_GUEST_ACCESS HARDEN_LOCK
+(XEN)   Xen settings: BTI-Thunk: JMP, SPEC_CTRL: IBRS+ STIBP+ SSBD- PSFD- BHI_DIS_S+, Other: IBPB-ctxt BRANCH_HARDEN
+(XEN)   Support for HVM VMs: MSR_SPEC_CTRL MSR_VIRT_SPEC_CTRL RSB EAGER_FPU
+(XEN)   Support for PV VMs: MSR_SPEC_CTRL EAGER_FPU
+(XEN)   XPTI (64-bit PV only): Dom0 disabled, DomU disabled (with PCID)
+(XEN)   PV L1TF shadowing: Dom0 disabled, DomU disabled
+(XEN) Using scheduler: SMP Credit Scheduler rev2 (credit2)
+(XEN) Initializing Credit2 scheduler
+(XEN)  load_precision_shift: 18
+(XEN)  load_window_shift: 30
+(XEN)  underload_balance_tolerance: 0
+(XEN)  overload_balance_tolerance: -3
+(XEN)  runqueues arrangement: socket
+(XEN)  cap enforcement granularity: 10ms
+(XEN) load tracking window length 1073741824 ns
+(XEN) Disabling HPET for being unreliable
+(XEN) Platform timer is 3.580MHz ACPI PM Timer
+(XEN) Detected 1689.603 MHz processor.
+(XEN) Freed 1020kB unused BSS memory
+(XEN) alt table ffff82d040462998 -> ffff82d040473910
+(XEN) Intel VT-d iommu 0 supported page sizes: 4kB, 2MB, 1GB
+(XEN) Intel VT-d iommu 1 supported page sizes: 4kB, 2MB, 1GB
+(XEN) Intel VT-d Snoop Control not enabled.
+(XEN) Intel VT-d Dom0 DMA Passthrough not enabled.
+(XEN) Intel VT-d Queued Invalidation enabled.
+(XEN) Intel VT-d Interrupt Remapping enabled.
+(XEN) Intel VT-d Posted Interrupt not enabled.
+(XEN) Intel VT-d Shared EPT tables enabled.
+(XEN) I/O virtualisation enabled
+(XEN)  - Dom0 mode: Relaxed
+(XEN) Interrupt remapping enabled
+(XEN) Enabled directed EOI with ioapic_ack_old on!
+(XEN) Enabling APIC mode.  Using 1 I/O APICs
+(XEN) ENABLING IO-APIC IRQs
+(XEN)  -> Using old ACK method
+(XEN) ..TIMER: vector=0xF0 apic1=0 pin1=2 apic2=-1 pin2=-1
+(XEN) ..no 8254 timer found - trying HPET Legacy Replacement Mode
+(XEN) Allocated console ring of 64 KiB.
+(XEN) VMX: Supported advanced features:
+(XEN)  - APIC MMIO access virtualisation
+(XEN)  - APIC TPR shadow
+(XEN)  - Extended Page Tables (EPT)
+(XEN)  - Virtual-Processor Identifiers (VPID)
+(XEN)  - Virtual NMI
+(XEN)  - MSR direct-access bitmap
+(XEN)  - Unrestricted Guest
+(XEN)  - APIC Register Virtualization
+(XEN)  - Virtual Interrupt Delivery
+(XEN)  - Posted Interrupt Processing
+(XEN)  - VMCS shadowing
+(XEN)  - VM Functions
+(XEN)  - Virtualisation Exceptions
+(XEN)  - TSC Scaling
+(XEN) HVM: ASIDs enabled.
+(XEN) HVM: VMX enabled
+(XEN) HVM: Hardware Assisted Paging (HAP) detected
+(XEN) HVM: HAP page sizes: 4kB, 2MB, 1GB
+(XEN) alt table ffff82d040462998 -> ffff82d040473910
+(XEN) altcall: Optimised away 234 endbr64 instructions
+(XEN) Brought up 12 CPUs
+(XEN) Scheduling granularity: cpu, 1 CPU per sched-resource
+(XEN) Initializing Credit2 scheduler
+(XEN)  load_precision_shift: 18
+(XEN)  load_window_shift: 30
+(XEN)  underload_balance_tolerance: 0
+(XEN)  overload_balance_tolerance: -3
+(XEN)  runqueues arrangement: socket
+(XEN)  cap enforcement granularity: 10ms
+(XEN) load tracking window length 1073741824 ns
+(XEN) Adding cpu 0 to runqueue 0
+(XEN)  First cpu on runqueue, activating
+(XEN) Adding cpu 1 to runqueue 0
+(XEN) Adding cpu 2 to runqueue 0
+(XEN) Adding cpu 3 to runqueue 0
+(XEN) Adding cpu 4 to runqueue 0
+(XEN) Adding cpu 5 to runqueue 0
+(XEN) Adding cpu 6 to runqueue 0
+(XEN) Adding cpu 7 to runqueue 0
+(XEN) Adding cpu 8 to runqueue 1
+(XEN)  First cpu on runqueue, activating
+(XEN) Adding cpu 9 to runqueue 1
+(XEN) Adding cpu 10 to runqueue 1
+(XEN) Adding cpu 11 to runqueue 1
+(XEN) mcheck_poll: Machine check polling timer started.
+(XEN) NX (Execute Disable) protection active
+(XEN) d0 has maximum 2496 PIRQs
+(XEN) *** Building a PV Dom0 ***
+(XEN)  Xen  kernel: 64-bit, lsb
+(XEN)  Dom0 kernel: 64-bit, lsb, paddr 0x1000000 -> 0x342c000
+(XEN) PHYSICAL MEMORY ARRANGEMENT:
+(XEN)  Dom0 alloc.:   0000000288000000->000000028c000000 (110824 pages to be allocated)
+(XEN)  Init. ramdisk: 0000000296ce8000->0000000297bffacd
+(XEN) VIRTUAL MEMORY ARRANGEMENT:
+(XEN)  Loaded kernel: ffffffff81000000->ffffffff8342c000
+(XEN)  Phys-Mach map: 0000008000000000->0000008000100000
+(XEN)  Start info:    ffffffff8342c000->ffffffff8342c4b8
+(XEN)  Page tables:   ffffffff8342d000->ffffffff8344c000
+(XEN)  Boot stack:    ffffffff8344c000->ffffffff8344d000
+(XEN)  TOTAL:         ffffffff80000000->ffffffff83800000
+(XEN)  ENTRY ADDRESS: ffffffff82caa4f0
+(XEN) Dom0 has maximum 12 VCPUs
+(XEN) Initial low memory virq threshold set at 0x4000 pages.
+(XEN) Scrubbing Free RAM in background
+(XEN) Std. Loglevel: Errors, warnings and info
+(XEN) Guest Loglevel: Nothing (Rate-limited: Errors and warnings)
+(XEN) *** Serial input to DOM0 (type 'CTRL-a' three times to switch input)
+(XEN) Freed 672kB init memory
+```
+
+## virt-host-validate
+
+$ virt-host-validate
+  QEMU: Checking for hardware virtualization                                 : PASS
+  QEMU: Checking if device '/dev/kvm' exists                                 : PASS
+  QEMU: Checking if device '/dev/kvm' is accessible                          : FAIL (Check /dev/kvm is world writable or you are in a group that is allowed to access it)
+  QEMU: Checking if device '/dev/vhost-net' exists                           : WARN (Load the 'vhost_net' module to improve performance of virtio networking)
+  QEMU: Checking if device '/dev/net/tun' exists                             : FAIL (Load the 'tun' module to enable networking for QEMU guests)
+Unable to initialize cgroups: internal error: no cgroup backend available
+  QEMU: Checking for device assignment IOMMU support                         : PASS
+  QEMU: Checking if IOMMU is enabled by kernel                               : PASS
+  QEMU: Checking for secure guest support                                    : WARN (Unknown if this platform has Secure Guest support)
+   LXC: Checking for Linux >= 2.6.26                                         : PASS
+   LXC: Checking for namespace 'ipc'                                         : PASS
+   LXC: Checking for namespace 'mnt'                                         : PASS
+   LXC: Checking for namespace 'pid'                                         : PASS
+   LXC: Checking for namespace 'uts'                                         : PASS
+   LXC: Checking for namespace 'net'                                         : PASS
+   LXC: Checking for namespace 'user'                                        : PASS
+Unable to initialize cgroups: internal error: no cgroup backend available
+   LXC: Checking if device '/sys/fs/fuse/connections' exists                 : FAIL (Load the 'fuse' module to enable /proc/ overrides)
+    CH: Checking for hardware virtualization                                 : PASS
+    CH: Checking if device '/dev/kvm' exists                                 : PASS
+    CH: Checking if device '/dev/kvm' is accessible                          : FAIL (Check /dev/kvm is world writable or you are in a group that is allowed to access it)
+saphir:~$

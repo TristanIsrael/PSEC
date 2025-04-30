@@ -1,158 +1,170 @@
-from PySide6.QtCore import QObject, Signal, Slot
-from PySide6.QtWidgets import QWidget
-from InterfaceSocle import InterfaceSocle
-from hashlib import md5
-from psec import Api, Parametres, Cles
+import cpuinfo
+import subprocess
 import os
-try:
-    from psec import ControleurBenchmark
-except:
-    print("Le contrôleur de benchmark n'est pas disponible")
+import psutil
+from Singleton import SingletonMeta
+from PySide6.QtCore import QObject, Property
 
 class AppController(QObject):
 
-    fenetre_app:QWidget = None
-    interface_socle:InterfaceSocle
+    def __get_system_info(self) -> dict:
+        '''
+        {
+            "python_version": "3.12.9.final.0 (64 bit)",
+            "cpuinfo_version": [
+                9,
+                0,
+                0
+            ],
+            "cpuinfo_version_string": "9.0.0",
+            "arch": "X86_64",
+            "bits": 64,
+            "count": 12,
+            "arch_string_raw": "x86_64",
+            "vendor_id_raw": "GenuineIntel",
+            "brand_raw": "12th Gen Intel(R) Core(TM) i5-1230U",
+            "hz_advertised_friendly": "1.6896 GHz",
+            "hz_actual_friendly": "1.6896 GHz",
+            "hz_advertised": [
+                1689603000,
+                0
+            ],
+            "hz_actual": [
+                1689603000,
+                0
+            ],
+            "stepping": 4,
+            "model": 154,
+            "family": 6,
+            "flags": [
+                "3dnowprefetch",
+                "abm",
+                "acpi",
+                "adx",
+                "aes",
+                "apic",
+                "arch_capabilities",
+                "avx",
+                "avx2",
+                "avx_vnni",
+                "bmi1",
+                "bmi2",
+                "clflush",
+                "clflushopt",
+                "clwb",
+                "cmov",
+                "constant_tsc",
+                "cpuid",
+                "cpuid_fault",
+                "cx16",
+                "cx8",
+                "de",
+                "erms",
+                "est",
+                "f16c",
+                "fma",
+                "fpu",
+                "fsgsbase",
+                "fsrm",
+                "fxsr",
+                "gfni",
+                "ht",
+                "hypervisor",
+                "ibpb",
+                "ibrs",
+                "ibrs_enhanced",
+                "lahf_lm",
+                "lm",
+                "mca",
+                "mce",
+                "md_clear",
+                "mmx",
+                "monitor",
+                "movbe",
+                "msr",
+                "nonstop_tsc",
+                "nopl",
+                "nx",
+                "osxsave",
+                "pae",
+                "pat",
+                "pclmulqdq",
+                "pni",
+                "popcnt",
+                "rdpid",
+                "rdrand",
+                "rdrnd",
+                "rdseed",
+                "rdtscp",
+                "rep_good",
+                "sep",
+                "serialize",
+                "sha",
+                "sha_ni",
+                "ss",
+                "ssbd",
+                "sse",
+                "sse2",
+                "sse4_1",
+                "sse4_2",
+                "ssse3",
+                "stibp",
+                "syscall",
+                "tsc",
+                "tsc_known_freq",
+                "vaes",
+                "vpclmulqdq",
+                "xgetbv1",
+                "xsave",
+                "xsavec",
+                "xsaveopt"
+            ],
+            "l3_cache_size": 12582912,
+            "l2_cache_size": 65536,
+            "l2_cache_line_size": 1280,
+            "l2_cache_associativity": 7
+        }
+        '''
 
-    # Signals    
-    testFinished = Signal(bool, str) # success, error    
-    workerThread = None
-    test_step = 0
-    testfile_footprint = ""
+        cpu = cpuinfo.get_cpu_info()
+        return cpu
+    
+    def has_vtd(self):        
+        ''' AKA VT-d '''
+        cmd = "dmesg | grep -i -e iommu -e dmar"
 
-    def __init__(self, parent = QObject()):
-        QObject.__init__(self, parent)
+        try:
+            result = subprocess.run(cmd, shell=True, capture_output=True, text=True, check=True)
 
-
-    def set_fenetre_app(self, fenetre:QWidget):
-        self.fenetre_app = fenetre
-
-
-    def set_interface_socle(self, interface_socle:InterfaceSocle):
-        self.interface_socle = interface_socle
-        self.interface_socle.fileCreated.connect(self.__on_file_created)
-
-
-    @Slot(str)
-    @Slot(str, str)
-    def debug(self, message:str, module:str = ""):
-        print(message, module)
-        Api().debug(message, module)
-
-
-    @Slot(str)
-    @Slot(str, str)
-    def info(self, message:str, module:str = ""):
-        Api().info(message, module)
-
-
-    @Slot(str)
-    @Slot(str, str)
-    def warn(self, message:str, module:str = ""):
-        Api().warn(message, module)
-
-
-    @Slot(str)
-    @Slot(str, str)
-    def error(self, message:str, module:str = ""):
-        Api().error(message, module)
-
-
-    @Slot()
-    def start_benchmark_inputs(self):
-        ControleurBenchmark().demarre_benchmark_inputs()
-
-
-    @Slot()
-    def start_benchmark_files(self):
-        ControleurBenchmark().demarre_benchmark_fichiers()
+            if result.returncode == 0 and "DMAR: Intel(R) Virtualization Technology for Directed I/O" in result.stdout:
+                return True
+        except subprocess.CalledProcessError:
+            return False
         
-
-    @Slot()
-    def start_test(self, step=0, args = {}):
-        if len(self.interface_socle.disks) == 0:
-            Api().error("start_test : Il n'y a pas de disque connecté", "AppController")
-            return 
+        return False
         
-        disk = self.interface_socle.disks[0]
+    def has_ept(self):
+        cmd = "xl dmesg | grep -i ept"
+
+        try:
+            result = subprocess.run(cmd, shell=True, capture_output=True, text=True, check=True)
+
+            if result.returncode == 0 and "(XEN) Intel VT-d Shared EPT tables enabled" in result.stdout:
+                return True
+        except subprocess.CalledProcessError:
+            return False
         
-        if step == 0:                        
-            Api().info("Démarrage des tests : étape 1", "AppController")
+        return False
+    
+    def has_hvm(self):
+        return os.path.exists("/dev/kvm")
+    
+    def get_installed_memory_in_gb(self):
+        mem = psutil.virtual_memory()
+        total_gb = mem.total / (1024 ** 3)
+        return total_gb
 
-            # 1 - Création d'un fichier sur le support USB            
-            Api().info("Création d'un fichier aléatoire", "AppController")
-            repository_path = Parametres().parametre(Cles.STORAGE_PATH_DOMU)
-            filepath = '/test_file'.format(repository_path)                    
-            contents = os.urandom(1024*1024)
-
-            h = md5()
-            h.update(contents)
-            self.testfile_footprint = h.hexdigest()
-
-            self.interface_socle.api.create_file(filepath, disk, contents)
-
-            # Next step after the confirmation of writing
-            self.test_step = 1 
-
-        elif step == 2:
-            Api().info("Démarrage de l'étape 2", "AppController")
-
-            # Vérification de l'étape précédente
-            if self.testfile_footprint != args.get("footprint"):
-                error = "L'empreinte du fichier est incorrecte"
-                Api().error(error, "AppController")
-                self.testFinished(False, error)
-                return 
-
-            # 2 - Copie du fichier dans le dépôt
-            complete_filepath = "/test_file"
-            self.interface_socle.api.lit_fichier(disk, complete_filepath)
-
-            # Next step after the confirmation of writing
-            self.test_step = 2
-
-        elif step == 3:
-            Api().info("Démarrage de l'étape 3", "AppController")
-
-            # Vérification de l'étape précédente
-            if self.testfile_footprint != args.get("footprint"):
-                error = "L'empreinte du fichier est incorrecte"
-                Api().error(error, "AppController")
-                self.testFinished(False, error)
-                return 
-            
-            # 3 - Copie du fichier sur le support USB
-            complete_filepath = "/test_file.copy"
-            self.interface_socle.api.copie_fichier(disk, complete_filepath, disk)
-
-            # Next step after the confirmation of writing
-            self.test_step = 3
-
-        elif step == 4:
-            Api().info("Démarrage de l'étape 4", "AppController")
-
-            # Vérification de l'étape précédente
-            if self.testfile_footprint != args.get("footprint"):
-                error = "L'empreinte du fichier est incorrecte"
-                Api().error(error, "AppController")
-                self.testFinished(False, error)
-                return 
-            
-            Api().info("Les tests sont terminés et réussis", "AppController")
-            self.testFinished(True, "")
-
-
-    @Slot(str, str, str)
-    def __on_file_created(self, filepath, disk, footprint):
-        Api().info("Le fichier {} a bien été créé sur le disque {}".format(filepath, disk), "AppController")
-
-        if self.test_step == 1:
-            Api().debug("Réponse étape 1 reçue")
-            self.start_test(2, { "filepath": filepath, "disk": disk, "footprint": footprint }, "AppController")
-        elif self.test_step == 2:
-            Api().debug("Réponse étape 2 reçue")
-            self.start_test(3, { "filepath": filepath, "disk": disk, "footprint": footprint }, "AppController")
-        elif self.test_step == 3:
-            Api().debug("Réponse étape 3 reçue")
-            self.start_test(4, { "filepath": filepath, "disk": disk, "footprint": footprint }, "AppController")
-   
+    cpuInfo = Property(type=dict, fget=__get_system_info, constant=True)
+    hasVTd = Property(type=bool, fget=has_vtd, constant=True)
+    hasHVM = Property(type=bool, fget=has_hvm, constant=True)
+    installedMemory = Property(type=float, fget=get_installed_memory_in_gb, constant=True)

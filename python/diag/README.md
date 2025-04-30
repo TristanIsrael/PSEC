@@ -1,4 +1,4 @@
-# PSEC Diagnostic tool
+# PSEC Demonstration application
 
 ## Dépendances
 

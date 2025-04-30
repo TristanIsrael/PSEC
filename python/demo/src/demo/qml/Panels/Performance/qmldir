@@ -1,0 +1,3 @@
+module Panels.Performance
+
+PerformancePanel 1.0 PerformancePanel.qml

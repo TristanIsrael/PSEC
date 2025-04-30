@@ -1,0 +1,3 @@
+module Panels.Compatibility
+
+CompatibilityPanel 1.0 CompatibilityPanel.qml

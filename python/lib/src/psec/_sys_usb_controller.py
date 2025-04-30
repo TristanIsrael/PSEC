@@ -22,6 +22,7 @@ class SysUsbController():
 
     def __init__(self, mqtt_client:MqttClient):
         self.mqtt_client = mqtt_client
+        self.__disk_monitor = None
         #self.__thread_pool = ThreadPoolExecutor(max_workers=1)
 
 
@@ -35,7 +36,7 @@ class SysUsbController():
 
         self.mqtt_client.start()
 
-        # Démarre du worker 
+        # Start the worker
         self.task_runner.start()
 
         
@@ -44,12 +45,12 @@ class SysUsbController():
         DemonInputs().stop()
 
 
-    def __on_mqtt_connected(self):       
+    def __on_mqtt_connected(self):
         Logger().setup("USB controller", self.mqtt_client)
         Logger().debug("Starting PSEC disk controller")
 
-        self.mqtt_client.subscribe("{}/+/+/request".format(Topics.SYSTEM))
-        self.mqtt_client.subscribe("{}/+/request".format(Topics.DISCOVER))
+        self.mqtt_client.subscribe(f"{Topics.SYSTEM}/+/+/request")
+        self.mqtt_client.subscribe(f"{Topics.DISCOVER}/+/request")
 
         # Démarrage de la surveillance des entrées
         if not NO_INPUTS_MONITORING:
@@ -58,8 +59,8 @@ class SysUsbController():
 
         #ControleurBenchmark().setup(self.mqtt_client)
 
-        self.disk_monitor = DiskMonitor(Constantes().constante(Cles.CHEMIN_MONTAGE_USB), self.mqtt_client)
-        threading.Thread(target=self.disk_monitor.start).start()
+        self.__disk_monitor = DiskMonitor(Constantes().constante(Cles.CHEMIN_MONTAGE_USB), self.mqtt_client)
+        threading.Thread(target=self.__disk_monitor.start).start()
 
         payload = {
             "components": [
@@ -73,7 +74,7 @@ class SysUsbController():
             ]
         }
         
-        self.mqtt_client.publish("{}/response".format(Topics.DISCOVER_COMPONENTS), payload)
+        self.mqtt_client.publish(f"{Topics.DISCOVER_COMPONENTS}/response", payload)
 
 
     def __on_mqtt_message(self, topic:str, payload:dict):
@@ -100,12 +101,14 @@ class SysUsbController():
             self.__handle_remove_file(base_topic, payload)
         elif base_topic == Topics.BENCHMARK:
             self.__handle_benchmark(base_topic, payload)
-        elif base_topic == Topics.FILE_FOOTPRINT:            
+        elif base_topic == Topics.FILE_FOOTPRINT:
             self.__handle_file_footprint(base_topic, payload)
-        elif base_topic == Topics.CREATE_FILE:            
+        elif base_topic == Topics.CREATE_FILE:
             self.__handle_create_file(base_topic, payload)
         elif base_topic == Topics.DISCOVER_COMPONENTS:
             self.__handle_discover_components(base_topic, payload)
+        elif base_topic == Topics.DELETE_FILE:
+            self.__handle_delete_file(payload)
 
     ####
     # Traitement des commandes
@@ -153,12 +156,12 @@ class SysUsbController():
         # - nom_fichier au format disk:filename
         # - nom_disque_destination
         if not MqttHelper.check_payload(payload, ["disk", "filepath"]):
-            Logger().error("Missing argument(s) for the command {}".format(topic))
+            Logger().error(f"Missing argument(s) for the command {topic}")
             return
         
-        source_disk = payload.get("disk", "")        
-        filepath = payload.get("filepath", "")   
-        repository_path:str = Parametres().parametre(Cles.STORAGE_PATH_DOMU)     
+        source_disk = payload.get("disk", "")
+        filepath = payload.get("filepath", "")
+        repository_path:str = Parametres().parametre(Cles.STORAGE_PATH_DOMU)
     
         source_location = "{}/{}".format(Parametres().parametre(Cles.CHEMIN_MONTAGE_USB), source_disk) 
         source_footprint = FichierHelper.calculate_footprint("{}/{}".format(source_location, filepath))     
@@ -176,12 +179,6 @@ class SysUsbController():
             notif = NotificationFactory.create_notification_error(source_disk, filepath, "The file could not be copied")
             self.mqtt_client.publish(Topics.ERROR, notif)
 
-        '''
-        try:                   
-            self.task_runner.run_task(self.__do_copy_file, args=(source_location, filepath, Constantes.REPOSITORY, repository_path,))
-        except Exception as e:
-            Logger().error("An error occured while reading the file {} from {}".format(filepath, source_disk))
-        '''
 
     def __handle_remove_file(self, topic:str, payload: dict):
         Logger().error("The command remove file is not implemented")
@@ -202,8 +199,8 @@ class SysUsbController():
 
         try:                   
             self.task_runner.run_task(self.__do_copy_file, args=(source_location, filepath, target_disk, destination_location,))
-        except Exception as e:
-            Logger().error("An error occured while copying the file {} on {}".format(filepath, target_disk))
+        except Exception:
+            Logger().error(f"An error occured while copying the file {filepath} on {target_disk}")
         
         #FichierHelper.copy_file(disk, filepath, destination_folder)
 
@@ -215,40 +212,31 @@ class SysUsbController():
         # Création du répertoire de destination si nécessaire
         parent_path = Path(filepath).parent
         if not parent_path.exists():
-            print("Création du répertoire {} dans le dépôt".format(parent_path))
-            os.makedirs("{}/{}".format(target_location, parent_path), exist_ok= True)
+            print(f"Création du répertoire {parent_path} dans le dépôt")
+            os.makedirs(f"{target_location}/{parent_path}", exist_ok= True)
 
         dest_footprint = FichierHelper.copy_file(source_location, filepath, target_location, source_footprint)
         if dest_footprint != "":
-            Logger().debug("The file {} has been copied to {}. The footprint is {}".format(filepath, target_location, source_footprint))            
+            Logger().debug(f"The file {filepath} has been copied to {target_location}. The footprint is {source_footprint}")
 
             # Envoi d'une notification pour informer de la présence d'un nouveau fichier
             notif = NotificationFactory.create_notification_new_file(disk= target_disk, filepath= filepath, source_footprint= source_footprint, dest_footprint= dest_footprint)
-            self.mqtt_client.publish("{}/notification".format(Topics.NEW_FILE), notif)
+            self.mqtt_client.publish(f"{Topics.NEW_FILE}/notification", notif)
 
             response = ResponseFactory.create_response_copy_file(filepath, target_disk, True, dest_footprint)            
         else:
             response = ResponseFactory.create_response_copy_file(filepath, target_disk, False, dest_footprint)
-            Logger().error("La copie du fichier {} dans le dépôt a échoué.".format(filepath))
+            Logger().error(f"La copie du fichier {filepath} dans le dépôt a échoué.")
 
-        self.mqtt_client.publish("{}/response".format(Topics.COPY_FILE), response)
+        self.mqtt_client.publish(f"{Topics.COPY_FILE}/response", response)
 
 
     def __handle_benchmark(self, topic:str, payload:dict):
         module = payload.get("module")
 
         if module is None:
-            Logger().error("Argument missing: module. Topic is {}".format(topic))
+            Logger().error(f"Argument missing: module. Topic is {topic}")
             return
-
-        '''if module == BenchmarkId.INPUTS:
-            ControleurBenchmark().execute_benchmark_inputs()
-        elif module == BenchmarkId.FILES:
-            ControleurBenchmark().execute_benchmark_fichiers()
-        else:
-            Logger().error("The benchmark cannot be started. Unknown module {}.".format(module))'
-        '''
-
 
     def __handle_file_footprint(self, topic:str, payload:dict):
         disk = payload.get("disk")
@@ -259,22 +247,22 @@ class SysUsbController():
             return
 
         if disk is None:
-            Logger().error("Argument missing: disk. Topic is {}".format(topic))
-            return        
-        
-        if filepath is None:
-            Logger().error("Argument missing: filepath. Topic is {}".format(topic))
+            Logger().error(f"fArgument missing: disk. Topic is {topic}")
             return
         
-        Logger().debug("Calculate footprint of the file {} on the disk {}".format(filepath, disk))
+        if filepath is None:
+            Logger().error(f"Argument missing: filepath. Topic is {topic}")
+            return
+        
+        Logger().debug(f"Calculate footprint of the file {filepath} on the disk {disk}")
 
         mount_point = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)
-        footprint = FichierHelper.calculate_footprint("{}/{}/{}".format(mount_point, disk, filepath))
+        footprint = FichierHelper.calculate_footprint(f"{mount_point}/{disk}/{filepath}")
 
-        Logger().info("The footprint of the file {} on the disk {} is {}".format(disk, filepath, footprint))
+        Logger().info(f"The footprint of the file {disk} on the disk {filepath} is {footprint}")
 
         response = ResponseFactory.create_response_file_footprint(filepath, disk, footprint)
-        self.mqtt_client.publish("{}/response".format(topic), response)
+        self.mqtt_client.publish(f"{topic}/response", response)
 
 
     def __handle_create_file(self, topic:str, payload:dict):
@@ -299,27 +287,27 @@ class SysUsbController():
         else:
             data = decoded
 
-        mount_point = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)        
-        complete_filepath = "{}/{}/{}".format(mount_point, disk, filepath)        
+        mount_point = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)
+        complete_filepath = f"{mount_point}/{disk}/{filepath}"
         
-        Logger().debug("Create a file {} of size {} octets on disk {}".format(filepath, len(data), disk))
+        Logger().debug(f"Create a file {filepath} of size {len(data)} octets on disk {disk}")
 
         try:
             with open(complete_filepath, 'wb') as f:
                 f.write(data)
-            f.close()            
+            f.close()
         except Exception as e:
-            Logger().error("An error occured while writing to file {}".format(complete_filepath))
+            Logger().error(f"An error occured while writing to file {complete_filepath}")
             Logger().error(str(e))
             
             response = ResponseFactory.create_response_create_file(filepath, disk, "", False)
-            self.mqtt_client.publish("{}/response".format(topic), response)
+            self.mqtt_client.publish(f"{topic}/response", response)
             return
 
         # On envoie la notification de succès
         footprint = FichierHelper.calculate_footprint(complete_filepath)
         response = ResponseFactory.create_response_create_file(complete_filepath, disk, footprint, True)
-        self.mqtt_client.publish("{}/response".format(topic), response)
+        self.mqtt_client.publish(f"{topic}/response", response)
 
     def __handle_discover_components(self, topic:str, payload:dict) -> None:
         response = {
@@ -330,5 +318,25 @@ class SysUsbController():
             ]
         }
 
-        self.mqtt_client.publish("{}/response".format(topic), response)
+        self.mqtt_client.publish(f"{topic}/response", response)
     
+    def __handle_delete_file(self, payload):
+        if not MqttHelper.check_payload(payload, ["disk", "filepath"]):
+            Logger().error(f"The command {Topics.DELETE_FILE} misses argument(s)", "Dom0")
+            return
+
+        disk = payload["disk"]
+
+        if disk == Constantes.REPOSITORY:
+            # This file is the repository so we ignore it
+            return
+
+        filepath = payload["filepath"]
+        mount_point = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)
+        storage_filepath = f"{mount_point}/{disk}/{filepath}"
+
+        if not FichierHelper().remove_file(storage_filepath):
+            Logger().error(f"Removal of file {filepath} from the disk {disk} failed")
+        else:
+            Logger().info(f"Removed file {filepath} from the disk {disk}")
+            
