@@ -6,7 +6,6 @@ import sys, threading
 
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterType, qmlRegisterSingletonType, qmlRegisterUncreatableType, qmlRegisterSingletonInstance
-from psec import Api, System
 from AppController import AppController
 
 if __name__ == '__main__':
