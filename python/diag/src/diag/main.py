@@ -9,12 +9,14 @@ from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterType, qmlRegisterSingletonType, qmlRegisterUncreatableType, qmlRegisterSingletonInstance
 from AppController import AppController
 
-def quit_app(sig, frame):
-    sys.exit(0)
+app = QGuiApplication(sys.argv)
+
+def handle_sigint(signum, frame):    
+    app.quit()  # Quitte la boucle Qt
+
+signal.signal(signal.SIGINT, handle_sigint)
 
 if __name__ == '__main__':
-    app = QGuiApplication(sys.argv)
-
     # Expose les Types QML
     qmlRegisterSingletonInstance(AppController, "net.alefbet", 1, 0, 'AppController', AppController(app))
 
@@ -30,7 +32,5 @@ if __name__ == '__main__':
     qml_root = engine.rootObjects()[0]
     if os.getenv("DEVMODE") is None:
         qml_root.showFullScreen()
-
-    signal.signal(signal.SIGINT, quit_app)
 
     app.exec()
