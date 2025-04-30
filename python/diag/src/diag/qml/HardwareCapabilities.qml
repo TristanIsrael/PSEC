@@ -36,7 +36,7 @@ ColumnLayout {
 
     PCapability {
         text: qsTr("CPU architecture")
-        state: cpuInfo["arch_string_raw"] +" " +cpuInfo["bits"]
+        state: cpuInfo["arch_string_raw"] +" " +cpuInfo["bits"] +"bit"
         stateColor: cpuInfo["arch_string_raw"] === "x86_64" ? Colors.green : Colors.red
     }
 

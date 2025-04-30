@@ -1,12 +1,16 @@
 #!/bin/python3
 
 import os
+import signal
 from pathlib import Path
 import sys, threading
 
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterType, qmlRegisterSingletonType, qmlRegisterUncreatableType, qmlRegisterSingletonInstance
 from AppController import AppController
+
+def quit_app(sig, frame):
+    sys.exit(0)
 
 if __name__ == '__main__':
     app = QGuiApplication(sys.argv)
@@ -26,5 +30,7 @@ if __name__ == '__main__':
     qml_root = engine.rootObjects()[0]
     if os.getenv("DEVMODE") is None:
         qml_root.showFullScreen()
+
+    signal.signal(signal.SIGINT, quit_app)
 
     app.exec()
