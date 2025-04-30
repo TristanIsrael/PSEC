@@ -3,12 +3,12 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "demo"
+name = "diag"
 version = "1.0"
 authors = [ 
     { name="Tristan Israël", email="tristan.israel@alefbet.net" }, 
 ]
-description = "Demonstration tool for the PSEC"
+description = "Demonstration tool for PSEC"
 readme = "README.md"
 requires-python = ">=3.9"
 classifiers = [

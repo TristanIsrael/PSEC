@@ -1,0 +1,23 @@
+#!/sbin/openrc-run
+
+name="psec-diag"
+
+depend() {
+    before *
+}
+
+start() {
+    ebegin "Start diagnostic tool"
+
+    start-stop-daemon --start --make-pidfile --exec /usr/lib/psec/diag/src/diag/start.sh --pidfile /var/run/$name.pid --background    
+
+    eend $?
+}
+
+stop() {
+    ebegin "Stop diagnostic tool"
+
+    kill -9 $(cat /var/run/$name.pid)
+
+    eend $?
+}

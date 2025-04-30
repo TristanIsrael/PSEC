@@ -1,0 +1,6 @@
+#!/bin/sh
+
+rc-update add diag
+rc-service diag start
+
+exit 0
