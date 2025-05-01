@@ -85,12 +85,47 @@ Rectangle {
                 topMargin: 20
                 left: parent.left
                 right: parent.right
-                bottom: parent.bottom
+                bottom: buttons.top
             }
 
             HardwareCapabilities {}
 
             SecurityCapabilities {}
+        }
+
+        RowLayout {
+            id: buttons
+
+            anchors {
+                bottom: parent.bottom
+                left: parent.left
+                right: parent.right
+            }
+            spacing: 20
+
+            Item {
+                Layout.fillWidth: true
+            }
+
+            PButton {
+                text: qsTr("Quit app")
+
+                onClicked: function() {
+                    Qt.quit()
+                }
+            }
+
+            PButton {
+                text: qsTr("Shutdown")
+
+                onClicked: function() {
+                    AppController.shutdown()
+                }
+            }
+
+            Item {
+                Layout.fillWidth: true
+            }
         }
     }
 }

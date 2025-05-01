@@ -19,10 +19,6 @@ ApplicationWindow {
     }
 
     Component.onCompleted: {
-        if(force_paysage) {
-            mode_paysage = force_paysage
-        }
-
         console.log("Mode paysage activé : " + (mode_paysage ? "Oui" : "Non"))
         console.log("Fonctionne sur " +Qt.platform.os)
     }    
@@ -36,6 +32,6 @@ ApplicationWindow {
 
     onVisibilityChanged: {  
         if(visible)      
-            AppController.debug("Résolution : " +Qt.application.screens[0].width +"x" +Qt.application.screens[0].height)
+            console.log("Résolution : " +Qt.application.screens[0].width +"x" +Qt.application.screens[0].height)
     }
 }

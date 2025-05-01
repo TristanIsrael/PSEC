@@ -3,7 +3,7 @@ import subprocess
 import os
 import psutil
 from Singleton import SingletonMeta
-from PySide6.QtCore import QObject, Property
+from PySide6.QtCore import QObject, Property, Slot
 
 class AppController(QObject):
 
@@ -163,6 +163,10 @@ class AppController(QObject):
         mem = psutil.virtual_memory()
         total_gb = mem.total / (1024 ** 3)
         return total_gb
+    
+    @Slot()
+    def shutdown(self):
+        subprocess.run("shutdown", check=False)
 
     cpuInfo = Property(type=dict, fget=__get_system_info, constant=True)
     hasVTd = Property(type=bool, fget=has_vtd, constant=True)
