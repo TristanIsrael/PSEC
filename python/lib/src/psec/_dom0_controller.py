@@ -37,7 +37,7 @@ class Dom0Controller():
     def __on_mqtt_connected(self):
         Logger().debug("Starting Dom0 controller")        
         self.mqtt_client.subscribe(f"{Topics.SYSTEM}/+/+/request") # All the system requests
-        self.mqtt_client.subscribe(f"{Topics.GUI_READY}/request")
+        self.mqtt_client.subscribe(Topics.GUI_READY)
         self.mqtt_client.subscribe(f"{Topics.SYSTEM_INFO}/request")
 
 
@@ -59,7 +59,7 @@ class Dom0Controller():
             self.__handle_shutdown(payload)
         elif topic == f"{Topics.RESTART_DOMAIN}/request":
             self.__handle_restart_domain(payload)
-        elif topic == f"{Topics.GUI_READY}":
+        elif topic == Topics.GUI_READY:
             self.__handle_gui_ready(payload)
         elif topic == f"{Topics.ENERGY_STATE}/request":
             self.__handle_energy_state()

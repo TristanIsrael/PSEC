@@ -273,6 +273,6 @@ class MqttClient():
         for arg in args:
             print(arg)
 
-        print("Disconnect from the broker")
-        self.mqtt_client.close()
+        #print("Disconnect from the broker")
+        #self.mqtt_client.close()
         
