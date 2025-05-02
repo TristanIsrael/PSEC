@@ -15,15 +15,105 @@ def hexdump(data, prefix=""):
         print(f"{prefix}{i:04x}: {hex_bytes:<48} {ascii_bytes}")
 
 class UnixSocketTunneler:
-    #__connection_lost = threading.Event()
 
     def __init__(self, client_socket_path, broker_socket_path, n_socket:int):
         self.client_socket_path = client_socket_path
         self.broker_socket_path = broker_socket_path
-        self.n_socket = n_socket
+        self.n_socket = n_socket    
 
+    def tunnel(self):
+        """
+        Set up connections and manage bidirectional tunneling.
+        We need to connect to the broken only when there is an incoming connection from a client
+        """
+        client_to_broker_buffer = b''
+        broker_to_client_buffer = b''
 
-    def create_client_socket_and_wait_for_connection(self) -> socket.socket:
+        while True:
+            # The tunnel is re-created as much as necessary to stay alive
+
+            try:
+                # Create broker socket
+                broker_sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+
+                # Connect to the client and wait for data
+                client_sock = self.__create_client_socket_and_wait_for_connection()
+
+                broker_socket_path = f"/tmp/mqtt_msg_{self.n_socket}.sock"
+                broker_sock.connect(broker_socket_path)
+                print(f"Connected to the broker on socket {broker_socket_path}")
+                
+                while True:
+                    rlist = []
+                    wlist = []
+
+                    # Watch broker and client socket for incoming data
+                    rlist.append(client_sock)
+                    rlist.append(broker_sock)
+
+                    # Write only when there are data to be sent
+                    if client_to_broker_buffer:
+                        wlist.append(broker_sock)
+                    if broker_to_client_buffer:
+                        wlist.append(client_sock)
+
+                    readable, writable, _ = select.select(rlist, wlist, [])
+
+                    # If the client sent data
+                    if client_sock in readable:
+                        try:
+                            data = client_sock.recv(4096)
+                            if data:
+                                client_to_broker_buffer += data
+                            else:
+                                print("Client socket closed.")
+                                break
+                        except BlockingIOError:
+                            pass
+
+                    # If the broker sent data
+                    if broker_sock in readable:
+                        try:
+                            data = broker_sock.recv(4096)
+                            if data:
+                                broker_to_client_buffer += data
+                            else:
+                                print("Broker socket closed.")
+                                break
+                        except BlockingIOError:
+                            pass
+
+                    # Send to the broker
+                    if broker_sock in writable and client_to_broker_buffer:
+                        try:
+                            sent = broker_sock.send(client_to_broker_buffer)
+                            client_to_broker_buffer = client_to_broker_buffer[sent:]
+                        except BlockingIOError:
+                            pass
+
+                    # Send to the client
+                    if client_sock in writable and broker_to_client_buffer:
+                        try:
+                            sent = client_sock.send(broker_to_client_buffer)
+                            broker_to_client_buffer = broker_to_client_buffer[sent:]
+                        except BlockingIOError:
+                            pass
+
+                # Fermeture des sockets proprement
+                #client_sock.close()
+                #broker_sock.close()
+
+                #print(f"Tunnel {self.client_socket_path} <--> {self.broker_socket_path} is broken")
+            except socket.error as e:
+                print(f"{self.client_socket_path} --> {self.broker_socket_path}. Socket error: {e}.")
+                #time.sleep(5)  # Wait before retrying
+            finally:
+                #print("Close connections")
+                client_sock.close()
+                broker_sock.close()
+                time.sleep(1)  # Wait before retrying
+
+    def __create_client_socket_and_wait_for_connection(self) -> socket.socket:
         client_sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         client_sock.connect(self.client_socket_path)
 
@@ -35,144 +125,8 @@ class UnixSocketTunneler:
             return client_sock
 
 
-    def tunnel(self):
-        """
-        Set up connections and manage bidirectional tunneling.
-        We need to connect to the broken only when there is an incoming connection from a client
-        """
-        client_to_broker_buffer = b''
-        broker_to_client_buffer = b''
-
-        while True:
-            try:
-                # Create broker socket
-                broker_sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
-
-                # Connect to the client and wait for data
-                client_sock = self.create_client_socket_and_wait_for_connection()
-
-                broker_socket_path = "/tmp/mqtt_msg_{}.sock".format(self.n_socket)
-                broker_sock.connect(broker_socket_path)
-                print("Connected to the broker on socket {}".format(broker_socket_path))
-                
-                while True:
-                    rlist = []
-                    wlist = []
-
-                    # On lit tout le temps des deux côtés si possible
-                    rlist.append(client_sock)
-                    rlist.append(broker_sock)
-
-                    # On écrit seulement s'il y a quelque chose à envoyer
-                    if client_to_broker_buffer:
-                        wlist.append(broker_sock)
-                    if broker_to_client_buffer:
-                        wlist.append(client_sock)
-
-                    readable, writable, _ = select.select(rlist, wlist, [])
-
-                    # Lecture depuis client
-                    if client_sock in readable:
-                        try:
-                            data = client_sock.recv(4096)
-                            if data:
-                                client_to_broker_buffer += data
-                            else:
-                                print("Client socket fermée.")
-                                break
-                        except BlockingIOError:
-                            pass
-
-                    # Lecture depuis broker
-                    if broker_sock in readable:
-                        try:
-                            data = broker_sock.recv(4096)
-                            if data:
-                                broker_to_client_buffer += data
-                            else:
-                                print("Broker socket fermée.")
-                                break
-                        except BlockingIOError:
-                            pass
-
-                    # Écriture vers broker
-                    if broker_sock in writable and client_to_broker_buffer:
-                        try:
-                            sent = broker_sock.send(client_to_broker_buffer)
-                            client_to_broker_buffer = client_to_broker_buffer[sent:]
-                        except BlockingIOError:
-                            pass
-
-                    # Écriture vers client
-                    if client_sock in writable and broker_to_client_buffer:
-                        try:
-                            sent = client_sock.send(broker_to_client_buffer)
-                            broker_to_client_buffer = broker_to_client_buffer[sent:]
-                        except BlockingIOError:
-                            pass
-
-
-                '''
-                sockets = [client_sock, broker_sock]
-                while True:
-                    # Utiliser select pour attendre les sockets prêtes en lecture
-                    readable, writable, _ = select.select(sockets, sockets, [])
-
-                    # Lecture sur socket_left et écriture sur socket_right
-                    if client_sock in readable:
-                        try:
-                            data = client_sock.recv(4096)
-                            if data:
-                                if DEBUG:
-                                    hexdump(data, prefix=f"client>broker ")
-                                if broker_sock in writable:
-                                    broker_sock.sendall(data)
-                                else:
-                                    print("socket_right n'est pas prête à écrire.")
-                            else:
-                                print("socket_left s'est fermée.")
-                                break  # Sortir de la boucle si la socket est fermée
-                        except OSError as e:
-                            print(f"Erreur lors de la lecture sur socket_left : {e}")
-                            break
-
-                    # Lecture sur socket_right et écriture sur socket_left
-                    if broker_sock in readable:
-                        try:
-                            data = broker_sock.recv(4096)
-                            if data:
-                                if DEBUG:
-                                    hexdump(data, prefix=f"broker>client ")
-                                if client_sock in writable:
-                                    client_sock.sendall(data)
-                                else:
-                                    print("socket_left n'est pas prête à écrire.")
-                            else:
-                                print("socket_right s'est fermée.")
-                                break  # Sortir de la boucle si la socket est fermée
-                        except OSError as e:
-                            print(f"Erreur lors de la lecture sur socket_right : {e}")
-                            break
-                '''
-
-                # Fermeture des sockets proprement
-                client_sock.close()
-                broker_sock.close()
-
-                print(f"Tunnel {self.client_socket_path} <--> {self.broker_socket_path} is broken")
-            except socket.error as e:
-                print(f"{self.client_socket_path} --> {self.broker_socket_path}. Socket error: {e}.")
-                #time.sleep(5)  # Wait before retrying
-            finally:
-                #print("Close connections")
-                client_sock.close()
-                broker_sock.close()
-                time.sleep(1)  # Wait before retrying
-
-
 def create_msg_tunnel(client_socket:str, n_socket:int):
     tunneler = UnixSocketTunneler(client_socket, broker_msg_socket, n_socket)
-    #threading.Thread(target=tunneler.tunnel).start()
     tunneler.tunnel()
 
 
