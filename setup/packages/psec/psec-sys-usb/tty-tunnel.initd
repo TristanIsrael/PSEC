@@ -1,0 +1,23 @@
+#!/sbin/openrc-run
+
+name="tty-tunnel"
+
+depend() {
+    before udev
+}
+
+start() {
+    ebegin "Create TTY tunnel"
+
+    start-stop-daemon --start --make-pidfile --exec /usr/lib/psec/bin/create-tty-tunnel.sh --pidfile /var/run/$name.pid --background
+
+    eend $?
+}
+
+stop() {
+    ebegin "Destroy TTY tunnel"
+
+    kill -9 $(cat /var/run/$name.pid)
+
+    eend $?
+}

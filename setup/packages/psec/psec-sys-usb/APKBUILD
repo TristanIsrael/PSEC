@@ -7,7 +7,7 @@ pkgdesc="PSEC - USB proxy virtual machine"
 url="https://www.alefbet.net/"
 arch="noarch"
 license="MIT"
-depends="psec-lib eudev"
+depends="psec-lib eudev socat"
 makedepends="python3-dev py3-build py3-installer git"
 builddir="$srcdir/$pkgname-$pkgver"
 checkdepends=""
@@ -21,7 +21,9 @@ notify-disk-added.py
 notify-disk-removed.py
 mdev-usb-storage.sh
 99-usbdisks.rules
-psec-sys-usb-controller.py"
+psec-sys-usb-controller.py
+create-tty-tunnel.sh
+tty-tunnel.initd"
 
 PSEC_CONFDIR="/etc/psec"
 PSEC_ROOTDIR="/usr/lib/psec"
@@ -35,4 +37,6 @@ package() {
     install -D -m644 "$srcdir"/99-usbdisks.rules "$pkgdir"/etc/udev/rules.d/99-usbdisks.rules
     install -D -m755 "$srcdir"/psec-sys-usb-controller.initd "$pkgdir"/etc/init.d/psec-sys-usb-controller
     install -D -m644 "$srcdir"/psec-sys-usb-controller.py "$pkgdir/$PSEC_BINDIR/psec-sys-usb-controller.py"
+    install -D -m755 "$srcdir"/tty-tunnel.initd "$pkgdir"/etc/init.d/tty-tunnel
+    install -D -m644 "$srcdir"/create-tty-tunnel.sh "$pkgdir/$PSEC_BINDIR/create-tty-tunnel.sh"
 }

@@ -764,6 +764,14 @@ Pour vous, cela se comporte comme si le Dom0 était directement relié au port s
 	•	Utilisez systemd ou supervisord pour relancer socat/agetty si besoin.
 	•	Ajoutez un handshake (par ex. mot de passe en premier) si exposition possible.
 
+### Maquettage
+
+DomU : `# socat /dev/ttyUSB0,raw,echo=0 /dev/hvc3,raw,echo=0`
+Dom0 :
+```
+# socat UNIX-CONNECT:/var/run/sys-usb-tty.sock PTY,link=/dev/tty-admin,raw,echo=0
+# agetty -o 38400,8n1 tty-admin vt100
+```
 
 ## Sortie XL 
 
