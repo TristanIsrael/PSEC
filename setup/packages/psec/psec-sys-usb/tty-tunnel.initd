@@ -3,7 +3,7 @@
 name="tty-tunnel"
 
 depend() {
-    before udev
+    after mdev
 }
 
 start() {

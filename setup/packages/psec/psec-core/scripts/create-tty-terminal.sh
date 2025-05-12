@@ -1,5 +1,5 @@
 #!/bin/sh
 
 while true; do
-    agetty -o 38400,8n1 tty-admin vt100
+    agetty -h -t 60 -L tty-admin vt102
 done
