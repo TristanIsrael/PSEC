@@ -171,7 +171,8 @@ class Dom0Controller():
     def __handle_system_info(self):
         payload = {
             "core": {
-                "version": __version__
+                "version": __version__,
+                "debug_on": System.debug_activated()
             },
             "system": {
                 "os" : {

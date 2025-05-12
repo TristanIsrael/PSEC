@@ -9,9 +9,13 @@ depend() {
 start() {
     ebegin "Create TTY tunnel"
 
-    start-stop-daemon --start --make-pidfile --exec /usr/lib/psec/bin/create-tty-tunnel.sh --pidfile /var/run/$name.pid --background
-
-    eend $?
+    if grep -q "DEBUG=ON" "/proc/cmdline"; then        
+        start-stop-daemon --start --make-pidfile --exec /usr/lib/psec/bin/create-tty-tunnel.sh --pidfile /var/run/$name.pid --background
+        eend $?
+    else
+        echo "Disabled"
+        eend 1
+    fi    
 }
 
 stop() {

@@ -118,7 +118,8 @@ p9 = [
 channel = [
 'name=console, connection=pty',
 'name=sys-usb-msg, connection=socket, path=/var/run/sys-usb-msg.sock',
-'name=sys-usb-input, connection=socket, path=/var/run/sys-usb-input.sock'
+'name=sys-usb-input, connection=socket, path=/var/run/sys-usb-input.sock',
+'name=sys-usb-tty, connection=socket, path=/var/run/sys-usb-tty.sock'
 ]
 device_model_override = "/usr/bin/qemu-system-x86_64"
 device_model_version = "qemu-xen"

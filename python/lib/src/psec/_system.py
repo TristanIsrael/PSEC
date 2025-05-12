@@ -1,6 +1,7 @@
 from . import SingletonMeta
 import subprocess
 import platform
+import os
 
 class System(metaclass=SingletonMeta):
 
@@ -97,3 +98,13 @@ class System(metaclass=SingletonMeta):
         
         else:
             return None  # Système non supporté
+
+    @staticmethod
+    def debug_activated():
+        try:
+            fd = os.open("/proc/cmdline", os.O_RDONLY)
+            data = os.read(fd)            
+            return b'debug=on' in data.lower()
+        except Exception:
+            return False
+        

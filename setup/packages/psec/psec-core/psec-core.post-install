@@ -46,6 +46,9 @@ rc-update add start-x
 rc-update add orchestrator
 #rc-service orchestrator start
 
+rc-update add tty-tunnel
+rc-update add tty-terminal
+
 # finish-core-init est exécuté par le script post-install du produit...
 #/usr/lib/psec/bin/finish-core-init.sh
 

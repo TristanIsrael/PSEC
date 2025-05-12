@@ -1,0 +1,22 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "demo2"
+version = "1.0"
+authors = [ 
+    { name="Tristan Israël", email="tristan.israel@alefbet.net" }, 
+]
+description = "Demonstration tool for PSEC"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3",
+    "Operating System :: POSIX :: Linux",
+]
+
+[project.urls]
+Homepage = "https://github.com/tibsys/PSEC"
+Issues = "https://github.com/tibsys/PSEC/issues"
