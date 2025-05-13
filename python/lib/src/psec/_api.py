@@ -4,6 +4,8 @@ import tempfile
 import os
 import zlib
 import base64
+import atexit
+import signal
 
 class Api(metaclass=SingletonMeta):
     """ Cette classe permet à un programme tiers d'envoyer des commandes ou recevoir des 
@@ -254,3 +256,11 @@ class Api(metaclass=SingletonMeta):
 
         for cb in self.__restart_callbacks:
             cb(domain_name, success, reason)
+
+api = Api()
+def cleanup():
+    api.stop()
+
+atexit.register(cleanup)
+signal.signal(signal.SIGTERM, cleanup)
+signal.signal(signal.SIGINT, cleanup)

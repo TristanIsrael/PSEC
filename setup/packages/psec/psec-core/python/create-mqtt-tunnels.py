@@ -114,7 +114,7 @@ class UnixSocketTunneler:
 
         ready_to_read, _, _ = select.select([client_sock], [], [])
         if client_sock in ready_to_read:
-            Logger.print("Client has connected.")
+            Logger.print("Client has sent its first byte.")
             return client_sock
 
 

@@ -4,7 +4,6 @@ from enum import StrEnum
 import time
 import json
 import threading
-import atexit
 import select
 from typing import Literal, Callable, Optional
 import serial
@@ -71,11 +70,13 @@ class SerialMQTTClient(mqtt.Client):
     ''' @brief Cette classe permet au client MQTT de communiquer sur un port série.
     '''
 
+    on_connection_lost: Optional[Callable[[], None]] = None
+
     def __init__(self, path:str, baudrate:int, *args, **kwargs):
         super().__init__(callback_api_version=CallbackAPIVersion.VERSION2, *args, **kwargs)
         self.path = path
         self.baudrate = baudrate
-        self.sock_ = None
+        self._sock = None
 
     def disconnect(self, reasoncode: ReasonCode | None = None, properties: Properties | None = None):
         self._send_disconnect(reasoncode, properties)
@@ -99,7 +100,13 @@ class SerialMQTTClient(mqtt.Client):
         rc = MQTTErrorCode.MQTT_ERR_SUCCESS
 
         while not self._thread_terminate:
-            rlist, wlist, _ = select.select([self.sock_], [self.sock_], [], 1)
+            if self._sock is None:
+                print("No socket found, exiting loop")
+                if self.on_connection_lost is not None:
+                    self.on_connection_lost()
+                return
+            
+            rlist, wlist, _ = select.select([self._sock], [self._sock], [], 1)
 
             if rlist:
                 rc = self.loop_read()
@@ -116,6 +123,11 @@ class SerialMQTTClient(mqtt.Client):
             rc = self.loop_misc()
             if rc != MQTTErrorCode.MQTT_ERR_SUCCESS:
                 print(f"Misc error {rc}")
+                if rc == MQTTErrorCode.MQTT_ERR_CONN_LOST:
+                    print("Connection lost.")
+                    if self.on_connection_lost is not None:
+                        self.on_connection_lost()
+
                 break
 
             time.sleep(0.2)
@@ -134,9 +146,9 @@ class SerialMQTTClient(mqtt.Client):
     def _create_socket(self):
         try:
             print(f"Create socket on {self.path}")
-            self.sock_ = SerialSocket(self.path, self.baudrate)
-            self._sockpairR = self.sock_
-            return self.sock_
+            self._sock = SerialSocket(self.path, self.baudrate)
+            self._sockpairR = self._sock
+            return self._sock
         except Exception as e:
             print("An error occured while opening the serial port")
             print(e)
@@ -161,7 +173,6 @@ class MqttClient():
         self.identifier = identifier
         self.connection_type = connection_type
         self.connection_string = connection_string
-        atexit.register(self.stop)
 
     def __del__(self):
         self.stop()
@@ -190,7 +201,7 @@ class MqttClient():
                     self.mqtt_client.connect(host=mqtt_host, keepalive=30)
                 elif self.connection_type == ConnectionType.UNIX_SOCKET:
                     mqtt_host = self.connection_string
-                    self.mqtt_client.connect(host=mqtt_host, port=1, keepalive=30)
+                    self.mqtt_client.connect(host=mqtt_host, port=1, keepalive=2)
                 else:
                     print(f"The connection type {self.connection_type} is not handled")
                     return
@@ -202,18 +213,19 @@ class MqttClient():
             self.mqtt_client.loop_start()
         elif self.connection_type == ConnectionType.SERIAL_PORT:
             self.mqtt_client = SerialMQTTClient(
-                client_id=self.identifier, 
-                path=self.connection_string, 
-                baudrate=115200, 
+                client_id=self.identifier,
+                path=self.connection_string,
+                baudrate=115200,
                 reconnect_on_failure=True
             )
             self.mqtt_client.on_connect = self.__on_connected
             self.mqtt_client.on_message = self.__on_message
             self.mqtt_client.on_disconnect = self.__on_disconnected
+            self.mqtt_client.on_connection_lost = self.__on_connection_lost
 
             if DEBUG:
                 self.mqtt_client.on_log = self.__on_log
-            self.mqtt_client.connect(host="localhost", port=1, keepalive=30)
+            self.mqtt_client.connect(host="localhost", port=1, keepalive=2)
 
             self.mqtt_client.loop_start()
         else:
@@ -283,6 +295,12 @@ class MqttClient():
 
         for cb in self.__connected_callbacks:
             cb()
+
+    def __on_connection_lost(self):
+        print("Connection lost, trying to reconnect.")
+        self.is_starting = False
+        self.connected = False
+        self.start()
 
     def __on_disconnected(self, *args):
         print("Disconnected from the broker")
