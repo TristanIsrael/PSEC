@@ -198,3 +198,11 @@ class Logger(metaclass=SingletonMeta):
             return logging.CRITICAL
         
         return logging.NOTSET
+    
+    @staticmethod
+    def format_logline(message:str) -> str:
+        return f"{datetime.now():%Y-%m-%d %H:%M:%S} - {message}"
+    
+    @staticmethod
+    def print(message:str) -> None:
+        print(Logger.format_logline(message))

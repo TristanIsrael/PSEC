@@ -16,7 +16,7 @@ start() {
         start-stop-daemon --start --make-pidfile --exec /usr/lib/psec/bin/create-tty-terminal.sh --pidfile /var/run/$name-tty-terminal.pid --background
         eend $?
 
-        ebegin "Log MQTT messages
+        ebegin "Log MQTT messages"
         start-stop-daemon --start --make-pidfile --exec /usr/lib/psec/bin/start-mqtt-logger.sh --pidfile /var/run/$name-mqtt.pid --background
         eend $?
     else 

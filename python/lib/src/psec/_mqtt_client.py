@@ -9,6 +9,8 @@ import select
 from typing import Literal, Callable, Optional
 import serial
 import paho.mqtt.client as mqtt
+from paho.mqtt.reasoncodes import ReasonCode
+from paho.mqtt.properties import Properties
 from paho.mqtt.enums import CallbackAPIVersion, MQTTErrorCode
 
 DEBUG = False
@@ -75,9 +77,15 @@ class SerialMQTTClient(mqtt.Client):
         self.baudrate = baudrate
         self.sock_ = None
 
+    def disconnect(self, reasoncode: ReasonCode | None = None, properties: Properties | None = None):
+        self._send_disconnect(reasoncode, properties)
+        self.__do_loop()
+
     def close(self):
-        if self.sock_ is not None:
-            self.sock_.close()
+        self.disconnect()
+        self._sock_close()
+        #if self.sock_ is not None:
+        #    self.sock_.close()
 
     def loop_start(self) -> MQTTErrorCode:
         self._thread_terminate = False
@@ -166,7 +174,12 @@ class MqttClient():
         print(f"Starting MQTT client {self.identifier}")
 
         if self.connection_type != ConnectionType.SERIAL_PORT:
-            self.mqtt_client = mqtt.Client(callback_api_version=CallbackAPIVersion.VERSION2, client_id=self.identifier, transport=self.__get_transport_type(), reconnect_on_failure=True)
+            self.mqtt_client = mqtt.Client(
+                callback_api_version=CallbackAPIVersion.VERSION2,
+                client_id=self.identifier,
+                transport=self.__get_transport_type(),
+                reconnect_on_failure=True
+            )
             self.mqtt_client.on_connect = self.__on_connected
             self.mqtt_client.on_message = self.__on_message
 
@@ -188,7 +201,12 @@ class MqttClient():
             
             self.mqtt_client.loop_start()
         elif self.connection_type == ConnectionType.SERIAL_PORT:
-            self.mqtt_client = SerialMQTTClient(client_id=self.identifier, path=self.connection_string, baudrate=115200, reconnect_on_failure=False)
+            self.mqtt_client = SerialMQTTClient(
+                client_id=self.identifier, 
+                path=self.connection_string, 
+                baudrate=115200, 
+                reconnect_on_failure=True
+            )
             self.mqtt_client.on_connect = self.__on_connected
             self.mqtt_client.on_message = self.__on_message
             self.mqtt_client.on_disconnect = self.__on_disconnected
@@ -197,7 +215,6 @@ class MqttClient():
                 self.mqtt_client.on_log = self.__on_log
             self.mqtt_client.connect(host="localhost", port=1, keepalive=30)
 
-            #threading.Thread(target=self.mqtt_client.loop_forever).start()
             self.mqtt_client.loop_start()
         else:
             print(f"The connection type {self.connection_type} is not handled")
@@ -268,7 +285,7 @@ class MqttClient():
             cb()
 
     def __on_disconnected(self, *args):
-        print("Disconnection from the MQTT broker asked by the client")
+        print("Disconnected from the broker")
         print("Arguments:")
         for arg in args:
             print(arg)

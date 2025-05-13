@@ -1,5 +1,5 @@
 import subprocess, os, time, threading, select, socket
-from psec import Constantes, Cles
+from psec import Constantes, Cles, Logger
 
 broker_msg_socket = Constantes().constante(Cles.MQTT_MSG_BROKER_SOCKETS)
 
@@ -12,16 +12,16 @@ def hexdump(data, prefix=""):
         chunk = data[i:i + 16]
         hex_bytes = " ".join(f"{byte:02x}" for byte in chunk)
         ascii_bytes = "".join(chr(byte) if 32 <= byte <= 126 else '.' for byte in chunk)
-        print(f"{prefix}{i:04x}: {hex_bytes:<48} {ascii_bytes}")
+        Logger.print(f"{prefix}{i:04x}: {hex_bytes:<48} {ascii_bytes}")
 
 class UnixSocketTunneler:
 
     def __init__(self, client_socket_path, broker_socket_path, n_socket:int):
         self.client_socket_path = client_socket_path
         self.broker_socket_path = broker_socket_path
-        self.n_socket = n_socket    
+        self.n_socket = n_socket
 
-    def tunnel(self):
+    def tunnel(self, messaging_socket_path:str):
         """
         Set up connections and manage bidirectional tunneling.
         We need to connect to the broken only when there is an incoming connection from a client
@@ -41,7 +41,7 @@ class UnixSocketTunneler:
 
                 broker_socket_path = f"/tmp/mqtt_msg_{self.n_socket}.sock"
                 broker_sock.connect(broker_socket_path)
-                print(f"Connected to the broker on socket {broker_socket_path}")
+                Logger.print(f"Connected to the broker on socket {broker_socket_path} and tunneling with {messaging_socket_path}")
                 
                 while True:
                     rlist = []
@@ -66,7 +66,7 @@ class UnixSocketTunneler:
                             if data:
                                 client_to_broker_buffer += data
                             else:
-                                print("Client socket closed.")
+                                Logger.print(f"Client socket closed on {broker_socket_path}.")
                                 break
                         except BlockingIOError:
                             pass
@@ -78,7 +78,7 @@ class UnixSocketTunneler:
                             if data:
                                 broker_to_client_buffer += data
                             else:
-                                print("Broker socket closed.")
+                                Logger.print(f"Broker socket closed on {broker_socket_path}.")
                                 break
                         except BlockingIOError:
                             pass
@@ -99,16 +99,9 @@ class UnixSocketTunneler:
                         except BlockingIOError:
                             pass
 
-                # Fermeture des sockets proprement
-                #client_sock.close()
-                #broker_sock.close()
-
-                #print(f"Tunnel {self.client_socket_path} <--> {self.broker_socket_path} is broken")
             except socket.error as e:
-                print(f"{self.client_socket_path} --> {self.broker_socket_path}. Socket error: {e}.")
-                #time.sleep(5)  # Wait before retrying
+                Logger.print(f"{self.client_socket_path} --> {self.broker_socket_path}. Socket error: {e}.")
             finally:
-                #print("Close connections")
                 client_sock.close()
                 broker_sock.close()
                 time.sleep(1)  # Wait before retrying
@@ -117,21 +110,22 @@ class UnixSocketTunneler:
         client_sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         client_sock.connect(self.client_socket_path)
 
-        print(f"Connected to {self.client_socket_path} and waiting for data")
+        Logger.print(f"Connected to {self.client_socket_path} and waiting for data")
 
         ready_to_read, _, _ = select.select([client_sock], [], [])
         if client_sock in ready_to_read:
-            print("Client has connected.")
+            Logger.print("Client has connected.")
             return client_sock
 
 
 def create_msg_tunnel(client_socket:str, n_socket:int):
+    Logger.print(f"Creating new tunnel between client socket {client_socket} with ID {n_socket}.")
     tunneler = UnixSocketTunneler(client_socket, broker_msg_socket, n_socket)
-    tunneler.tunnel()
+    tunneler.tunnel(client_socket)
 
 
 def wait_for_broker_socket() -> bool:
-    print("Waiting for MQTT Broker sockets...")
+    Logger.print("Waiting for MQTT Broker sockets...")
     
     cmd = "find /var/run/ -name '{}'".format(broker_msg_socket)
 
@@ -142,12 +136,12 @@ def wait_for_broker_socket() -> bool:
         if len(files) == 0:
             time.sleep(1)
         else:
-            print("Broker sockets ready")
+            Logger.print("Broker sockets ready")
             return True
 
 
 def watch_msg_sockets():
-    print("Looking for msg mqtt sockets")
+    Logger.print("Looking for msg mqtt sockets")
 
     cmd = "find /var/run/ -name '*-msg.sock'"
     sockets = set()
@@ -161,7 +155,7 @@ def watch_msg_sockets():
         for file in new_files:
             if file == "":
                 continue
-            print(f"New messaging socket found : {file}")
+            Logger.print(f"New messaging socket found : {file}")
             threading.Thread(target=create_msg_tunnel, args=(file, n_socket)).start()
             n_socket += 1
 

@@ -1,6 +1,7 @@
 #!/sbin/openrc-run
 
 name="create-mqtt-tunnels"
+logfile="/var/log/psec/mqtt-tunnels.log"
 
 depend() {
     after start-domains
@@ -9,7 +10,12 @@ depend() {
 start() {
     ebegin "Create MQTT tunnels"
 
-    start-stop-daemon --start --make-pidfile --exec /usr/bin/python3 --pidfile /var/run/$name.pid --background -- /usr/lib/psec/bin/create-mqtt-tunnels.py
+    if grep -q "DEBUG=ON" "/proc/cmdline"; then
+        rm -f $logfile
+        start-stop-daemon --start --make-pidfile --exec /usr/bin/python3 --pidfile /var/run/$name.pid --background --stdout $logfile --stderr $logfile -- -u /usr/lib/psec/bin/create-mqtt-tunnels.py
+    else 
+        start-stop-daemon --start --make-pidfile --exec /usr/bin/python3 --pidfile /var/run/$name.pid --background -- /usr/lib/psec/bin/create-mqtt-tunnels.py
+    fi
 
     eend $?
 }
