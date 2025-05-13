@@ -25,6 +25,7 @@ init/splash.initd
 init/orchestrator.initd
 init/start-x.initd
 init/create-mqtt-tunnels.initd
+init/debug.initd
 
 scripts/create-local-alpine-repository.sh
 scripts/finish-core-init.sh
@@ -69,9 +70,8 @@ boot/Splash_1024_768.png
 misc/qemu-system-x86_64.cmd
 
 scripts/create-tty-tunnel.sh
-init/tty-tunnel.initd
 scripts/create-tty-terminal.sh
-init/tty-terminal.initd
+scripts/start-mqtt-logger.sh
 "
 
 PSEC_CONFDIR="etc/psec"
@@ -103,7 +103,7 @@ package() {
     install -D -m755 "$srcdir"/splash.initd "$pkgdir"/etc/init.d/splash
     install -D -m755 "$srcdir"/psec-core-controller.initd "$pkgdir"/etc/init.d/psec-core-controller
     install -D -m755 "$srcdir"/start-x.initd "$pkgdir"/etc/init.d/start-x
-    install -D -m755 "$srcdir"/orchestrator.initd "$pkgdir"/etc/init.d/orchestrator    
+    install -D -m755 "$srcdir"/orchestrator.initd "$pkgdir"/etc/init.d/orchestrator
     
     # Configuration
     install -D -m644 "$srcdir"/topology.json "$pkgdir/$PSEC_CONFDIR"/topology.json
@@ -158,10 +158,10 @@ package() {
     install -D -m644 "$srcdir"/mosquitto.conf "$pkgdir"/etc/mosquitto/mosquitto.conf
     install -D -m755 "$srcdir"/create-mqtt-tunnels.initd "$pkgdir"/etc/init.d/create-mqtt-tunnels        
 
-    # TTY tunnel
-    install -D -m755 "$srcdir"/tty-tunnel.initd "$pkgdir"/etc/init.d/tty-tunnel
-    install -D -m755 "$srcdir"/tty-terminal.initd "$pkgdir"/etc/init.d/tty-terminal
+    # Debugging
+    install -D -m755 "$srcdir"/debug.initd "$pkgdir"/etc/init.d/debug
     install -D -m755 "$srcdir"/create-tty-tunnel.sh "$pkgdir/$PSEC_BINDIR"/create-tty-tunnel.sh
     install -D -m755 "$srcdir"/create-tty-terminal.sh "$pkgdir/$PSEC_BINDIR"/create-tty-terminal.sh
+    install -D -m755 "$srcdir"/start-mqtt-logger.sh "$pkgdir/$PSEC_BINDIR"/start-mqtt-logger.sh
     install -D -m644 "$srcdir"/motd "$pkgdir/etc/motd"
 }
