@@ -12,7 +12,7 @@ def hexdump(data, prefix=""):
         chunk = data[i:i + 16]
         hex_bytes = " ".join(f"{byte:02x}" for byte in chunk)
         ascii_bytes = "".join(chr(byte) if 32 <= byte <= 126 else '.' for byte in chunk)
-        Logger.print(f"{prefix}{i:04x}: {hex_bytes:<48} {ascii_bytes}")
+        Logger.print(f"{prefix} {i:04x}: {hex_bytes:<48} {ascii_bytes}")
 
 class UnixSocketTunneler:
 
@@ -65,6 +65,8 @@ class UnixSocketTunneler:
                             data = client_sock.recv(4096)
                             if data:
                                 client_to_broker_buffer += data
+                                if DEBUG:
+                                    Logger.print(hexdump(data, f"from client @ {messaging_socket_path}"))
                             else:
                                 Logger.print(f"Client socket closed on {broker_socket_path}.")
                                 break
@@ -77,6 +79,8 @@ class UnixSocketTunneler:
                             data = broker_sock.recv(4096)
                             if data:
                                 broker_to_client_buffer += data
+                                if DEBUG:
+                                    Logger.print(hexdump(data, f"from broker for {messaging_socket_path}"))
                             else:
                                 Logger.print(f"Broker socket closed on {broker_socket_path}.")
                                 break
@@ -87,6 +91,8 @@ class UnixSocketTunneler:
                     if broker_sock in writable and client_to_broker_buffer:
                         try:
                             sent = broker_sock.send(client_to_broker_buffer)
+                            if DEBUG:
+                                Logger.print(hexdump(data, f"to broker from {messaging_socket_path}"))
                             client_to_broker_buffer = client_to_broker_buffer[sent:]
                         except BlockingIOError:
                             pass
@@ -95,6 +101,8 @@ class UnixSocketTunneler:
                     if client_sock in writable and broker_to_client_buffer:
                         try:
                             sent = client_sock.send(broker_to_client_buffer)
+                            if DEBUG:
+                                Logger.print(hexdump(data, f"to client @ {messaging_socket_path}"))
                             broker_to_client_buffer = broker_to_client_buffer[sent:]
                         except BlockingIOError:
                             pass

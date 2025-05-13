@@ -163,7 +163,7 @@ class Api(metaclass=SingletonMeta):
         self.__mqtt_client.publish("{}/request".format(Topics.DISCOVER_COMPONENTS), {})
 
 
-    def publish_components(self, components:list) -> None:        
+    def publish_components(self, components:list) -> None:
         payload = {
             "components": components
         }
@@ -212,7 +212,7 @@ class Api(metaclass=SingletonMeta):
     #    
     def __on_mqtt_connected(self):
         Logger().setup("Api", mqtt_client=self.__mqtt_client, recording=self.__recording, filename=self.__logfile)
-        self.subscribe(f"{Topics.DISKS}/+")
+        '''self.subscribe(f"{Topics.DISKS}/+")
         self.subscribe(f"{Topics.DISKS}/+/response")
         self.subscribe(f"{Topics.MISC}/+/response")
         self.subscribe(f"{Topics.DISCOVER}/+/response")
@@ -220,7 +220,7 @@ class Api(metaclass=SingletonMeta):
         self.subscribe(f"{Topics.ENERGY_STATE}/response")
         self.subscribe(f"{Topics.RESTART_DOMAIN}/response")
         self.subscribe(f"{Topics.SYSTEM_INFO}/response")
-        self.subscribe(Topics.ERROR)
+        self.subscribe(Topics.ERROR)'''
 
         for cb in self.__ready_callbacks:
             cb()
@@ -238,7 +238,10 @@ class Api(metaclass=SingletonMeta):
             return # Stop here
 
         for cb in self.__message_callbacks:
-            cb(topic, payload)
+            try:
+                cb(topic, payload)
+            except Exception:
+                Logger.print("An exception has been raised by the callback")                
 
 
     def __on_shutdown(self, payload:dict):

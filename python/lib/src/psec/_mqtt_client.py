@@ -44,6 +44,12 @@ class SerialSocket():
 
         return b""
 
+    def pending(self) -> int:
+        if self.serial is not None:
+            return self.serial.in_waiting
+        
+        return 0
+
     def send(self, buffer: bytes) -> int:
         if self.serial is not None and self.serial.is_open:
             #print("send:{}".format(buffer))
@@ -98,6 +104,7 @@ class SerialMQTTClient(mqtt.Client):
 
     def __do_loop(self):
         rc = MQTTErrorCode.MQTT_ERR_SUCCESS
+        timeout = 1.0
 
         while not self._thread_terminate:
             if self._sock is None:
@@ -106,10 +113,15 @@ class SerialMQTTClient(mqtt.Client):
                     self.on_connection_lost()
                 return
             
-            rlist, wlist, _ = select.select([self._sock], [self._sock], [], 1)
+            # if bytes are pending do not wait in select
+            pending_bytes = self._sock.pending()
+            if pending_bytes > 0:
+                timeout = 0.0
 
-            if rlist:
-                rc = self.loop_read()
+            rlist, wlist, _ = select.select([self._sock], [self._sock], [], timeout)
+
+            if rlist or pending_bytes > 0:
+                rc = self.loop_read()                
                 if rc != MQTTErrorCode.MQTT_ERR_SUCCESS:
                     print(f"Read error {rc}")
                     break
@@ -130,7 +142,7 @@ class SerialMQTTClient(mqtt.Client):
 
                 break
 
-            time.sleep(0.2)
+            #time.sleep(0.2)
 
         print("MQTT loop ended")
 
