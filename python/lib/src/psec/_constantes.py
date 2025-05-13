@@ -102,3 +102,4 @@ class Constantes(metaclass=SingletonMeta):
     PSEC_DISK_CONTROLLER = "psec_disk_controller"
     PSEC_INPUT_CONTROLLER = "psec_input_controller"
     PSEC_IO_BENCHMARK = "psec_io_benchmark"
+    PSEC_SYSTEM_CONTROLLER = "psec_system_controller"

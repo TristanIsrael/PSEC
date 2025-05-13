@@ -49,8 +49,16 @@ class SysUsbController():
         Logger().setup("USB controller", self.mqtt_client)
         Logger().debug("Starting PSEC disk controller")
 
-        self.mqtt_client.subscribe(f"{Topics.SYSTEM}/+/+/request")
-        self.mqtt_client.subscribe(f"{Topics.DISCOVER}/+/request")
+        self.mqtt_client.subscribe(f"{Topics.LIST_DISKS}/request")
+        self.mqtt_client.subscribe(f"{Topics.LIST_FILES}/request")
+        self.mqtt_client.subscribe(f"{Topics.COPY_FILE}/request")
+        self.mqtt_client.subscribe(f"{Topics.READ_FILE}/request")
+        self.mqtt_client.subscribe(f"{Topics.DELETE_FILE}/request")
+        self.mqtt_client.subscribe(f"{Topics.BENCHMARK}/request")
+        self.mqtt_client.subscribe(f"{Topics.FILE_FOOTPRINT}/request")
+        self.mqtt_client.subscribe(f"{Topics.CREATE_FILE}/request")
+        self.mqtt_client.subscribe(f"{Topics.DISCOVER_COMPONENTS}/request")
+        self.mqtt_client.subscribe(f"{Topics.DELETE_FILE}/request")
 
         # Démarrage de la surveillance des entrées
         if not NO_INPUTS_MONITORING:
@@ -62,17 +70,12 @@ class SysUsbController():
         self.__disk_monitor = DiskMonitor(Constantes().constante(Cles.CHEMIN_MONTAGE_USB), self.mqtt_client)
         threading.Thread(target=self.__disk_monitor.start).start()
 
-        payload = {
-            "components": [
-                {
-                "id": Constantes.PSEC_DISK_CONTROLLER,
-                "domain_name": "sys-usb",
-                "label": "System Disk controller",
-                "type": "core",
-                "state": EtatComposant.READY
-                }
-            ]
-        }
+        payload = ResponseFactory.create_response_component_state(
+            Constantes.PSEC_DISK_CONTROLLER,
+            "System Disk controller",
+            "sys-usb",
+            EtatComposant.READY
+        )
         
         self.mqtt_client.publish(f"{Topics.DISCOVER_COMPONENTS}/response", payload)
 

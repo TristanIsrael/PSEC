@@ -8,7 +8,7 @@ from . import Constantes, __version__
 from . import Logger, FichierHelper, Parametres, Cles
 from . import ResponseFactory
 from . import MqttClient, Topics, MqttHelper, NotificationFactory
-from . import System
+from . import System, EtatComposant
 
 class Dom0Controller():
     """ Cette classe traite les commandes envoyées par les Domaines et qui concernent le dépôt local et le 
@@ -35,15 +35,19 @@ class Dom0Controller():
     
 
     def __on_mqtt_connected(self):
-        Logger().debug("Starting Dom0 controller")        
-        self.mqtt_client.subscribe(f"{Topics.SYSTEM}/+/+/request") # All the system requests
+        Logger().debug("Starting Dom0 controller")
+        self.mqtt_client.subscribe(f"{Topics.LIST_FILES}/request")
+        self.mqtt_client.subscribe(f"{Topics.FILE_FOOTPRINT}/request")
+        self.mqtt_client.subscribe(f"{Topics.SHUTDOWN}/request")
+        self.mqtt_client.subscribe(f"{Topics.RESTART_DOMAIN}/request")
         self.mqtt_client.subscribe(Topics.GUI_READY)
         self.mqtt_client.subscribe(f"{Topics.SYSTEM_INFO}/request")
+        self.mqtt_client.subscribe(f"{Topics.ENERGY_STATE}/request")
+        self.mqtt_client.subscribe(f"{Topics.DELETE_FILE}/request")
+        self.mqtt_client.subscribe(Topics.DISCOVER_COMPONENTS)
 
 
     def __on_mqtt_message(self, topic:str, payload:dict):
-        #base_topic, _ = topic.rsplit("/", 1)
-
         # The message will be handled in a thread        
         threading.Thread(target=self.__message_worker, args=(topic, payload, )).start()
 
@@ -51,22 +55,27 @@ class Dom0Controller():
     def __message_worker(self, topic:str, payload:dict):
         """ Cette fonction traite uniquement les messages destinés au Dom0 """
         
-        if topic == f"{Topics.LIST_FILES}/request":
-            self.__handle_list_files(payload)
-        elif topic == f"{Topics.FILE_FOOTPRINT}/request":
-            self.__handle_file_footprint(payload)
-        elif topic == f"{Topics.SHUTDOWN}/request":
-            self.__handle_shutdown(payload)
-        elif topic == f"{Topics.RESTART_DOMAIN}/request":
-            self.__handle_restart_domain(payload)
-        elif topic == Topics.GUI_READY:
-            self.__handle_gui_ready(payload)
-        elif topic == f"{Topics.ENERGY_STATE}/request":
-            self.__handle_energy_state()
-        elif topic == f"{Topics.SYSTEM_INFO}/request":
-            self.__handle_system_info()
-        elif topic == f"{Topics.DELETE_FILE}/request":
-            self.__handle_delete_file(payload)
+        try:
+            if topic == f"{Topics.LIST_FILES}/request":
+                self.__handle_list_files(payload)
+            elif topic == f"{Topics.FILE_FOOTPRINT}/request":
+                self.__handle_file_footprint(payload)
+            elif topic == f"{Topics.SHUTDOWN}/request":
+                self.__handle_shutdown(payload)
+            elif topic == f"{Topics.RESTART_DOMAIN}/request":
+                self.__handle_restart_domain(payload)
+            elif topic == Topics.GUI_READY:
+                self.__handle_gui_ready(payload)
+            elif topic == f"{Topics.ENERGY_STATE}/request":
+                self.__handle_energy_state()
+            elif topic == f"{Topics.SYSTEM_INFO}/request":
+                self.__handle_system_info()
+            elif topic == f"{Topics.DELETE_FILE}/request":
+                self.__handle_delete_file(payload)
+            elif topic == f"{Topics.DISCOVER_COMPONENTS}/request":
+                self.__handle_discover_components()
+        except Exception:
+            Logger.print("An exception occured while handling the message")
 
 
 
@@ -75,7 +84,7 @@ class Dom0Controller():
             return 
 
         # Récupère la liste des fichiers                    
-        fichiers = FichierHelper.get_files_list(Constantes.REPOSITORY)
+        fichiers = FichierHelper.get_files_list(Constantes.REPOSITORY, True)
 
         # Génère la réponse
         response = ResponseFactory.create_response_list_files(Constantes.REPOSITORY, fichiers)
@@ -231,3 +240,12 @@ class Dom0Controller():
         else:
             Logger().info(f"Removed file {filepath} from repository")
         
+    def __handle_discover_components(self):
+        payload = ResponseFactory.create_response_component_state(
+            Constantes.PSEC_SYSTEM_CONTROLLER,
+            "System main controller",
+            "Dom0",
+            EtatComposant.READY
+        )
+
+        self.mqtt_client.publish(f"{Topics.DISCOVER_COMPONENTS}/response", payload)
