@@ -5,8 +5,7 @@ rc-service create-mqtt-tunnels stop
 rc-service mosquitto stop
 rc-service start-x stop
 rc-service orchestrator stop
-rc-service tty-terminal stop
-rc-service tty-tunnel stop
+rc-service debug stop
 
 # Stop all domains
 xl list | tail -n +3 | awk '{print $1}' | while read -r dom; do

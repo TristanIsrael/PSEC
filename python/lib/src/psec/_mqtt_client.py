@@ -201,7 +201,7 @@ class MqttClient():
                     self.mqtt_client.connect(host=mqtt_host, keepalive=30)
                 elif self.connection_type == ConnectionType.UNIX_SOCKET:
                     mqtt_host = self.connection_string
-                    self.mqtt_client.connect(host=mqtt_host, port=1, keepalive=2)
+                    self.mqtt_client.connect(host=mqtt_host, port=1, keepalive=5)
                 else:
                     print(f"The connection type {self.connection_type} is not handled")
                     return
@@ -225,7 +225,7 @@ class MqttClient():
 
             if DEBUG:
                 self.mqtt_client.on_log = self.__on_log
-            self.mqtt_client.connect(host="localhost", port=1, keepalive=2)
+            self.mqtt_client.connect(host="localhost", port=1, keepalive=5)
 
             self.mqtt_client.loop_start()
         else:

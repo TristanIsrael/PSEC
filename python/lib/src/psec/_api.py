@@ -258,7 +258,7 @@ class Api(metaclass=SingletonMeta):
             cb(domain_name, success, reason)
 
 api = Api()
-def cleanup():
+def cleanup(signum, frame):
     api.stop()
 
 atexit.register(cleanup)
