@@ -16,7 +16,7 @@ builddir="$srcdir/$pkgname-$pkgver"
 install="$pkgname.pre-install $pkgname.post-install $pkgname.pre-deinstall $pkgname.post-deinstall"
 checkdepends=""
 subpackages=""
-replaces="alpine-baselayout-data mosquitto grub openrc qemu-system-x86_64"
+replaces="alpine-baselayout alpine-baselayout-data mosquitto grub openrc qemu-system-x86_64"
 options="!check"  # no tests provided
 
 source="
@@ -48,7 +48,7 @@ conf/10-energy-saving.conf
 conf/topology.json
 conf/mosquitto.conf
 conf/rc.conf
-
+conf/motd
 conf/grub/grub.default
 conf/grub/grub.cfg-durabook-r8
 
@@ -163,4 +163,5 @@ package() {
     install -D -m755 "$srcdir"/tty-terminal.initd "$pkgdir"/etc/init.d/tty-terminal
     install -D -m755 "$srcdir"/create-tty-tunnel.sh "$pkgdir/$PSEC_BINDIR"/create-tty-tunnel.sh
     install -D -m755 "$srcdir"/create-tty-terminal.sh "$pkgdir/$PSEC_BINDIR"/create-tty-terminal.sh
+    install -D -m644 "$srcdir"/motd "$pkgdir/etc/motd"
 }

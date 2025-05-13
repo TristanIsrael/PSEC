@@ -1,5 +1,9 @@
 #!/bin/sh
 
+while [ ! -e "/dev/tty-admin" ]; do
+    sleep 1
+done
+
 while true; do
-    agetty -h -t 60 -L tty-admin vt102
+    setsid agetty -h -t 60 -L tty-admin vt100
 done
