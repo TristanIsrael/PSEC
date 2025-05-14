@@ -1,0 +1,224 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>psec._request_factory &mdash; PSEC 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            PSEC
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PSEC</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">psec._request_factory</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for psec._request_factory</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">Constantes</span><span class="p">,</span> <span class="n">Parametres</span><span class="p">,</span> <span class="n">Cles</span>
+
+<div class="viewcode-block" id="RequestFactory">
+<a class="viewcode-back" href="../../psec.html#psec.RequestFactory">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RequestFactory</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&#39;&#39;&#39; La classe MessageFactory permet de générer les notification, commandes et</span>
+<span class="sd">    erreurs utilisées dans le cadre des échanges entre domaines.</span>
+
+<span class="sd">    L&#39;émetteur de la commande est automatiquement ajouté lors de sa création.</span>
+
+<span class="sd">    Pour rappel les domaines impliqués dans le socle sont :</span>
+<span class="sd">    - sys-usb qui gère les accès aux supports USB</span>
+
+<span class="sd">    Les notification sont les suivantes :</span>
+<span class="sd">    - Le DomU informe le Dom0 qu&#39;il a démarré (DomU -&gt; Dom0)</span>
+<span class="sd">    - La sys-usb informe le Dom0 qu&#39;un support USB a été connecté (DomU -&gt; Dom0)</span>
+<span class="sd">    - La sys-usb informe le Dom0 qu&#39;un support USB a été déconnecté (DomU -&gt; Dom0)</span>
+
+<span class="sd">    Les commandes sont les suivantes :</span>
+<span class="sd">    - Journalisation</span>
+<span class="sd">      - Un domaine ajoute une entrée dans le journal (Dom* -&gt; Dom0)</span>
+<span class="sd">      - Le Dom0 enregistre le journal sur le support USB de sortie (DomU -&gt; Dom0)</span>
+<span class="sd">    - Système</span>
+<span class="sd">      - Le DomU demande l&#39;état d&#39;activation du débogage (DomU -&gt; Dom0)</span>
+<span class="sd">      - Le DomU demande le redémarrage du système (DomU -&gt; Dom0)</span>
+<span class="sd">      - Le DomU demande l&#39;arrêt du système (DomU -&gt; Dom0)</span>
+<span class="sd">      - Le DomU demande la réinitialisation d&#39;un autre DomU (DomU -&gt; Dom0)</span>
+<span class="sd">      - Le DomU demande le niveau de charge de la batterie (DomU -&gt; Dom0)</span>
+<span class="sd">      - Le DomU demande l&#39;état de l&#39;alimentation secteur (DomU -&gt; Dom0)</span>
+<span class="sd">    - Fichiers</span>
+<span class="sd">      - Le DomU demande la liste des fichiers d&#39;un support USB (DomU -&gt; Dom0 ; Dom0 -&gt; sys-usb)</span>
+<span class="sd">      - Le DomU demande la création d&#39;une archive sécurisée sur le support USB de sortie (DomU -&gt; Dom0 ; Dom0 -&gt; sys-usb)</span>
+<span class="sd">      - Le DomU demande l&#39;ajout d&#39;un fichier à l&#39;archive sécurisée sur le support USB de sortie (DomU -&gt; Dom0 ; Dom0 -&gt; sys-usb)</span>
+<span class="sd">      - Le DomU demande la copie d&#39;un fichier (DomU -&gt; Dom0 ; Dom0 -&gt; sys-usb)      </span>
+<span class="sd">    - Notifications</span>
+<span class="sd">      - Le DomU notifie l&#39;appui sur une touche de clavier (DomU -&gt; Dom0 -&gt; *)</span>
+<span class="sd">      - Le DomU notifie l&#39;appui sur un bouton de souris (DomU -&gt; Dom0 -&gt; *)</span>
+<span class="sd">      - Le DomU notifie le déplacement de la souris (DomU -&gt; Dom0 -&gt; *)</span>
+<span class="sd">      - Le DomU informe le toucher de l&#39;écran tactile (DomU -&gt; Dom0 -&gt; *)</span>
+<span class="sd">    </span>
+<span class="sd">    &#39;&#39;&#39;</span>    
+
+<div class="viewcode-block" id="RequestFactory.create_request_files_list">
+<a class="viewcode-back" href="../../psec.html#psec.RequestFactory.create_request_files_list">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_request_files_list</span><span class="p">(</span><span class="n">disk</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">recursive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">from_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span> 
+            <span class="s2">&quot;disk&quot;</span><span class="p">:</span> <span class="n">disk</span><span class="p">,</span>
+            <span class="s2">&quot;recursive&quot;</span><span class="p">:</span> <span class="n">recursive</span><span class="p">,</span>
+            <span class="s2">&quot;from_dir&quot;</span><span class="p">:</span> <span class="n">from_dir</span>
+            <span class="p">}</span></div>
+
+    
+<div class="viewcode-block" id="RequestFactory.create_request_read_file">
+<a class="viewcode-back" href="../../psec.html#psec.RequestFactory.create_request_read_file">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_request_read_file</span><span class="p">(</span><span class="n">disk</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">filepath</span> <span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;disk&quot;</span><span class="p">:</span> <span class="n">disk</span><span class="p">,</span>
+            <span class="s2">&quot;filepath&quot;</span><span class="p">:</span> <span class="n">filepath</span>
+        <span class="p">}</span>        </div>
+
+    
+<div class="viewcode-block" id="RequestFactory.create_request_copy_file">
+<a class="viewcode-back" href="../../psec.html#psec.RequestFactory.create_request_copy_file">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_request_copy_file</span><span class="p">(</span><span class="n">source_disk</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">destination_disk</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span> <span class="p">:</span>
+        <span class="c1"># Exemple :</span>
+        <span class="c1"># { filepath: &quot;Mon Disque:/répertoire/fichier&quot;, disk_destination: &quot;Autre disque&quot; }</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;disk&quot;</span><span class="p">:</span> <span class="n">source_disk</span><span class="p">,</span>
+            <span class="s2">&quot;filepath&quot;</span><span class="p">:</span> <span class="n">filepath</span><span class="p">,</span>
+            <span class="s2">&quot;destination&quot;</span><span class="p">:</span> <span class="n">destination_disk</span>
+        <span class="p">}</span>        </div>
+
+    
+<div class="viewcode-block" id="RequestFactory.create_request_delete_file">
+<a class="viewcode-back" href="../../psec.html#psec.RequestFactory.create_request_delete_file">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_request_delete_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">disk</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Constantes</span><span class="p">()</span><span class="o">.</span><span class="n">constante</span><span class="p">(</span><span class="n">Cles</span><span class="o">.</span><span class="n">DEPOT_LOCAL</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;filepath&quot;</span><span class="p">:</span> <span class="n">filepath</span><span class="p">,</span>
+            <span class="s2">&quot;disk&quot;</span><span class="p">:</span> <span class="n">disk</span>
+        <span class="p">}</span></div>
+
+    
+<div class="viewcode-block" id="RequestFactory.create_request_start_benchmark">
+<a class="viewcode-back" href="../../psec.html#psec.RequestFactory.create_request_start_benchmark">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_request_start_benchmark</span><span class="p">(</span><span class="n">id_benchmark</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;module&quot;</span><span class="p">:</span> <span class="n">id_benchmark</span>
+        <span class="p">}</span>        </div>
+
+
+<div class="viewcode-block" id="RequestFactory.create_request_get_file_footprint">
+<a class="viewcode-back" href="../../psec.html#psec.RequestFactory.create_request_get_file_footprint">[docs]</a>
+    <span class="nd">@staticmethod</span> 
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_request_get_file_footprint</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">disk</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;filepath&quot;</span><span class="p">:</span> <span class="n">filepath</span><span class="p">,</span>
+            <span class="s2">&quot;disk&quot;</span><span class="p">:</span> <span class="n">disk</span>
+        <span class="p">}</span>        </div>
+
+    
+<div class="viewcode-block" id="RequestFactory.create_request_create_file">
+<a class="viewcode-back" href="../../psec.html#psec.RequestFactory.create_request_create_file">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_request_create_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">disk</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">contents</span><span class="p">:</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">compressed</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;filepath&quot;</span><span class="p">:</span> <span class="n">filepath</span><span class="p">,</span>
+            <span class="s2">&quot;disk&quot;</span><span class="p">:</span> <span class="n">disk</span><span class="p">,</span>
+            <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">contents</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;compressed&quot;</span><span class="p">:</span> <span class="n">compressed</span>
+        <span class="p">}</span>    </div>
+
+
+<div class="viewcode-block" id="RequestFactory.create_request_restart_domain">
+<a class="viewcode-back" href="../../psec.html#psec.RequestFactory.create_request_restart_domain">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_request_restart_domain</span><span class="p">(</span><span class="n">domain_name</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;domain_name&quot;</span><span class="p">:</span> <span class="n">domain_name</span>
+        <span class="p">}</span>    </div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Tristan Israël.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

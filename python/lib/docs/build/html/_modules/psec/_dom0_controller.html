@@ -1,0 +1,355 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>psec._dom0_controller &mdash; PSEC 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            PSEC
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PSEC</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">psec._dom0_controller</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for psec._dom0_controller</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">platform</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">psutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">Constantes</span><span class="p">,</span> <span class="n">__version__</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">Logger</span><span class="p">,</span> <span class="n">FichierHelper</span><span class="p">,</span> <span class="n">Parametres</span><span class="p">,</span> <span class="n">Cles</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResponseFactory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">MqttClient</span><span class="p">,</span> <span class="n">Topics</span><span class="p">,</span> <span class="n">MqttHelper</span><span class="p">,</span> <span class="n">NotificationFactory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">System</span><span class="p">,</span> <span class="n">EtatComposant</span>
+
+<div class="viewcode-block" id="Dom0Controller">
+<a class="viewcode-back" href="../../psec.html#psec.Dom0Controller">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Dom0Controller</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Cette classe traite les commandes envoyées par les Domaines et qui concernent le dépôt local et le </span>
+<span class="sd">    système en général (supervision, configuration, etc).</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>    
+
+    <span class="n">__mqtt_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
+    <span class="n">__is_shutting_down</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mqtt_client</span><span class="p">:</span> <span class="n">MqttClient</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span> <span class="o">=</span> <span class="n">mqtt_client</span>
+
+        <span class="c1"># Handle Mqtt messages</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">on_connected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__on_mqtt_connected</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">on_message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__on_mqtt_message</span>
+        
+        <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="s2">&quot;System controller&quot;</span><span class="p">,</span> <span class="n">mqtt_client</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Dom0Controller.start">
+<a class="viewcode-back" href="../../psec.html#psec.Dom0Controller.start">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_lock</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span></div>
+
+    
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__on_mqtt_connected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Starting Dom0 controller&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">LIST_FILES</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">FILE_FOOTPRINT</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">SHUTDOWN</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">RESTART_DOMAIN</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">GUI_READY</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">SYSTEM_INFO</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">ENERGY_STATE</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">DELETE_FILE</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">DISCOVER_COMPONENTS</span><span class="p">)</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__on_mqtt_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
+        <span class="c1"># The message will be handled in a thread        </span>
+        <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__message_worker</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="n">payload</span><span class="p">,</span> <span class="p">))</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__message_worker</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Cette fonction traite uniquement les messages destinés au Dom0 &quot;&quot;&quot;</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">topic</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">LIST_FILES</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__handle_list_files</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">topic</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">FILE_FOOTPRINT</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__handle_file_footprint</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">topic</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">SHUTDOWN</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__handle_shutdown</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">topic</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">RESTART_DOMAIN</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__handle_restart_domain</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">topic</span> <span class="o">==</span> <span class="n">Topics</span><span class="o">.</span><span class="n">GUI_READY</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__handle_gui_ready</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">topic</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">ENERGY_STATE</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__handle_energy_state</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">topic</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">SYSTEM_INFO</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__handle_system_info</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">topic</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">DELETE_FILE</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__handle_delete_file</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">topic</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">DISCOVER_COMPONENTS</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__handle_discover_components</span><span class="p">()</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">Logger</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;An exception occured while handling the message&quot;</span><span class="p">)</span>
+
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__handle_list_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span><span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_storage_request</span><span class="p">(</span><span class="n">payload</span><span class="p">):</span>
+            <span class="k">return</span> 
+
+        <span class="c1"># Récupère la liste des fichiers                    </span>
+        <span class="n">fichiers</span> <span class="o">=</span> <span class="n">FichierHelper</span><span class="o">.</span><span class="n">get_files_list</span><span class="p">(</span><span class="n">Constantes</span><span class="o">.</span><span class="n">REPOSITORY</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Génère la réponse</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">ResponseFactory</span><span class="o">.</span><span class="n">create_response_list_files</span><span class="p">(</span><span class="n">Constantes</span><span class="o">.</span><span class="n">REPOSITORY</span><span class="p">,</span> <span class="n">fichiers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">LIST_FILES</span><span class="si">}</span><span class="s2">/response&quot;</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__handle_file_footprint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span><span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_storage_request</span><span class="p">(</span><span class="n">payload</span><span class="p">):</span>
+            <span class="k">return</span>
+                    
+        <span class="n">filepath</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;filepath&quot;</span><span class="p">)</span>
+        <span class="n">disk</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;disk&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">filepath</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">disk</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># S&#39;il manque un argument on envoie une erreur</span>
+            <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;La commande est incomplète : il manque le nom du disque et/ou le chemin du fichier&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        
+        <span class="c1"># Calcule l&#39;empreinte</span>
+        <span class="n">repository_path</span> <span class="o">=</span> <span class="n">Parametres</span><span class="p">()</span><span class="o">.</span><span class="n">parametre</span><span class="p">(</span><span class="n">Cles</span><span class="o">.</span><span class="n">CHEMIN_DEPOT_DOM0</span><span class="p">)</span>
+        <span class="n">footprint</span> <span class="o">=</span> <span class="n">FichierHelper</span><span class="o">.</span><span class="n">calculate_footprint</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repository_path</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Footprint = </span><span class="si">{</span><span class="n">footprint</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        
+        <span class="c1"># Génère la réponse</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">ResponseFactory</span><span class="o">.</span><span class="n">create_response_file_footprint</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">disk</span><span class="p">,</span> <span class="n">footprint</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">FILE_FOOTPRINT</span><span class="si">}</span><span class="s2">/response&quot;</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__handle_shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_shutting_down</span><span class="p">:</span>
+            <span class="k">return</span>
+        
+        <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;System shutdown requested!&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__is_shutting_down</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># There is currently no rule for the shutdown, so we accept it</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">ResponseFactory</span><span class="o">.</span><span class="n">create_response_shutdown</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">SHUTDOWN</span><span class="si">}</span><span class="s2">/response&quot;</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span>
+
+        <span class="c1"># We wait 5 seconds to let the GUIs and clients acknowledge the information</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+        <span class="c1"># Then we shut the system down</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;poweroff&quot;</span><span class="p">]</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__handle_restart_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">MqttHelper</span><span class="o">.</span><span class="n">check_payload</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;domain_name&quot;</span><span class="p">]):</span>
+            <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing argument domain_name in the topic </span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">RESTART_DOMAIN</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        
+        <span class="n">domain_name</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;domain_name&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__reboot_domain</span><span class="p">(</span><span class="n">domain_name</span><span class="p">)</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__handle_gui_ready</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
+        <span class="c1"># When GUI is ready we hide the splash screen</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;killall&quot;</span><span class="p">,</span> <span class="s2">&quot;feh&quot;</span><span class="p">]</span>
+        <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__is_storage_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span><span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;disk&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;disk&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">Constantes</span><span class="o">.</span><span class="n">REPOSITORY</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__reboot_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_name</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;xl&quot;</span><span class="p">,</span> <span class="s2">&quot;reboot&quot;</span><span class="p">,</span> <span class="n">domain_name</span><span class="p">]</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rebooting domain </span><span class="si">{</span><span class="n">domain_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">ResponseFactory</span><span class="o">.</span><span class="n">create_response_restart_domain</span><span class="p">(</span><span class="n">domain_name</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">RESTART_DOMAIN</span><span class="si">}</span><span class="s2">/response&quot;</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The domain </span><span class="si">{</span><span class="n">domain_name</span><span class="si">}</span><span class="s2"> won&#39;t reboot&quot;</span><span class="p">)</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">ResponseFactory</span><span class="o">.</span><span class="n">create_response_restart_domain</span><span class="p">(</span><span class="n">domain_name</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">RESTART_DOMAIN</span><span class="si">}</span><span class="s2">/response&quot;</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__handle_energy_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">battery</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">sensors_battery</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">battery</span><span class="p">:</span>
+            <span class="n">payload</span> <span class="o">=</span> <span class="n">NotificationFactory</span><span class="o">.</span><span class="n">create_notification_energy_state</span><span class="p">(</span><span class="n">battery</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">ENERGY_STATE</span><span class="si">}</span><span class="s2">/response&quot;</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__handle_system_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;core&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="n">__version__</span><span class="p">,</span>
+                <span class="s2">&quot;debug_on&quot;</span><span class="p">:</span> <span class="n">System</span><span class="o">.</span><span class="n">debug_activated</span><span class="p">()</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;system&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;os&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">(),</span>
+                    <span class="s2">&quot;release&quot;</span><span class="p">:</span> <span class="n">platform</span><span class="o">.</span><span class="n">release</span><span class="p">(),</span>
+                    <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="n">platform</span><span class="o">.</span><span class="n">version</span><span class="p">()</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;machine&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;arch&quot;</span><span class="p">:</span> <span class="n">platform</span><span class="o">.</span><span class="n">machine</span><span class="p">(),</span>
+                    <span class="s2">&quot;processor&quot;</span><span class="p">:</span> <span class="n">platform</span><span class="o">.</span><span class="n">processor</span><span class="p">(),</span>
+                    <span class="s2">&quot;platform&quot;</span><span class="p">:</span> <span class="n">platform</span><span class="o">.</span><span class="n">platform</span><span class="p">(),</span>
+                    <span class="s2">&quot;cpu&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_count</span><span class="p">(),</span>
+                        <span class="s2">&quot;freq_current&quot;</span><span class="p">:</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_freq</span><span class="p">()</span><span class="o">.</span><span class="n">current</span><span class="p">,</span>
+                        <span class="s2">&quot;freq_min&quot;</span><span class="p">:</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_freq</span><span class="p">()</span><span class="o">.</span><span class="n">min</span><span class="p">,</span>
+                        <span class="s2">&quot;freq_max&quot;</span><span class="p">:</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_freq</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">,</span>
+                        <span class="s2">&quot;percent&quot;</span><span class="p">:</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_percent</span><span class="p">()</span>
+                    <span class="p">},</span>
+                    <span class="s2">&quot;memory&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;total&quot;</span><span class="p">:</span> <span class="n">psutil</span><span class="o">.</span><span class="n">virtual_memory</span><span class="p">()</span><span class="o">.</span><span class="n">total</span><span class="p">,</span>
+                        <span class="s2">&quot;available&quot;</span><span class="p">:</span> <span class="n">psutil</span><span class="o">.</span><span class="n">virtual_memory</span><span class="p">()</span><span class="o">.</span><span class="n">available</span><span class="p">,</span>
+                        <span class="s2">&quot;percent&quot;</span><span class="p">:</span> <span class="n">psutil</span><span class="o">.</span><span class="n">virtual_memory</span><span class="p">()</span><span class="o">.</span><span class="n">percent</span><span class="p">,</span>
+                        <span class="s2">&quot;used&quot;</span><span class="p">:</span> <span class="n">psutil</span><span class="o">.</span><span class="n">virtual_memory</span><span class="p">()</span><span class="o">.</span><span class="n">used</span><span class="p">,</span>
+                        <span class="s2">&quot;free&quot;</span><span class="p">:</span> <span class="n">psutil</span><span class="o">.</span><span class="n">virtual_memory</span><span class="p">()</span><span class="o">.</span><span class="n">free</span>
+                    <span class="p">},</span>
+                    <span class="s2">&quot;load&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;1&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getloadavg</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
+                        <span class="s2">&quot;5&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getloadavg</span><span class="p">()[</span><span class="mi">1</span><span class="p">],</span>
+                        <span class="s2">&quot;15&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getloadavg</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span>
+                    <span class="p">}</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;boot_time&quot;</span><span class="p">:</span> <span class="n">psutil</span><span class="o">.</span><span class="n">boot_time</span><span class="p">(),</span>
+                <span class="s2">&quot;uuid&quot;</span><span class="p">:</span> <span class="n">System</span><span class="p">()</span><span class="o">.</span><span class="n">get_system_uuid</span><span class="p">()</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">SYSTEM_INFO</span><span class="si">}</span><span class="s2">/response&quot;</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__handle_delete_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">MqttHelper</span><span class="o">.</span><span class="n">check_payload</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;disk&quot;</span><span class="p">,</span> <span class="s2">&quot;filepath&quot;</span><span class="p">]):</span>
+            <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The command </span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">DELETE_FILE</span><span class="si">}</span><span class="s2"> misses argument(s)&quot;</span><span class="p">,</span> <span class="s2">&quot;Dom0&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">disk</span> <span class="o">=</span> <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;disk&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">disk</span> <span class="o">!=</span> <span class="n">Constantes</span><span class="o">.</span><span class="n">REPOSITORY</span><span class="p">:</span>
+            <span class="c1"># This file is not stored in the repository so we ignore it</span>
+            <span class="k">return</span>
+
+        <span class="n">filepath</span> <span class="o">=</span> <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;filepath&quot;</span><span class="p">]</span>
+        <span class="n">repository_path</span> <span class="o">=</span> <span class="n">Parametres</span><span class="p">()</span><span class="o">.</span><span class="n">parametre</span><span class="p">(</span><span class="n">Cles</span><span class="o">.</span><span class="n">CHEMIN_DEPOT_DOM0</span><span class="p">)</span>
+        <span class="n">storage_filepath</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repository_path</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">FichierHelper</span><span class="p">()</span><span class="o">.</span><span class="n">remove_file</span><span class="p">(</span><span class="n">storage_filepath</span><span class="p">):</span>
+            <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Removal of file </span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2"> from repository failed&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Removed file </span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2"> from repository&quot;</span><span class="p">)</span>
+        
+    <span class="k">def</span><span class="w"> </span><span class="nf">__handle_discover_components</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="n">ResponseFactory</span><span class="o">.</span><span class="n">create_response_component_state</span><span class="p">(</span>
+            <span class="n">Constantes</span><span class="o">.</span><span class="n">PSEC_SYSTEM_CONTROLLER</span><span class="p">,</span>
+            <span class="s2">&quot;System main controller&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Dom0&quot;</span><span class="p">,</span>
+            <span class="n">EtatComposant</span><span class="o">.</span><span class="n">READY</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">DISCOVER_COMPONENTS</span><span class="si">}</span><span class="s2">/response&quot;</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Tristan Israël.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

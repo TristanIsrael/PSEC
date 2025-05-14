@@ -1,0 +1,224 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>psec._constantes &mdash; PSEC 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            PSEC
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PSEC</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">psec._constantes</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for psec._constantes</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingletonMeta</span>
+
+<div class="viewcode-block" id="Cles">
+<a class="viewcode-back" href="../../psec.html#psec.Cles">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Cles</span><span class="p">:</span> 
+    <span class="n">NIVEAU_JOURNAL</span> <span class="o">=</span> <span class="s2">&quot;niveau_debug&quot;</span>
+    <span class="n">CHEMIN_JOURNAL</span> <span class="o">=</span> <span class="s2">&quot;chemin_journal&quot;</span>
+    <span class="n">CHEMIN_JOURNAL_LOCAL</span> <span class="o">=</span> <span class="s2">&quot;chemin_journal_local&quot;</span>
+    <span class="n">IDENTIFIANT_DOMAINE</span> <span class="o">=</span> <span class="s2">&quot;identifiant_domaine&quot;</span>
+    <span class="n">CHEMIN_SOCKET_INPUT_DOMU</span> <span class="o">=</span> <span class="s2">&quot;chemin_socket_input_domu&quot;</span>
+    <span class="n">CHEMIN_SOCKET_INPUT_DOM0</span> <span class="o">=</span> <span class="s2">&quot;chemin_socket_input_dom0&quot;</span>
+    <span class="n">CHEMIN_SOCKETS_JOURNAL</span> <span class="o">=</span> <span class="s2">&quot;chemin_sockets_log&quot;</span>     
+    <span class="n">CHEMIN_SOCKETS_MESSAGERIE</span> <span class="o">=</span> <span class="s2">&quot;chemin_sockets_msg&quot;</span>    
+    <span class="c1">#CHEMIN_SOCKET_API = &quot;chemin_socket_api&quot;</span>
+    <span class="c1">#CHEMIN_FICHIER_CONFIG_LOCAL = &quot;chemin_fichier_config_local&quot;</span>
+    <span class="n">CHEMIN_FICHIER_CONFIG_GLOBAL</span> <span class="o">=</span> <span class="s2">&quot;chemin_fichier_config_global&quot;</span>        
+    <span class="n">TAILLE_TRAME</span> <span class="o">=</span> <span class="s2">&quot;taille_trame&quot;</span>    
+    <span class="n">CHEMIN_FICHIERS_PID</span> <span class="o">=</span> <span class="s2">&quot;chemin_fichiers_pid&quot;</span>
+    <span class="n">CHEMIN_MONTAGE_USB</span> <span class="o">=</span> <span class="s2">&quot;chemin_montage_usb&quot;</span>
+    <span class="n">DEPOT_LOCAL</span> <span class="o">=</span> <span class="s2">&quot;depot_local&quot;</span>
+    <span class="n">ACTIVE_JOURNAL_LOCAL</span> <span class="o">=</span> <span class="s2">&quot;active_journal_local&quot;</span>
+    <span class="n">NOM_DOMAINE_GUI</span> <span class="o">=</span> <span class="s2">&quot;nom_domaine_gui&quot;</span>
+    <span class="n">BENCHMARK_INPUTS_ITERATIONS</span> <span class="o">=</span> <span class="s2">&quot;benchmark_inputs_iterations&quot;</span>
+    <span class="n">CHEMIN_DEPOT_DOM0</span> <span class="o">=</span> <span class="s2">&quot;chemin_depot_dom0&quot;</span>        
+
+    <span class="n">SERIAL_PORT_MSG</span> <span class="o">=</span> <span class="s2">&quot;serial_port_msg&quot;</span>
+    <span class="n">SERIAL_PORT_LOG</span> <span class="o">=</span> <span class="s2">&quot;serial_port_log&quot;</span>
+    <span class="n">MQTT_MSG_BROKER_SOCKET</span> <span class="o">=</span> <span class="s2">&quot;mqtt_msg_broker_socket&quot;</span>    
+    <span class="n">MQTT_MSG_BROKER_SOCKETS</span> <span class="o">=</span> <span class="s2">&quot;mqtt_msg_broker_sockets&quot;</span>    
+    <span class="n">MQTT_LOG_BROKER_SOCKET</span> <span class="o">=</span> <span class="s2">&quot;mqtt_log_broker_socket&quot;</span>
+    <span class="n">MQTT_MSG_SOCKET_FILTER</span> <span class="o">=</span> <span class="s2">&quot;mqtt_msg_socket_filter&quot;</span>
+    <span class="n">MQTT_LOG_SOCKET_FILTER</span> <span class="o">=</span> <span class="s2">&quot;mqtt_log_socket_filter&quot;</span>
+    <span class="n">XEN_SOCKETS_PATH</span> <span class="o">=</span> <span class="s2">&quot;xen_sockets_path&quot;</span>
+    <span class="n">STORAGE_PATH_DOMU</span> <span class="o">=</span> <span class="s2">&quot;storage_path_domu&quot;</span></div>
+
+
+<div class="viewcode-block" id="TypeEntree">
+<a class="viewcode-back" href="../../psec.html#psec.TypeEntree">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TypeEntree</span><span class="p">:</span>
+    <span class="n">INCONNU</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">CLAVIER</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">SOURIS</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">TOUCH</span> <span class="o">=</span> <span class="mi">3</span></div>
+
+
+<div class="viewcode-block" id="BoutonSouris">
+<a class="viewcode-back" href="../../psec.html#psec.BoutonSouris">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BoutonSouris</span><span class="p">():</span>
+    <span class="n">AUCUN</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">GAUCHE</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">MILIEU</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">DROIT</span> <span class="o">=</span> <span class="mi">3</span></div>
+
+
+<div class="viewcode-block" id="BenchmarkId">
+<a class="viewcode-back" href="../../psec.html#psec.BenchmarkId">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BenchmarkId</span><span class="p">():</span>
+    <span class="n">INPUTS</span> <span class="o">=</span> <span class="s2">&quot;inputs&quot;</span>
+    <span class="n">FILES</span> <span class="o">=</span> <span class="s2">&quot;files&quot;</span></div>
+
+
+<div class="viewcode-block" id="EtatComposant">
+<a class="viewcode-back" href="../../psec.html#psec.EtatComposant">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EtatComposant</span><span class="p">():</span>
+    <span class="n">UNKNOWN</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
+    <span class="n">STARTING</span> <span class="o">=</span> <span class="s2">&quot;starting&quot;</span>
+    <span class="n">READY</span> <span class="o">=</span> <span class="s2">&quot;ready&quot;</span>
+    <span class="n">ERROR</span> <span class="o">=</span> <span class="s2">&quot;error&quot;</span></div>
+
+
+<div class="viewcode-block" id="Constantes">
+<a class="viewcode-back" href="../../psec.html#psec.Constantes">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Constantes</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">SingletonMeta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Classe définissant des constantes pour le système&quot;&quot;&quot;</span>        
+
+    <span class="n">constantes</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">Cles</span><span class="o">.</span><span class="n">SERIAL_PORT_MSG</span><span class="p">:</span> <span class="s2">&quot;/dev/hvc1&quot;</span><span class="p">,</span>
+        <span class="n">Cles</span><span class="o">.</span><span class="n">SERIAL_PORT_LOG</span><span class="p">:</span> <span class="s2">&quot;/dev/hvc2&quot;</span><span class="p">,</span>
+        <span class="n">Cles</span><span class="o">.</span><span class="n">MQTT_MSG_BROKER_SOCKET</span><span class="p">:</span> <span class="s2">&quot;/tmp/mqtt_msg_dom0.sock&quot;</span><span class="p">,</span>
+        <span class="n">Cles</span><span class="o">.</span><span class="n">MQTT_MSG_BROKER_SOCKETS</span><span class="p">:</span> <span class="s2">&quot;/tmp/mqtt_msg*.sock&quot;</span><span class="p">,</span>
+        <span class="n">Cles</span><span class="o">.</span><span class="n">MQTT_LOG_BROKER_SOCKET</span><span class="p">:</span> <span class="s2">&quot;/tmp/mqtt_log.sock&quot;</span><span class="p">,</span>
+        <span class="n">Cles</span><span class="o">.</span><span class="n">MQTT_MSG_SOCKET_FILTER</span><span class="p">:</span> <span class="s2">&quot;/var/run/*-msg.sock&quot;</span><span class="p">,</span>
+        <span class="n">Cles</span><span class="o">.</span><span class="n">MQTT_LOG_SOCKET_FILTER</span><span class="p">:</span> <span class="s2">&quot;/var/run/*-log.sock&quot;</span><span class="p">,</span>
+        <span class="n">Cles</span><span class="o">.</span><span class="n">XEN_SOCKETS_PATH</span><span class="p">:</span> <span class="s2">&quot;/var/run&quot;</span><span class="p">,</span>
+
+        <span class="n">Cles</span><span class="o">.</span><span class="n">CHEMIN_FICHIER_CONFIG_GLOBAL</span><span class="p">:</span> <span class="s2">&quot;/etc/psec/global.conf&quot;</span><span class="p">,</span>        
+        <span class="c1"># Sockets pv channel entre Dom0 et DomU        </span>
+        <span class="n">Cles</span><span class="o">.</span><span class="n">CHEMIN_SOCKET_INPUT_DOMU</span><span class="p">:</span> <span class="s2">&quot;/dev/hvc2&quot;</span><span class="p">,</span>
+        <span class="c1">#Cles.CHEMIN_SOCKET_API: &quot;/run/panoptiscan.sock&quot;,</span>
+        <span class="n">Cles</span><span class="o">.</span><span class="n">TAILLE_TRAME</span><span class="p">:</span> <span class="mi">1024</span><span class="p">,</span>
+        <span class="c1"># Journalisations</span>
+        <span class="n">Cles</span><span class="o">.</span><span class="n">CHEMIN_JOURNAL_LOCAL</span><span class="p">:</span> <span class="s2">&quot;/var/log/psec/psec.log&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;format_chaine_log_prod&quot;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)-8s</span><span class="s1"> </span><span class="si">%(domaine)-10s</span><span class="s1"> [</span><span class="si">%(entite)-20s</span><span class="s1">] </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+        <span class="s2">&quot;format_chaine_log_debug&quot;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(levelname)-8s</span><span class="s1"> </span><span class="si">%(domaine)-10s</span><span class="s1"> [</span><span class="si">%(entite)-20s</span><span class="s1">] </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>        
+        <span class="c1">#Cles.CHEMIN_SOCKETS_JOURNAL: &quot;/var/run&quot;,</span>
+        <span class="c1">#Cles.CHEMIN_SOCKETS_MESSAGERIE: &quot;/var/run&quot;,</span>
+        <span class="c1">#Cles.CHEMIN_SOCKETS_DOM0: &quot;/var/run&quot;,</span>
+        <span class="n">Cles</span><span class="o">.</span><span class="n">CHEMIN_SOCKET_INPUT_DOM0</span><span class="p">:</span> <span class="s2">&quot;/var/run/sys-usb-input.sock&quot;</span><span class="p">,</span>
+        <span class="n">Cles</span><span class="o">.</span><span class="n">CHEMIN_FICHIERS_PID</span><span class="p">:</span> <span class="s2">&quot;/tmp&quot;</span><span class="p">,</span>        
+        <span class="n">Cles</span><span class="o">.</span><span class="n">CHEMIN_MONTAGE_USB</span><span class="p">:</span> <span class="s2">&quot;/media/usb&quot;</span><span class="p">,</span> <span class="c1">#/mnt</span>
+        <span class="n">Cles</span><span class="o">.</span><span class="n">DEPOT_LOCAL</span><span class="p">:</span> <span class="s2">&quot;depot_local&quot;</span><span class="p">,</span>
+        <span class="n">Cles</span><span class="o">.</span><span class="n">ACTIVE_JOURNAL_LOCAL</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;chemin_fichier_config_global&quot;</span><span class="p">:</span> <span class="s2">&quot;/etc/psec/global.conf&quot;</span><span class="p">,</span>
+        <span class="n">Cles</span><span class="o">.</span><span class="n">NOM_DOMAINE_GUI</span><span class="p">:</span> <span class="s2">&quot;sys-gui&quot;</span><span class="p">,</span>
+        <span class="n">Cles</span><span class="o">.</span><span class="n">BENCHMARK_INPUTS_ITERATIONS</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
+        <span class="n">Cles</span><span class="o">.</span><span class="n">CHEMIN_DEPOT_DOM0</span><span class="p">:</span> <span class="s2">&quot;/usr/lib/psec/storage&quot;</span><span class="p">,</span>
+        <span class="n">Cles</span><span class="o">.</span><span class="n">STORAGE_PATH_DOMU</span><span class="p">:</span> <span class="s2">&quot;/mnt/storage&quot;</span>
+    <span class="p">}</span>                
+
+<div class="viewcode-block" id="Constantes.constante">
+<a class="viewcode-back" href="../../psec.html#psec.Constantes.constante">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">constante</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cle</span><span class="p">):</span>
+        <span class="n">valeur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">constantes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cle</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">valeur</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">valeur</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+        
+    <span class="n">REPOSITORY</span> <span class="o">=</span> <span class="s2">&quot;__repository__&quot;</span>
+    <span class="n">FOOTPRINT_METHOD</span> <span class="o">=</span> <span class="s2">&quot;md5&quot;</span>
+    <span class="n">PSEC_DISK_CONTROLLER</span> <span class="o">=</span> <span class="s2">&quot;psec_disk_controller&quot;</span>
+    <span class="n">PSEC_INPUT_CONTROLLER</span> <span class="o">=</span> <span class="s2">&quot;psec_input_controller&quot;</span>
+    <span class="n">PSEC_IO_BENCHMARK</span> <span class="o">=</span> <span class="s2">&quot;psec_io_benchmark&quot;</span>
+    <span class="n">PSEC_SYSTEM_CONTROLLER</span> <span class="o">=</span> <span class="s2">&quot;psec_system_controller&quot;</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Tristan Israël.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

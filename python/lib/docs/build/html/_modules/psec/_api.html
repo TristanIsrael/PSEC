@@ -1,0 +1,768 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>psec._api &mdash; PSEC 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            PSEC
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PSEC</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">psec._api</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for psec._api</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">Constantes</span><span class="p">,</span> <span class="n">RequestFactory</span><span class="p">,</span> <span class="n">Topics</span><span class="p">,</span> <span class="n">NotificationFactory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">Logger</span><span class="p">,</span> <span class="n">MqttClient</span><span class="p">,</span> <span class="n">ConnectionType</span><span class="p">,</span> <span class="n">Cles</span><span class="p">,</span> <span class="n">SingletonMeta</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">zlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">base64</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">atexit</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">signal</span>
+
+<div class="viewcode-block" id="Api">
+<a class="viewcode-back" href="../../psec.html#psec.Api">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Api</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">SingletonMeta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">    This class allows a third-party program to send commands or receive notifications without needing to use the socket directly.</span>
+
+<span class="sd">    The API provides a simple set of instructions for sending commands and receiving notifications. However, it does not handle the formatting of commands, which is managed by the RequestFactory, ResponseFactory, or NotificationFactory classes.</span>
+
+<span class="sd">    The API can only be used within a user domain (Domain).</span>
+
+<span class="sd">    To use the API, simply instantiate the Api class and open the socket by calling the start() function. Then, the other functions allow for sending and receiving messages and notifications.</span>
+
+<span class="sd">    Asynchronous</span>
+<span class="sd">    ============</span>
+
+<span class="sd">    All commands operate asynchronously. The result of executing a command will only be communicated through a notification or a response. Therefore, a callback function must be provided to the API in order to receive responses. The internal topics</span>
+<span class="sd">    provided in the :class:`Topics` use the suffix `/request` and `/response` to differenciate the query and the answer. When an answer is expected on a topic, it will always be suffixed with `/response`.</span>
+
+<span class="sd">    Subscription</span>
+<span class="sd">    ============</span>
+
+<span class="sd">    **The messages and notifications can be received only when the following conditions are met:**</span>
+
+<span class="sd">    - The topic has been subscribed (see :func:`Api.subscribe`)</span>
+<span class="sd">    - A message callback function has been provided (see :func:`Api.add_message_callback`)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">__ready_callbacks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">__message_callbacks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">__subscriptions</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">__shutdown_callbacks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">__restart_callbacks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">__recording</span> <span class="o">=</span> <span class="kc">False</span>
+
+
+<div class="viewcode-block" id="Api.start">
+<a class="viewcode-back" href="../../psec.html#psec.Api.start">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mqtt_client</span><span class="p">:</span><span class="n">MqttClient</span><span class="p">,</span> <span class="n">recording</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">logfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">(),</span> <span class="s2">&quot;journal.log&quot;</span><span class="p">)):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Starts the API by connecting to the MQTT broker and opening a log file if asked.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            mqtt_client (MqttClient): The instance of the MqttClient class which handles the connexion to the MQTT broker.</span>
+<span class="sd">            recording (bool): If true, the events will be recorded in a log file.</span>
+<span class="sd">            logfile (str): If recording is true, the location of the log file can provided with this parameter.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span> <span class="o">=</span> <span class="n">mqtt_client</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__recording</span> <span class="o">=</span> <span class="n">recording</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__logfile</span> <span class="o">=</span> <span class="n">logfile</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">on_connected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__on_mqtt_connected</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">on_message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__on_message_received</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="Api.stop">
+<a class="viewcode-back" href="../../psec.html#psec.Api.stop">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stops the Api by disconnecting from the MQTT broker.        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="Api.get_mqtt_client">
+<a class="viewcode-back" href="../../psec.html#psec.Api.get_mqtt_client">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_mqtt_client</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the current MQTT client instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span></div>
+
+
+
+<div class="viewcode-block" id="Api.add_message_callback">
+<a class="viewcode-back" href="../../psec.html#psec.Api.add_message_callback">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_message_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback_fn</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a callback for receiving messages</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            callback_fn(Callable): A function which will be called by the API when a message arrives.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">callback_fn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__message_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback_fn</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: message callback function is None&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Api.add_ready_callback">
+<a class="viewcode-back" href="../../psec.html#psec.Api.add_ready_callback">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_ready_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback_fn</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a callback to notify when the API is connected to the MQTT broker and ready.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            callback_fn(Callable): A function which will be called by the API when it is connected to the MQTT broker.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">callback_fn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ready_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback_fn</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: ready callback function is None&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Api.add_shutdown_callback">
+<a class="viewcode-back" href="../../psec.html#psec.Api.add_shutdown_callback">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_shutdown_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback_fn</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a callback to notify when the system has started shutting down.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            callback_fn(Callable): A function which will be called by the API when the system is shutting down.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">callback_fn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__shutdown_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback_fn</span><span class="p">)</span>            
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: shutdown callback function is None&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Api.add_restart_callback">
+<a class="viewcode-back" href="../../psec.html#psec.Api.add_restart_callback">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_restart_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback_fn</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a callback to notify when the system is restarting a component.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            callback_fn(Callable): A function which will be called by the API when the system is restarting a component.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">callback_fn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__restart_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback_fn</span><span class="p">)</span>            
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: shutdown callback function is None&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Api.subscribe">
+<a class="viewcode-back" href="../../psec.html#psec.Api.subscribe">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">subscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Subscribes to a topic on the broker.</span>
+
+<span class="sd">        If the function subscribed to is a PSEC function, the :class:`Topics` class provides the reference of the topic names.                </span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            topic(str): The topic to subscribe to.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">topic</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__subscriptions</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">topic</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Api.publish">
+<a class="viewcode-back" href="../../psec.html#psec.Api.publish">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">publish</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Publish a message on the MQTT broker.</span>
+
+<span class="sd">        The message is formatted in `JSON` and can provided directly as a `dict`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            topic(str): The topic to publish to.</span>
+<span class="sd">            payload(dict): The message formatted in `JSON`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span></div>
+
+
+
+    <span class="c1">####</span>
+    <span class="c1"># Fonctions de journalisation</span>
+    <span class="c1">#</span>
+<div class="viewcode-block" id="Api.debug">
+<a class="viewcode-back" href="../../psec.html#psec.Api.debug">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Publish a `debug` message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            message(str): The message to publish</span>
+<span class="sd">            module(str, optional): The name of the component involved.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">module</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Api.info">
+<a class="viewcode-back" href="../../psec.html#psec.Api.info">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Publish a `info` message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            message(str): The message to publish</span>
+<span class="sd">            module(str, optional): The name of the component involved.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">module</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Api.warn">
+<a class="viewcode-back" href="../../psec.html#psec.Api.warn">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">warn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Publish a `warn` message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            message(str): The message to publish</span>
+<span class="sd">            module(str, optional): The name of the component involved.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">module</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Api.error">
+<a class="viewcode-back" href="../../psec.html#psec.Api.error">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Publish an `error` message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            message(str): The message to publish</span>
+<span class="sd">            module(str, optional): The name of the component involved.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">module</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Api.critical">
+<a class="viewcode-back" href="../../psec.html#psec.Api.critical">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Publish a `critical` message.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            message(str): The message to publish</span>
+<span class="sd">            module(str, optional): The name of the component involved.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">module</span><span class="p">)</span></div>
+
+
+
+    <span class="c1">####</span>
+    <span class="c1"># Fonctions de gestion des supports de stockage</span>
+    <span class="c1">#</span>
+<div class="viewcode-block" id="Api.get_disks_list">
+<a class="viewcode-back" href="../../psec.html#psec.Api.get_disks_list">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_disks_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Asks the system to provide the list of external disks connected.</span>
+
+<span class="sd">        The response is provided on the topic :attr:`Topic.LIST_DISKS`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/request&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">LIST_DISKS</span><span class="p">),</span> <span class="p">{})</span></div>
+
+
+
+<div class="viewcode-block" id="Api.get_files_list">
+<a class="viewcode-back" href="../../psec.html#psec.Api.get_files_list">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_files_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">disk</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">recursive</span><span class="p">:</span><span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">from_dir</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Asks the system to provide the list of files of an external disk or the repository.</span>
+
+<span class="sd">        The response is provided on the topic :attr:`Topics.LIST_FILES`</span>
+
+<span class="sd">        By default the listing is done from the root of the disk. This can be changed by setting the </span>
+<span class="sd">        argument `from_dir` to a specifi directory of the disk.</span>
+
+<span class="sd">        By default the listing is not recursive, which means that the system will only look in the</span>
+<span class="sd">        directory provided and not in the subdirectories if any. This can be changed by setting the</span>
+<span class="sd">        argument `from_dir`.</span>
+
+<span class="sd">        **Performance consideration**</span>
+
+<span class="sd">        If the disk has a large number of files and nestes folders, the recursive listing will take a</span>
+<span class="sd">        long time and return a single response with a large JSON string. **This should be avoided for</span>
+<span class="sd">        performance reasons**. </span>
+
+<span class="sd">        Always prefer a pure asynchronous method of listing all the files and directories by listing</span>
+<span class="sd">        the files only *not recursively* and send new queries for the remaining directories.</span>
+
+<span class="sd">        Thus, the system will always be very efficient and responsive instead of waiting for a big </span>
+<span class="sd">        result to be provided.</span>
+
+<span class="sd">        Please also consider using a **lazy-loading** strategy which minimizes the load on the system</span>
+<span class="sd">        by avoiding the listing of files which are not necessary and delays the listing when it is</span>
+<span class="sd">        necessary.</span>
+
+<span class="sd">        The response is provided on the topic :attr:`Topic.LIST_FILES`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            disk(str): The name of the disk.</span>
+<span class="sd">            recursive(bool): Looks for files recursively if True.</span>
+<span class="sd">            from_dir(str, optional): The starting directory for the listing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="n">RequestFactory</span><span class="o">.</span><span class="n">create_request_files_list</span><span class="p">(</span><span class="n">disk</span><span class="p">,</span> <span class="n">recursive</span><span class="p">,</span> <span class="n">from_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/request&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">LIST_FILES</span><span class="p">),</span> <span class="n">payload</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Api.read_file">
+<a class="viewcode-back" href="../../psec.html#psec.Api.read_file">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">disk</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Copies a file into the *repository*.</span>
+
+<span class="sd">        When the file is created the :attr:`Topic.NEW_FILE` notification is sent.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            disk(str): The source disk.</span>
+<span class="sd">            filepath(str): The full path of the file to be copied.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="n">RequestFactory</span><span class="o">.</span><span class="n">create_request_read_file</span><span class="p">(</span><span class="n">disk</span><span class="p">,</span> <span class="n">filepath</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/request&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">READ_FILE</span><span class="p">),</span> <span class="n">payload</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Api.copy_file">
+<a class="viewcode-back" href="../../psec.html#psec.Api.copy_file">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">copy_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_disk</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">destination_disk</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Copies a file from a disk to another.</span>
+
+<span class="sd">        When the file is created the :attr:`Topic.NEW_FILE` notification is sent.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            source_disk(str): The source disk.</span>
+<span class="sd">            filepath(str): The full path of the file to be copied.</span>
+<span class="sd">            destination_disk(str): The destination disk.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="n">RequestFactory</span><span class="o">.</span><span class="n">create_request_copy_file</span><span class="p">(</span><span class="n">source_disk</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">destination_disk</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/request&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">COPY_FILE</span><span class="p">),</span> <span class="n">payload</span><span class="p">)</span></div>
+
+
+
+<span class="w">    </span><span class="sd">&#39;&#39;&#39;def copy_file_to_storage(self, source_disk:str, filepath:str):</span>
+<span class="sd">        self.copy_file(source_disk, filepath, Constantes.REPOSITORY)&#39;&#39;&#39;</span>
+
+
+<div class="viewcode-block" id="Api.delete_file">
+<a class="viewcode-back" href="../../psec.html#psec.Api.delete_file">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">disk</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes a file from a disk (including the storage).</span>
+
+<span class="sd">        When the storage is involved, please use the :attr:`Constantes.REPOSITORY`.</span>
+
+<span class="sd">        In case of an error, the :attr:`Topic.ERROR` notification is sent.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="n">RequestFactory</span><span class="o">.</span><span class="n">create_request_delete_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">disk</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/request&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">DELETE_FILE</span><span class="p">),</span> <span class="n">payload</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Api.get_file_footprint">
+<a class="viewcode-back" href="../../psec.html#psec.Api.get_file_footprint">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_file_footprint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">disk</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the fingerprint of a file.</span>
+
+<span class="sd">        The response is provided on the topic :attr:`Topic.FILE_FOOTPRINT`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filepath(str): The full path of the file.</span>
+<span class="sd">            disk(str): The disk on which the file is located.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="n">RequestFactory</span><span class="o">.</span><span class="n">create_request_get_file_footprint</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">disk</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/request&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">FILE_FOOTPRINT</span><span class="p">),</span> <span class="n">payload</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Api.create_file">
+<a class="viewcode-back" href="../../psec.html#psec.Api.create_file">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">disk</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">contents</span><span class="p">:</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a new file on a disk by providing raw data.</span>
+
+<span class="sd">        The directories will be created if necessary before creating the file on the disk.        </span>
+
+<span class="sd">        **Binary/string data**</span>
+
+<span class="sd">        Both binary and string data can be provided but when providing binary data, they will</span>
+<span class="sd">        be encoded in Base64 before being sent to the broker because only text messages can</span>
+<span class="sd">        be exchanged in MQTT. If binary data are provided, the argument `binary` **must** be </span>
+<span class="sd">        set to `True`.</span>
+
+<span class="sd">        When the file has been created, the notification :attr:`Topic.NEW_FILE` is sent.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filepath(str): The full path of the file.</span>
+<span class="sd">            disk(str): The disk on which the file will be created.</span>
+<span class="sd">            contents(bytes): The data to write in the file.</span>
+<span class="sd">            binary(bool, optional): If True, it means that the data provided are binary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">contents</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">binary</span> <span class="k">else</span> <span class="n">zlib</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">contents</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="n">RequestFactory</span><span class="o">.</span><span class="n">create_request_create_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">disk</span><span class="p">,</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">binary</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/request&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">CREATE_FILE</span><span class="p">),</span> <span class="n">payload</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Api.discover_components">
+<a class="viewcode-back" href="../../psec.html#psec.Api.discover_components">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">discover_components</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Asks all the components of the system to notify their state.</span>
+
+<span class="sd">        The response is provided on the topic :attr:`Topic.DISCOVER_COMPONENTS`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/request&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">DISCOVER_COMPONENTS</span><span class="p">),</span> <span class="p">{})</span></div>
+
+
+
+<div class="viewcode-block" id="Api.publish_components">
+<a class="viewcode-back" href="../../psec.html#psec.Api.publish_components">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">publish_components</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">components</span><span class="p">:</span><span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Publishes a list of components and their state.</span>
+
+<span class="sd">        The payload should be created using the fonction :func:`ResponseFactory.create_response_component_state`.</span>
+<span class="sd">        </span>
+<span class="sd">        The format of a component state structure is the following::</span>
+
+<span class="sd">            {</span>
+<span class="sd">                &quot;id&quot;: &quot;unique identifier of the component,</span>
+<span class="sd">                &quot;domain_name&quot;: &quot;automatically provided by PSEC using the hostname&quot;,</span>
+<span class="sd">                &quot;label&quot;: &quot;The name of the component&quot;,</span>
+<span class="sd">                &quot;type&quot;: &quot;a key identifying the type or category of the component&quot;,</span>
+<span class="sd">                &quot;state&quot;: &quot;The current state of the component. See EtatComposant&quot;,</span>
+<span class="sd">                &quot;version&quot;: &quot;The software version of the component&quot;,</span>
+<span class="sd">                &quot;description&quot;: &quot;A paragraph describing the component&quot;</span>
+<span class="sd">            }</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            components(list): a List of components in the form of dictionaries.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;components&quot;</span><span class="p">:</span> <span class="n">components</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/response&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">DISCOVER_COMPONENTS</span><span class="p">),</span> <span class="n">payload</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Api.request_energy_state">
+<a class="viewcode-back" href="../../psec.html#psec.Api.request_energy_state">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">request_energy_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Asks the system the state of the power supply.</span>
+
+<span class="sd">        The response is provided on the topic :attr:`Topic.ENERGY_STATE`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/request&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">ENERGY_STATE</span><span class="p">),</span> <span class="p">{})</span></div>
+
+
+
+<div class="viewcode-block" id="Api.request_system_info">
+<a class="viewcode-back" href="../../psec.html#psec.Api.request_system_info">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">request_system_info</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Asks the system to provide technical information.</span>
+
+<span class="sd">        Here is an example of the result provided::</span>
+
+<span class="sd">            {</span>
+<span class="sd">                &quot;core&quot;: {</span>
+<span class="sd">                    &quot;version&quot;: &quot;1.1&quot;, </span>
+<span class="sd">                    &quot;debug_on&quot;: false</span>
+<span class="sd">                }, </span>
+<span class="sd">                &quot;system&quot;: {</span>
+<span class="sd">                    &quot;os&quot;: {</span>
+<span class="sd">                        &quot;name&quot;: &quot;Linux&quot;, </span>
+<span class="sd">                        &quot;release&quot;: &quot;6.12.20-0-lts&quot;, </span>
+<span class="sd">                        &quot;version&quot;: &quot;#1-Alpine SMP PREEMPT_DYNAMIC 2025-03-24 08:09:11&quot;}, </span>
+<span class="sd">                        &quot;machine&quot;: {</span>
+<span class="sd">                            &quot;arch&quot;: &quot;x86_64&quot;, </span>
+<span class="sd">                            &quot;processor&quot;: &quot;&quot;, </span>
+<span class="sd">                            &quot;platform&quot;: &quot;Linux-6.12.20-0-lts-x86_64-with&quot;, </span>
+<span class="sd">                            &quot;cpu&quot;: {</span>
+<span class="sd">                                &quot;count&quot;: 12, </span>
+<span class="sd">                                &quot;freq_current&quot;: 1689.5970000000004, </span>
+<span class="sd">                                &quot;freq_min&quot;: 0.0, </span>
+<span class="sd">                                &quot;freq_max&quot;: 0.0, </span>
+<span class="sd">                                &quot;percent&quot;: 0.0</span>
+<span class="sd">                            }, </span>
+<span class="sd">                            &quot;memory&quot;: {</span>
+<span class="sd">                                &quot;total&quot;: 405987328, </span>
+<span class="sd">                                &quot;available&quot;: 103829504, </span>
+<span class="sd">                                &quot;percent&quot;: 74.4, </span>
+<span class="sd">                                &quot;used&quot;: 252207104, </span>
+<span class="sd">                                &quot;free&quot;: 20271104</span>
+<span class="sd">                            }, </span>
+<span class="sd">                            &quot;load&quot;: {</span>
+<span class="sd">                                &quot;1&quot;: 0.4306640625, </span>
+<span class="sd">                                &quot;5&quot;: 0.16650390625, </span>
+<span class="sd">                                &quot;15&quot;: 0.0595703125</span>
+<span class="sd">                            }</span>
+<span class="sd">                        }, </span>
+<span class="sd">                        &quot;boot_time&quot;: 1747205332.0, </span>
+<span class="sd">                        &quot;uuid&quot;: &quot;11ec0800-4fb9-11ef-bd38-ad993f2e7700&quot;</span>
+<span class="sd">                    }</span>
+<span class="sd">                }</span>
+<span class="sd">            }</span>
+
+<span class="sd">        The response is provided on the topic :attr:`Topic.SYSTEM_INFO`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/request&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">SYSTEM_INFO</span><span class="p">),</span> <span class="p">{})</span></div>
+
+
+
+    <span class="c1">####</span>
+    <span class="c1"># Fonctions de notification</span>
+    <span class="c1">#</span>
+<div class="viewcode-block" id="Api.notify_disk_added">
+<a class="viewcode-back" href="../../psec.html#psec.Api.notify_disk_added">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">notify_disk_added</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">disk</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sends a notification to inform the other components an external storage has been added to the system.</span>
+
+<span class="sd">        **This notification is for internal use only**</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="n">NotificationFactory</span><span class="o">.</span><span class="n">create_notification_disk_state</span><span class="p">(</span><span class="n">disk</span><span class="p">,</span> <span class="s2">&quot;connected&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">DISK_STATE</span><span class="p">),</span> <span class="n">payload</span><span class="p">)</span></div>
+
+    
+
+<div class="viewcode-block" id="Api.notify_disk_removed">
+<a class="viewcode-back" href="../../psec.html#psec.Api.notify_disk_removed">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">notify_disk_removed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">disk</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sends a notification to inform the other components an external storage has been removed from the system.</span>
+
+<span class="sd">        **This notification is for internal use only**</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="n">NotificationFactory</span><span class="o">.</span><span class="n">create_notification_disk_state</span><span class="p">(</span><span class="n">disk</span><span class="p">,</span> <span class="s2">&quot;diconnected&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">DISK_STATE</span><span class="p">),</span> <span class="n">payload</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="Api.notify_gui_ready">
+<a class="viewcode-back" href="../../psec.html#psec.Api.notify_gui_ready">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">notify_gui_ready</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sends a notification to inform the other components the Graphical User Interface is ready.</span>
+
+<span class="sd">        **This notification is mandatory to make the splash screen disappear when the GUI is ready, otherwise</span>
+<span class="sd">        the GUI of the system would remain behind the splash screen**</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">GUI_READY</span><span class="p">),</span> <span class="p">{})</span></div>
+
+
+
+    <span class="c1">####</span>
+    <span class="c1"># Workflow functions</span>
+    <span class="c1">#</span>
+<div class="viewcode-block" id="Api.shutdown">
+<a class="viewcode-back" href="../../psec.html#psec.Api.shutdown">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Makes the system shutdown.</span>
+
+<span class="sd">        When a shutdown is asked by a Domain, typically the GUI, a notification is</span>
+<span class="sd">        sent to all the components to inform them of the shutdown so they can get</span>
+<span class="sd">        prepared.</span>
+
+<span class="sd">        The response is sent on the topic :attr:`Topics.SHUTDOWN` with the following payload::</span>
+
+<span class="sd">            {</span>
+<span class="sd">                &quot;state&quot;: &quot;accepted or refused&quot;</span>
+<span class="sd">                &quot;reason&quot;: &quot;the reason why the shutdown was refused&quot;</span>
+<span class="sd">            }</span>
+<span class="sd">        &quot;&quot;&quot;</span>       
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/request&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">SHUTDOWN</span><span class="p">),</span> <span class="p">{})</span></div>
+
+
+
+<div class="viewcode-block" id="Api.restart_domain">
+<a class="viewcode-back" href="../../psec.html#psec.Api.restart_domain">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">restart_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_name</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Makes a Domain restart.</span>
+
+<span class="sd">        The response is sent on the topic :attr:`Topics.RESTART_DOMAIN` with the following payload::</span>
+
+<span class="sd">            {</span>
+<span class="sd">                &quot;domain_name&quot;: &quot;The Domain name&quot;,</span>
+<span class="sd">                &quot;state&quot;: &quot;accepted or refused&quot;,</span>
+<span class="sd">                &quot;reason&quot;: &quot;The reason why the restart was refused&quot;</span>
+<span class="sd">            }</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            domain_name(str): The name of the Domain to restart.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="n">RequestFactory</span><span class="o">.</span><span class="n">create_request_restart_domain</span><span class="p">(</span><span class="n">domain_name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/request&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">RESTART_DOMAIN</span><span class="p">),</span> <span class="n">payload</span><span class="p">)</span></div>
+
+
+
+    <span class="c1">####</span>
+    <span class="c1"># Fonctions privées</span>
+    <span class="c1">#    </span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__on_mqtt_connected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="s2">&quot;Api&quot;</span><span class="p">,</span> <span class="n">mqtt_client</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="p">,</span> <span class="n">recording</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__recording</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__logfile</span><span class="p">)</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;self.subscribe(f&quot;{Topics.DISKS}/+&quot;)</span>
+<span class="sd">        self.subscribe(f&quot;{Topics.DISKS}/+/response&quot;)</span>
+<span class="sd">        self.subscribe(f&quot;{Topics.MISC}/+/response&quot;)</span>
+<span class="sd">        self.subscribe(f&quot;{Topics.DISCOVER}/+/response&quot;)</span>
+<span class="sd">        self.subscribe(f&quot;{Topics.SHUTDOWN}/response&quot;)</span>
+<span class="sd">        self.subscribe(f&quot;{Topics.ENERGY_STATE}/response&quot;)</span>
+<span class="sd">        self.subscribe(f&quot;{Topics.RESTART_DOMAIN}/response&quot;)</span>
+<span class="sd">        self.subscribe(f&quot;{Topics.SYSTEM_INFO}/response&quot;)</span>
+<span class="sd">        self.subscribe(Topics.ERROR)&#39;&#39;&#39;</span>
+
+        <span class="k">for</span> <span class="n">cb</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ready_callbacks</span><span class="p">:</span>
+            <span class="n">cb</span><span class="p">()</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__on_message_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>  
+        <span class="c1"># Intercept shutdown response</span>
+        <span class="k">if</span> <span class="n">topic</span> <span class="o">==</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/response&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">SHUTDOWN</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__on_shutdown</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+            <span class="k">return</span> <span class="c1"># Stop here</span>
+        
+        <span class="c1"># Intercept restart domain response</span>
+        <span class="k">if</span> <span class="n">topic</span> <span class="o">==</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/response&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">RESTART_DOMAIN</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__on_restart_domain</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+            <span class="k">return</span> <span class="c1"># Stop here</span>
+
+        <span class="k">for</span> <span class="n">cb</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__message_callbacks</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">cb</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">Logger</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;An exception has been raised by the callback&quot;</span><span class="p">)</span>                
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__on_shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
+        <span class="n">success</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;accepted&quot;</span>
+        <span class="n">reason</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;reason&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">cb</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__shutdown_callbacks</span><span class="p">:</span>
+            <span class="n">cb</span><span class="p">(</span><span class="n">success</span><span class="p">,</span> <span class="n">reason</span><span class="p">)</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__on_restart_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
+        <span class="n">success</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;accepted&quot;</span>
+        <span class="n">domain_name</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;domain_name&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">reason</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;reason&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">cb</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__restart_callbacks</span><span class="p">:</span>
+            <span class="n">cb</span><span class="p">(</span><span class="n">domain_name</span><span class="p">,</span> <span class="n">success</span><span class="p">,</span> <span class="n">reason</span><span class="p">)</span></div>
+
+
+<span class="n">api</span> <span class="o">=</span> <span class="n">Api</span><span class="p">()</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cleanup</span><span class="p">(</span><span class="n">signum</span><span class="p">,</span> <span class="n">frame</span><span class="p">):</span>
+    <span class="n">api</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+<span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">cleanup</span><span class="p">)</span>
+<span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGTERM</span><span class="p">,</span> <span class="n">cleanup</span><span class="p">)</span>
+<span class="n">signal</span><span class="o">.</span><span class="n">signal</span><span class="p">(</span><span class="n">signal</span><span class="o">.</span><span class="n">SIGINT</span><span class="p">,</span> <span class="n">cleanup</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Tristan Israël.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

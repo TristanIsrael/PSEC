@@ -8,30 +8,32 @@ import atexit
 import signal
 
 class Api(metaclass=SingletonMeta):
-    """ Cette classe permet à un programme tiers d'envoyer des commandes ou recevoir des 
-    notifications sans avoir à passer par la socket.
+    """ 
+    This class allows a third-party program to send commands or receive notifications without needing to use the socket directly.
 
-    L'API fournit un jeu d'instructions simples permettant d'envoyer les commandes et 
-    recevoir les notifications. En revanche elle ne prend pas en charge le formattage des
-    commandes, cela étant géré par la classe MessageFactory.
+    The API provides a simple set of instructions for sending commands and receiving notifications. However, it does not handle the formatting of commands, which is managed by the RequestFactory, ResponseFactory, or NotificationFactory classes.
 
-    L'API n'est utilisable que sur un Domaine utilisateur.
+    The API can only be used within a user domain (Domain).
 
-    Pour utiliser l'API il suffit d'instancier la classe Api et d'ouvrir la socket en appelant
-    la fonction connecte_socket(). Ensuite, les autres fonctions permettent l'envoi et la réception
-    de messages et notifications.
+    To use the API, simply instantiate the Api class and open the socket by calling the start() function. Then, the other functions allow for sending and receiving messages and notifications.
 
-    Les commandes ont toutes un fonctionnement asynchrone. Le résultat de l'exécution d'une 
-    commande ne sera communiqué qu'au travers d'une notification. Il est donc nécessaire de fournir
-    à l'API une fonction de callback permettant de recevoir ces fonctions.
+    Asynchronous
+    ============
 
-    La fonction de callback est fournie à l'API durant son instanciation. La signature de la fonction de
-    callback est la suivante : callback(message : Message) -> None
+    All commands operate asynchronously. The result of executing a command will only be communicated through a notification or a response. Therefore, a callback function must be provided to the API in order to receive responses. The internal topics
+    provided in the :class:`Topics` use the suffix `/request` and `/response` to differenciate the query and the answer. When an answer is expected on a topic, it will always be suffixed with `/response`.
+
+    Subscription
+    ============
+
+    **The messages and notifications can be received only when the following conditions are met:**
+
+    - The topic has been subscribed (see :func:`Api.subscribe`)
+    - A message callback function has been provided (see :func:`Api.add_message_callback`)
     """
 
     __ready_callbacks = list()
     __message_callbacks = list()
-    #__sock = None
     __subscriptions = list()
     __shutdown_callbacks = list()
     __restart_callbacks = list()
@@ -39,6 +41,14 @@ class Api(metaclass=SingletonMeta):
 
 
     def start(self, mqtt_client:MqttClient, recording = False, logfile = os.path.join(tempfile.gettempdir(), "journal.log")):
+        """
+        Starts the API by connecting to the MQTT broker and opening a log file if asked.
+
+        Args:
+            mqtt_client (MqttClient): The instance of the MqttClient class which handles the connexion to the MQTT broker.
+            recording (bool): If true, the events will be recorded in a log file.
+            logfile (str): If recording is true, the location of the log file can provided with this parameter.
+        """
         self.__mqtt_client = mqtt_client
         self.__recording = recording
         self.__logfile = logfile
@@ -50,14 +60,26 @@ class Api(metaclass=SingletonMeta):
 
 
     def stop(self):
+        """
+        Stops the Api by disconnecting from the MQTT broker.        
+        """
         self.__mqtt_client.stop()
 
 
     def get_mqtt_client(self):
+        """
+        Returns the current MQTT client instance.
+        """
         return self.__mqtt_client
 
 
     def add_message_callback(self, callback_fn):
+        """
+        Adds a callback for receiving messages
+
+        Args:
+            callback_fn(Callable): A function which will be called by the API when a message arrives.
+        """
         if callback_fn is not None:
             self.__message_callbacks.append(callback_fn)
         else:
@@ -65,13 +87,25 @@ class Api(metaclass=SingletonMeta):
 
 
     def add_ready_callback(self, callback_fn):
+        """
+        Adds a callback to notify when the API is connected to the MQTT broker and ready.
+
+        Args:
+            callback_fn(Callable): A function which will be called by the API when it is connected to the MQTT broker.
+        """
         if callback_fn is not None:
-            self.__ready_callbacks.append(callback_fn)            
+            self.__ready_callbacks.append(callback_fn)
         else:
             print("WARNING: ready callback function is None")
 
 
     def add_shutdown_callback(self, callback_fn):
+        """
+        Adds a callback to notify when the system has started shutting down.
+
+        Args:
+            callback_fn(Callable): A function which will be called by the API when the system is shutting down.
+        """
         if callback_fn is not None:
             self.__shutdown_callbacks.append(callback_fn)            
         else:
@@ -79,6 +113,12 @@ class Api(metaclass=SingletonMeta):
 
 
     def add_restart_callback(self, callback_fn):
+        """
+        Adds a callback to notify when the system is restarting a component.
+
+        Args:
+            callback_fn(Callable): A function which will be called by the API when the system is restarting a component.
+        """
         if callback_fn is not None:
             self.__restart_callbacks.append(callback_fn)            
         else:
@@ -86,11 +126,28 @@ class Api(metaclass=SingletonMeta):
 
 
     def subscribe(self, topic:str):
+        """
+        Subscribes to a topic on the broker.
+
+        If the function subscribed to is a PSEC function, the :class:`Topics` class provides the reference of the topic names.                
+
+        Args:
+            topic(str): The topic to subscribe to.
+        """
         if not topic in self.__subscriptions:
             self.__mqtt_client.subscribe(topic)
 
 
     def publish(self, topic:str, payload:dict):
+        """
+        Publish a message on the MQTT broker.
+
+        The message is formatted in `JSON` and can provided directly as a `dict`.
+
+        Args:
+            topic(str): The topic to publish to.
+            payload(dict): The message formatted in `JSON`.
+        """
         self.__mqtt_client.publish(topic, payload)
 
 
@@ -98,22 +155,57 @@ class Api(metaclass=SingletonMeta):
     # Fonctions de journalisation
     #
     def debug(self, message : str, module: str = ""):
+        """
+        Publish a `debug` message.
+
+        Args:
+            message(str): The message to publish
+            module(str, optional): The name of the component involved.
+        """
         Logger().debug(message, module)
 
 
     def info(self, message : str, module: str = ""):
+        """
+        Publish a `info` message.
+
+        Args:
+            message(str): The message to publish
+            module(str, optional): The name of the component involved.
+        """
         Logger().info(message, module)
 
 
     def warn(self, message : str, module: str = ""):
+        """
+        Publish a `warn` message.
+
+        Args:
+            message(str): The message to publish
+            module(str, optional): The name of the component involved.
+        """
         Logger().warn(message, module)
 
 
     def error(self, message : str, module: str = ""):
+        """
+        Publish an `error` message.
+
+        Args:
+            message(str): The message to publish
+            module(str, optional): The name of the component involved.
+        """
         Logger().error(message, module)
 
 
     def critical(self, message : str, module: str = ""):
+        """
+        Publish a `critical` message.
+
+        Args:
+            message(str): The message to publish
+            module(str, optional): The name of the component involved.
+        """
         Logger().critical(message, module)
 
 
@@ -121,49 +213,169 @@ class Api(metaclass=SingletonMeta):
     # Fonctions de gestion des supports de stockage
     #
     def get_disks_list(self):
+        """
+        Asks the system to provide the list of external disks connected.
+
+        The response is provided on the topic :attr:`Topic.LIST_DISKS`.
+        """
         self.__mqtt_client.publish("{}/request".format(Topics.LIST_DISKS), {})
 
 
     def get_files_list(self, disk: str, recursive:bool = False, from_dir:str = ""):
+        """
+        Asks the system to provide the list of files of an external disk or the repository.
+
+        The response is provided on the topic :attr:`Topics.LIST_FILES`
+
+        By default the listing is done from the root of the disk. This can be changed by setting the 
+        argument `from_dir` to a specifi directory of the disk.
+
+        By default the listing is not recursive, which means that the system will only look in the
+        directory provided and not in the subdirectories if any. This can be changed by setting the
+        argument `from_dir`.
+
+        **Performance consideration**
+
+        If the disk has a large number of files and nestes folders, the recursive listing will take a
+        long time and return a single response with a large JSON string. **This should be avoided for
+        performance reasons**. 
+
+        Always prefer a pure asynchronous method of listing all the files and directories by listing
+        the files only *not recursively* and send new queries for the remaining directories.
+
+        Thus, the system will always be very efficient and responsive instead of waiting for a big 
+        result to be provided.
+
+        Please also consider using a **lazy-loading** strategy which minimizes the load on the system
+        by avoiding the listing of files which are not necessary and delays the listing when it is
+        necessary.
+
+        The response is provided on the topic :attr:`Topic.LIST_FILES`.
+
+        Args:
+            disk(str): The name of the disk.
+            recursive(bool): Looks for files recursively if True.
+            from_dir(str, optional): The starting directory for the listing.
+        """
         payload = RequestFactory.create_request_files_list(disk, recursive, from_dir)
         self.__mqtt_client.publish("{}/request".format(Topics.LIST_FILES), payload)
 
 
     def read_file(self, disk:str, filepath:str):
+        """
+        Copies a file into the *repository*.
+
+        When the file is created the :attr:`Topic.NEW_FILE` notification is sent.
+
+        Args:
+            disk(str): The source disk.
+            filepath(str): The full path of the file to be copied.
+        """
         payload = RequestFactory.create_request_read_file(disk, filepath)
         self.__mqtt_client.publish("{}/request".format(Topics.READ_FILE), payload)
 
 
     def copy_file(self, source_disk:str, filepath:str, destination_disk:str):
+        """
+        Copies a file from a disk to another.
+
+        When the file is created the :attr:`Topic.NEW_FILE` notification is sent.
+
+        Args:
+            source_disk(str): The source disk.
+            filepath(str): The full path of the file to be copied.
+            destination_disk(str): The destination disk.
+        """
         payload = RequestFactory.create_request_copy_file(source_disk, filepath, destination_disk)
         self.__mqtt_client.publish("{}/request".format(Topics.COPY_FILE), payload)
 
 
-    def copy_file_to_storage(self, source_disk:str, filepath:str):        
-        self.copy_file(source_disk, filepath, Constantes.REPOSITORY)
+    '''def copy_file_to_storage(self, source_disk:str, filepath:str):
+        self.copy_file(source_disk, filepath, Constantes.REPOSITORY)'''
 
 
     def delete_file(self, filepath:str, disk:str):
+        """
+        Removes a file from a disk (including the storage).
+
+        When the storage is involved, please use the :attr:`Constantes.REPOSITORY`.
+
+        In case of an error, the :attr:`Topic.ERROR` notification is sent.
+        """
         payload = RequestFactory.create_request_delete_file(filepath, disk)
         self.__mqtt_client.publish("{}/request".format(Topics.DELETE_FILE), payload)
 
 
     def get_file_footprint(self, filepath:str, disk:str):
+        """
+        Compute the fingerprint of a file.
+
+        The response is provided on the topic :attr:`Topic.FILE_FOOTPRINT`.
+
+        Args:
+            filepath(str): The full path of the file.
+            disk(str): The disk on which the file is located.
+        """
         payload = RequestFactory.create_request_get_file_footprint(filepath, disk)
         self.__mqtt_client.publish("{}/request".format(Topics.FILE_FOOTPRINT), payload)
 
 
     def create_file(self, filepath:str, disk:str, contents:bytes, binary=False):
+        """
+        Creates a new file on a disk by providing raw data.
+
+        The directories will be created if necessary before creating the file on the disk.        
+
+        **Binary/string data**
+
+        Both binary and string data can be provided but when providing binary data, they will
+        be encoded in Base64 before being sent to the broker because only text messages can
+        be exchanged in MQTT. If binary data are provided, the argument `binary` **must** be 
+        set to `True`.
+
+        When the file has been created, the notification :attr:`Topic.NEW_FILE` is sent.
+
+        Args:
+            filepath(str): The full path of the file.
+            disk(str): The disk on which the file will be created.
+            contents(bytes): The data to write in the file.
+            binary(bool, optional): If True, it means that the data provided are binary.
+        """
         data = contents if not binary else zlib.compress(contents, level=1)
         payload = RequestFactory.create_request_create_file(filepath, disk, base64.b64encode(data), binary)
         self.__mqtt_client.publish("{}/request".format(Topics.CREATE_FILE), payload)
 
 
-    def discover_components(self) -> None:        
+    def discover_components(self) -> None:
+        """
+        Asks all the components of the system to notify their state.
+
+        The response is provided on the topic :attr:`Topic.DISCOVER_COMPONENTS`
+        """
         self.__mqtt_client.publish("{}/request".format(Topics.DISCOVER_COMPONENTS), {})
 
 
     def publish_components(self, components:list) -> None:
+        """
+        Publishes a list of components and their state.
+
+        The payload should be created using the fonction :func:`ResponseFactory.create_response_component_state`.
+        
+        The format of a component state structure is the following::
+
+            {
+                "id": "unique identifier of the component,
+                "domain_name": "automatically provided by PSEC using the hostname",
+                "label": "The name of the component",
+                "type": "a key identifying the type or category of the component",
+                "state": "The current state of the component. See EtatComposant",
+                "version": "The software version of the component",
+                "description": "A paragraph describing the component"
+            }
+
+        Args:
+            components(list): a List of components in the form of dictionaries.
+        """
         payload = {
             "components": components
         }
@@ -171,10 +383,62 @@ class Api(metaclass=SingletonMeta):
 
 
     def request_energy_state(self) -> None:
+        """
+        Asks the system the state of the power supply.
+
+        The response is provided on the topic :attr:`Topic.ENERGY_STATE`
+        """
         self.__mqtt_client.publish("{}/request".format(Topics.ENERGY_STATE), {})
 
 
     def request_system_info(self) -> None:
+        """
+        Asks the system to provide technical information.
+
+        Here is an example of the result provided::
+
+            {
+                "core": {
+                    "version": "1.1", 
+                    "debug_on": false
+                }, 
+                "system": {
+                    "os": {
+                        "name": "Linux", 
+                        "release": "6.12.20-0-lts", 
+                        "version": "#1-Alpine SMP PREEMPT_DYNAMIC 2025-03-24 08:09:11"}, 
+                        "machine": {
+                            "arch": "x86_64", 
+                            "processor": "", 
+                            "platform": "Linux-6.12.20-0-lts-x86_64-with", 
+                            "cpu": {
+                                "count": 12, 
+                                "freq_current": 1689.5970000000004, 
+                                "freq_min": 0.0, 
+                                "freq_max": 0.0, 
+                                "percent": 0.0
+                            }, 
+                            "memory": {
+                                "total": 405987328, 
+                                "available": 103829504, 
+                                "percent": 74.4, 
+                                "used": 252207104, 
+                                "free": 20271104
+                            }, 
+                            "load": {
+                                "1": 0.4306640625, 
+                                "5": 0.16650390625, 
+                                "15": 0.0595703125
+                            }
+                        }, 
+                        "boot_time": 1747205332.0, 
+                        "uuid": "11ec0800-4fb9-11ef-bd38-ad993f2e7700"
+                    }
+                }
+            }
+
+        The response is provided on the topic :attr:`Topic.SYSTEM_INFO`
+        """
         self.__mqtt_client.publish("{}/request".format(Topics.SYSTEM_INFO), {})
 
 
@@ -182,27 +446,71 @@ class Api(metaclass=SingletonMeta):
     # Fonctions de notification
     #
     def notify_disk_added(self, disk):
+        """
+        Sends a notification to inform the other components an external storage has been added to the system.
+
+        **This notification is for internal use only**
+        """
         payload = NotificationFactory.create_notification_disk_state(disk, "connected")
         self.__mqtt_client.publish("{}".format(Topics.DISK_STATE), payload)
     
 
     def notify_disk_removed(self, disk):
+        """
+        Sends a notification to inform the other components an external storage has been removed from the system.
+
+        **This notification is for internal use only**
+        """
         payload = NotificationFactory.create_notification_disk_state(disk, "diconnected")
         self.__mqtt_client.publish("{}".format(Topics.DISK_STATE), payload)
 
 
     def notify_gui_ready(self) -> None:
+        """
+        Sends a notification to inform the other components the Graphical User Interface is ready.
+
+        **This notification is mandatory to make the splash screen disappear when the GUI is ready, otherwise
+        the GUI of the system would remain behind the splash screen**
+        """
         self.__mqtt_client.publish("{}".format(Topics.GUI_READY), {})
 
 
     ####
     # Workflow functions
     #
-    def shutdown(self):        
+    def shutdown(self): 
+        """
+        Makes the system shutdown.
+
+        When a shutdown is asked by a Domain, typically the GUI, a notification is
+        sent to all the components to inform them of the shutdown so they can get
+        prepared.
+
+        The response is sent on the topic :attr:`Topics.SHUTDOWN` with the following payload::
+
+            {
+                "state": "accepted or refused"
+                "reason": "the reason why the shutdown was refused"
+            }
+        """       
         self.__mqtt_client.publish("{}/request".format(Topics.SHUTDOWN), {})
 
 
     def restart_domain(self, domain_name:str):
+        """
+        Makes a Domain restart.
+
+        The response is sent on the topic :attr:`Topics.RESTART_DOMAIN` with the following payload::
+
+            {
+                "domain_name": "The Domain name",
+                "state": "accepted or refused",
+                "reason": "The reason why the restart was refused"
+            }
+
+        Args:
+            domain_name(str): The name of the Domain to restart.
+        """
         payload = RequestFactory.create_request_restart_domain(domain_name)
         self.__mqtt_client.publish("{}/request".format(Topics.RESTART_DOMAIN), payload)
 
@@ -212,16 +520,7 @@ class Api(metaclass=SingletonMeta):
     #    
     def __on_mqtt_connected(self):
         Logger().setup("Api", mqtt_client=self.__mqtt_client, recording=self.__recording, filename=self.__logfile)
-        '''self.subscribe(f"{Topics.DISKS}/+")
-        self.subscribe(f"{Topics.DISKS}/+/response")
-        self.subscribe(f"{Topics.MISC}/+/response")
-        self.subscribe(f"{Topics.DISCOVER}/+/response")
-        self.subscribe(f"{Topics.SHUTDOWN}/response")
-        self.subscribe(f"{Topics.ENERGY_STATE}/response")
-        self.subscribe(f"{Topics.RESTART_DOMAIN}/response")
-        self.subscribe(f"{Topics.SYSTEM_INFO}/response")
-        self.subscribe(Topics.ERROR)'''
-
+        
         for cb in self.__ready_callbacks:
             cb()
 

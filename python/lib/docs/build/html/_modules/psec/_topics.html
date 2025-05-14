@@ -1,0 +1,141 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>psec._topics &mdash; PSEC 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            PSEC
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PSEC</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">psec._topics</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for psec._topics</h1><div class="highlight"><pre>
+<div class="viewcode-block" id="Topics">
+<a class="viewcode-back" href="../../psec.html#psec.Topics">[docs]</a>
+<span></span><span class="k">class</span><span class="w"> </span><span class="nc">Topics</span><span class="p">():</span>
+    <span class="c1"># Groups</span>
+    <span class="n">SYSTEM</span> <span class="o">=</span> <span class="s2">&quot;system&quot;</span>
+    <span class="n">DISKS</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">SYSTEM</span><span class="si">}</span><span class="s2">/disks&quot;</span>
+    <span class="n">MISC</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">SYSTEM</span><span class="si">}</span><span class="s2">/misc&quot;</span>
+    <span class="n">EVENTS</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">SYSTEM</span><span class="si">}</span><span class="s2">/events&quot;</span>
+    <span class="n">DISCOVER</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">SYSTEM</span><span class="si">}</span><span class="s2">/discover&quot;</span>
+    <span class="n">WORKFLOW</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">SYSTEM</span><span class="si">}</span><span class="s2">/workflow&quot;</span>
+    <span class="n">ENERGY</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">SYSTEM</span><span class="si">}</span><span class="s2">/energy&quot;</span>
+
+    <span class="c1"># Disks and files management</span>
+    <span class="n">LIST_DISKS</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DISKS</span><span class="si">}</span><span class="s2">/list_disks&quot;</span>
+    <span class="n">LIST_FILES</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DISKS</span><span class="si">}</span><span class="s2">/list_files&quot;</span>
+    <span class="n">READ_FILE</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DISKS</span><span class="si">}</span><span class="s2">/read_file&quot;</span>
+    <span class="n">COPY_FILE</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DISKS</span><span class="si">}</span><span class="s2">/copy_file&quot;</span>
+    <span class="n">DELETE_FILE</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DISKS</span><span class="si">}</span><span class="s2">/delete_file&quot;</span>
+    <span class="n">FILE_FOOTPRINT</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DISKS</span><span class="si">}</span><span class="s2">/file_footprint&quot;</span>
+    <span class="n">CREATE_FILE</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DISKS</span><span class="si">}</span><span class="s2">/create_file&quot;</span>
+    <span class="n">NEW_FILE</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DISKS</span><span class="si">}</span><span class="s2">/new_file&quot;</span>
+    <span class="n">DISK_STATE</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DISKS</span><span class="si">}</span><span class="s2">/state&quot;</span>
+
+    <span class="c1"># Workflow management</span>
+    <span class="n">SHUTDOWN</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">WORKFLOW</span><span class="si">}</span><span class="s2">/shutdown&quot;</span>
+    <span class="n">RESTART_DOMAIN</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">WORKFLOW</span><span class="si">}</span><span class="s2">/restart_domain&quot;</span>
+    <span class="n">GUI_READY</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">WORKFLOW</span><span class="si">}</span><span class="s2">/gui_ready&quot;</span>
+
+    <span class="c1"># Miscellaneous</span>
+    <span class="n">DISCOVER_COMPONENTS</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DISCOVER</span><span class="si">}</span><span class="s2">/components&quot;</span>
+    <span class="n">KEEPALIVE</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">MISC</span><span class="si">}</span><span class="s2">/ping&quot;</span>
+    <span class="n">ENERGY_STATE</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">ENERGY</span><span class="si">}</span><span class="s2">/state&quot;</span>
+    <span class="n">SYSTEM_INFO</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">SYSTEM</span><span class="si">}</span><span class="s2">/info&quot;</span>
+    <span class="n">BENCHMARK</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">MISC</span><span class="si">}</span><span class="s2">/benchmark&quot;</span>
+
+    <span class="c1"># Logging</span>
+    <span class="n">ERROR</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">EVENTS</span><span class="si">}</span><span class="s2">/error&quot;</span>
+    <span class="n">WARNING</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">EVENTS</span><span class="si">}</span><span class="s2">/warning&quot;</span>
+    <span class="n">INFO</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">EVENTS</span><span class="si">}</span><span class="s2">/info&quot;</span>
+    <span class="n">DEBUG</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">EVENTS</span><span class="si">}</span><span class="s2">/debug&quot;</span>
+    <span class="n">SET_LOGLEVEL</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">EVENTS</span><span class="si">}</span><span class="s2">/set_loglevel&quot;</span>
+    <span class="n">SAVE_LOG</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">EVENTS</span><span class="si">}</span><span class="s2">/save_log&quot;</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Tristan Israël.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

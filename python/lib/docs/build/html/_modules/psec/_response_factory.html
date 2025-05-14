@@ -1,0 +1,258 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>psec._response_factory &mdash; PSEC 1.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=8d563738"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            PSEC
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PSEC</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">psec._response_factory</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for psec._response_factory</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">EtatComposant</span><span class="p">,</span> <span class="n">BenchmarkId</span><span class="p">,</span> <span class="n">Constantes</span>
+
+<div class="viewcode-block" id="ResponseFactory">
+<a class="viewcode-back" href="../../psec.html#psec.ResponseFactory">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ResponseFactory</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; La classe ResponseFactory permet de générer les messages en réponse à certaines commandes.    </span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ResponseFactory.create_response_disks_list">
+<a class="viewcode-back" href="../../psec.html#psec.ResponseFactory.create_response_disks_list">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_response_disks_list</span><span class="p">(</span><span class="n">disks_list</span><span class="p">:</span><span class="nb">list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">())</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;disks&quot;</span><span class="p">:</span> <span class="n">disks_list</span>
+        <span class="p">}</span>        
+        <span class="k">return</span> <span class="n">payload</span></div>
+
+    
+<div class="viewcode-block" id="ResponseFactory.create_response_list_files">
+<a class="viewcode-back" href="../../psec.html#psec.ResponseFactory.create_response_list_files">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_response_list_files</span><span class="p">(</span><span class="n">disk</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">files</span><span class="p">:</span><span class="nb">list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">())</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;disk&quot;</span><span class="p">:</span> <span class="n">disk</span><span class="p">,</span>
+            <span class="s2">&quot;files&quot;</span><span class="p">:</span> <span class="n">files</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">payload</span></div>
+
+
+<div class="viewcode-block" id="ResponseFactory.cree_reponse_benchmark_inputs">
+<a class="viewcode-back" href="../../psec.html#psec.ResponseFactory.cree_reponse_benchmark_inputs">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cree_reponse_benchmark_inputs</span><span class="p">(</span><span class="n">duree</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">BenchmarkId</span><span class="o">.</span><span class="n">INPUTS</span><span class="p">,</span>
+            <span class="s2">&quot;duration&quot;</span><span class="p">:</span> <span class="n">duree</span><span class="p">,</span>
+            <span class="s2">&quot;iterations&quot;</span><span class="p">:</span> <span class="n">iterations</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">payload</span></div>
+
+
+<div class="viewcode-block" id="ResponseFactory.cree_reponse_benchmark_fichiers_demarre">
+<a class="viewcode-back" href="../../psec.html#psec.ResponseFactory.cree_reponse_benchmark_fichiers_demarre">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cree_reponse_benchmark_fichiers_demarre</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">BenchmarkId</span><span class="o">.</span><span class="n">FILES</span><span class="p">,</span>
+            <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="s2">&quot;started&quot;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">payload</span></div>
+
+    
+<div class="viewcode-block" id="ResponseFactory.cree_reponse_benchmark_fichiers_termine">
+<a class="viewcode-back" href="../../psec.html#psec.ResponseFactory.cree_reponse_benchmark_fichiers_termine">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cree_reponse_benchmark_fichiers_termine</span><span class="p">(</span><span class="n">metrics</span><span class="p">:</span><span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">BenchmarkId</span><span class="o">.</span><span class="n">FILES</span><span class="p">,</span>
+            <span class="s2">&quot;estatetat&quot;</span><span class="p">:</span> <span class="s2">&quot;finished&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;metrics&quot;</span><span class="p">:</span> <span class="n">metrics</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">payload</span></div>
+
+
+<div class="viewcode-block" id="ResponseFactory.cree_reponse_benchmark_fichiers_erreur">
+<a class="viewcode-back" href="../../psec.html#psec.ResponseFactory.cree_reponse_benchmark_fichiers_erreur">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cree_reponse_benchmark_fichiers_erreur</span><span class="p">(</span><span class="n">erreur</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">BenchmarkId</span><span class="o">.</span><span class="n">FILES</span><span class="p">,</span>
+            <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="s2">&quot;error&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="n">erreur</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">payload</span></div>
+
+    
+<div class="viewcode-block" id="ResponseFactory.create_response_file_footprint">
+<a class="viewcode-back" href="../../psec.html#psec.ResponseFactory.create_response_file_footprint">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_response_file_footprint</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">disk</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">footprint</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;filepath&quot;</span><span class="p">:</span> <span class="n">filepath</span><span class="p">,</span>
+            <span class="s2">&quot;disk&quot;</span><span class="p">:</span> <span class="n">disk</span><span class="p">,</span>
+            <span class="s2">&quot;footprint&quot;</span><span class="p">:</span> <span class="n">footprint</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">payload</span></div>
+
+    
+<div class="viewcode-block" id="ResponseFactory.create_response_create_file">
+<a class="viewcode-back" href="../../psec.html#psec.ResponseFactory.create_response_create_file">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_response_create_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">disk</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">footprint</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">success</span><span class="p">:</span><span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;filepath&quot;</span><span class="p">:</span> <span class="n">filepath</span><span class="p">,</span>
+            <span class="s2">&quot;disk&quot;</span><span class="p">:</span> <span class="n">disk</span><span class="p">,</span>
+            <span class="s2">&quot;footprint&quot;</span><span class="p">:</span> <span class="n">footprint</span><span class="p">,</span>
+            <span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="n">success</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">payload</span></div>
+
+
+<div class="viewcode-block" id="ResponseFactory.create_response_component_state">
+<a class="viewcode-back" href="../../psec.html#psec.ResponseFactory.create_response_component_state">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_response_component_state</span><span class="p">(</span><span class="n">component_id</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">component_label</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">domain_name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span><span class="n">EtatComposant</span><span class="p">,</span> <span class="n">component_type</span> <span class="o">=</span> <span class="s2">&quot;core&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;components&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">component_id</span><span class="p">,</span>
+                <span class="s2">&quot;domain_name&quot;</span><span class="p">:</span> <span class="n">domain_name</span><span class="p">,</span>
+                <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="n">component_label</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">component_type</span><span class="p">,</span>
+                <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="n">state</span>
+                <span class="p">}</span>
+            <span class="p">]</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">payload</span></div>
+
+
+<div class="viewcode-block" id="ResponseFactory.create_response_copy_file">
+<a class="viewcode-back" href="../../psec.html#psec.ResponseFactory.create_response_copy_file">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_response_copy_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">disk</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">success</span><span class="p">:</span><span class="nb">bool</span><span class="p">,</span> <span class="n">footprint</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;filepath&quot;</span><span class="p">:</span> <span class="n">filepath</span><span class="p">,</span>
+            <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;ok&quot;</span> <span class="k">if</span> <span class="n">success</span> <span class="k">else</span> <span class="s2">&quot;error&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;footprint&quot;</span><span class="p">:</span> <span class="n">footprint</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">payload</span></div>
+
+    
+    
+<div class="viewcode-block" id="ResponseFactory.create_response_shutdown">
+<a class="viewcode-back" href="../../psec.html#psec.ResponseFactory.create_response_shutdown">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_response_shutdown</span><span class="p">(</span><span class="n">accepted</span><span class="p">:</span><span class="nb">bool</span><span class="p">):</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="s2">&quot;accepted&quot;</span> <span class="k">if</span> <span class="n">accepted</span> <span class="k">else</span> <span class="s2">&quot;refused&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;reason&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">payload</span></div>
+
+    
+
+<div class="viewcode-block" id="ResponseFactory.create_response_restart_domain">
+<a class="viewcode-back" href="../../psec.html#psec.ResponseFactory.create_response_restart_domain">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_response_restart_domain</span><span class="p">(</span><span class="n">domain_name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">accepted</span><span class="p">:</span><span class="nb">bool</span><span class="p">):</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;domain_name&quot;</span><span class="p">:</span> <span class="n">domain_name</span><span class="p">,</span>
+            <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="s2">&quot;accepted&quot;</span> <span class="k">if</span> <span class="n">accepted</span> <span class="k">else</span> <span class="s2">&quot;refused&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;reason&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">payload</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Tristan Israël.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
