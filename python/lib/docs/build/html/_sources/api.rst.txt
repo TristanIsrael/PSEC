@@ -1,0 +1,11 @@
+psec package
+============
+
+Module contents
+---------------
+
+.. automodule:: psec.api
+   :members:
+   :show-inheritance:
+   :undoc-members:
+   
