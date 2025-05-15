@@ -2,6 +2,11 @@
 
 This project provides a software architecture for creating security products.
 
+> ⚠️ **Important Notice**
+
+This repository is subject to a restrictive license.  
+You are **not allowed to fork, copy, modify, or reuse** this code in any form, including through GitHub features, **without explicit written permission** from the author.
+
 ## Documentation
 
 Newcomers should begin with the [architecture documentation](python/lib/docs/source/markdown/architecture.md).
