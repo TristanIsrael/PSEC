@@ -1,5 +1,5 @@
-psec package
-============
+PSEC python documentation
+=========================
 
 Module contents
 ---------------

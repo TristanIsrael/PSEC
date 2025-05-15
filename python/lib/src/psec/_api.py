@@ -38,6 +38,7 @@ class Api(metaclass=SingletonMeta):
     __shutdown_callbacks = list()
     __restart_callbacks = list()
     __recording = False
+    __mqtt_client = None
 
 
     def start(self, mqtt_client:MqttClient, recording = False, logfile = os.path.join(tempfile.gettempdir(), "journal.log")):
@@ -63,7 +64,8 @@ class Api(metaclass=SingletonMeta):
         """
         Stops the Api by disconnecting from the MQTT broker.        
         """
-        self.__mqtt_client.stop()
+        if self.__mqtt_client is not None:
+            self.__mqtt_client.stop()
 
 
     def get_mqtt_client(self):
@@ -559,9 +561,8 @@ class Api(metaclass=SingletonMeta):
         for cb in self.__restart_callbacks:
             cb(domain_name, success, reason)
 
-api = Api()
-def cleanup(signum, frame):
-    api.stop()
+def cleanup():
+    Api().stop()
 
 atexit.register(cleanup)
 signal.signal(signal.SIGTERM, cleanup)

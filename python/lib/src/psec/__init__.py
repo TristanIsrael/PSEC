@@ -7,7 +7,7 @@ from ._constantes import Constantes, Cles, BoutonSouris, TypeEntree, BenchmarkId
 try:
     from ._keymap_fr import KeymapFR
 except Exception as e:
-    print("La classe KeymapFR ne sera pas disponible")
+    print("The class KeymapFR won't be available due to missing dependancy")
     print(e)
 from ._topics import Topics
 from ._mqtt_helper import MqttHelper
@@ -18,19 +18,25 @@ from ._notification_factory import NotificationFactory
 from ._logger import Logger
 from ._fichier_helper import FichierHelper
 from ._response_factory import ResponseFactory
-from ._disk_monitor import DiskMonitor
+try:
+    from ._disk_monitor import DiskMonitor
+except Exception as e:
+    print("The class DiskMonitor won't be available due to missing dependancy")
+    print(e)
 from ._mouse import Mouse, MouseButton, MouseWheel, MouseMove
 from ._tasks_runner import TaskRunner
 try:
-    from ._demon_inputs import DemonInputs          
-    #from ._controleur_benchmark import ControleurBenchmark  
+    from ._demon_inputs import DemonInputs
 except Exception as e:
-    print("Les classes DemonInputs, ControleurVmSysUsb et ControleurBenchmark ne seront pas disponibles")
+    print("The classes DemonInputs, ControleurVmSysUsb et ControleurBenchmark won't be available due to missing dependancy")
     print(e)
+try:
+    from ._sys_usb_controller import SysUsbController
+except Exception as e:
+    print("The class SysUsbController won't be available due to missing dependancy")
 from ._api import Api
 #from ._inputs_proxy import InputsProxy
 from ._dom0_controller import Dom0Controller
-from ._sys_usb_controller import SysUsbController
 from ._components_helper import ComponentsHelper
 from ._mqtt_factory import MqttFactory
 from ._mock_sys_usb_controller import MockSysUsbController

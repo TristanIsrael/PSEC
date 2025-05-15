@@ -75,15 +75,10 @@ class FichierHelper():
 
                     liste.append(entryDict)
                 elif entree.is_dir():
-                    #is_bundle = False
-                    #if entree.name.endswith(".app"):
-                    #    is_bundle = FichierHelper.is_macos_bundle(_real_filepath)
-
                     entryDict = {
                         "type": "folder",
                         "path": "/" if filepath == "" else filepath,
                         "name": filename
-                        #"is_bundle": is_bundle
                     }
 
                     liste.append(entryDict)

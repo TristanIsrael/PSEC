@@ -5,6 +5,3 @@ paho-mqtt>=2.0.0
 pyudev
 msgpack
 psutil
-sphinx
-sphinx-rtd-theme
-poetry

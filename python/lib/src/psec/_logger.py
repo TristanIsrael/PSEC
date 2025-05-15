@@ -1,5 +1,9 @@
 from . import MqttClient, SingletonMeta, Topics, MqttHelper, RequestFactory
-import os, zlib, base64, logging
+import os
+import zlib
+import base64
+import logging
+import platform
 from datetime import datetime
 
 class FileHandler:
@@ -40,7 +44,7 @@ class Logger(metaclass=SingletonMeta):
         if self.__is_setup:
             return
         
-        self.__domain_name = os.uname().nodename
+        self.__domain_name = platform.node()
         self.__module_name = module_name
         self.__mqtt_client = mqtt_client
 

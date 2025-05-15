@@ -22,6 +22,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',    # Pour les docstrings Google/Numpy
     'sphinx.ext.viewcode',    # Lien vers le code source
+    "myst_parser",
 ]
 
 templates_path = ['_templates']
@@ -34,3 +35,9 @@ exclude_patterns = []
 
 html_theme = 'furo'
 html_static_path = ['_static']
+
+# Sources
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.md': 'markdown',
+}
