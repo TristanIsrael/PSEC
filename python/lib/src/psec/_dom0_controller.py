@@ -206,18 +206,21 @@ class Dom0Controller():
                         "percent": psutil.virtual_memory().percent,
                         "used": psutil.virtual_memory().used,
                         "free": psutil.virtual_memory().free
-                    },
-                    "load": {
-                        "1": os.getloadavg()[0],
-                        "5": os.getloadavg()[1],
-                        "15": os.getloadavg()[2]
-                    }
+                    }                    
                 },
                 "boot_time": psutil.boot_time(),
                 "uuid": System().get_system_uuid()
             }
         }
-
+ 
+        # Special case for Windows
+        if hasattr(os, "getloadavg"):
+            payload["system"]["machine"]["load"] = {
+                "1": os.getloadavg()[0],
+                "5": os.getloadavg()[1],
+                "15": os.getloadavg()[2]
+            }
+ 
         self.mqtt_client.publish(f"{Topics.SYSTEM_INFO}/response", payload)
 
     def __handle_delete_file(self, payload:dict):
