@@ -29,3 +29,24 @@ The project is divided into different parts :
 ## Licence
 
 Please read the [licence](python/lib/LICENCE.md) carefully before using this product. 
+
+## Releases
+
+*Please notice that only x86_64 packages are available*
+
+The releases are available in the [official repository](https://alefbet.net/repositories/PSEC).
+
+Add the following in `/etc/apk/repositories`:
+```
+https://alefbet.net/repositories/PSEC
+```
+
+The [public key file](misc/psec.rsa.pub) must be downloaded into `/etc/apk/keys`.
+
+## First use
+
+When you use PSEC for the first time we suggest you start with the [demonstration app](python/demo/README.md) or the [diagnostic app](python/diag/README.md).
+
+Follow the instruction in the [provisioning](python/lib/docs/source/markdown/provisioning.md) documentation.
+
+**Please notice that your hardware must be compatible with VT-d and VT-x. This can be verified with the [diagnostic app](python/diag/README.md).**
