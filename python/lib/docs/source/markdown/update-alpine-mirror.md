@@ -1,49 +1,48 @@
-# Créer ou mettre à jour le miroir Alpine
+# Create or Update the Alpine Mirror
 
-Cette documentation présente la mise en oeuvre des dépôts de paquets Alpine.
+This documentation presents the implementation of the Alpine package repositories.
 
-## Pré-requis
+## Prerequisites
 
-Pour réaliser cette procédure, les pré-requis suivants doivent être satisfaits :
+To perform this procedure, the following prerequisites must be met:
 
-- Serveur web existant avec un accès non sécurisé (pas de mot de passe ni certificat SSL) pour les *dépôts Alpine*
+- Existing web server with unsecured access (no password or SSL certificate) for the *Alpine repositories*
 
-## Principes
+## Principles
 
-Les dépôts sont faits pour évoluer dans le temps et permettre la MCO et la MCS de la distribution Alpine installée sur les stations blanches, mais aussi les logiciels du contrôleur (Panoptiscan) et les bases antivirales.
+The repositories are designed to evolve over time and allow the Maintenance en Condition Opérationnelle (MCO) and the Maintenance en Condition de Sécurité (MCS) of the Alpine distribution installed on the thin clients, as well as the controller software (Panoptiscan) and the antivirus databases.
 
-Lorsqu'un miroir est synchronisé depuis Internet, il faut conserver sa numération (par exemple 3.15.2) et établir un lien symbolique vers ce répertoire permettant à la fois d'utiliser systématiquement la dernière version des dépôts mais aussi d'utiliser une version spécifique lorsque c'est nécessaire (régression, tests, etc)
+When a mirror is synchronized from the Internet, its numbering (for example 3.15.2) must be preserved and a symbolic link must be created to this directory to allow both systematic use of the latest repository version and use of a specific version when necessary (regression, testing, etc.)
 
-## Procédure
+## Procedure
 
-- Sur le serveur web, créer le répertoire racine des dépôts, par convention, nous appelerons cette racine [ALPINE] dans la suite de ce document.
+- On the web server, create the root directory for the repositories; by convention, we will call this root [ALPINE] in the remainder of this document.
 
-- Dans le dossier [ALPINE], créer le sous-dossier`panoptiscan`.
+- Inside the [ALPINE] folder, create the subfolder `panoptiscan`.
 
-- Dans le dossier [ALPINE], copier le dépôt Alpine officiel en conservant le nom de la version, par exemple 3.15.
+- Inside the [ALPINE] folder, copy the official Alpine repository keeping the version name, for example 3.15.
 
-- Créer un lien symbolique nommé `latest-stable` vers le dossier du dépôt officiel.
+- Create a symbolic link named `latest-stable` pointing to the official repository folder.
 
-### Actions communes
+### Common Actions
 
-Les mises à jour, même mineures, apportent presque toujours des modifications sur les noyau XEN et Linux. Ceux-ci doivent être mis à jour sur les dépôts mais aussi sur l'infrastructure de déploiement.
+Updates, even minor ones, almost always bring changes to the XEN and Linux kernels. These must be updated both on the repositories and on the deployment infrastructure.
 
-**Avant de mettre à jour un dépôt existant, il est recommandé d'en créer une copie et de la conserver pour pouvoir revenir sur celui-ci en cas de dysfonctionnement des stations blanches consécutif à la mise à jour. Voir ci-dessous :**
+**Before updating an existing repository, it is recommended to create a copy of it and keep it in order to be able to roll back in case of malfunction of the thin clients following the update. See below:**
 
-- Créer un nouveau répertoire portant le numéro exact de la version (3.15.5 et non 3.15) : 
+- Create a new directory with the exact version number (3.15.5 and not 3.15): 
 ```
 $ cd [ALPINE]
 $ cp -r 3.15.4 3.15.5
-
 ```
 
-- Dans une ligne de commande shell, se placer dans le répertoire et commencer la mise à jour :
+- In a shell command line, navigate to the directory and start the update:
 ```
-$ wget --mirror --no-parent https://dl-cdn.alpinelinux.org/alpine/v3.15/releases/x86_64/
+$ wget –mirror –no-parent https://dl-cdn.alpinelinux.org/alpine/v3.15/releases/x86_64/
 ```
 
->>> Créer un script de mise à jour automatisée
+>>> Create an automated update script
 
-### Actions post-mise à jour
+### Post-Update Actions
 
-Après la mise à jour des dépôts, l'infrastructure de déploiement doit être mise à niveau. Pour ce faire, il suffit de rejouer le playbook ansible de déploiement (voir [Créer l'infrasructure de déploiement](creer-l-infrastructure-de-deploiement.md).
+After updating the repositories, the deployment infrastructure must be upgraded. To do this, simply rerun the Ansible deployment playbook (see [Create the deployment infrastructure](support-infrastructure.md)).

@@ -1,44 +1,44 @@
-# Approvisionnement
+# Provisioning
 
-Ce document présente différentes façons d'approvisionner un équipement avec un système basé sur PSEC.
+This document describes various methods to provision a device with a PSEC-based system.
 
-## Manuel
+## Manual
 
-L'approvisionnement manuel consiste à dérouler un processus d'installation pas-à-pas à partir d'un support USB.
+Manual provisioning consists of going through an installation process step-by-step using a USB drive.
 
-1 - Créer une clé USB d'installation pour Alpine Linux. 
-  - La version d'Alpine Linux utilisée doit correspondre à celle du dépôt souhaité.
-  - L'image ISO utilisée doit être celle de **Alpine Standard**
+1 - Create an installation USB stick for Alpine Linux.  
+  - The Alpine Linux version must match the desired repository version.  
+  - The ISO image used must be **Alpine Standard**.
 
-2 - Installer Alpine Linux sur l'équipement.
-  - Lui affecter un périphérique réseau avec DHCP ou IP fixe en fonction de la situation.
-  - Dans la section APK Mirror, si un dépôt Internet est utilisé choisir `f`, sinon ne pas choisir d'entrée de menu mais saisir l'URL du dépôt `main` local d'Alpine.
-  - Créer un compte utilisateur `admin`
+2 - Install Alpine Linux on the device.  
+  - Assign a network interface with either DHCP or a static IP depending on the context.  
+  - In the APK Mirror section, if using an internet repository, select `f`, otherwise do not select any menu entry but manually enter the URL of the local Alpine `main` repository.  
+  - Create an `admin` user account.
 
-3 - A la fin de l'installation redémarrer le système
+3 - Reboot the system at the end of the installation.
 
-4 - A l'issue du redémarrage, se logger en tant que `admin`
+4 - After reboot, log in as `admin`.
 
-5 - Ajouter les dépôts de binaires 
-  - Taper la commande `$ su - root` puis le mot de passe du compte `root`
-  - Taper la commande `# vi /etc/apk/repositories` et ajouter le dépôt `community` ainsi que le dépôt `PSEC` et les dépôts spécifiques au produit à installer.
-  - Taper `:wq`
+5 - Add binary repositories  
+  - Type `$ su - root` and enter the `root` password.  
+  - Run `# vi /etc/apk/repositories` and add the `community` repository, the `PSEC` repository, and any product-specific repositories.  
+  - Save and exit with `:wq`.
 
-6 - Ajouter les clés PGP 
-  - Taper la commande `# cd /etc/apk/keys` puis `# wget [URL du depot PSEC]/psec.rsa.pub` et recommencer avec les clés des dépôts spécifiques au produit à installer.
-  - Taper la commande `# apk update`
+6 - Add PGP keys  
+  - Run `# cd /etc/apk/keys` then `# wget [PSEC repository URL]/psec.rsa.pub`, and repeat the process for other product-specific repositories.  
+  - Run `# apk update`.
 
-7 - (Optionnel) Autoriser le compte `admin` à exécuter des commandes `root`
-  - Taper la commande `# apk add sudo`, puis `# visudo`
-  - Editer la ligne `# %wheel ALL=(ALL:ALL) NOPASSWD: ALL` et retirer le `#` au début pour décommenter la ligne.
-  - Taper `:wq`  
-  - Taper la commande `# exit`
+7 - (Optional) Allow the `admin` user to execute root commands  
+  - Run `# apk add sudo`, then `# visudo`  
+  - Edit the line `# %wheel ALL=(ALL:ALL) NOPASSWD: ALL` and remove the `#` to uncomment it.  
+  - Save and exit with `:wq`  
+  - Type `# exit`
 
-8 - Installer XEN
-  - Taper la commande `$ sudo apk add xen xen-hypervisor`
-  - Taper la commande `$ sudo reboot`
-  - Au redémarrage, séletionner dans GRUB la première entrée contenant le libellé `Xen`
-  - A la fin du démarrage se logger en tant que `root`
-  - Taper la commande `# rc-service xenstored start`
+8 - Install XEN  
+  - Run `$ sudo apk add xen xen-hypervisor`  
+  - Run `$ sudo reboot`  
+  - On reboot, select the first GRUB entry labeled with `Xen`  
+  - After booting, log in as `root`  
+  - Start the Xen service with `# rc-service xenstored start`
 
-9 - Installer le produit en suivant la documentation fournie.
+9 - Install the product following the provided documentation.

@@ -1,94 +1,96 @@
-# Créer l'infrastructure de déploiement
+# Creating the Deployment Infrastructure
 
-Cette documentation indique comment mettre en oeuvre l'indrastructure de déploiement. 
+*This document is not up-to-date*
 
-L'infrastructure de déploiement PXE s'appuie sur les services suivants :
+This documentation explains how to implement the deployment infrastructure.
 
-| Nom          | Adresse IPv4     | Description |
-|--------------|------------------|-------------------------------|
-| DHCP | 192.168.10.1 | Serveur DHCP pour le boot PXE |
-| TFTP | 192.168.10.1 | Serveur TFTP pour le boot PXE |
-| HTTP | 192.168.10.2 | Serveur HTTP servant les configurations des stations blanches |
-| NFS | 192.168.10.2 | Serveur NFS permettant à l'intégrateur de stocker ou modifier les configurations des stations blanches |
-| DEPOTS | 192.168.10.3 | Serveur HTTP servant les paquets Alpine (APK) |
-| ADMIN | 192.168.10.250 | Machine permettant à l'administrateur d'installer et de configurer l'infrastructure de déploiement |
+The PXE deployment infrastructure relies on the following services:
 
-## Etapes
+| Name    | IPv4 Address    | Description |
+|---------|-----------------|-------------|
+| DHCP    | 192.168.10.1    | DHCP server for PXE boot |
+| TFTP    | 192.168.10.1    | TFTP server for PXE boot |
+| HTTP    | 192.168.10.2    | HTTP server serving the white stations configurations |
+| NFS     | 192.168.10.2    | NFS server allowing the integrator to store or modify white stations configurations |
+| REPOSITORIES | 192.168.10.3 | HTTP server serving Alpine packages (APK) |
+| ADMIN   | 192.168.10.250  | Machine enabling the administrator to install and configure the deployment infrastructure |
 
-La création de l'infrastructure se fait en deux étapes :
+## Steps
 
-1. Création des machines virtuelles
+The creation of the infrastructure is done in two steps:
 
-2. Déploiement et configuration des services
+1. Creation of virtual machines
 
-## Pré-requis
+2. Deployment and configuration of services
 
-L'administrateur doit avoir à sa disposition :
+## Prerequisites
 
-- le kit d'installation dans lequel figure cette documentation
+The administrator must have available:
 
-- la dernière version de l'ISO Alpine extended
+- the installation kit which includes this documentation
 
-- la dernière version de l'image ISO Alpine XEN
+- the latest Alpine extended ISO
 
-- la dernière version de l'image ISO Alpine Virtual
+- the latest Alpine XEN ISO image
 
-- un miroir du dépôt officiel des paquets Alpine (voir *Créer un miroir des dépôts Alpine*)
+- the latest Alpine Virtual ISO image
 
-## Création des machines virtuelles
+- a mirror of the official Alpine package repository (see *Creating an Alpine package mirror*)
 
-Cette section décrit les étapes de création des machines virtuelles de l'infrastructure. Les machines doivent être créées dans l'ordre indiqué.
+## Creating the Virtual Machines
 
-### Poste d'administration
+This section describes the steps to create the infrastructure virtual machines. The machines must be created in the indicated order.
 
-Cette section décrit la création d'une machine pour l'administrateur.
+### Administration Workstation
 
-*à compléter*
+This section describes creating a machine for the administrator.
 
-### Dépôts embarqués
+*to be completed*
 
-Les dépôts Alpine peuvent être stockés sur un serveur HTTP existants s'il en existe un dans le réseau. Cette section indique comment créer un nouveau serveur HTTP pour les dépôts Alpine.
+### Embedded Repositories
 
-**La machine doit avoir au moins 2Go de mémoire.**
+Alpine repositories can be stored on an existing HTTP server if one exists on the network. This section explains how to create a new HTTP server for Alpine repositories.
 
-- Démarrer sur la machine avec l'ISO Alpine standard.
+**The machine must have at least 2 GB of memory.**
 
-- A l'invite de login, taper `root` puis Entrée. L'authentification est terminée.
+- Boot the machine using the standard Alpine ISO.
 
-- Taper la commande `setup-keymap`. Taper ensuite `fr`, puis Entrée, puis `fr`, puis Entrée. Le clavier est à présent en français.
+- At the login prompt, type `root` then Enter. Authentication is done.
 
-- Taper la commande `setup-interfaces`
+- Type the command `setup-keymap`. Then type `fr`, Enter, `fr`, Enter. The keyboard is now set to French.
 
-- A la question `Which one do you want to initialize?`, taper `eth0` puis Entrée
+- Type the command `setup-interfaces`.
 
-- A la question `Ip address fot eth0?`, taper `192.168.10.3` puis Entrée
+- At the question `Which one do you want to initialize?`, type `eth0` then Enter.
 
-- A la question `Netmask?`, taper `255.255.255.0` puis Entrée
+- At the question `Ip address for eth0?`, type `192.168.10.3` then Enter.
 
-- A la question `Gateway?`, taper `none` puis Entrée
+- At the question `Netmask?`, type `255.255.255.0` then Enter.
 
-- A la question `Do you want to do any manual network configuration?`, taper `n` puis Entrée
+- At the question `Gateway?`, type `none` then Enter.
 
-- Taper la commande `/etc/init.d/networking restart`. Le serveur est à présent configuré avec l'adresse IP `192.168.10.3`
+- At the question `Do you want to do any manual network configuration?`, type `n` then Enter.
 
-- Taper la commande `rc-update add networking`
+- Type the command `/etc/init.d/networking restart`. The server is now configured with IP address `192.168.10.3`.
 
-- Taper la commande `setup-sshd` puis Entrée.
+- Type the command `rc-update add networking`.
 
-- A la question `Which SSH server`, taper `openssh` puis Entrée
+- Type the command `setup-sshd` then Enter.
 
-- Le serveur SSH est à présent configuré
+- At the question `Which SSH server`, type `openssh` then Enter.
 
-- Taper la commande `adduser admin` puis Entrée. Ssaisissez ensuite un mot de passe fort puis Entrée (deux fois consécutives)
+- The SSH server is now configured.
 
-- Taper les commandes suivantes :
+- Type the command `adduser admin` then Enter. Then enter a strong password twice consecutively.
+
+- Type the following commands:
 ```
 mkdir -p /var/depots/alpine/main/x86_64
 chown -R admin:admin /var/depots/main/x86_64
 chmod -R 770 /var/depots/main/x86_64
 ```
 
-- Depuis une machine d'administration connectée au même réseau, décompresser l'archive alpine.tar contenant les fichiers du dépôt Alpine dans le dossier `/tmp/alpine`, et taper les commandes suivantes : 
+- From an administration machine connected to the same network, extract the archive alpine.tar containing the Alpine repository files into the `/tmp/alpine` folder, then type the following commands:
 ```
 scp /tmp/alpine/main/x86_64/dosfstools-*.apk admin@192.168.10.3:/var/depots/alpine/main/x86_64
 scp /tmp/alpine/main/x86_64/grub-efi-*.apk admin@192.168.10.3:/var/depots/alpine/main/x86_64
@@ -105,142 +107,142 @@ scp /tmp/alpine/main/x86_64/mkinitfs-*.apk admin@192.168.10.3:/var/depots/alpine
 scp /tmp/alpine/main/x86_64/grub-*.apk admin@192.168.10.3:/var/depots/alpine/main/x86_64
 scp /tmp/alpine/main/x86_64/libfdisk-*.apk admin@192.168.10.3:/var/depots/alpine/main/x86_64
 scp /tmp/alpine/main/x86_64/libsmartcols-*.apk admin@192.168.10.3:/var/depots/alpine/main/x86_64
-linux-lts*
-linux-firmware*
-openssh*
-ncurses*
-libedit*
-busybox*
+scp /tmp/alpine/main/x86_64/linux-lts.apk admin@192.168.10.3:/var/depots/alpine/main/x86_64
+scp /tmp/alpine/main/x86_64/linux-firmware*.apk admin@192.168.10.3:/var/depots/alpine/main/x86_64
+scp /tmp/alpine/main/x86_64/openssh*.apk admin@192.168.10.3:/var/depots/alpine/main/x86_64
+scp /tmp/alpine/main/x86_64/ncurses*.apk admin@192.168.10.3:/var/depots/alpine/main/x86_64
+scp /tmp/alpine/main/x86_64/libedit*.apk admin@192.168.10.3:/var/depots/alpine/main/x86_64
+scp /tmp/alpine/main/x86_64/busybox*.apk admin@192.168.10.3:/var/depots/alpine/main/x86_64
 ```
 
-- Modifier le fichier `/etc/apk/repositories` et y insérer la ligne `/var/depots/alpine/main`
+- Edit the file `/etc/apk/repositories` and add the line `/var/depots/alpine/main`
 
-- Taper la commande `apk update` puis Entrée.
+- Type the command `apk update` then Enter.
 
-- Taper la commande `setup-disk` puis Entrée.
+- Type the command `setup-disk` then Enter.
 
-- A la question `Which disk(s) do you like to use?`, taper `sda` puis Entrée
+- At the question `Which disk(s) do you like to use?`, type `sda` then Enter.
 
-- A la question `How would you like to use it?`, taper `sys` puis Entrée
+- At the question `How would you like to use it?`, type `sys` then Enter.
 
-- A la question `WARNING: Erase the above disk(s) and continue?`, taper `y` puis Entrée
+- At the question `WARNING: Erase the above disk(s) and continue?`, type `y` then Enter.
 
-- A la fin de l'installation, taper `reboot`
+- At the end of installation, type `reboot`.
 
-- A l'invite de login, taper `root` puis Entrée. L'authentification est terminée.
+- At the login prompt, type `root` then Enter. Authentication is done.
 
-- Taper la commande `setup-hostname` puis Entrée, puis `depots.local`, puis Entrée
+- Type the command `setup-hostname` then Enter, then `depots.local`, then Enter.
 
-- Taper la commande `passwd` puis Entrée. Saisissez un mot de passe fort pour le compte root (à deux reprises).
+- Type the command `passwd` then Enter. Enter a strong password for the root account (twice).
 
-- Taper les commandes suivantes :
+- Type the following commands:
 ```
 mkdir -p /var/depots/alpine/
 chown -R admin:admin /var/depots/
 chmod -R 770 /var/depots/
 ```
 
-- Depuis la machine d'administration, taper les commandes suivantes 
+- From the administration machine, type the following commands:
 ```
-cd [répertoire des fichiers alpine contenant le dossier main et le dossier community]
+cd [directory containing alpine files with folders main and community]
 scp -r main community admin@192.168.10.3:/var/depots/alpine
 ```
 
-- Modifier le fichier `/etc/apk/repositories` et y insérer les lignes suivantes :
+- Edit the file `/etc/apk/repositories` and add the following lines:
 ```
 /var/depots/alpine/main
 /var/depots/alpine/community
 ```
 
-- Taper la commande `apk update` puis Entrée.
+- Type the command `apk update` then Enter.
 
-- Taper la commande `setup-timezone` puis Entrée, puis `Europe/Paris`, puis Entrée
+- Type the command `setup-timezone` then Enter, then `Europe/Paris`, then Enter.
 
-- Taper les commandes suivantes :
+- Type the following commands:
 ```
 apk add lighttpd
 rc-update add lighttpd default
 ```
 
-- Editer le fichier `/etc/lighttpd/lighttpd.conf` et ajouter à la fin du fichier `server.dir-listing = "enable"`
+- Edit the file `/etc/lighttpd/lighttpd.conf` and add at the end of the file: `server.dir-listing = "enable"`
 
-### Dépôts sur un stockage réseau (CIFS)
+### Repositories on Network Storage (CIFS)
 
-Dans le cas où le mirroir du dépôt est sur un stockage réseau accessible via CIFS (partage de fichier Windows), cette machine virtuelle servira uniquement d'intermédiaire. La configuration peut être réalisée comme suit.
+If the repository mirror is on a network storage accessible via CIFS (Windows file share), this virtual machine will only serve as an intermediary. Configuration can be done as follows.
 
-**Résumé de la configuration :**
-La machine virtuelle sera configurée comme un serveur réseau normal avec un nom d'hôte. 512 Mo de RAM sont suffisants.
+**Configuration summary:**  
+The virtual machine will be configured as a normal network server with a hostname. 512 MB of RAM is sufficient.
 
-- Démarrer sur la machine avec l'ISO Alpine standard.
+- Boot the machine using the standard Alpine ISO.
 
-- A l'invite de login, taper `root` puis Entrée. L'authentification est terminée.
+- At the login prompt, type `root` then Enter. Authentication is done.
 
-- Taper la commande `setup-keymap`. Taper ensuite `fr`, puis Entrée, puis `fr`, puis Entrée. Le clavier est à présent en français.
+- Type the command `setup-keymap`. Then type `fr`, Enter, `fr`, Enter. The keyboard is now French.
 
-- Taper la commande `setup-interfaces`
+- Type the command `setup-interfaces`.
 
-- A la question `Which one do you want to initialize?`, taper `eth0` puis Entrée
+- At the question `Which one do you want to initialize?`, type `eth0` then Enter.
 
-- A la question `Ip address for eth0?`, taper `dhcp` puis Entrée.
+- At the question `Ip address for eth0?`, type `dhcp` then Enter.
 
-- A la question `Do you want to do any manual network configuration?`, taper `n` puis Entrée
+- At the question `Do you want to do any manual network configuration?`, type `n` then Enter.
 
-- Taper la commande `/etc/init.d/networking restart`. Le serveur est à présent configuré avec l'adresse IP fournie par le serveur DHCP.
+- Type the command `/etc/init.d/networking restart`. The server is now configured with the IP address provided by the DHCP server.
 
-- Taper la commande `rc-update add networking`
+- Type the command `rc-update add networking`.
 
-- Taper la commande `setup-sshd` puis Entrée.
+- Type the command `setup-sshd` then Enter.
 
-- A la question `Which SSH server`, taper `openssh` puis Entrée
+- At the question `Which SSH server`, type `openssh` then Enter.
 
-- Le serveur SSH est à présent configuré
+- The SSH server is now configured.
 
-- Taper la commande `adduser admin` puis Entrée. Ssaisissez ensuite un mot de passe fort puis Entrée (deux fois consécutives)
+- Type the command `adduser admin` then Enter. Then enter a strong password twice consecutively.
 
-A COMPLETER
+*TO BE COMPLETED*
 
-### Serveur DHCP
+### DHCP Server
 
-Le serveur DHCP doit être installé à partir d'une ISO de Alpine Linux standard 3.15 minimum.
+The DHCP server must be installed from an Alpine Linux standard ISO 3.15 minimum.
 
-- Démarrer sur la machine avec l'ISO Alpine standard.
+- Boot the machine using the standard Alpine ISO.
 
-- A l'invite de login, taper `root` puis Entrée. L'authentification est terminée.
+- At the login prompt, type `root` then Enter. Authentication is done.
 
-- Taper la commande `setup-alpine` puis Entrée.
+- Type the command `setup-alpine` then Enter.
 
-- à compléter
+- *to be completed*
 
-Suivez ensuite les instructions de la section *Configuration commune*.
+Then follow the instructions in the *Common configuration* section.
 
-### Serveur HTTP/TFTP/NFS
+### HTTP/TFTP/NFS Server
 
-Le serveur HTTP/TFP/NFS doit être installé à partir d'une ISO de Alpine Linux standard 3.15 minimum.
+The HTTP/TFTP/NFS server must be installed from an Alpine Linux standard ISO 3.15 minimum.
 
-- Démarrer sur la machine avec l'ISO Alpine standard.
+- Boot the machine using the standard Alpine ISO.
 
-- A l'invite de login, taper `root` puis Entrée. L'authentification est terminée.
+- At the login prompt, type `root` then Enter. Authentication is done.
 
-- Taper la commande `setup-alpine` puis Entrée.
+- Type the command `setup-alpine` then Enter.
 
-- à compléter
+- *to be completed*
 
-Suivez ensuite les instructions de la section *Configuration commune*.
+Then follow the instructions in the *Common configuration* section.
 
-### Configuration commune
+### Common Configuration
 
-Chaque machine doit être configurée avec un utilisateur permettant de déployer les services grâce à Ansible.
+Each machine must be configured with a user allowing deployment of services via Ansible.
 
-- Taper la commande `adduser ansible` puis Entrée. Saisir un mot de passe fort pour l'utilisateur (deux foix consécutives).
+- Type the command `adduser ansible` then Enter. Enter a strong password for the user (twice consecutively).
 
-- Ajouter les lignes suivantes dans le fichier /etc/apk/repositories :
+- Add the following lines in the file `/etc/apk/repositories`:
 ```
 http://192.168.10.3/alpine/main
 http://192.168.10.3/alpine/community
 ```
 
-- Taper la commande `visudo` puis Entrée.
+- Type the command `visudo` then Enter.
 
-## Déploiement des services
+## Services Deployment
 
-à rédiger
+*to be written*
