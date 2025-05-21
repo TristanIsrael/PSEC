@@ -8,7 +8,10 @@ class MockSysUsbController():
 
     def __init__(self):
         self.__thread_pool = ThreadPoolExecutor(max_workers=1)
-
+        self.source_disk_path = None
+        self.storage_path = None
+        self.destination_disk_path = None
+        self.mqtt_client = None
 
     def start(self, source_disk_path:str, storage_path:str, destination_disk_path:str):
         self.source_disk_path = source_disk_path
@@ -23,8 +26,8 @@ class MockSysUsbController():
 
     def __on_mqtt_connected(self):
         self.__debug("MQTT client connected")
-        self.mqtt_client.subscribe("{}/+/+/request".format(Topics.SYSTEM))
-        self.mqtt_client.subscribe("{}/+/request".format(Topics.DISCOVER))
+        self.mqtt_client.subscribe(f"{Topics.SYSTEM}/+/+/request")
+        self.mqtt_client.subscribe(f"{Topics.DISCOVER}/+/request")
 
         # Finally we announce our components
         self.__handle_discover_components()
