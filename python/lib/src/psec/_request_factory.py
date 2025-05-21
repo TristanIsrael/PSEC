@@ -1,4 +1,4 @@
-from . import Constantes, Parametres, Cles
+from . import Constants, Parameters, Keys
 
 class RequestFactory():
     ''' La classe MessageFactory permet de générer les notification, commandes et
@@ -64,7 +64,7 @@ class RequestFactory():
         }        
     
     @staticmethod
-    def create_request_delete_file(filepath: str, disk: str = Constantes().constante(Cles.DEPOT_LOCAL)) -> dict:
+    def create_request_delete_file(filepath: str, disk: str = Constants().constant(Keys.LOCAL_REPOSITORY)) -> dict:
         return {
             "filepath": filepath,
             "disk": disk

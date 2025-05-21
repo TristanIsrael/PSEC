@@ -1,4 +1,4 @@
-from psec import SingletonMeta, Logger, RequestFactory, BenchmarkId, Parametres, Cles
+from psec import SingletonMeta, Logger, RequestFactory, BenchmarkId, Parameters, Keys
 try:
     from psec import DemonInputs
 except:
@@ -35,7 +35,7 @@ class ControleurBenchmark(metaclass=SingletonMeta):
 
         start_ms = time.time()*1000
 
-        iterations:int = Parametres().parametre(Cles.BENCHMARK_INPUTS_ITERATIONS)
+        iterations:int = Parameters().parametre(Keys.BENCHMARK_INPUTS_ITERATIONS)
         mouse = Mouse()
         for i in range(iterations):
             mouse.x = random.randrange(0, 1024, 1)
@@ -107,7 +107,7 @@ class ControleurBenchmark(metaclass=SingletonMeta):
     def __execute_benchmark_fichiers(self, disque:str, taille_fichier_ko:int, quantite_fichiers:int, metrics:list):
         Logger().info("Démarrage d'une itération de benchmark fichier pour {} fichiers de {} Ko".format(quantite_fichiers, taille_fichier_ko), "BenchmarkController")
 
-        point_montage = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)
+        point_montage = Parameters().parametre(Keys.USB_MOUNT_PATH)
 
         # Step 1 : create files on disk
         for n_fichier in range(1, quantite_fichiers+1):

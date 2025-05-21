@@ -1,11 +1,11 @@
-from . import Constantes, RequestFactory, Topics, NotificationFactory
-from . import Logger, MqttClient, ConnectionType, Cles, SingletonMeta
 import tempfile
 import os
 import zlib
 import base64
 import atexit
 import signal
+from . import RequestFactory, Topics, NotificationFactory
+from . import Logger, MqttClient, SingletonMeta
 
 class Api(metaclass=SingletonMeta):
     """ 
@@ -220,7 +220,7 @@ class Api(metaclass=SingletonMeta):
 
         The response is provided on the topic :attr:`Topic.LIST_DISKS`.
         """
-        self.__mqtt_client.publish("{}/request".format(Topics.LIST_DISKS), {})
+        self.__mqtt_client.publish(f"{Topics.LIST_DISKS}/request", {})
 
 
     def get_files_list(self, disk: str, recursive:bool = False, from_dir:str = ""):
@@ -260,7 +260,7 @@ class Api(metaclass=SingletonMeta):
             from_dir(str, optional): The starting directory for the listing.
         """
         payload = RequestFactory.create_request_files_list(disk, recursive, from_dir)
-        self.__mqtt_client.publish("{}/request".format(Topics.LIST_FILES), payload)
+        self.__mqtt_client.publish(f"{Topics.LIST_FILES}/request", payload)
 
 
     def read_file(self, disk:str, filepath:str):
@@ -274,7 +274,7 @@ class Api(metaclass=SingletonMeta):
             filepath(str): The full path of the file to be copied.
         """
         payload = RequestFactory.create_request_read_file(disk, filepath)
-        self.__mqtt_client.publish("{}/request".format(Topics.READ_FILE), payload)
+        self.__mqtt_client.publish(f"{Topics.READ_FILE}/request", payload)
 
 
     def copy_file(self, source_disk:str, filepath:str, destination_disk:str):
@@ -289,11 +289,7 @@ class Api(metaclass=SingletonMeta):
             destination_disk(str): The destination disk.
         """
         payload = RequestFactory.create_request_copy_file(source_disk, filepath, destination_disk)
-        self.__mqtt_client.publish("{}/request".format(Topics.COPY_FILE), payload)
-
-
-    '''def copy_file_to_storage(self, source_disk:str, filepath:str):
-        self.copy_file(source_disk, filepath, Constantes.REPOSITORY)'''
+        self.__mqtt_client.publish(f"{Topics.COPY_FILE}/request", payload)
 
 
     def delete_file(self, filepath:str, disk:str):
@@ -305,7 +301,7 @@ class Api(metaclass=SingletonMeta):
         In case of an error, the :attr:`Topic.ERROR` notification is sent.
         """
         payload = RequestFactory.create_request_delete_file(filepath, disk)
-        self.__mqtt_client.publish("{}/request".format(Topics.DELETE_FILE), payload)
+        self.__mqtt_client.publish(f"{Topics.DELETE_FILE}/request", payload)
 
 
     def get_file_footprint(self, filepath:str, disk:str):
@@ -319,7 +315,7 @@ class Api(metaclass=SingletonMeta):
             disk(str): The disk on which the file is located.
         """
         payload = RequestFactory.create_request_get_file_footprint(filepath, disk)
-        self.__mqtt_client.publish("{}/request".format(Topics.FILE_FOOTPRINT), payload)
+        self.__mqtt_client.publish(f"{Topics.FILE_FOOTPRINT}/request", payload)
 
 
     def create_file(self, filepath:str, disk:str, contents:bytes, binary=False):
@@ -345,7 +341,7 @@ class Api(metaclass=SingletonMeta):
         """
         data = contents if not binary else zlib.compress(contents, level=1)
         payload = RequestFactory.create_request_create_file(filepath, disk, base64.b64encode(data), binary)
-        self.__mqtt_client.publish("{}/request".format(Topics.CREATE_FILE), payload)
+        self.__mqtt_client.publish(f"{Topics.CREATE_FILE}/request", payload)
 
 
     def discover_components(self) -> None:
@@ -354,7 +350,7 @@ class Api(metaclass=SingletonMeta):
 
         The response is provided on the topic :attr:`Topic.DISCOVER_COMPONENTS`
         """
-        self.__mqtt_client.publish("{}/request".format(Topics.DISCOVER_COMPONENTS), {})
+        self.__mqtt_client.publish(f"{Topics.DISCOVER_COMPONENTS}/request", {})
 
 
     def publish_components(self, components:list) -> None:
@@ -381,7 +377,7 @@ class Api(metaclass=SingletonMeta):
         payload = {
             "components": components
         }
-        self.__mqtt_client.publish("{}/response".format(Topics.DISCOVER_COMPONENTS), payload)
+        self.__mqtt_client.publish(f"{Topics.DISCOVER_COMPONENTS}/response", payload)
 
 
     def request_energy_state(self) -> None:
@@ -390,7 +386,7 @@ class Api(metaclass=SingletonMeta):
 
         The response is provided on the topic :attr:`Topic.ENERGY_STATE`
         """
-        self.__mqtt_client.publish("{}/request".format(Topics.ENERGY_STATE), {})
+        self.__mqtt_client.publish(f"{Topics.ENERGY_STATE}/request", {})
 
 
     def request_system_info(self) -> None:
@@ -441,7 +437,7 @@ class Api(metaclass=SingletonMeta):
 
         The response is provided on the topic :attr:`Topic.SYSTEM_INFO`
         """
-        self.__mqtt_client.publish("{}/request".format(Topics.SYSTEM_INFO), {})
+        self.__mqtt_client.publish(f"{Topics.SYSTEM_INFO}/request", {})
 
 
     ####
@@ -454,7 +450,7 @@ class Api(metaclass=SingletonMeta):
         **This notification is for internal use only**
         """
         payload = NotificationFactory.create_notification_disk_state(disk, "connected")
-        self.__mqtt_client.publish("{}".format(Topics.DISK_STATE), payload)
+        self.__mqtt_client.publish(f"{Topics.DISK_STATE}", payload)
     
 
     def notify_disk_removed(self, disk):
@@ -464,7 +460,7 @@ class Api(metaclass=SingletonMeta):
         **This notification is for internal use only**
         """
         payload = NotificationFactory.create_notification_disk_state(disk, "diconnected")
-        self.__mqtt_client.publish("{}".format(Topics.DISK_STATE), payload)
+        self.__mqtt_client.publish(f"{Topics.DISK_STATE}", payload)
 
 
     def notify_gui_ready(self) -> None:
@@ -474,7 +470,7 @@ class Api(metaclass=SingletonMeta):
         **This notification is mandatory to make the splash screen disappear when the GUI is ready, otherwise
         the GUI of the system would remain behind the splash screen**
         """
-        self.__mqtt_client.publish("{}".format(Topics.GUI_READY), {})
+        self.__mqtt_client.publish(f"{Topics.GUI_READY}", {})
 
 
     ####
@@ -495,7 +491,7 @@ class Api(metaclass=SingletonMeta):
                 "reason": "the reason why the shutdown was refused"
             }
         """       
-        self.__mqtt_client.publish("{}/request".format(Topics.SHUTDOWN), {})
+        self.__mqtt_client.publish(f"{Topics.SHUTDOWN}/request", {})
 
 
     def restart_domain(self, domain_name:str):
@@ -514,7 +510,7 @@ class Api(metaclass=SingletonMeta):
             domain_name(str): The name of the Domain to restart.
         """
         payload = RequestFactory.create_request_restart_domain(domain_name)
-        self.__mqtt_client.publish("{}/request".format(Topics.RESTART_DOMAIN), payload)
+        self.__mqtt_client.publish(f"{Topics.RESTART_DOMAIN}/request", payload)
 
 
     ####
@@ -529,12 +525,12 @@ class Api(metaclass=SingletonMeta):
 
     def __on_message_received(self, topic:str, payload:dict):  
         # Intercept shutdown response
-        if topic == "{}/response".format(Topics.SHUTDOWN):
+        if topic == f"{Topics.SHUTDOWN}/response":
             self.__on_shutdown(payload)
             return # Stop here
         
         # Intercept restart domain response
-        if topic == "{}/response".format(Topics.RESTART_DOMAIN):
+        if topic == f"{Topics.RESTART_DOMAIN}/response":
             self.__on_restart_domain(payload)
             return # Stop here
 

@@ -1,9 +1,12 @@
 __author__ = "Tristan Israël (tristan.israel@alefbet.net)"
 __version__ = '1.1'
 
+import logging
+from logging import NullHandler
+
 from ._singleton import SingletonMeta
 from ._system import System
-from ._constantes import Constantes, Cles, BoutonSouris, TypeEntree, BenchmarkId, EtatComposant
+from ._constants import Constants, Keys, InputType, BenchmarkId, ComponentState
 try:
     from ._keymap_fr import KeymapFR
 except Exception as e:
@@ -12,7 +15,7 @@ except Exception as e:
 from ._topics import Topics
 from ._mqtt_helper import MqttHelper
 from ._mqtt_client import MqttClient, ConnectionType, SerialMQTTClient
-from ._parametres import Parametres
+#from .deprecated._parameters import Parameters
 from ._request_factory import RequestFactory
 from ._notification_factory import NotificationFactory
 from ._logger import Logger
@@ -35,32 +38,27 @@ try:
 except Exception as e:
     print("The class SysUsbController won't be available due to missing dependancy")
 from ._api import Api
-#from ._inputs_proxy import InputsProxy
 from ._dom0_controller import Dom0Controller
 from ._components_helper import ComponentsHelper
 from ._mqtt_factory import MqttFactory
 from ._mock_sys_usb_controller import MockSysUsbController
 
-import logging
-from logging import NullHandler
 
 __all__ = [
     "__version__",
     "KeymapFR",
-    "TypeEntree", "BoutonSouris", "Constantes", "EtatComposant", "MouseMove",     
+    "InputType", "MouseButton", "Constants", "ComponentState", "MouseMove",     
     "RequestFactory",
-    #"Journal", "JournalProxy", "DemonProxyJournal",
     "Logger",
-    "NotificationFactory", "BoutonSouris",
-    "Parametres", "Cles", "ResponseFactory",    
+    "NotificationFactory", "MouseButton",
+    "Keys", "ResponseFactory",    
+    #"Parameters"
     "DiskMonitor",
     "FichierHelper",    
     "SingletonMeta",
     "DemonInputs",
-    "Mouse", "MouseButton", "MouseWheel", #"InputsProxy",
-    #"ControleurBenchmark", 
+    "Mouse", "MouseButton", "MouseWheel",
     "BenchmarkId",
-    #"MockXenbus",
     "TaskRunner",
     "MqttClient", "ConnectionType", "Topics", "MqttFactory", "SerialMQTTClient", "MqttHelper",
     "Dom0Controller", "SysUsbController", "Api",

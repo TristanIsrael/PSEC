@@ -1,4 +1,4 @@
-from psec import MqttFactory, Logger, TypeEntree, Topics, MqttHelper, ResponseFactory
+from psec import MqttFactory, Logger, InputType, Topics, MqttHelper, ResponseFactory
 import os
 import glob
 import subprocess
@@ -104,9 +104,9 @@ def start_events_listener(virtual_mouse, virtual_touch):
                 # Supposons que 'data' soit un tableau de 4 entiers
                 device_type, event_type, event_code, event_value = data
 
-                if device_type == TypeEntree.SOURIS:
+                if device_type == InputType.MOUSE:
                     device = virtual_mouse
-                elif device_type == TypeEntree.TOUCH and virtual_touch is not None:
+                elif device_type == InputType.TOUCH and virtual_touch is not None:
                     device = virtual_touch
                 else:
                     device = None

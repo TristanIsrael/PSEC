@@ -1,7 +1,9 @@
-import os.path, logging, json
-from . import SingletonMeta, Constantes, Cles
+import os
+import logging
+import json
+from .. import SingletonMeta, Constants, Keys
 
-class Parametres(metaclass=SingletonMeta):
+class Parameters(metaclass=SingletonMeta):
     """Classe permettant de gérer les paramètres du système"""    
 
     # Par défaut, c'est le fichier de paramètres global qui est utilisé
@@ -9,7 +11,7 @@ class Parametres(metaclass=SingletonMeta):
     params = {}
 
     def __init__(self):
-        self.chemin_fichier_parametres = Constantes().constante("chemin_fichier_config_global")
+        self.chemin_fichier_parametres = Constants().constant("chemin_fichier_config_global")
         if self.__verifie_fichier_parametres(self.chemin_fichier_parametres):
             self.__lit_fichier()            
 
@@ -30,8 +32,8 @@ class Parametres(metaclass=SingletonMeta):
             params = json.load(f)
             for cle in params:
                 valeur = params[cle]
-                if cle == Cles.NIVEAU_JOURNAL:
-                    niv = Parametres.niveau_journalisation_from_string(valeur)
+                if cle == Keys.LOG_LEVEL:
+                    niv = Parameters.niveau_journalisation_from_string(valeur)
                     self.params[cle] = niv                    
                 else:                    
                     self.params[cle] = valeur                    
@@ -48,7 +50,7 @@ class Parametres(metaclass=SingletonMeta):
         if valeur:
             return valeur          
         else:
-            valeur = Constantes().constante(cle)
+            valeur = Constants().constant(cle)
             if valeur:
                 return valeur 
             else:

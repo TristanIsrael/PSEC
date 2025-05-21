@@ -1,4 +1,4 @@
-from . import EtatComposant
+from . import ComponentState
 
 class ComponentsHelper():
 
@@ -11,7 +11,7 @@ class ComponentsHelper():
         for update in updates:
             if update["id"] in components_dict:
                 # Si l'id existe, mettre à jour uniquement le champ 'state'
-                components_dict[update["id"]]["state"] = update.get("state", EtatComposant.UNKNOWN)
+                components_dict[update["id"]]["state"] = update.get("state", ComponentState.UNKNOWN)
             else:
                 # Si l'id n'existe pas, ajouter l'entrée
                 self.__components.append(update)
@@ -32,9 +32,9 @@ class ComponentsHelper():
     def get_state(self, id:str):
         for comp in self.__components:
             if comp.get("id") == id:
-                return comp.get("state", EtatComposant.UNKNOWN)
+                return comp.get("state", ComponentState.UNKNOWN)
             
-        return EtatComposant.UNKNOWN
+        return ComponentState.UNKNOWN
     
     def get_type(self, id:str) -> str:
         for comp in self.__components:

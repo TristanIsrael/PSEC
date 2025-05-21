@@ -4,11 +4,11 @@ import subprocess
 import time
 import psutil
 import os
-from . import Constantes, __version__
-from . import Logger, FichierHelper, Parametres, Cles
+from . import Constants, __version__
+from . import Logger, FichierHelper, Parameters, Keys
 from . import ResponseFactory
 from . import MqttClient, Topics, MqttHelper, NotificationFactory
-from . import System, EtatComposant
+from . import System, ComponentState
 
 class Dom0Controller():
     """ Cette classe traite les commandes envoyées par les Domaines et qui concernent le dépôt local et le 
@@ -84,10 +84,10 @@ class Dom0Controller():
             return 
 
         # Récupère la liste des fichiers                    
-        fichiers = FichierHelper.get_files_list(Constantes.REPOSITORY, True)
+        fichiers = FichierHelper.get_files_list(Constants.REPOSITORY, True)
 
         # Génère la réponse
-        response = ResponseFactory.create_response_list_files(Constantes.REPOSITORY, fichiers)
+        response = ResponseFactory.create_response_list_files(Constants.REPOSITORY, fichiers)
         self.mqtt_client.publish(f"{Topics.LIST_FILES}/response", response)
 
 
@@ -104,7 +104,7 @@ class Dom0Controller():
             return
         
         # Calcule l'empreinte
-        repository_path = Parametres().parametre(Cles.CHEMIN_DEPOT_DOM0)
+        repository_path = Parameters().parametre(Keys.LOCAL_REPOSITORY_DOM0)
         footprint = FichierHelper.calculate_footprint(f"{repository_path}/{filepath}")
 
         Logger().info(f"Footprint = {footprint}")
@@ -150,7 +150,7 @@ class Dom0Controller():
 
     def __is_storage_request(self, payload:dict) -> bool:
         if payload.get("disk") is not None:
-            return payload.get("disk") == Constantes.REPOSITORY
+            return payload.get("disk") == Constants.REPOSITORY
         else:
             return False
 
@@ -230,12 +230,12 @@ class Dom0Controller():
 
         disk = payload["disk"]
 
-        if disk != Constantes.REPOSITORY:
+        if disk != Constants.REPOSITORY:
             # This file is not stored in the repository so we ignore it
             return
 
         filepath = payload["filepath"]
-        repository_path = Parametres().parametre(Cles.CHEMIN_DEPOT_DOM0)
+        repository_path = Parameters().parametre(Keys.LOCAL_REPOSITORY_DOM0)
         storage_filepath = f"{repository_path}/{filepath}"
 
         if not FichierHelper().remove_file(storage_filepath):
@@ -245,10 +245,10 @@ class Dom0Controller():
         
     def __handle_discover_components(self):
         payload = ResponseFactory.create_response_component_state(
-            Constantes.PSEC_SYSTEM_CONTROLLER,
+            Constants.PSEC_SYSTEM_CONTROLLER,
             "System main controller",
             "Dom0",
-            EtatComposant.READY
+            ComponentState.READY
         )
 
         self.mqtt_client.publish(f"{Topics.DISCOVER_COMPONENTS}/response", payload)

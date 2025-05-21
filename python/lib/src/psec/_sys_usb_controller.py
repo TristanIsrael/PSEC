@@ -1,6 +1,6 @@
-from . import Constantes, Parametres, MqttClient, Topics
-from . import FichierHelper, ResponseFactory, EtatComposant
-from . import Logger, Cles, BenchmarkId, MqttClient, DiskMonitor, MqttHelper
+from . import Constants, Parameters, MqttClient, Topics
+from . import FichierHelper, ResponseFactory, ComponentState
+from . import Logger, Keys, BenchmarkId, MqttClient, DiskMonitor, MqttHelper
 from . import TaskRunner
 try:
     from . import DemonInputs
@@ -67,14 +67,14 @@ class SysUsbController():
 
         #ControleurBenchmark().setup(self.mqtt_client)
 
-        self.__disk_monitor = DiskMonitor(Constantes().constante(Cles.CHEMIN_MONTAGE_USB), self.mqtt_client)
+        self.__disk_monitor = DiskMonitor(Constants().constant(Keys.USB_MOUNT_PATH), self.mqtt_client)
         threading.Thread(target=self.__disk_monitor.start).start()
 
         payload = ResponseFactory.create_response_component_state(
-            Constantes.PSEC_DISK_CONTROLLER,
+            Constants.PSEC_DISK_CONTROLLER,
             "System Disk controller",
             "sys-usb",
-            EtatComposant.READY
+            ComponentState.READY
         )
         
         self.mqtt_client.publish(f"{Topics.DISCOVER_COMPONENTS}/response", payload)
@@ -138,7 +138,7 @@ class SysUsbController():
         recursive = payload.get("recursive", False)
         from_dir = payload.get("from_dir", "")
 
-        if disk == Constantes.REPOSITORY:
+        if disk == Constants.REPOSITORY:
             return
 
         # Récupère la liste des fichiers
@@ -164,9 +164,9 @@ class SysUsbController():
         
         source_disk = payload.get("disk", "")
         filepath = payload.get("filepath", "")
-        repository_path:str = Parametres().parametre(Cles.STORAGE_PATH_DOMU)
+        repository_path:str = Parameters().parametre(Keys.STORAGE_PATH_DOMU)
     
-        source_location = "{}/{}".format(Parametres().parametre(Cles.CHEMIN_MONTAGE_USB), source_disk) 
+        source_location = "{}/{}".format(Parameters().parametre(Keys.USB_MOUNT_PATH), source_disk) 
         source_footprint = FichierHelper.calculate_footprint("{}/{}".format(source_location, filepath))     
 
         dest_parent_path = Path("{}/{}".format(repository_path, filepath)).parent
@@ -176,7 +176,7 @@ class SysUsbController():
 
         dest_footprint = FichierHelper.copy_file(source_location, filepath, repository_path, source_footprint)
         if dest_footprint != "":            
-            notif = NotificationFactory.create_notification_new_file(Constantes.REPOSITORY, filepath, source_footprint, dest_footprint)
+            notif = NotificationFactory.create_notification_new_file(Constants.REPOSITORY, filepath, source_footprint, dest_footprint)
             self.mqtt_client.publish(Topics.NEW_FILE, notif)
         else:
             notif = NotificationFactory.create_notification_error(source_disk, filepath, "The file could not be copied")
@@ -197,8 +197,8 @@ class SysUsbController():
         filepath = payload.get("filepath", "")
         target_disk = payload.get("destination", "")
         
-        source_location = "{}/{}".format(Parametres().parametre(Cles.CHEMIN_MONTAGE_USB), source_disk)        
-        destination_location = "{}/{}".format(Parametres().parametre(Cles.CHEMIN_MONTAGE_USB), target_disk)
+        source_location = "{}/{}".format(Parameters().parametre(Keys.USB_MOUNT_PATH), source_disk)        
+        destination_location = "{}/{}".format(Parameters().parametre(Keys.USB_MOUNT_PATH), target_disk)
 
         try:                   
             self.task_runner.run_task(self.__do_copy_file, args=(source_location, filepath, target_disk, destination_location,))
@@ -245,7 +245,7 @@ class SysUsbController():
         disk = payload.get("disk")
         filepath = payload.get("filepath")
         
-        if disk is not None and disk == Constantes.REPOSITORY:
+        if disk is not None and disk == Constants.REPOSITORY:
             # Ignored
             return
 
@@ -259,7 +259,7 @@ class SysUsbController():
         
         Logger().debug(f"Calculate footprint of the file {filepath} on the disk {disk}")
 
-        mount_point = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)
+        mount_point = Parameters().parametre(Keys.USB_MOUNT_PATH)
         footprint = FichierHelper.calculate_footprint(f"{mount_point}/{disk}/{filepath}")
 
         Logger().info(f"The footprint of the file {disk} on the disk {filepath} is {footprint}")
@@ -277,7 +277,7 @@ class SysUsbController():
             Logger().error("Missing argument in the create_file command")
             return
 
-        if disk == Constantes.REPOSITORY:
+        if disk == Constants.REPOSITORY:
             # Ignored
             return
 
@@ -290,7 +290,7 @@ class SysUsbController():
         else:
             data = decoded
 
-        mount_point = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)
+        mount_point = Parameters().parametre(Keys.USB_MOUNT_PATH)
         complete_filepath = f"{mount_point}/{disk}/{filepath}"
         
         Logger().debug(f"Create a file {filepath} of size {len(data)} octets on disk {disk}")
@@ -315,9 +315,9 @@ class SysUsbController():
     def __handle_discover_components(self, topic:str, payload:dict) -> None:
         response = {
             "components": [
-                { "id": Constantes.PSEC_DISK_CONTROLLER, "domain_name": "sys-usb", "label": "System disk controller", "type": "core", "state": EtatComposant.READY },
-                { "id": Constantes.PSEC_INPUT_CONTROLLER, "domain_name": "sys-usb", "label": "Input controller", "type": "core", "state": EtatComposant.READY },
-                { "id": Constantes.PSEC_IO_BENCHMARK, "domain_name": "sys-usb", "label": "System I/O benchmark", "type": "core", "state": EtatComposant.READY }
+                { "id": Constants.PSEC_DISK_CONTROLLER, "domain_name": "sys-usb", "label": "System disk controller", "type": "core", "state": ComponentState.READY },
+                { "id": Constants.PSEC_INPUT_CONTROLLER, "domain_name": "sys-usb", "label": "Input controller", "type": "core", "state": ComponentState.READY },
+                { "id": Constants.PSEC_IO_BENCHMARK, "domain_name": "sys-usb", "label": "System I/O benchmark", "type": "core", "state": ComponentState.READY }
             ]
         }
 
@@ -330,12 +330,12 @@ class SysUsbController():
 
         disk = payload["disk"]
 
-        if disk == Constantes.REPOSITORY:
+        if disk == Constants.REPOSITORY:
             # This file is the repository so we ignore it
             return
 
         filepath = payload["filepath"]
-        mount_point = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)
+        mount_point = Parameters().parametre(Keys.USB_MOUNT_PATH)
         storage_filepath = f"{mount_point}/{disk}/{filepath}"
 
         if not FichierHelper().remove_file(storage_filepath):

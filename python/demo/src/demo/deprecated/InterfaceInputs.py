@@ -3,7 +3,7 @@ from PySide6.QtCore import  Slot, QPoint, QCoreApplication, Qt, QEvent, QPointF
 from PySide6.QtGui import QMouseEvent, QWheelEvent, QHoverEvent, QEnterEvent, QGuiApplication
 from PySide6.QtWidgets import QWidget
 from python.diag.src.diag.deprecated.MousePointer import MousePointer
-from psec import Parametres, Cles, Mouse, MouseButton, MouseWheel, MouseMove, Api
+from psec import Parameters, Keys, Mouse, MouseButton, MouseWheel, MouseMove, Api
 import serial, subprocess #, threading
 
 class InterfaceInputs(QObject):
@@ -32,7 +32,7 @@ class InterfaceInputs(QObject):
     def demarre_surveillance(self):        
         try:
             Api().info("Démarrage de la surveillance des inputs", "InterfaceInputs")
-            self.chemin_socket_inputs = Parametres().parametre(Cles.CHEMIN_SOCKET_INPUT_DOMU)
+            self.chemin_socket_inputs = Parameters().parametre(Keys.INPUT_SOCKET_PATH_DOMU)
             self.__connecte_interface_xenbus()
         except Exception as e:
             Api().error("Impossible d'ouvrir le port Xenbus Inputs", "InterfaceInputs")

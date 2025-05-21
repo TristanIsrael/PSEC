@@ -1,5 +1,5 @@
 import os, shutil
-from psec import MqttClient, ConnectionType, Topics, ResponseFactory, FichierHelper, MqttHelper, NotificationFactory, Constantes
+from psec import MqttClient, ConnectionType, Topics, ResponseFactory, FichierHelper, MqttHelper, NotificationFactory, Constants
 from concurrent.futures import ThreadPoolExecutor
 import base64, zlib
 
@@ -74,7 +74,7 @@ class MockSysUsbController():
                 source_footprint = FichierHelper.calculate_footprint(source_path)
                 dest_footprint = FichierHelper.calculate_footprint(dest_filepath)
 
-                notif = NotificationFactory.create_notification_new_file(Constantes.REPOSITORY, filepath, source_footprint, dest_footprint)
+                notif = NotificationFactory.create_notification_new_file(Constants.REPOSITORY, filepath, source_footprint, dest_footprint)
                 self.mqtt_client.publish(Topics.NEW_FILE, notif)
             except Exception as e:
                 self.__debug("Error during copy: {}".format(e))
@@ -125,9 +125,9 @@ class MockSysUsbController():
     def __handle_discover_components(self):
         response = {
             "components": [
-                { "id": Constantes.PSEC_DISK_CONTROLLER, "label": "System disk controller", "type": "core", "state": "ready" },
-                { "id": Constantes.PSEC_INPUT_CONTROLLER, "label": "Input controller", "type": "core", "state": "ready" },
-                { "id": Constantes.PSEC_IO_BENCHMARK, "label": "System I/O benchmark", "type": "core", "state": "ready" }
+                { "id": Constants.PSEC_DISK_CONTROLLER, "label": "System disk controller", "type": "core", "state": "ready" },
+                { "id": Constants.PSEC_INPUT_CONTROLLER, "label": "Input controller", "type": "core", "state": "ready" },
+                { "id": Constants.PSEC_IO_BENCHMARK, "label": "System I/O benchmark", "type": "core", "state": "ready" }
             ]
         }
 
@@ -166,7 +166,7 @@ class MockSysUsbController():
             self.__debug("Missing argument in the create_file command")
             return
 
-        if disk == Constantes.REPOSITORY:
+        if disk == Constants.REPOSITORY:
             # Ignored
             return
 

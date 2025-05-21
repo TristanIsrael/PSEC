@@ -2,7 +2,7 @@ from PySide6.QtCore import QObject, Signal
 from PySide6.QtCore import QProcess, QTimer, QDir, Property, Slot, QPoint, QCoreApplication, Qt, QEvent, QSize
 from PySide6.QtGui import QMouseEvent, QCursor
 from PySide6.QtWidgets import QWidget
-from psec import Api, Constantes, Topics, BenchmarkId, MqttClient, MqttFactory
+from psec import Api, Constants, Topics, BenchmarkId, MqttClient, MqttFactory
 import os
 
 class InterfaceSocle(QObject):
@@ -52,7 +52,7 @@ class InterfaceSocle(QObject):
     
     @Slot()
     def get_storage_content(self):
-        return self.get_disk_content(Constantes.REPOSITORY)
+        return self.get_disk_content(Constants.REPOSITORY)
 
     def get_disks(self):
         return self.__disks

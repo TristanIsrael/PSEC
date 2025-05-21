@@ -2,7 +2,7 @@ from PySide6.QtCore import QObject, Signal, Slot
 from PySide6.QtWidgets import QWidget
 from InterfaceSocle import InterfaceSocle
 from hashlib import md5
-from psec import Api, Parametres, Cles
+from psec import Api, Parameters, Keys
 import os
 try:
     from psec import ControleurBenchmark
@@ -78,7 +78,7 @@ class AppController(QObject):
 
             # 1 - Création d'un fichier sur le support USB            
             Api().info("Création d'un fichier aléatoire", "AppController")
-            repository_path = Parametres().parametre(Cles.STORAGE_PATH_DOMU)
+            repository_path = Parameters().parametre(Keys.STORAGE_PATH_DOMU)
             filepath = '/test_file'.format(repository_path)                    
             contents = os.urandom(1024*1024)
 

@@ -1,4 +1,4 @@
-from . import Parametres, Cles, Constantes, Logger
+from . import Parameters, Keys, Constants, Logger
 from pathlib import Path
 import os, hashlib, subprocess
 
@@ -13,7 +13,7 @@ class FichierHelper():
         """
 
         disques = []
-        point_montage = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)
+        point_montage = Parameters().parametre(Keys.USB_MOUNT_PATH)
         #print("Recherche de disques USB dans {}".format(point_montage))                
         with os.scandir(point_montage) as dossiers:
             for dossier in dossiers:
@@ -38,10 +38,10 @@ class FichierHelper():
         """
 
         chemin:str = ""
-        if disk == Constantes.REPOSITORY:
-            chemin = Parametres().parametre(Cles.CHEMIN_DEPOT_DOM0)
+        if disk == Constants.REPOSITORY:
+            chemin = Parameters().parametre(Keys.LOCAL_REPOSITORY_DOM0)
         else:
-            chemin_montage = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)
+            chemin_montage = Parameters().parametre(Keys.USB_MOUNT_PATH)
             if chemin_montage == None:
                 print("Aucun point de montage défini. Abandon")
                 return []
@@ -104,7 +104,7 @@ class FichierHelper():
     def calculate_footprint(filepath:str) -> str:
         try:
             with open(filepath, "rb") as f:            
-                hash = hashlib.file_digest(f, Constantes.FOOTPRINT_METHOD)
+                hash = hashlib.file_digest(f, Constants.FOOTPRINT_METHOD)
                 return hash.hexdigest()                
         except Exception as e:
             print("An error occured while calculating the footprint of the file {}".format(filepath))
@@ -143,7 +143,7 @@ class FichierHelper():
 
     @staticmethod
     def copy_file_to_repository(source_location:str, filepath:str, footprint:str):
-        repository_path = str(Parametres().parametre(Cles.STORAGE_PATH_DOMU))
+        repository_path = str(Parameters().parametre(Keys.STORAGE_PATH_DOMU))
         FichierHelper.copy_file(source_location, filepath, repository_path, footprint)
 
     @staticmethod
