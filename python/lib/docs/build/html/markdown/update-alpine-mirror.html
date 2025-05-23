@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="prev" title="Créer l’infrastructure de déploiement" href="support-infrastructure.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="prev" title="Creating the Deployment Infrastructure" href="support-infrastructure.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
-        <title>Créer ou mettre à jour le miroir Alpine - PSEC 1.0.0 documentation</title>
+        <title>Create or Update the Alpine Mirror - PSEC 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
@@ -202,19 +202,18 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../psec.html">PSEC python documentation</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Project documentation</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Project documentation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="architecture.html">Description du socle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">Platform Description</a></li>
 <li class="toctree-l2"><a class="reference internal" href="boot-sequence.html">Boot sequence</a></li>
-<li class="toctree-l2"><a class="reference internal" href="boot-usb.html">Créer une clé USB bootable</a></li>
-<li class="toctree-l2"><a class="reference internal" href="build-alpine-packets.html">Compiler des paquets Alpine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="boot-usb.html">Create a Bootable USB Drive</a></li>
 <li class="toctree-l2"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="documentation.html">Documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="graphical-design.html">Graphical design</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html">Integration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="protocol.html">Protocol</a></li>
-<li class="toctree-l2"><a class="reference internal" href="provisioning.html">Approvisionnement</a></li>
-<li class="toctree-l2"><a class="reference internal" href="python-api.html">API Python</a></li>
-<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html">Créer l’infrastructure de déploiement</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Créer ou mettre à jour le miroir Alpine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provisioning.html">Provisioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python-api.html">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Create or Update the Alpine Mirror</a></li>
 </ul>
 </li>
 </ul>
@@ -257,58 +256,57 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="creer-ou-mettre-a-jour-le-miroir-alpine">
-<h1>Créer ou mettre à jour le miroir Alpine<a class="headerlink" href="#creer-ou-mettre-a-jour-le-miroir-alpine" title="Link to this heading">¶</a></h1>
-<p>Cette documentation présente la mise en oeuvre des dépôts de paquets Alpine.</p>
-<section id="pre-requis">
-<h2>Pré-requis<a class="headerlink" href="#pre-requis" title="Link to this heading">¶</a></h2>
-<p>Pour réaliser cette procédure, les pré-requis suivants doivent être satisfaits :</p>
+          <section id="create-or-update-the-alpine-mirror">
+<h1>Create or Update the Alpine Mirror<a class="headerlink" href="#create-or-update-the-alpine-mirror" title="Link to this heading">¶</a></h1>
+<p>This documentation presents the implementation of the Alpine package repositories.</p>
+<section id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">¶</a></h2>
+<p>To perform this procedure, the following prerequisites must be met:</p>
 <ul class="simple">
-<li><p>Serveur web existant avec un accès non sécurisé (pas de mot de passe ni certificat SSL) pour les <em>dépôts Alpine</em></p></li>
+<li><p>Existing web server with unsecured access (no password or SSL certificate) for the <em>Alpine repositories</em></p></li>
 </ul>
 </section>
-<section id="principes">
-<h2>Principes<a class="headerlink" href="#principes" title="Link to this heading">¶</a></h2>
-<p>Les dépôts sont faits pour évoluer dans le temps et permettre la MCO et la MCS de la distribution Alpine installée sur les stations blanches, mais aussi les logiciels du contrôleur (Panoptiscan) et les bases antivirales.</p>
-<p>Lorsqu’un miroir est synchronisé depuis Internet, il faut conserver sa numération (par exemple 3.15.2) et établir un lien symbolique vers ce répertoire permettant à la fois d’utiliser systématiquement la dernière version des dépôts mais aussi d’utiliser une version spécifique lorsque c’est nécessaire (régression, tests, etc)</p>
+<section id="principles">
+<h2>Principles<a class="headerlink" href="#principles" title="Link to this heading">¶</a></h2>
+<p>The repositories are designed to evolve over time and allow the Maintenance en Condition Opérationnelle (MCO) and the Maintenance en Condition de Sécurité (MCS) of the Alpine distribution installed on the thin clients, as well as the controller software (Panoptiscan) and the antivirus databases.</p>
+<p>When a mirror is synchronized from the Internet, its numbering (for example 3.15.2) must be preserved and a symbolic link must be created to this directory to allow both systematic use of the latest repository version and use of a specific version when necessary (regression, testing, etc.)</p>
 </section>
 <section id="procedure">
-<h2>Procédure<a class="headerlink" href="#procedure" title="Link to this heading">¶</a></h2>
+<h2>Procedure<a class="headerlink" href="#procedure" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Sur le serveur web, créer le répertoire racine des dépôts, par convention, nous appelerons cette racine [ALPINE] dans la suite de ce document.</p></li>
-<li><p>Dans le dossier [ALPINE], créer le sous-dossier<code class="docutils literal notranslate"><span class="pre">panoptiscan</span></code>.</p></li>
-<li><p>Dans le dossier [ALPINE], copier le dépôt Alpine officiel en conservant le nom de la version, par exemple 3.15.</p></li>
-<li><p>Créer un lien symbolique nommé <code class="docutils literal notranslate"><span class="pre">latest-stable</span></code> vers le dossier du dépôt officiel.</p></li>
+<li><p>On the web server, create the root directory for the repositories; by convention, we will call this root [ALPINE] in the remainder of this document.</p></li>
+<li><p>Inside the [ALPINE] folder, create the subfolder <code class="docutils literal notranslate"><span class="pre">panoptiscan</span></code>.</p></li>
+<li><p>Inside the [ALPINE] folder, copy the official Alpine repository keeping the version name, for example 3.15.</p></li>
+<li><p>Create a symbolic link named <code class="docutils literal notranslate"><span class="pre">latest-stable</span></code> pointing to the official repository folder.</p></li>
 </ul>
-<section id="actions-communes">
-<h3>Actions communes<a class="headerlink" href="#actions-communes" title="Link to this heading">¶</a></h3>
-<p>Les mises à jour, même mineures, apportent presque toujours des modifications sur les noyau XEN et Linux. Ceux-ci doivent être mis à jour sur les dépôts mais aussi sur l’infrastructure de déploiement.</p>
-<p><strong>Avant de mettre à jour un dépôt existant, il est recommandé d’en créer une copie et de la conserver pour pouvoir revenir sur celui-ci en cas de dysfonctionnement des stations blanches consécutif à la mise à jour. Voir ci-dessous :</strong></p>
+<section id="common-actions">
+<h3>Common Actions<a class="headerlink" href="#common-actions" title="Link to this heading">¶</a></h3>
+<p>Updates, even minor ones, almost always bring changes to the XEN and Linux kernels. These must be updated both on the repositories and on the deployment infrastructure.</p>
+<p><strong>Before updating an existing repository, it is recommended to create a copy of it and keep it in order to be able to roll back in case of malfunction of the thin clients following the update. See below:</strong></p>
 <ul class="simple">
-<li><p>Créer un nouveau répertoire portant le numéro exact de la version (3.15.5 et non 3.15) :</p></li>
+<li><p>Create a new directory with the exact version number (3.15.5 and not 3.15):</p></li>
 </ul>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cd [ALPINE]
 $ cp -r 3.15.4 3.15.5
-
 </pre></div>
 </div>
 <ul class="simple">
-<li><p>Dans une ligne de commande shell, se placer dans le répertoire et commencer la mise à jour :</p></li>
+<li><p>In a shell command line, navigate to the directory and start the update:</p></li>
 </ul>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ wget --mirror --no-parent https://dl-cdn.alpinelinux.org/alpine/v3.15/releases/x86_64/
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ wget –mirror –no-parent https://dl-cdn.alpinelinux.org/alpine/v3.15/releases/x86_64/
 </pre></div>
 </div>
 <blockquote>
 <div><blockquote>
 <div><blockquote>
-<div><p>Créer un script de mise à jour automatisée</p>
+<div><p>Create an automated update script</p>
 </div></blockquote>
 </div></blockquote>
 </div></blockquote>
 </section>
-<section id="actions-post-mise-a-jour">
-<h3>Actions post-mise à jour<a class="headerlink" href="#actions-post-mise-a-jour" title="Link to this heading">¶</a></h3>
-<p>Après la mise à jour des dépôts, l’infrastructure de déploiement doit être mise à niveau. Pour ce faire, il suffit de rejouer le playbook ansible de déploiement (voir <a class="reference internal" href="#creer-l-infrastructure-de-deploiement.md"><span class="xref myst">Créer l’infrasructure de déploiement</span></a>.</p>
+<section id="post-update-actions">
+<h3>Post-Update Actions<a class="headerlink" href="#post-update-actions" title="Link to this heading">¶</a></h3>
+<p>After updating the repositories, the deployment infrastructure must be upgraded. To do this, simply rerun the Ansible deployment playbook (see <a class="reference internal" href="support-infrastructure.html"><span class="std std-doc">Create the deployment infrastructure</span></a>).</p>
 </section>
 </section>
 </section>
@@ -326,7 +324,7 @@ $ cp -r 3.15.4 3.15.5
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Créer l’infrastructure de déploiement</div>
+                <div class="title">Creating the Deployment Infrastructure</div>
                 
               </div>
             </a>
@@ -360,12 +358,12 @@ $ cp -r 3.15.4 3.15.5
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Créer ou mettre à jour le miroir Alpine</a><ul>
-<li><a class="reference internal" href="#pre-requis">Pré-requis</a></li>
-<li><a class="reference internal" href="#principes">Principes</a></li>
-<li><a class="reference internal" href="#procedure">Procédure</a><ul>
-<li><a class="reference internal" href="#actions-communes">Actions communes</a></li>
-<li><a class="reference internal" href="#actions-post-mise-a-jour">Actions post-mise à jour</a></li>
+<li><a class="reference internal" href="#">Create or Update the Alpine Mirror</a><ul>
+<li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li><a class="reference internal" href="#principles">Principles</a></li>
+<li><a class="reference internal" href="#procedure">Procedure</a><ul>
+<li><a class="reference internal" href="#common-actions">Common Actions</a></li>
+<li><a class="reference internal" href="#post-update-actions">Post-Update Actions</a></li>
 </ul>
 </li>
 </ul>

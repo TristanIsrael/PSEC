@@ -1,18 +1,21 @@
-# API Python
+# Python API
 
-Ce document décrit le fonctionnement de l'API Python.
+This document describes how the Python API works.
 
-## Emplacement des fichiers
+*Work in progress*
 
-Certains fichiers ont un emplacement fixe, ou faisant l'objet d'un paramètre :
+## File Locations
 
-| Fichier | Description | Paramètre | Valeur par défaut | Commentaire |
+Some files have a fixed location or are configurable via parameters:
+
+| File | Description | Parameter | Default Value | Notes |
 |---|---|---|---|---|
-| Fichier journal | Fichier journal local au domaine | CHEMIN_JOURNAL_LOCAL | /var/log/panoptiscan.log | Le fichier n'est créé que si le paramètre ACTIVE_JOURNAL_LOCAL est à True |
-| Bibliothèque python | La bibliothèque contient toutes les classes Python nécessaires au fonctionnement du système | Aucun | Dossier python du système | La bibliothèque est packagée dans le fichier panoptiscan_lib[...]-none-any.whl et est installée automatiquement lors du déploiement du système |
-| Socket messagerie DomU | Les sockets de communication avec chaque DomU sont stockées au même endroit. | CHEMIN_SOCKETS_MSG | /var/run/panoptiscan/*-msg.sock | |
-| Socket journal DomU | Les sockets de journalisation avec chaque DomU sont stockées au même endroit. | CHEMIN_SOCKETS_LOG | /var/run/panoptiscan/*-log.sock | |
-| Paramètres globaux | Les paramètres définissent le comportement des composants python | CHEMIN_FICHIER_CONFIG_GLOBAL | /etc/panoptiscan/global.conf | |
+| Log file | Domain-local log file | CHEMIN_JOURNAL_LOCAL | /var/log/panoptiscan.log | The file is only created if the parameter `ACTIVE_JOURNAL_LOCAL` is set to True |
+| Python library | Contains all Python classes required for the system | None | System's `python` directory | The library is packaged in the file `panoptiscan_lib[...]-none-any.whl` and is installed automatically during system deployment |
+| DomU messaging socket | Messaging sockets for communication with each DomU are stored in a common directory | CHEMIN_SOCKETS_MSG | /var/run/panoptiscan/*-msg.sock | |
+| DomU logging socket | Logging sockets for each DomU are stored in a common directory | CHEMIN_SOCKETS_LOG | /var/run/panoptiscan/*-log.sock | |
+| Global configuration | Defines the behavior of Python components | CHEMIN_FICHIER_CONFIG_GLOBAL | /etc/panoptiscan/global.conf | |
 
 ## Packaging
 
+...

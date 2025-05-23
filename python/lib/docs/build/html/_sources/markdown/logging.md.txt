@@ -1,41 +1,41 @@
-# Journalisation
+# Logging
 
-Ce document présente la stratégie de journalisation et les mécanismes mis en oeuvre.
+This document describes the logging strategy and the mechanisms implemented.
 
-## Fonctionnalités
+## Features
 
-La journalisation se situe à deux niveaux :
-- système d'exploitation : les services peuvent enregistrer un certain nombre d'événements dans des fichiers situés dans `/var/log` ou transmis à un gestionnaire de journaux comme `syslog`.
-- application métier : les applications et le socle produisent des événements concernant le fonctionnement du produit.
+Logging occurs at two levels:
+- Operating system: services can record a number of events in files located in `/var/log` or send them to a log manager such as `syslog`.
+- Business application: applications and the platform generate events related to the operation of the product.
 
-Seuls les événements métier sont concernés par cette documentation.
+Only business events are covered in this documentation.
 
 ## Architecture
 
-La journalisation utilise la messagerie du système au travers de topics spécifiques `system/events`.
+Logging uses the system messaging infrastructure through specific topics `system/events`.
 
-## Niveau de débogage
+## Debug Level
 
-Le niveau de débogage est défini grâce à la commande `system/events/set_loglevel`.
+The debug level is set using the command `system/events/set_loglevel`.
 
-## Emission d'un événement
+## Emitting an Event
 
-Le partage d'une information à journaliser se fait grâce aux notifications `system/events/[loglevel]` où `loglevel` peut être :
-- `debug` : Information à des fins de débogage
-- `info` : Information générale
-- `warn` : Avertissement
-- `error` : Erreur logicielle impactant seulement une partie des fonctions du système
-- `critical` : Erreur logicielle ou matérielle empêchant le système de fonctionner.
+Sharing log information is done via notifications `system/events/[loglevel]` where `loglevel` can be:
+- `debug`: Debugging information
+- `info`: General information
+- `warn`: Warning
+- `error`: Software error impacting only part of the system functions
+- `critical`: Software or hardware error preventing the system from operating
 
-L'émission d'un événement est simplifiée par la classe python `Logger`. Elle s'utilise de la façon suivante :
+Event emission is simplified through the Python class `Logger`. It is used as follows:
 
-`Logger().debug("Message de débogage", "Nom du module")` 
-ou encore `Logger().info("Message d'information")`.
+`Logger().debug("Debug message", "Module name")`  
+or `Logger().info("Informational message")`.
 
-## Enregistrement
+## Recording
 
-Le socle conserve automatiquement tous les événements d'un niveau supérieur ou égale à celui défini par la commande `set_loglevel` (ou `info` par défaut) dans un fichier qui peut être copié ou téléchargé ensuite à la demande. Le niveau de journalisation peut être défini afin de ne retenir qu'une partie seulement des événements.
+The platform automatically saves all events at or above the level defined by the `set_loglevel` command (or `info` by default) into a file that can be copied or downloaded on demand. The logging level can be configured to keep only a subset of events.
 
-## Récupération du journal
+## Retrieving the Log
 
-La commande permettant de récupérer le journal est `system/events/save_log`.
+The command to retrieve the log is `system/events/save_log`.

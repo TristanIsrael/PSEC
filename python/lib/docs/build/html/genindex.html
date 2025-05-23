@@ -200,19 +200,18 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="psec.html">PSEC python documentation</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="markdown/index.html">Project documentation</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Project documentation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="markdown/architecture.html">Description du socle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="markdown/architecture.html">Platform Description</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/boot-sequence.html">Boot sequence</a></li>
-<li class="toctree-l2"><a class="reference internal" href="markdown/boot-usb.html">Créer une clé USB bootable</a></li>
-<li class="toctree-l2"><a class="reference internal" href="markdown/build-alpine-packets.html">Compiler des paquets Alpine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="markdown/boot-usb.html">Create a Bootable USB Drive</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/debugging.html">Debugging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/documentation.html">Documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/graphical-design.html">Graphical design</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/integration.html">Integration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/protocol.html">Protocol</a></li>
-<li class="toctree-l2"><a class="reference internal" href="markdown/provisioning.html">Approvisionnement</a></li>
-<li class="toctree-l2"><a class="reference internal" href="markdown/python-api.html">API Python</a></li>
-<li class="toctree-l2"><a class="reference internal" href="markdown/support-infrastructure.html">Créer l’infrastructure de déploiement</a></li>
-<li class="toctree-l2"><a class="reference internal" href="markdown/update-alpine-mirror.html">Créer ou mettre à jour le miroir Alpine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="markdown/provisioning.html">Provisioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="markdown/python-api.html">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="markdown/support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="markdown/update-alpine-mirror.html">Create or Update the Alpine Mirror</a></li>
 </ul>
 </li>
 </ul>
@@ -278,6 +277,8 @@
 </li>
         <li><a href="psec.html#psec.Api.add_shutdown_callback">add_shutdown_callback() (psec.Api method)</a>
 </li>
+        <li><a href="psec.html#psec.Api.add_subscription_callback">add_subscription_callback() (psec.Api method)</a>
+</li>
         <li><a href="psec.html#psec.Api">Api (class in psec)</a>
 </li>
         <li><a href="psec.html#psec.BoutonSouris.AUCUN">AUCUN (psec.BoutonSouris attribute)</a>
@@ -294,12 +295,14 @@
 </li>
         <li><a href="psec.html#psec.Cles.BENCHMARK_INPUTS_ITERATIONS">BENCHMARK_INPUTS_ITERATIONS (psec.Cles attribute)</a>
 </li>
-        <li><a href="psec.html#psec.BenchmarkId">BenchmarkId (class in psec)</a>
+        <li><a href="psec.html#psec.Debugging.benchmark_messaging">benchmark_messaging() (psec.Debugging method)</a>
 </li>
-        <li><a href="psec.html#psec.BoutonSouris">BoutonSouris (class in psec)</a>
+        <li><a href="psec.html#psec.BenchmarkId">BenchmarkId (class in psec)</a>
 </li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="psec.html#psec.BoutonSouris">BoutonSouris (class in psec)</a>
+</li>
         <li><a href="psec.html#psec.Mouse.button_equals">button_equals() (psec.Mouse method)</a>
 </li>
         <li><a href="psec.html#psec.Mouse.button_pressed">button_pressed() (psec.Mouse method)</a>
@@ -462,6 +465,10 @@
         </ul></li>
         <li><a href="psec.html#psec.System.debug_activated">debug_activated() (psec.System static method)</a>
 </li>
+        <li><a href="psec.html#psec.Debugging">Debugging (class in psec)</a>
+</li>
+        <li><a href="psec.html#psec.Topics.DEBUGGING">DEBUGGING (psec.Topics attribute)</a>
+</li>
         <li><a href="psec.html#psec.Topics.DELETE_FILE">DELETE_FILE (psec.Topics attribute)</a>
 </li>
         <li><a href="psec.html#psec.Api.delete_file">delete_file() (psec.Api method)</a>
@@ -489,6 +496,8 @@
         <li><a href="psec.html#psec.Topics.DISKS">DISKS (psec.Topics attribute)</a>
 </li>
         <li><a href="psec.html#psec.Dom0Controller">Dom0Controller (class in psec)</a>
+</li>
+        <li><a href="psec.html#psec.System.domain_name">domain_name() (psec.System static method)</a>
 </li>
         <li><a href="psec.html#psec.MouseWheel.DOWN">DOWN (psec.MouseWheel attribute)</a>
 </li>
@@ -771,11 +780,13 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="psec.html#psec.MqttClient.on_connected">on_connected (psec.MqttClient attribute)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="psec.html#psec.SerialMQTTClient.on_connection_lost">on_connection_lost (psec.SerialMQTTClient attribute)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="psec.html#psec.MqttClient.on_message">on_message (psec.MqttClient attribute)</a>
+</li>
+        <li><a href="psec.html#psec.MqttClient.on_subscribed">on_subscribed (psec.MqttClient attribute)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -790,6 +801,10 @@
         <li><a href="psec.html#psec.Parametres">Parametres (class in psec)</a>
 </li>
         <li><a href="psec.html#psec.Parametres.params">params (psec.Parametres attribute)</a>
+</li>
+        <li><a href="psec.html#psec.Topics.PING">PING (psec.Topics attribute)</a>
+</li>
+        <li><a href="psec.html#psec.Api.ping">ping() (psec.Api method)</a>
 </li>
         <li><a href="psec.html#psec.Logger.print">print() (psec.Logger static method)</a>
 </li>

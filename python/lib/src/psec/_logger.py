@@ -1,4 +1,5 @@
 from . import MqttClient, SingletonMeta, Topics, MqttHelper, RequestFactory
+from . import System
 import os
 import zlib
 import base64
@@ -44,7 +45,7 @@ class Logger(metaclass=SingletonMeta):
         if self.__is_setup:
             return
         
-        self.__domain_name = platform.node()
+        self.__domain_name = System.domain_name()
         self.__module_name = module_name
         self.__mqtt_client = mqtt_client
 

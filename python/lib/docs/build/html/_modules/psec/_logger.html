@@ -199,8 +199,22 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../psec.html">psec package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../markdown/protocol.html">Protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../psec.html">PSEC python documentation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../markdown/index.html">Project documentation</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Project documentation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/architecture.html">Platform Description</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/boot-sequence.html">Boot sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/boot-usb.html">Create a Bootable USB Drive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/debugging.html">Debugging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/documentation.html">Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/graphical-design.html">Graphical design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/integration.html">Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/protocol.html">Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/provisioning.html">Provisioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/python-api.html">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/update-alpine-mirror.html">Create or Update the Alpine Mirror</a></li>
+</ul>
+</li>
 </ul>
 
 </div>
@@ -237,6 +251,7 @@
         <article role="main" id="furo-main-content">
           <h1>Source code for psec._logger</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">MqttClient</span><span class="p">,</span> <span class="n">SingletonMeta</span><span class="p">,</span> <span class="n">Topics</span><span class="p">,</span> <span class="n">MqttHelper</span><span class="p">,</span> <span class="n">RequestFactory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">System</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">zlib</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">base64</span>
@@ -286,7 +301,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__is_setup</span><span class="p">:</span>
             <span class="k">return</span>
         
-        <span class="bp">self</span><span class="o">.</span><span class="n">__domain_name</span> <span class="o">=</span> <span class="n">platform</span><span class="o">.</span><span class="n">node</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__domain_name</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">domain_name</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__module_name</span> <span class="o">=</span> <span class="n">module_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span> <span class="o">=</span> <span class="n">mqtt_client</span>
 
@@ -471,7 +486,7 @@
 <a class="viewcode-back" href="../../psec.html#psec.Logger.format_logline">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">format_logline</span><span class="p">(</span><span class="n">message</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="si">:</span><span class="s2">%Y-%m-%d %H:%M:%S</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span></div>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="si">:</span><span class="s2">%Y-%m-%d %H:%M:%S.%f</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span></div>
 
     
 <div class="viewcode-block" id="Logger.print">

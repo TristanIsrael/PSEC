@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="API Python" href="python-api.html" /><link rel="prev" title="Protocol" href="protocol.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Python API" href="python-api.html" /><link rel="prev" title="Protocol" href="protocol.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
-        <title>Approvisionnement - PSEC 1.0.0 documentation</title>
+        <title>Provisioning - PSEC 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
@@ -202,19 +202,18 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../psec.html">PSEC python documentation</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Project documentation</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Project documentation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="architecture.html">Description du socle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">Platform Description</a></li>
 <li class="toctree-l2"><a class="reference internal" href="boot-sequence.html">Boot sequence</a></li>
-<li class="toctree-l2"><a class="reference internal" href="boot-usb.html">Créer une clé USB bootable</a></li>
-<li class="toctree-l2"><a class="reference internal" href="build-alpine-packets.html">Compiler des paquets Alpine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="boot-usb.html">Create a Bootable USB Drive</a></li>
 <li class="toctree-l2"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="documentation.html">Documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="graphical-design.html">Graphical design</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html">Integration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="protocol.html">Protocol</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Approvisionnement</a></li>
-<li class="toctree-l2"><a class="reference internal" href="python-api.html">API Python</a></li>
-<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html">Créer l’infrastructure de déploiement</a></li>
-<li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html">Créer ou mettre à jour le miroir Alpine</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Provisioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python-api.html">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html">Create or Update the Alpine Mirror</a></li>
 </ul>
 </li>
 </ul>
@@ -257,52 +256,52 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="approvisionnement">
-<h1>Approvisionnement<a class="headerlink" href="#approvisionnement" title="Link to this heading">¶</a></h1>
-<p>Ce document présente différentes façons d’approvisionner un équipement avec un système basé sur PSEC.</p>
-<section id="manuel">
-<h2>Manuel<a class="headerlink" href="#manuel" title="Link to this heading">¶</a></h2>
-<p>L’approvisionnement manuel consiste à dérouler un processus d’installation pas-à-pas à partir d’un support USB.</p>
-<p>1 - Créer une clé USB d’installation pour Alpine Linux.</p>
+          <section id="provisioning">
+<h1>Provisioning<a class="headerlink" href="#provisioning" title="Link to this heading">¶</a></h1>
+<p>This document describes various methods to provision a device with a PSEC-based system.</p>
+<section id="manual">
+<h2>Manual<a class="headerlink" href="#manual" title="Link to this heading">¶</a></h2>
+<p>Manual provisioning consists of going through an installation process step-by-step using a USB drive.</p>
+<p>1 - Create an installation USB stick for Alpine Linux.</p>
 <ul class="simple">
-<li><p>La version d’Alpine Linux utilisée doit correspondre à celle du dépôt souhaité.</p></li>
-<li><p>L’image ISO utilisée doit être celle de <strong>Alpine Standard</strong></p></li>
+<li><p>The Alpine Linux version must match the desired repository version.</p></li>
+<li><p>The ISO image used must be <strong>Alpine Standard</strong>.</p></li>
 </ul>
-<p>2 - Installer Alpine Linux sur l’équipement.</p>
+<p>2 - Install Alpine Linux on the device.</p>
 <ul class="simple">
-<li><p>Lui affecter un périphérique réseau avec DHCP ou IP fixe en fonction de la situation.</p></li>
-<li><p>Dans la section APK Mirror, si un dépôt Internet est utilisé choisir <code class="docutils literal notranslate"><span class="pre">f</span></code>, sinon ne pas choisir d’entrée de menu mais saisir l’URL du dépôt <code class="docutils literal notranslate"><span class="pre">main</span></code> local d’Alpine.</p></li>
-<li><p>Créer un compte utilisateur <code class="docutils literal notranslate"><span class="pre">admin</span></code></p></li>
+<li><p>Assign a network interface with either DHCP or a static IP depending on the context.</p></li>
+<li><p>In the APK Mirror section, if using an internet repository, select <code class="docutils literal notranslate"><span class="pre">f</span></code>, otherwise do not select any menu entry but manually enter the URL of the local Alpine <code class="docutils literal notranslate"><span class="pre">main</span></code> repository.</p></li>
+<li><p>Create an <code class="docutils literal notranslate"><span class="pre">admin</span></code> user account.</p></li>
 </ul>
-<p>3 - A la fin de l’installation redémarrer le système</p>
-<p>4 - A l’issue du redémarrage, se logger en tant que <code class="docutils literal notranslate"><span class="pre">admin</span></code></p>
-<p>5 - Ajouter les dépôts de binaires</p>
+<p>3 - Reboot the system at the end of the installation.</p>
+<p>4 - After reboot, log in as <code class="docutils literal notranslate"><span class="pre">admin</span></code>.</p>
+<p>5 - Add binary repositories</p>
 <ul class="simple">
-<li><p>Taper la commande <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">su</span> <span class="pre">-</span> <span class="pre">root</span></code> puis le mot de passe du compte <code class="docutils literal notranslate"><span class="pre">root</span></code></p></li>
-<li><p>Taper la commande <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">vi</span> <span class="pre">/etc/apk/repositories</span></code> et ajouter le dépôt <code class="docutils literal notranslate"><span class="pre">community</span></code> ainsi que le dépôt <code class="docutils literal notranslate"><span class="pre">PSEC</span></code> et les dépôts spécifiques au produit à installer.</p></li>
-<li><p>Taper <code class="docutils literal notranslate"><span class="pre">:wq</span></code></p></li>
+<li><p>Type <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">su</span> <span class="pre">-</span> <span class="pre">root</span></code> and enter the <code class="docutils literal notranslate"><span class="pre">root</span></code> password.</p></li>
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">vi</span> <span class="pre">/etc/apk/repositories</span></code> and add the <code class="docutils literal notranslate"><span class="pre">community</span></code> repository, the <code class="docutils literal notranslate"><span class="pre">PSEC</span></code> repository, and any product-specific repositories.</p></li>
+<li><p>Save and exit with <code class="docutils literal notranslate"><span class="pre">:wq</span></code>.</p></li>
 </ul>
-<p>6 - Ajouter les clés PGP</p>
+<p>6 - Add PGP keys</p>
 <ul class="simple">
-<li><p>Taper la commande <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">cd</span> <span class="pre">/etc/apk/keys</span></code> puis <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">wget</span> <span class="pre">[URL</span> <span class="pre">du</span> <span class="pre">depot</span> <span class="pre">PSEC]/psec.rsa.pub</span></code> et recommencer avec les clés des dépôts spécifiques au produit à installer.</p></li>
-<li><p>Taper la commande <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">apk</span> <span class="pre">update</span></code></p></li>
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">cd</span> <span class="pre">/etc/apk/keys</span></code> then <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">wget</span> <span class="pre">[PSEC</span> <span class="pre">repository</span> <span class="pre">URL]/psec.rsa.pub</span></code>, and repeat the process for other product-specific repositories.</p></li>
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">apk</span> <span class="pre">update</span></code>.</p></li>
 </ul>
-<p>7 - (Optionnel) Autoriser le compte <code class="docutils literal notranslate"><span class="pre">admin</span></code> à exécuter des commandes <code class="docutils literal notranslate"><span class="pre">root</span></code></p>
+<p>7 - (Optional) Allow the <code class="docutils literal notranslate"><span class="pre">admin</span></code> user to execute root commands</p>
 <ul class="simple">
-<li><p>Taper la commande <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">apk</span> <span class="pre">add</span> <span class="pre">sudo</span></code>, puis <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">visudo</span></code></p></li>
-<li><p>Editer la ligne <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">%wheel</span> <span class="pre">ALL=(ALL:ALL)</span> <span class="pre">NOPASSWD:</span> <span class="pre">ALL</span></code> et retirer le <code class="docutils literal notranslate"><span class="pre">#</span></code> au début pour décommenter la ligne.</p></li>
-<li><p>Taper <code class="docutils literal notranslate"><span class="pre">:wq</span></code></p></li>
-<li><p>Taper la commande <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">exit</span></code></p></li>
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">apk</span> <span class="pre">add</span> <span class="pre">sudo</span></code>, then <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">visudo</span></code></p></li>
+<li><p>Edit the line <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">%wheel</span> <span class="pre">ALL=(ALL:ALL)</span> <span class="pre">NOPASSWD:</span> <span class="pre">ALL</span></code> and remove the <code class="docutils literal notranslate"><span class="pre">#</span></code> to uncomment it.</p></li>
+<li><p>Save and exit with <code class="docutils literal notranslate"><span class="pre">:wq</span></code></p></li>
+<li><p>Type <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">exit</span></code></p></li>
 </ul>
-<p>8 - Installer XEN</p>
+<p>8 - Install XEN</p>
 <ul class="simple">
-<li><p>Taper la commande <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">sudo</span> <span class="pre">apk</span> <span class="pre">add</span> <span class="pre">xen</span> <span class="pre">xen-hypervisor</span></code></p></li>
-<li><p>Taper la commande <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">sudo</span> <span class="pre">reboot</span></code></p></li>
-<li><p>Au redémarrage, séletionner dans GRUB la première entrée contenant le libellé <code class="docutils literal notranslate"><span class="pre">Xen</span></code></p></li>
-<li><p>A la fin du démarrage se logger en tant que <code class="docutils literal notranslate"><span class="pre">root</span></code></p></li>
-<li><p>Taper la commande <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">rc-service</span> <span class="pre">xenstored</span> <span class="pre">start</span></code></p></li>
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">sudo</span> <span class="pre">apk</span> <span class="pre">add</span> <span class="pre">xen</span> <span class="pre">xen-hypervisor</span></code></p></li>
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">sudo</span> <span class="pre">reboot</span></code></p></li>
+<li><p>On reboot, select the first GRUB entry labeled with <code class="docutils literal notranslate"><span class="pre">Xen</span></code></p></li>
+<li><p>After booting, log in as <code class="docutils literal notranslate"><span class="pre">root</span></code></p></li>
+<li><p>Start the Xen service with <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">rc-service</span> <span class="pre">xenstored</span> <span class="pre">start</span></code></p></li>
 </ul>
-<p>9 - Installer le produit en suivant la documentation fournie.</p>
+<p>9 - Install the product following the provided documentation.</p>
 </section>
 </section>
 
@@ -316,7 +315,7 @@
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">API Python</div>
+                <div class="title">Python API</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -361,8 +360,8 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Approvisionnement</a><ul>
-<li><a class="reference internal" href="#manuel">Manuel</a></li>
+<li><a class="reference internal" href="#">Provisioning</a><ul>
+<li><a class="reference internal" href="#manual">Manual</a></li>
 </ul>
 </li>
 </ul>

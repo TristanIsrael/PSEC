@@ -179,6 +179,7 @@ class MqttClient():
     identifier:str = "unknown"
     on_connected: Optional[Callable[[], None]] = None
     on_message: Optional[Callable[[str, dict], None]] = None
+    on_subscribed: Optional[Callable[[], None]] = None
     __message_callbacks = []
     __connected_callbacks = []
     connected = False
@@ -209,6 +210,8 @@ class MqttClient():
             )
             self.mqtt_client.on_connect = self.__on_connected
             self.mqtt_client.on_message = self.__on_message
+            self.mqtt_client.on_subscribe = self.__on_subscribe
+            self.mqtt_client.on_disconnect = self.__on_disconnected
 
             mqtt_host = "undefined"
             try:
@@ -237,6 +240,7 @@ class MqttClient():
             self.mqtt_client.on_connect = self.__on_connected
             self.mqtt_client.on_message = self.__on_message
             self.mqtt_client.on_disconnect = self.__on_disconnected
+            self.mqtt_client.on_subscribe = self.__on_subscribe
             self.mqtt_client.on_connection_lost = self.__on_connection_lost
 
             if DEBUG:
@@ -269,9 +273,9 @@ class MqttClient():
                 self.connected = False
                 self.is_starting = False
 
-    def subscribe(self, topic:str):
+    def subscribe(self, topic:str) -> tuple[MQTTErrorCode, int | None]:
         print(f"Subscribe to topic {topic}")
-        self.mqtt_client.subscribe(topic)
+        return self.mqtt_client.subscribe(topic)
 
     def publish(self, topic:str, payload:dict):
         self.mqtt_client.publish(topic=topic, payload=json.dumps(payload))
@@ -311,6 +315,12 @@ class MqttClient():
 
         for cb in self.__connected_callbacks:
             cb()
+
+    def __on_subscribe(self, client, userdata, mid, reason_code_list, properties):
+        print("Subscribed to a topic")
+
+        if self.on_subscribed is not None:
+            self.on_subscribed(mid)
 
     def __on_connection_lost(self):
         print("Connection lost, trying to reconnect.")

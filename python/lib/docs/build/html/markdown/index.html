@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Description du socle" href="architecture.html" /><link rel="prev" title="PSEC python documentation" href="../psec.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Platform Description" href="architecture.html" /><link rel="prev" title="PSEC python documentation" href="../psec.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
         <title>Project documentation - PSEC 1.0.0 documentation</title>
@@ -202,19 +202,18 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../psec.html">PSEC python documentation</a></li>
 <li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">Project documentation</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Project documentation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="architecture.html">Description du socle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">Platform Description</a></li>
 <li class="toctree-l2"><a class="reference internal" href="boot-sequence.html">Boot sequence</a></li>
-<li class="toctree-l2"><a class="reference internal" href="boot-usb.html">Créer une clé USB bootable</a></li>
-<li class="toctree-l2"><a class="reference internal" href="build-alpine-packets.html">Compiler des paquets Alpine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="boot-usb.html">Create a Bootable USB Drive</a></li>
 <li class="toctree-l2"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="documentation.html">Documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="graphical-design.html">Graphical design</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html">Integration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="protocol.html">Protocol</a></li>
-<li class="toctree-l2"><a class="reference internal" href="provisioning.html">Approvisionnement</a></li>
-<li class="toctree-l2"><a class="reference internal" href="python-api.html">API Python</a></li>
-<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html">Créer l’infrastructure de déploiement</a></li>
-<li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html">Créer ou mettre à jour le miroir Alpine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provisioning.html">Provisioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python-api.html">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html">Create or Update the Alpine Mirror</a></li>
 </ul>
 </li>
 </ul>
@@ -262,8 +261,8 @@
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Description du socle</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="architecture.html#machines-virtuelles-domaines">Machines virtuelles (domaines)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Platform Description</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html#virtual-machines-domains">Virtual Machines (Domains)</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="boot-sequence.html">Boot sequence</a><ul>
@@ -271,17 +270,8 @@
 <li class="toctree-l2"><a class="reference internal" href="boot-sequence.html#steps">Steps</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="boot-usb.html">Créer une clé USB bootable</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="boot-usb.html#procedure">Procédure</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="build-alpine-packets.html">Compiler des paquets Alpine</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="build-alpine-packets.html#creer-un-poste-d-administrateur">Créer un poste d’administrateur</a></li>
-<li class="toctree-l2"><a class="reference internal" href="build-alpine-packets.html#avertissement">Avertissement</a></li>
-<li class="toctree-l2"><a class="reference internal" href="build-alpine-packets.html#compilation">Compilation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="build-alpine-packets.html#publication">Publication</a></li>
-<li class="toctree-l2"><a class="reference internal" href="build-alpine-packets.html#test-du-depot">Test du dépôt</a></li>
-<li class="toctree-l2"><a class="reference internal" href="build-alpine-packets.html#configuration-des-paquets">Configuration des paquets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="boot-usb.html">Create a Bootable USB Drive</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="boot-usb.html#procedure">Procedure</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a><ul>
@@ -315,26 +305,26 @@
 <li class="toctree-l2"><a class="reference internal" href="protocol.html#notes">Notes</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="provisioning.html">Approvisionnement</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="provisioning.html#manuel">Manuel</a></li>
+<li class="toctree-l1"><a class="reference internal" href="provisioning.html">Provisioning</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="provisioning.html#manual">Manual</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="python-api.html">API Python</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="python-api.html#emplacement-des-fichiers">Emplacement des fichiers</a></li>
+<li class="toctree-l1"><a class="reference internal" href="python-api.html">Python API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="python-api.html#file-locations">File Locations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="python-api.html#packaging">Packaging</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="support-infrastructure.html">Créer l’infrastructure de déploiement</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html#etapes">Etapes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html#pre-requis">Pré-requis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html#creation-des-machines-virtuelles">Création des machines virtuelles</a></li>
-<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html#deploiement-des-services">Déploiement des services</a></li>
+<li class="toctree-l1"><a class="reference internal" href="support-infrastructure.html">Creating the Deployment Infrastructure</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html#steps">Steps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html#creating-the-virtual-machines">Creating the Virtual Machines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html#services-deployment">Services Deployment</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="update-alpine-mirror.html">Créer ou mettre à jour le miroir Alpine</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html#pre-requis">Pré-requis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html#principes">Principes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html#procedure">Procédure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="update-alpine-mirror.html">Create or Update the Alpine Mirror</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html#principles">Principles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html#procedure">Procedure</a></li>
 </ul>
 </li>
 </ul>
@@ -351,7 +341,7 @@
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Description du socle</div>
+                <div class="title">Platform Description</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>

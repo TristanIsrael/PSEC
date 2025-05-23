@@ -7,6 +7,7 @@ class Topics():
     DISCOVER = f"{SYSTEM}/discover"
     WORKFLOW = f"{SYSTEM}/workflow"
     ENERGY = f"{SYSTEM}/energy"
+    DEBUG = f"{SYSTEM}debug"
 
     # Disks and files management
     LIST_DISKS = f"{DISKS}/list_disks"
@@ -38,3 +39,7 @@ class Topics():
     DEBUG = f"{EVENTS}/debug"
     SET_LOGLEVEL = f"{EVENTS}/set_loglevel"
     SAVE_LOG = f"{EVENTS}/save_log"
+
+    # Debugging
+    DEBUGGING = f"{SYSTEM}/debugging"
+    PING = f"{DEBUGGING}/ping"

@@ -108,3 +108,6 @@ class System(metaclass=SingletonMeta):
         except Exception:
             return False
         
+    @staticmethod
+    def domain_name():
+        return platform.node()

@@ -1,56 +1,56 @@
-# Description du socle
+# Platform Description
 
-Ce document décrit l'architecture du socle technique orienté produits de sécurité.
+This document describes the architecture of the security-oriented technical platform.
 
-## Machines virtuelles (domaines)
+## Virtual Machines (Domains)
 
-Le socle comporte les machines virtuelles suivantes :
+The platform includes the following virtual machines:
 
-| Nom | Description | Confiance |
+| Name | Description | Trust Level |
 |---|---|---|
-| Dom0 | Le Domaine 0 est une machine virtuelle spéciale permettant de gérer les domaines utilisateur et l'interface avec le XenBus | Forte |
-| vm-sys-usb | Ce domaine utilisateur a pour fonction de gérer les supports USB (clavier, souris, supports de stockage) et de les isoler du reste du système | Faible |
-|  | |
+| Dom0 | Domain 0 is a special virtual machine used to manage user domains and interface with the XenBus | High |
+| vm-sys-usb | This user domain is responsible for managing USB devices (keyboard, mouse, storage devices) and isolating them from the rest of the system | Low |
+|  |  |  |
 
 ### Dom0
 
-Cette section fournit des détails techniques sur le `domaine 0`.
+This section provides technical details about `Domain 0`.
 
-**La toolstack XEN doit être installée sur le Dom0. En principe elle est fournie par l'installation PXE lors du démarrage depuis le réseau**.
+**The XEN toolstack must be installed on Dom0. It is typically provided by the PXE installation during network boot.**
 
-Paquets installés :
+Installed packages:
 - python (`python3`)
 
 ### vm-sys-usb
 
-Cette section fournit des détails techniques sur le domaine utilisateur `vm-sys-usb`.
+This section provides technical details about the user domain `vm-sys-usb`.
 
-Le domaine `vm-sys-usb` fournit les fonctions suivantes au travers du XenStore :
-- saisie clavier
-- position de la souris
-- état des boutons de la souris
-- position du toucher sur l'écran tactile
-- lecture du catalogue des fichiers d'un support USB
-- lecture d'un fichier depuis un support USB
-- écriture d'un fichier sur un support USB.
+The `vm-sys-usb` domain provides the following functions via XenStore:
+- keyboard input
+- mouse position
+- mouse button states
+- touchscreen position
+- reading the file catalog from a USB device
+- reading a file from a USB device
+- writing a file to a USB device
 
-Ressources :
-| Ressource | Capacité |
+Resources:
+| Resource | Capacity |
 |---|---|
-| RAM | 400 Mo |
+| RAM | 400 MB |
 
-Paquets installés :
+Installed packages:
 - python3
 - py3-pyserial
 - ntfs-3g 
-- evtest (pour le développement uniquement) 
+- evtest (development only) 
 - py3-libevdev
 
-Fichiers supprimés :
-- aucun
+Removed files:
+- none
 
-#### Détection des supports USB
+#### USB Device Detection
 
-La détection des supports USB est prise en charge par `udev`. Une règle spécifique est ajoutée grâce au fichier `99-usbdisks.rules` placé dans le répertoire `/etc/udev/rules.d`.
+USB device detection is handled by `udev`. A specific rule is added using the `99-usbdisks.rules` file placed in the `/etc/udev/rules.d` directory.
 
-Lorsqu'un support USB est connecté, le script `mdev-usb-storage` est exécuté. Celui-ci vérifie la présence du support et crée un point de montage dans `/media/usb` portant le même nom que le disque connecté. Ensuite, une notification est envoyée sur le Xenbus grâce à la messagerie.
+When a USB device is connected, the `mdev-usb-storage` script is executed. It checks for the presence of the device and creates a mount point in `/media/usb` with the same name as the connected disk. A notification is then sent on the Xenbus via the messaging system.

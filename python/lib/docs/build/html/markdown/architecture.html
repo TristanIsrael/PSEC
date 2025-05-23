@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Boot sequence" href="boot-sequence.html" /><link rel="prev" title="Project documentation" href="index.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
-        <title>Description du socle - PSEC 1.0.0 documentation</title>
+        <title>Platform Description - PSEC 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
@@ -202,19 +202,18 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../psec.html">PSEC python documentation</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Project documentation</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Project documentation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Description du socle</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Platform Description</a></li>
 <li class="toctree-l2"><a class="reference internal" href="boot-sequence.html">Boot sequence</a></li>
-<li class="toctree-l2"><a class="reference internal" href="boot-usb.html">Créer une clé USB bootable</a></li>
-<li class="toctree-l2"><a class="reference internal" href="build-alpine-packets.html">Compiler des paquets Alpine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="boot-usb.html">Create a Bootable USB Drive</a></li>
 <li class="toctree-l2"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="documentation.html">Documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="graphical-design.html">Graphical design</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html">Integration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="protocol.html">Protocol</a></li>
-<li class="toctree-l2"><a class="reference internal" href="provisioning.html">Approvisionnement</a></li>
-<li class="toctree-l2"><a class="reference internal" href="python-api.html">API Python</a></li>
-<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html">Créer l’infrastructure de déploiement</a></li>
-<li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html">Créer ou mettre à jour le miroir Alpine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provisioning.html">Provisioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python-api.html">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html">Create or Update the Alpine Mirror</a></li>
 </ul>
 </li>
 </ul>
@@ -257,28 +256,28 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="description-du-socle">
-<h1>Description du socle<a class="headerlink" href="#description-du-socle" title="Link to this heading">¶</a></h1>
-<p>Ce document décrit l’architecture du socle technique orienté produits de sécurité.</p>
-<section id="machines-virtuelles-domaines">
-<h2>Machines virtuelles (domaines)<a class="headerlink" href="#machines-virtuelles-domaines" title="Link to this heading">¶</a></h2>
-<p>Le socle comporte les machines virtuelles suivantes :</p>
+          <section id="platform-description">
+<h1>Platform Description<a class="headerlink" href="#platform-description" title="Link to this heading">¶</a></h1>
+<p>This document describes the architecture of the security-oriented technical platform.</p>
+<section id="virtual-machines-domains">
+<h2>Virtual Machines (Domains)<a class="headerlink" href="#virtual-machines-domains" title="Link to this heading">¶</a></h2>
+<p>The platform includes the following virtual machines:</p>
 <div class="table-wrapper colwidths-auto docutils container">
 <table class="docutils align-default">
 <thead>
-<tr class="row-odd"><th class="head"><p>Nom</p></th>
+<tr class="row-odd"><th class="head"><p>Name</p></th>
 <th class="head"><p>Description</p></th>
-<th class="head"><p>Confiance</p></th>
+<th class="head"><p>Trust Level</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Dom0</p></td>
-<td><p>Le Domaine 0 est une machine virtuelle spéciale permettant de gérer les domaines utilisateur et l’interface avec le XenBus</p></td>
-<td><p>Forte</p></td>
+<td><p>Domain 0 is a special virtual machine used to manage user domains and interface with the XenBus</p></td>
+<td><p>High</p></td>
 </tr>
 <tr class="row-odd"><td><p>vm-sys-usb</p></td>
-<td><p>Ce domaine utilisateur a pour fonction de gérer les supports USB (clavier, souris, supports de stockage) et de les isoler du reste du système</p></td>
-<td><p>Faible</p></td>
+<td><p>This user domain is responsible for managing USB devices (keyboard, mouse, storage devices) and isolating them from the rest of the system</p></td>
+<td><p>Low</p></td>
 </tr>
 <tr class="row-even"><td><p></p></td>
 <td><p></p></td>
@@ -289,57 +288,57 @@
 </div>
 <section id="dom0">
 <h3>Dom0<a class="headerlink" href="#dom0" title="Link to this heading">¶</a></h3>
-<p>Cette section fournit des détails techniques sur le <code class="docutils literal notranslate"><span class="pre">domaine</span> <span class="pre">0</span></code>.</p>
-<p><strong>La toolstack XEN doit être installée sur le Dom0. En principe elle est fournie par l’installation PXE lors du démarrage depuis le réseau</strong>.</p>
-<p>Paquets installés :</p>
+<p>This section provides technical details about <code class="docutils literal notranslate"><span class="pre">Domain</span> <span class="pre">0</span></code>.</p>
+<p><strong>The XEN toolstack must be installed on Dom0. It is typically provided by the PXE installation during network boot.</strong></p>
+<p>Installed packages:</p>
 <ul class="simple">
 <li><p>python (<code class="docutils literal notranslate"><span class="pre">python3</span></code>)</p></li>
 </ul>
 </section>
 <section id="vm-sys-usb">
 <h3>vm-sys-usb<a class="headerlink" href="#vm-sys-usb" title="Link to this heading">¶</a></h3>
-<p>Cette section fournit des détails techniques sur le domaine utilisateur <code class="docutils literal notranslate"><span class="pre">vm-sys-usb</span></code>.</p>
-<p>Le domaine <code class="docutils literal notranslate"><span class="pre">vm-sys-usb</span></code> fournit les fonctions suivantes au travers du XenStore :</p>
+<p>This section provides technical details about the user domain <code class="docutils literal notranslate"><span class="pre">vm-sys-usb</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">vm-sys-usb</span></code> domain provides the following functions via XenStore:</p>
 <ul class="simple">
-<li><p>saisie clavier</p></li>
-<li><p>position de la souris</p></li>
-<li><p>état des boutons de la souris</p></li>
-<li><p>position du toucher sur l’écran tactile</p></li>
-<li><p>lecture du catalogue des fichiers d’un support USB</p></li>
-<li><p>lecture d’un fichier depuis un support USB</p></li>
-<li><p>écriture d’un fichier sur un support USB.</p></li>
+<li><p>keyboard input</p></li>
+<li><p>mouse position</p></li>
+<li><p>mouse button states</p></li>
+<li><p>touchscreen position</p></li>
+<li><p>reading the file catalog from a USB device</p></li>
+<li><p>reading a file from a USB device</p></li>
+<li><p>writing a file to a USB device</p></li>
 </ul>
-<p>Ressources :</p>
+<p>Resources:</p>
 <div class="table-wrapper colwidths-auto docutils container">
 <table class="docutils align-default">
 <thead>
-<tr class="row-odd"><th class="head"><p>Ressource</p></th>
-<th class="head"><p>Capacité</p></th>
+<tr class="row-odd"><th class="head"><p>Resource</p></th>
+<th class="head"><p>Capacity</p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>RAM</p></td>
-<td><p>400 Mo</p></td>
+<td><p>400 MB</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<p>Paquets installés :</p>
+<p>Installed packages:</p>
 <ul class="simple">
 <li><p>python3</p></li>
 <li><p>py3-pyserial</p></li>
 <li><p>ntfs-3g</p></li>
-<li><p>evtest (pour le développement uniquement)</p></li>
+<li><p>evtest (development only)</p></li>
 <li><p>py3-libevdev</p></li>
 </ul>
-<p>Fichiers supprimés :</p>
+<p>Removed files:</p>
 <ul class="simple">
-<li><p>aucun</p></li>
+<li><p>none</p></li>
 </ul>
-<section id="detection-des-supports-usb">
-<h4>Détection des supports USB<a class="headerlink" href="#detection-des-supports-usb" title="Link to this heading">¶</a></h4>
-<p>La détection des supports USB est prise en charge par <code class="docutils literal notranslate"><span class="pre">udev</span></code>. Une règle spécifique est ajoutée grâce au fichier <code class="docutils literal notranslate"><span class="pre">99-usbdisks.rules</span></code> placé dans le répertoire <code class="docutils literal notranslate"><span class="pre">/etc/udev/rules.d</span></code>.</p>
-<p>Lorsqu’un support USB est connecté, le script <code class="docutils literal notranslate"><span class="pre">mdev-usb-storage</span></code> est exécuté. Celui-ci vérifie la présence du support et crée un point de montage dans <code class="docutils literal notranslate"><span class="pre">/media/usb</span></code> portant le même nom que le disque connecté. Ensuite, une notification est envoyée sur le Xenbus grâce à la messagerie.</p>
+<section id="usb-device-detection">
+<h4>USB Device Detection<a class="headerlink" href="#usb-device-detection" title="Link to this heading">¶</a></h4>
+<p>USB device detection is handled by <code class="docutils literal notranslate"><span class="pre">udev</span></code>. A specific rule is added using the <code class="docutils literal notranslate"><span class="pre">99-usbdisks.rules</span></code> file placed in the <code class="docutils literal notranslate"><span class="pre">/etc/udev/rules.d</span></code> directory.</p>
+<p>When a USB device is connected, the <code class="docutils literal notranslate"><span class="pre">mdev-usb-storage</span></code> script is executed. It checks for the presence of the device and creates a mount point in <code class="docutils literal notranslate"><span class="pre">/media/usb</span></code> with the same name as the connected disk. A notification is then sent on the Xenbus via the messaging system.</p>
 </section>
 </section>
 </section>
@@ -400,11 +399,11 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Description du socle</a><ul>
-<li><a class="reference internal" href="#machines-virtuelles-domaines">Machines virtuelles (domaines)</a><ul>
+<li><a class="reference internal" href="#">Platform Description</a><ul>
+<li><a class="reference internal" href="#virtual-machines-domains">Virtual Machines (Domains)</a><ul>
 <li><a class="reference internal" href="#dom0">Dom0</a></li>
 <li><a class="reference internal" href="#vm-sys-usb">vm-sys-usb</a><ul>
-<li><a class="reference internal" href="#detection-des-supports-usb">Détection des supports USB</a></li>
+<li><a class="reference internal" href="#usb-device-detection">USB Device Detection</a></li>
 </ul>
 </li>
 </ul>

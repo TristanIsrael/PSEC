@@ -4,7 +4,7 @@ This document gives details about the graphical design of the project.
 
 ## Font
 
-Nokio Medium
+`Nokio Medium`
 
 ## Colors palette
 

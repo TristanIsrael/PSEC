@@ -199,7 +199,22 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../psec.html">psec package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../psec.html">PSEC python documentation</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../markdown/index.html">Project documentation</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Project documentation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/architecture.html">Platform Description</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/boot-sequence.html">Boot sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/boot-usb.html">Create a Bootable USB Drive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/debugging.html">Debugging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/documentation.html">Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/graphical-design.html">Graphical design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/integration.html">Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/protocol.html">Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/provisioning.html">Provisioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/python-api.html">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/update-alpine-mirror.html">Create or Update the Alpine Mirror</a></li>
+</ul>
+</li>
 </ul>
 
 </div>
@@ -236,13 +251,16 @@
         <article role="main" id="furo-main-content">
           <h1>Source code for psec._api</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">Constantes</span><span class="p">,</span> <span class="n">RequestFactory</span><span class="p">,</span> <span class="n">Topics</span><span class="p">,</span> <span class="n">NotificationFactory</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">Logger</span><span class="p">,</span> <span class="n">MqttClient</span><span class="p">,</span> <span class="n">ConnectionType</span><span class="p">,</span> <span class="n">Cles</span><span class="p">,</span> <span class="n">SingletonMeta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">Logger</span><span class="p">,</span> <span class="n">MqttClient</span><span class="p">,</span> <span class="n">System</span><span class="p">,</span> <span class="n">SingletonMeta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">paho.mqtt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">MQTTErrorCode</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">zlib</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">base64</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">atexit</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">signal</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
 
 <div class="viewcode-block" id="Api">
 <a class="viewcode-back" href="../../psec.html#psec.Api">[docs]</a>
@@ -262,6 +280,11 @@
 <span class="sd">    All commands operate asynchronously. The result of executing a command will only be communicated through a notification or a response. Therefore, a callback function must be provided to the API in order to receive responses. The internal topics</span>
 <span class="sd">    provided in the :class:`Topics` use the suffix `/request` and `/response` to differenciate the query and the answer. When an answer is expected on a topic, it will always be suffixed with `/response`.</span>
 
+<span class="sd">    **The callbacks are**:</span>
+<span class="sd">    - API is ready  (see :func:`Api.add_ready_callback`)</span>
+<span class="sd">    - Message received  (see :func:`Api.add_message_callback`)</span>
+<span class="sd">    - The broker acknowledged a subscription (see :func:`Api.add_subscription_callback`)</span>
+
 <span class="sd">    Subscription</span>
 <span class="sd">    ============</span>
 
@@ -269,15 +292,58 @@
 
 <span class="sd">    - The topic has been subscribed (see :func:`Api.subscribe`)</span>
 <span class="sd">    - A message callback function has been provided (see :func:`Api.add_message_callback`)</span>
+
+<span class="sd">    How to use the API</span>
+<span class="sd">    ==================</span>
+
+<span class="sd">    The sequence to correctly handle the connection and subscriptions on a broker is the following:</span>
+<span class="sd">        1. start</span>
+<span class="sd">        2. on ready</span>
+<span class="sd">            - subscribe</span>
+<span class="sd">        3. on subscribed</span>
+<span class="sd">            - continue the app</span>
+
+<span class="sd">    Here is an example:</span>
+
+<span class="sd">    ::</span>
+
+<span class="sd">        import threading</span>
+<span class="sd">        from psec import MqttFactory, Api        </span>
+<span class="sd">        </span>
+<span class="sd">        event = threading.Event()</span>
+<span class="sd">        subscriptions = []</span>
+
+<span class="sd">        def start():</span>
+<span class="sd">            client=MqttFactory.create_mqtt_network_dev(&quot;my_app&quot;)</span>
+<span class="sd">            Api().start(client)</span>
+<span class="sd">            Api().add_ready_callback(on_connected)</span>
+<span class="sd">            event.wait()</span>
+
+<span class="sd">        def on_connected():</span>
+<span class="sd">            Api().add_subscription_callback(on_subscribed)</span>
+<span class="sd">            Api().add_message_callback(self.on_message_received)</span>
+<span class="sd">            success, mid = Api().subscribe(&lt;topic name&gt;)</span>
+<span class="sd">            if success:</span>
+<span class="sd">                subscriptions.append(mid)</span>
+
+<span class="sd">        def on_subscribed(mid):</span>
+<span class="sd">            if mid in subscriptions:</span>
+<span class="sd">                &lt;continue app starting&gt;</span>
+
+<span class="sd">        if __name__ == &quot;__main__&quot;:</span>
+<span class="sd">            start()</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">__ready_callbacks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="n">__message_callbacks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="n">__subscriptions</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="n">__shutdown_callbacks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-    <span class="n">__restart_callbacks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">__restart_callbacks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>    
+    <span class="n">__subscription_callbacks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
     <span class="n">__recording</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">__mqtt_client</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">__ping_id</span> <span class="o">=</span> <span class="mi">0</span>
 
 
 <div class="viewcode-block" id="Api.start">
@@ -297,6 +363,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">on_connected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__on_mqtt_connected</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">on_message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__on_message_received</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">on_subscribed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__on_subscribed</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
 
@@ -333,7 +400,8 @@
 <span class="sd">            callback_fn(Callable): A function which will be called by the API when a message arrives.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">callback_fn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__message_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback_fn</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">callback_fn</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__message_callbacks</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__message_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback_fn</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: message callback function is None&quot;</span><span class="p">)</span></div>
 
@@ -349,10 +417,24 @@
 <span class="sd">            callback_fn(Callable): A function which will be called by the API when it is connected to the MQTT broker.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">callback_fn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__ready_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback_fn</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">callback_fn</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ready_callbacks</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__ready_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback_fn</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: ready callback function is None&quot;</span><span class="p">)</span></div>
 
+
+<div class="viewcode-block" id="Api.add_subscription_callback">
+<a class="viewcode-back" href="../../psec.html#psec.Api.add_subscription_callback">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_subscription_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback_fn</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adds a callback to notify when a subscription has been acknowledged by the broker.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            callback_fn(Callable): A function which will be called by the API when the subscription has been acknowledged.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">callback_fn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">callback_fn</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__subscription_callbacks</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__subscription_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback_fn</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Api.add_shutdown_callback">
@@ -365,7 +447,8 @@
 <span class="sd">            callback_fn(Callable): A function which will be called by the API when the system is shutting down.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">callback_fn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__shutdown_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback_fn</span><span class="p">)</span>            
+            <span class="k">if</span> <span class="n">callback_fn</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__shutdown_callbacks</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__shutdown_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback_fn</span><span class="p">)</span>            
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: shutdown callback function is None&quot;</span><span class="p">)</span></div>
 
@@ -381,7 +464,8 @@
 <span class="sd">            callback_fn(Callable): A function which will be called by the API when the system is restarting a component.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">callback_fn</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__restart_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback_fn</span><span class="p">)</span>            
+            <span class="k">if</span> <span class="n">callback_fn</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__restart_callbacks</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__restart_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback_fn</span><span class="p">)</span>            
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: shutdown callback function is None&quot;</span><span class="p">)</span></div>
 
@@ -389,7 +473,7 @@
 
 <div class="viewcode-block" id="Api.subscribe">
 <a class="viewcode-back" href="../../psec.html#psec.Api.subscribe">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">subscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">subscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Subscribes to a topic on the broker.</span>
 
@@ -397,9 +481,18 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            topic(str): The topic to subscribe to.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple[bool, int | None]: A tuple containing the result as bool and the ID of the subscription</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">topic</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__subscriptions</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">topic</span><span class="p">)</span></div>
+            <span class="n">error_code</span><span class="p">,</span> <span class="n">mid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">topic</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">error_code</span> <span class="o">!=</span> <span class="n">MQTTErrorCode</span><span class="o">.</span><span class="n">MQTT_ERR_SUCCESS</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;WARNING: An error occured while subscribing to the topic </span><span class="si">{</span><span class="n">topic</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">error_code</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">mid</span><span class="p">)</span></div>
 
 
 
@@ -583,10 +676,6 @@
         <span class="n">payload</span> <span class="o">=</span> <span class="n">RequestFactory</span><span class="o">.</span><span class="n">create_request_copy_file</span><span class="p">(</span><span class="n">source_disk</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">destination_disk</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/request&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">COPY_FILE</span><span class="p">),</span> <span class="n">payload</span><span class="p">)</span></div>
 
-
-
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;def copy_file_to_storage(self, source_disk:str, filepath:str):</span>
-<span class="sd">        self.copy_file(source_disk, filepath, Constantes.REPOSITORY)&#39;&#39;&#39;</span>
 
 
 <div class="viewcode-block" id="Api.delete_file">
@@ -805,7 +894,7 @@
     <span class="c1">#</span>
 <div class="viewcode-block" id="Api.shutdown">
 <a class="viewcode-back" href="../../psec.html#psec.Api.shutdown">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span> 
+    <span class="k">def</span><span class="w"> </span><span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Makes the system shutdown.</span>
 
@@ -820,7 +909,7 @@
 <span class="sd">                &quot;reason&quot;: &quot;the reason why the shutdown was refused&quot;</span>
 <span class="sd">            }</span>
 <span class="sd">        &quot;&quot;&quot;</span>       
-        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/request&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">SHUTDOWN</span><span class="p">),</span> <span class="p">{})</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">SHUTDOWN</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">,</span> <span class="p">{})</span></div>
 
 
 
@@ -842,29 +931,67 @@
 <span class="sd">            domain_name(str): The name of the Domain to restart.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">payload</span> <span class="o">=</span> <span class="n">RequestFactory</span><span class="o">.</span><span class="n">create_request_restart_domain</span><span class="p">(</span><span class="n">domain_name</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/request&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">RESTART_DOMAIN</span><span class="p">),</span> <span class="n">payload</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">RESTART_DOMAIN</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span></div>
 
 
 
     <span class="c1">####</span>
-    <span class="c1"># Fonctions privées</span>
+    <span class="c1"># Debugging functions</span>
+    <span class="c1">#</span>
+<div class="viewcode-block" id="Api.ping">
+<a class="viewcode-back" href="../../psec.html#psec.Api.ping">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">ping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_domain</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sends a ping request to a specific user Domain</span>
+
+<span class="sd">        The ping request is peer-to-peer, so the topic format is a little different from</span>
+<span class="sd">        other topics. The name of the target is in the topic so it can be routed by</span>
+<span class="sd">        the broker.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            target_domain(str): The name of the targetted Domain.</span>
+<span class="sd">            data(str, optional): Data to be sent to the target.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ping_id</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ping_id</span><span class="p">,</span>
+            <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">System</span><span class="o">.</span><span class="n">domain_name</span><span class="p">(),</span>
+            <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">,</span>
+            <span class="s2">&quot;sent_at&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">timestamp</span><span class="p">()</span><span class="o">*</span><span class="mi">1000</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">PING</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">target_domain</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span></div>
+
+
+    <span class="c1">####</span>
+    <span class="c1"># Private functions</span>
     <span class="c1">#    </span>
     <span class="k">def</span><span class="w"> </span><span class="nf">__on_mqtt_connected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="s2">&quot;Api&quot;</span><span class="p">,</span> <span class="n">mqtt_client</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="p">,</span> <span class="n">recording</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__recording</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__logfile</span><span class="p">)</span>
+
+        <span class="c1"># Automatically subscribe to ping topic</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">PING</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">domain_name</span><span class="p">()</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">SHUTDOWN</span><span class="si">}</span><span class="s2">/response&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">RESTART_DOMAIN</span><span class="si">}</span><span class="s2">/response&quot;</span><span class="p">)</span>
         
         <span class="k">for</span> <span class="n">cb</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ready_callbacks</span><span class="p">:</span>
             <span class="n">cb</span><span class="p">()</span>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__on_message_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>  
+    <span class="k">def</span><span class="w"> </span><span class="nf">__on_message_received</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
         <span class="c1"># Intercept shutdown response</span>
-        <span class="k">if</span> <span class="n">topic</span> <span class="o">==</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/response&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">SHUTDOWN</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">topic</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">SHUTDOWN</span><span class="si">}</span><span class="s2">/response&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__on_shutdown</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
             <span class="k">return</span> <span class="c1"># Stop here</span>
         
         <span class="c1"># Intercept restart domain response</span>
-        <span class="k">if</span> <span class="n">topic</span> <span class="o">==</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/response&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">RESTART_DOMAIN</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">topic</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">RESTART_DOMAIN</span><span class="si">}</span><span class="s2">/response&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__on_restart_domain</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+            <span class="k">return</span> <span class="c1"># Stop here</span>
+        
+        <span class="c1"># Intercept ping request</span>
+        <span class="k">if</span> <span class="n">topic</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">PING</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">domain_name</span><span class="p">()</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__on_ping</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
             <span class="k">return</span> <span class="c1"># Stop here</span>
 
         <span class="k">for</span> <span class="n">cb</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__message_callbacks</span><span class="p">:</span>
@@ -882,16 +1009,36 @@
             <span class="n">cb</span><span class="p">(</span><span class="n">success</span><span class="p">,</span> <span class="n">reason</span><span class="p">)</span>
 
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">__on_subscribed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mid</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">cb</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__subscription_callbacks</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">cb</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">cb</span><span class="p">(</span><span class="n">mid</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;WARNING: an exception occured in the callback on_subscribe </span><span class="si">{</span><span class="n">cb</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+
     <span class="k">def</span><span class="w"> </span><span class="nf">__on_restart_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
         <span class="n">success</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;accepted&quot;</span>
         <span class="n">domain_name</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;domain_name&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="n">reason</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;reason&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">cb</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__restart_callbacks</span><span class="p">:</span>
-            <span class="n">cb</span><span class="p">(</span><span class="n">domain_name</span><span class="p">,</span> <span class="n">success</span><span class="p">,</span> <span class="n">reason</span><span class="p">)</span></div>
+            <span class="n">cb</span><span class="p">(</span><span class="n">domain_name</span><span class="p">,</span> <span class="n">success</span><span class="p">,</span> <span class="n">reason</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__on_ping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">System</span><span class="o">.</span><span class="n">domain_name</span><span class="p">(),</span>
+            <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;sent_at&quot;</span><span class="p">:</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sent_at&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>            
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">PING</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="si">}</span><span class="s2">/response&quot;</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span></div>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">cleanup</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">cleanup</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="n">Api</span><span class="p">()</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
 
 <span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">cleanup</span><span class="p">)</span>

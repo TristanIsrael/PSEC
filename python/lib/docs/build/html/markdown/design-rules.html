@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
-        <title>Logging - PSEC 1.0.0 documentation</title>
+        <title>Design rules - PSEC 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
@@ -236,7 +236,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="../_sources/markdown/logging.md.txt" title="View this page">
+  <a class="muted-link" href="../_sources/markdown/design-rules.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -256,47 +256,192 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="logging">
-<h1>Logging<a class="headerlink" href="#logging" title="Link to this heading">¶</a></h1>
-<p>This document describes the logging strategy and the mechanisms implemented.</p>
-<section id="features">
-<h2>Features<a class="headerlink" href="#features" title="Link to this heading">¶</a></h2>
-<p>Logging occurs at two levels:</p>
+          <section id="design-rules">
+<h1>Design rules<a class="headerlink" href="#design-rules" title="Link to this heading">¶</a></h1>
+<p>This document presents the design rules and guidelines for all the features of PSEC.</p>
+<p>The table below presents the rules guiding the design of the platform and their impact on operational
+maintenance (OCM), security maintenance (SCM), ease of integration of business components, and
+performance.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Id</p></th>
+<th class="head"><p>Rule</p></th>
+<th class="head"><p>OCM</p></th>
+<th class="head"><p>SCM</p></th>
+<th class="head"><p>Integration</p></th>
+<th class="head"><p>Performance</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>#1</p></td>
+<td><p>Use of off-the-shelf software and libraries</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>#2</p></td>
+<td><p>Use of standard protocols</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p>#3</p></td>
+<td><p>Components from mainstream channels</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>#4</p></td>
+<td><p>Use of lightweight software and libraries</p></td>
+<td><p></p></td>
+<td><p></p></td>
+<td><p></p></td>
+<td><p>x</p></td>
+</tr>
+<tr class="row-even"><td><p>#5</p></td>
+<td><p>Use of robust software and libraries</p></td>
+<td><p></p></td>
+<td><p>x</p></td>
+<td><p></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p>#6</p></td>
+<td><p>Provision of an API</p></td>
+<td><p></p></td>
+<td><p>x</p></td>
+<td><p></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p>#7</p></td>
+<td><p>Provision of built-in debugging tools</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+</tr>
+<tr class="row-odd"><td><p>#8</p></td>
+<td><p>Stateless system</p></td>
+<td><p></p></td>
+<td><p>x</p></td>
+<td><p></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p>#9</p></td>
+<td><p>Configuration management</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+</tr>
+<tr class="row-odd"><td><p>#10</p></td>
+<td><p>Always reduce attack surface</p></td>
+<td><p>x</p></td>
+<td><p>x</p></td>
+<td><p></p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<section id="use-of-off-the-shelf-software-and-libraries">
+<h2>Use of Off-the-Shelf Software and Libraries<a class="headerlink" href="#use-of-off-the-shelf-software-and-libraries" title="Link to this heading">¶</a></h2>
+<p>The platform mainly relies on Alpine Linux, Mosquitto, XOrg, and python.</p>
+<p><strong>Alpine Linux</strong> provides several crucial features and capabilities to meet the design rules:</p>
 <ul class="simple">
-<li><p>Operating system: services can record a number of events in files located in <code class="docutils literal notranslate"><span class="pre">/var/log</span></code> or send them to a log manager such as <code class="docutils literal notranslate"><span class="pre">syslog</span></code>.</p></li>
-<li><p>Business application: applications and the platform generate events related to the operation of the product.</p></li>
+<li><p>Ultra-lightweight: it allows creating a system with a very small memory and disk footprint, mainly due to the use of the MUSL system library, Busybox, and OpenRC</p></li>
+<li><p>Enhanced security: all packages are compiled with security options such as stack-smashing
+protection, PIE, and fortify source</p></li>
+<li><p>Powerful, fast, and lightweight package manager APK</p></li>
+<li><p>Modular: default minimal installation and enhanced capabilities by adding component packages.</p></li>
+<li><p>Fast booting thanks to its lightweight and modular nature.</p></li>
+<li><p>Rolling Release: Rolling release distribution with continuous updates without the need for a
+complete reinstallation</p></li>
 </ul>
-<p>Only business events are covered in this documentation.</p>
+<p><strong>Mosquitto</strong> is an MQTT broker (See the next section) that provides inter-application and inter-
+component messaging capabilities.</p>
+<p><strong>XOrg</strong> is a display server for graphical user interfaces. It allows business applications to display their graphical interface on the system’s screen.</p>
+<p><strong>python</strong> is an interpreter and programming language. It offers easy integration capabilities as it does
+not impose any compilation chain or software factory for developing software building blocks for the
+product.</p>
 </section>
-<section id="architecture">
-<h2>Architecture<a class="headerlink" href="#architecture" title="Link to this heading">¶</a></h2>
-<p>Logging uses the system messaging infrastructure through specific topics <code class="docutils literal notranslate"><span class="pre">system/events</span></code>.</p>
+<section id="use-of-standard-protocols">
+<h2>Use of Standard Protocols<a class="headerlink" href="#use-of-standard-protocols" title="Link to this heading">¶</a></h2>
+<p>The platform uses the MQTT protocol16 for messaging and notification functions, allowing it to rely on
+a mature and well-understood communication mechanism. Business components can communicate with each other, send commands to the platform, and receive notifications using this protocol.</p>
 </section>
-<section id="debug-level">
-<h2>Debug Level<a class="headerlink" href="#debug-level" title="Link to this heading">¶</a></h2>
-<p>The debug level is set using the command <code class="docutils literal notranslate"><span class="pre">system/events/set_loglevel</span></code>.</p>
+<section id="components-from-mainstream-channels">
+<h2>Components from Mainstream Channels<a class="headerlink" href="#components-from-mainstream-channels" title="Link to this heading">¶</a></h2>
+<p>All the software used comes from one of the two official binary repositories of Alpine Linux: main17
+and community18</p>
+<p>This way, as soon as a security patch or bug fix is published, the platform and products can benefit
+from an upgrade simply by updating the installed packages.</p>
 </section>
-<section id="emitting-an-event">
-<h2>Emitting an Event<a class="headerlink" href="#emitting-an-event" title="Link to this heading">¶</a></h2>
-<p>Sharing log information is done via notifications <code class="docutils literal notranslate"><span class="pre">system/events/[loglevel]</span></code> where <code class="docutils literal notranslate"><span class="pre">loglevel</span></code> can be:</p>
+<section id="use-of-lightweight-software-and-libraries">
+<h2>Use of Lightweight Software and Libraries<a class="headerlink" href="#use-of-lightweight-software-and-libraries" title="Link to this heading">¶</a></h2>
+<p>The choice of components on which the platform relies was made based on strict criteria of lightweight
+nature and performance. When multiple components can serve the same function, the choice is made
+based on the component’s disk and memory footprint, as well as its performance (speed, stability).</p>
+</section>
+<section id="use-of-robust-software-and-libraries">
+<h2>Use of Robust Software and Libraries<a class="headerlink" href="#use-of-robust-software-and-libraries" title="Link to this heading">¶</a></h2>
+<p>Similarly, the robustness of a component is considered when it may be exploited as a vector for a threat.
+While the Alpine Linux packages are compiled with options that enhance their security, vulnerabilities
+may still exist in these components.
+The CVE system is used and monitored to confirm or reject the choices of critical components in the platform.</p>
+</section>
+<section id="provision-of-an-api">
+<h2>Provision of an API<a class="headerlink" href="#provision-of-an-api" title="Link to this heading">¶</a></h2>
+<p>The provision of an API is a crucial element for facilitating the integration of business components and
+enabling rapid product creation.</p>
+<p>The provided API allows for easy invocation of platform functions and sending notifications, either
+through a python function call or by sending an MQTT message.</p>
+</section>
+<section id="provision-of-built-in-debugging-tools">
+<h2>Provision of Built-in Debugging Tools<a class="headerlink" href="#provision-of-built-in-debugging-tools" title="Link to this heading">¶</a></h2>
+<p>The platform offers an integrated mechanism that facilitates debugging of business applications. The
+API provides functions such as debug, warn, critical, among others, that allow propagating debugging
+messages or system statuses. When the system is configured in debugging mode, these messages can
+then be captured from a device connected via an RS-232 serial port.</p>
+<p>All debugging and system information messages are also centralized by the platform and can be
+serialized on demand into a text file.</p>
+</section>
+<section id="stateless-system">
+<h2>Stateless System<a class="headerlink" href="#stateless-system" title="Link to this heading">¶</a></h2>
+<p>The stateless nature of the platform is its main guarantee against integrity breaches (See Security
+chapter). It is immune to any attempt to compromise its integrity. In return, it does not provide any
+permanent storage functionality, databases, or recovery from previous states.
+As a result, business components must manage their own permanent storage when necessary,
+particularly by using external storage.</p>
+</section>
+<section id="configuration-management">
+<h2>Configuration Management<a class="headerlink" href="#configuration-management" title="Link to this heading">¶</a></h2>
+<p>The platform facilitates hardware and software configuration management through the use of a descrip-
+tion file called topology.json.</p>
+<p>This file allows defining one or more software configurations and associating them with hardware
+configurations. For example, the system integrator or designer can choose to enable or disable the GUI,
+the use of USB ports, or the memory allocated to a business component. They can also prohibit the use
+of one or more PCI peripherals.</p>
+<p>Using the APK package manager in product packaging also allows fine-grained specification of which
+software packages will be used by the system, with a dependency system that allows choosing the
+components of the platform to be used.</p>
+<p>The available platform packages are:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">debug</span></code>: Debugging information</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">info</span></code>: General information</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">warn</span></code>: Warning</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">error</span></code>: Software error impacting only part of the system functions</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">critical</span></code>: Software or hardware error preventing the system from operating</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">psec-core</span></code> - this package is essential.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">psec-lib</span></code> - this package allows installing the API into a system component. It is optional.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">psec-gui-base</span></code> - this package initializes the graphical environment for displaying the GUI in a
+system component. It is optional.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">psec-sys-gui</span></code> - this package initializes access to the system’s graphics card. It will not be installed
+if the product does not include a graphical interface.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">psec-sys-usb</span></code> - this package enables the use of USB peripherals on the hardware. It will not be
+installed if the product does not enable USB functionality.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">psec-container-debian</span></code> - this package installs an LXC container with a Debian Linux system to
+run programs that are incompatible with Alpine Linux or require glibc. This package is meant to
+be installed into a Virtual Machine and ran in memory.</p></li>
 </ul>
-<p>Event emission is simplified through the Python class <code class="docutils literal notranslate"><span class="pre">Logger</span></code>. It is used as follows:</p>
-<p><code class="docutils literal notranslate"><span class="pre">Logger().debug(&quot;Debug</span> <span class="pre">message&quot;,</span> <span class="pre">&quot;Module</span> <span class="pre">name&quot;)</span></code><br />
-or <code class="docutils literal notranslate"><span class="pre">Logger().info(&quot;Informational</span> <span class="pre">message&quot;)</span></code>.</p>
-</section>
-<section id="recording">
-<h2>Recording<a class="headerlink" href="#recording" title="Link to this heading">¶</a></h2>
-<p>The platform automatically saves all events at or above the level defined by the <code class="docutils literal notranslate"><span class="pre">set_loglevel</span></code> command (or <code class="docutils literal notranslate"><span class="pre">info</span></code> by default) into a file that can be copied or downloaded on demand. The logging level can be configured to keep only a subset of events.</p>
-</section>
-<section id="retrieving-the-log">
-<h2>Retrieving the Log<a class="headerlink" href="#retrieving-the-log" title="Link to this heading">¶</a></h2>
-<p>The command to retrieve the log is <code class="docutils literal notranslate"><span class="pre">system/events/save_log</span></code>.</p>
 </section>
 </section>
 
@@ -337,13 +482,16 @@ or <code class="docutils literal notranslate"><span class="pre">Logger().info(&q
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Logging</a><ul>
-<li><a class="reference internal" href="#features">Features</a></li>
-<li><a class="reference internal" href="#architecture">Architecture</a></li>
-<li><a class="reference internal" href="#debug-level">Debug Level</a></li>
-<li><a class="reference internal" href="#emitting-an-event">Emitting an Event</a></li>
-<li><a class="reference internal" href="#recording">Recording</a></li>
-<li><a class="reference internal" href="#retrieving-the-log">Retrieving the Log</a></li>
+<li><a class="reference internal" href="#">Design rules</a><ul>
+<li><a class="reference internal" href="#use-of-off-the-shelf-software-and-libraries">Use of Off-the-Shelf Software and Libraries</a></li>
+<li><a class="reference internal" href="#use-of-standard-protocols">Use of Standard Protocols</a></li>
+<li><a class="reference internal" href="#components-from-mainstream-channels">Components from Mainstream Channels</a></li>
+<li><a class="reference internal" href="#use-of-lightweight-software-and-libraries">Use of Lightweight Software and Libraries</a></li>
+<li><a class="reference internal" href="#use-of-robust-software-and-libraries">Use of Robust Software and Libraries</a></li>
+<li><a class="reference internal" href="#provision-of-an-api">Provision of an API</a></li>
+<li><a class="reference internal" href="#provision-of-built-in-debugging-tools">Provision of Built-in Debugging Tools</a></li>
+<li><a class="reference internal" href="#stateless-system">Stateless System</a></li>
+<li><a class="reference internal" href="#configuration-management">Configuration Management</a></li>
 </ul>
 </li>
 </ul>

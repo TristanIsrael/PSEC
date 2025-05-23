@@ -13,5 +13,5 @@
     "python.testing.cwd": "python/lib/src",
     "python.autoComplete.extraPaths": [
         "${workspaceFolder}/python/lib/src"             // Ajoute le dossier src au PYTHONPATH
-    ],    
+    ]
 }

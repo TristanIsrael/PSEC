@@ -1,11 +1,14 @@
 from . import Constantes, RequestFactory, Topics, NotificationFactory
-from . import Logger, MqttClient, ConnectionType, Cles, SingletonMeta
+from . import Logger, MqttClient, System, SingletonMeta
+from paho.mqtt.enums import MQTTErrorCode
 import tempfile
 import os
 import zlib
 import base64
 import atexit
 import signal
+import threading
+from datetime import datetime
 
 class Api(metaclass=SingletonMeta):
     """ 
@@ -23,6 +26,11 @@ class Api(metaclass=SingletonMeta):
     All commands operate asynchronously. The result of executing a command will only be communicated through a notification or a response. Therefore, a callback function must be provided to the API in order to receive responses. The internal topics
     provided in the :class:`Topics` use the suffix `/request` and `/response` to differenciate the query and the answer. When an answer is expected on a topic, it will always be suffixed with `/response`.
 
+    **The callbacks are**:
+    - API is ready  (see :func:`Api.add_ready_callback`)
+    - Message received  (see :func:`Api.add_message_callback`)
+    - The broker acknowledged a subscription (see :func:`Api.add_subscription_callback`)
+
     Subscription
     ============
 
@@ -30,15 +38,58 @@ class Api(metaclass=SingletonMeta):
 
     - The topic has been subscribed (see :func:`Api.subscribe`)
     - A message callback function has been provided (see :func:`Api.add_message_callback`)
+
+    How to use the API
+    ==================
+
+    The sequence to correctly handle the connection and subscriptions on a broker is the following:
+        1. start
+        2. on ready
+            - subscribe
+        3. on subscribed
+            - continue the app
+
+    Here is an example:
+
+    ::
+
+        import threading
+        from psec import MqttFactory, Api        
+        
+        event = threading.Event()
+        subscriptions = []
+
+        def start():
+            client=MqttFactory.create_mqtt_network_dev("my_app")
+            Api().start(client)
+            Api().add_ready_callback(on_connected)
+            event.wait()
+
+        def on_connected():
+            Api().add_subscription_callback(on_subscribed)
+            Api().add_message_callback(self.on_message_received)
+            success, mid = Api().subscribe(<topic name>)
+            if success:
+                subscriptions.append(mid)
+
+        def on_subscribed(mid):
+            if mid in subscriptions:
+                <continue app starting>
+
+        if __name__ == "__main__":
+            start()
+
     """
 
     __ready_callbacks = list()
     __message_callbacks = list()
     __subscriptions = list()
     __shutdown_callbacks = list()
-    __restart_callbacks = list()
+    __restart_callbacks = list()    
+    __subscription_callbacks = list()
     __recording = False
     __mqtt_client = None
+    __ping_id = 0
 
 
     def start(self, mqtt_client:MqttClient, recording = False, logfile = os.path.join(tempfile.gettempdir(), "journal.log")):
@@ -56,6 +107,7 @@ class Api(metaclass=SingletonMeta):
 
         self.__mqtt_client.on_connected = self.__on_mqtt_connected
         self.__mqtt_client.on_message = self.__on_message_received
+        self.__mqtt_client.on_subscribed = self.__on_subscribed
 
         self.__mqtt_client.start()
 
@@ -83,7 +135,8 @@ class Api(metaclass=SingletonMeta):
             callback_fn(Callable): A function which will be called by the API when a message arrives.
         """
         if callback_fn is not None:
-            self.__message_callbacks.append(callback_fn)
+            if callback_fn not in self.__message_callbacks:
+                self.__message_callbacks.append(callback_fn)
         else:
             print("WARNING: message callback function is None")
 
@@ -96,10 +149,21 @@ class Api(metaclass=SingletonMeta):
             callback_fn(Callable): A function which will be called by the API when it is connected to the MQTT broker.
         """
         if callback_fn is not None:
-            self.__ready_callbacks.append(callback_fn)
+            if callback_fn not in self.__ready_callbacks:
+                self.__ready_callbacks.append(callback_fn)
         else:
             print("WARNING: ready callback function is None")
 
+    def add_subscription_callback(self, callback_fn):
+        """
+        Adds a callback to notify when a subscription has been acknowledged by the broker.
+
+        Args:
+            callback_fn(Callable): A function which will be called by the API when the subscription has been acknowledged.
+        """
+        if callback_fn is not None:
+            if callback_fn not in self.__subscription_callbacks:
+                self.__subscription_callbacks.append(callback_fn)
 
     def add_shutdown_callback(self, callback_fn):
         """
@@ -109,7 +173,8 @@ class Api(metaclass=SingletonMeta):
             callback_fn(Callable): A function which will be called by the API when the system is shutting down.
         """
         if callback_fn is not None:
-            self.__shutdown_callbacks.append(callback_fn)            
+            if callback_fn not in self.__shutdown_callbacks:
+                self.__shutdown_callbacks.append(callback_fn)            
         else:
             print("WARNING: shutdown callback function is None")
 
@@ -122,12 +187,13 @@ class Api(metaclass=SingletonMeta):
             callback_fn(Callable): A function which will be called by the API when the system is restarting a component.
         """
         if callback_fn is not None:
-            self.__restart_callbacks.append(callback_fn)            
+            if callback_fn not in self.__restart_callbacks:
+                self.__restart_callbacks.append(callback_fn)            
         else:
             print("WARNING: shutdown callback function is None")
 
 
-    def subscribe(self, topic:str):
+    def subscribe(self, topic:str) -> tuple[bool, int | None]:
         """
         Subscribes to a topic on the broker.
 
@@ -135,9 +201,18 @@ class Api(metaclass=SingletonMeta):
 
         Args:
             topic(str): The topic to subscribe to.
+
+        Returns:
+            tuple[bool, int | None]: A tuple containing the result as bool and the ID of the subscription
         """
         if not topic in self.__subscriptions:
-            self.__mqtt_client.subscribe(topic)
+            error_code, mid = self.__mqtt_client.subscribe(topic)
+            if error_code != MQTTErrorCode.MQTT_ERR_SUCCESS:
+                print(f"WARNING: An error occured while subscribing to the topic {topic}")
+                print(error_code)
+                return (False, None)
+            else:
+                return (True, mid)
 
 
     def publish(self, topic:str, payload:dict):
@@ -290,10 +365,6 @@ class Api(metaclass=SingletonMeta):
         """
         payload = RequestFactory.create_request_copy_file(source_disk, filepath, destination_disk)
         self.__mqtt_client.publish("{}/request".format(Topics.COPY_FILE), payload)
-
-
-    '''def copy_file_to_storage(self, source_disk:str, filepath:str):
-        self.copy_file(source_disk, filepath, Constantes.REPOSITORY)'''
 
 
     def delete_file(self, filepath:str, disk:str):
@@ -480,7 +551,7 @@ class Api(metaclass=SingletonMeta):
     ####
     # Workflow functions
     #
-    def shutdown(self): 
+    def shutdown(self):
         """
         Makes the system shutdown.
 
@@ -495,7 +566,7 @@ class Api(metaclass=SingletonMeta):
                 "reason": "the reason why the shutdown was refused"
             }
         """       
-        self.__mqtt_client.publish("{}/request".format(Topics.SHUTDOWN), {})
+        self.__mqtt_client.publish(f"{Topics.SHUTDOWN}/request", {})
 
 
     def restart_domain(self, domain_name:str):
@@ -514,28 +585,63 @@ class Api(metaclass=SingletonMeta):
             domain_name(str): The name of the Domain to restart.
         """
         payload = RequestFactory.create_request_restart_domain(domain_name)
-        self.__mqtt_client.publish("{}/request".format(Topics.RESTART_DOMAIN), payload)
+        self.__mqtt_client.publish(f"{Topics.RESTART_DOMAIN}/request", payload)
 
 
     ####
-    # Fonctions privées
+    # Debugging functions
+    #
+    def ping(self, target_domain:str, data:str = ""):
+        """
+        Sends a ping request to a specific user Domain
+
+        The ping request is peer-to-peer, so the topic format is a little different from
+        other topics. The name of the target is in the topic so it can be routed by
+        the broker.
+
+        Args:
+            target_domain(str): The name of the targetted Domain.
+            data(str, optional): Data to be sent to the target.
+        """
+        
+        self.__ping_id += 1
+        payload = {
+            "id": self.__ping_id,
+            "source": System.domain_name(),
+            "data": data,
+            "sent_at": datetime.now().timestamp()*1000
+        }
+        self.__mqtt_client.publish(f"{Topics.PING}/{target_domain}/request", payload)
+
+    ####
+    # Private functions
     #    
     def __on_mqtt_connected(self):
         Logger().setup("Api", mqtt_client=self.__mqtt_client, recording=self.__recording, filename=self.__logfile)
+
+        # Automatically subscribe to ping topic
+        self.subscribe(f"{Topics.PING}/{System.domain_name()}/request")
+        self.subscribe(f"{Topics.SHUTDOWN}/response")
+        self.subscribe(f"{Topics.RESTART_DOMAIN}/response")
         
         for cb in self.__ready_callbacks:
             cb()
 
 
-    def __on_message_received(self, topic:str, payload:dict):  
+    def __on_message_received(self, topic:str, payload:dict):
         # Intercept shutdown response
-        if topic == "{}/response".format(Topics.SHUTDOWN):
+        if topic == f"{Topics.SHUTDOWN}/response":
             self.__on_shutdown(payload)
             return # Stop here
         
         # Intercept restart domain response
-        if topic == "{}/response".format(Topics.RESTART_DOMAIN):
+        if topic == f"{Topics.RESTART_DOMAIN}/response":
             self.__on_restart_domain(payload)
+            return # Stop here
+        
+        # Intercept ping request
+        if topic == f"{Topics.PING}/{System.domain_name()}/request":
+            self.__on_ping(payload)
             return # Stop here
 
         for cb in self.__message_callbacks:
@@ -553,6 +659,16 @@ class Api(metaclass=SingletonMeta):
             cb(success, reason)
 
 
+    def __on_subscribed(self, mid):
+        try:
+            for cb in self.__subscription_callbacks:
+                if cb is not None:
+                    cb(mid)
+        except Exception as e:
+            print(f"WARNING: an exception occured in the callback on_subscribe {cb}")
+            print(e)
+
+
     def __on_restart_domain(self, payload:dict):
         success = payload.get("state", "") == "accepted"
         domain_name = payload.get("domain_name", "")
@@ -561,7 +677,17 @@ class Api(metaclass=SingletonMeta):
         for cb in self.__restart_callbacks:
             cb(domain_name, success, reason)
 
-def cleanup():
+    def __on_ping(self, payload: dict):
+        payload = {
+            "id": payload.get("id", ""),
+            "source": System.domain_name(),
+            "data": payload.get("data", ""),
+            "sent_at": payload.get("sent_at", "")            
+        }
+
+        self.__mqtt_client.publish(f"{Topics.PING}/{payload.get("source", "")}/response", payload)
+
+def cleanup(*args, **kwargs):
     Api().stop()
 
 atexit.register(cleanup)

@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Compiler des paquets Alpine" href="build-alpine-packets.html" /><link rel="prev" title="Boot sequence" href="boot-sequence.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Debugging" href="debugging.html" /><link rel="prev" title="Boot sequence" href="boot-sequence.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
-        <title>Créer une clé USB bootable - PSEC 1.0.0 documentation</title>
+        <title>Create a Bootable USB Drive - PSEC 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
@@ -202,19 +202,18 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../psec.html">PSEC python documentation</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Project documentation</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Project documentation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="architecture.html">Description du socle</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">Platform Description</a></li>
 <li class="toctree-l2"><a class="reference internal" href="boot-sequence.html">Boot sequence</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Créer une clé USB bootable</a></li>
-<li class="toctree-l2"><a class="reference internal" href="build-alpine-packets.html">Compiler des paquets Alpine</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Create a Bootable USB Drive</a></li>
 <li class="toctree-l2"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="documentation.html">Documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="graphical-design.html">Graphical design</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html">Integration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="protocol.html">Protocol</a></li>
-<li class="toctree-l2"><a class="reference internal" href="provisioning.html">Approvisionnement</a></li>
-<li class="toctree-l2"><a class="reference internal" href="python-api.html">API Python</a></li>
-<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html">Créer l’infrastructure de déploiement</a></li>
-<li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html">Créer ou mettre à jour le miroir Alpine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provisioning.html">Provisioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python-api.html">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html">Create or Update the Alpine Mirror</a></li>
 </ul>
 </li>
 </ul>
@@ -257,64 +256,65 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="creer-une-cle-usb-bootable">
-<h1>Créer une clé USB bootable<a class="headerlink" href="#creer-une-cle-usb-bootable" title="Link to this heading">¶</a></h1>
-<p>Cette procédure décrit le processus de création d’un clé USB bootable.</p>
+          <section id="create-a-bootable-usb-drive">
+<h1>Create a Bootable USB Drive<a class="headerlink" href="#create-a-bootable-usb-drive" title="Link to this heading">¶</a></h1>
+<p>This procedure describes the process of creating a bootable USB drive.</p>
 <section id="procedure">
-<h2>Procédure<a class="headerlink" href="#procedure" title="Link to this heading">¶</a></h2>
+<h2>Procedure<a class="headerlink" href="#procedure" title="Link to this heading">¶</a></h2>
 <ul class="simple">
-<li><p>Télécharger l’image ISO officielle d’Alpine Standard (<a class="reference internal" href="#%60https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/x86_64/alpine-standard-3.21.3-x86_64.iso%60"><span class="xref myst">Alpine Standard x86_64</span></a>).</p></li>
-<li><p>Copier l’ISO sur une clé USB : <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">sudo</span> <span class="pre">dd</span> <span class="pre">if=alpine-standard-xxx.iso</span> <span class="pre">of=/dev/xxx</span> <span class="pre">bs=4m</span></code></p></li>
-<li><p>Démarrer sur la clé USB</p></li>
-<li><p>S’identifier en tant que <code class="docutils literal notranslate"><span class="pre">root</span></code></p></li>
-<li><p>Taper <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">setup-alpine</span></code> et configurer le système sans installation sur disque ni stockage de la configuration</p>
+<li><p>Download the official Alpine Standard ISO image (<a class="reference internal" href="#%60https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/x86_64/alpine-standard-3.21.3-x86_64.iso%60"><span class="xref myst">Alpine Standard x86_64</span></a>).</p></li>
+<li><p>Copy the ISO to a USB drive: <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">sudo</span> <span class="pre">dd</span> <span class="pre">if=alpine-standard-xxx.iso</span> <span class="pre">of=/dev/xxx</span> <span class="pre">bs=4m</span></code></p></li>
+<li><p>Boot from the USB drive</p></li>
+<li><p>Log in as <code class="docutils literal notranslate"><span class="pre">root</span></code></p></li>
+<li><p>Type <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">setup-alpine</span></code> and configure the system without disk installation or config storage</p>
 <ul>
-<li><p>Le script échouera</p></li>
+<li><p>The script will fail</p></li>
 </ul>
 </li>
-<li><p>Taper <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">apk</span> <span class="pre">add</span> <span class="pre">dosfstools</span> <span class="pre">wipefs</span></code></p></li>
-<li><p>Installer la nouvelle clé qui deviendra le système bootable</p>
+<li><p>Type <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">apk</span> <span class="pre">add</span> <span class="pre">dosfstools</span> <span class="pre">wipefs</span></code></p></li>
+<li><p>Plug in the new USB drive that will become the bootable system</p>
 <ul>
-<li><p>dans <code class="docutils literal notranslate"><span class="pre">dmesg</span></code> identifier la nouvelle clé <code class="docutils literal notranslate"><span class="pre">sdx</span></code></p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">dmesg</span></code> to identify the new drive (e.g., <code class="docutils literal notranslate"><span class="pre">sdx</span></code>)</p></li>
 </ul>
 </li>
-<li><p>Préparer la clé (voir chapitre préparation de la clé bootable)</p></li>
-<li><p>Débrancher la clé ISO et ne conserver que la nouvelle clé bootable</p></li>
-<li><p>Redémarrer sur la clé bootable</p></li>
-<li><p>Configurer les dépôts dans <code class="docutils literal notranslate"><span class="pre">/etc/apk/repositories</span></code></p></li>
-<li><p>Le cas échéant, remonter le système en R/W : <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">mount</span> <span class="pre">-o</span> <span class="pre">remount,rw</span> <span class="pre">/dev/sda1</span> <span class="pre">/media/usb</span></code></p></li>
-<li><p>Taper <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">setup-apkcache</span> <span class="pre">/media/usb/cache</span></code></p></li>
-<li><p>Taper <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">apk</span> <span class="pre">cache</span> <span class="pre">-v</span> <span class="pre">sync</span></code></p></li>
-<li><p>Taper <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">setup-lbu</span> <span class="pre">usb</span></code></p></li>
-<li><p>Taper <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">lbu</span> <span class="pre">commit</span> <span class="pre">-d</span></code></p></li>
-<li><p>Le système bootable est prêt</p>
+<li><p>Prepare the drive (see the <em>Bootable USB Drive Preparation</em> section)</p></li>
+<li><p>Unplug the ISO USB and keep only the new bootable USB drive</p></li>
+<li><p>Reboot from the new bootable USB drive</p></li>
+<li><p>Configure the repositories in <code class="docutils literal notranslate"><span class="pre">/etc/apk/repositories</span></code></p></li>
+<li><p>If needed, remount the system in R/W mode: <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">mount</span> <span class="pre">-o</span> <span class="pre">remount,rw</span> <span class="pre">/dev/sda1</span> <span class="pre">/media/usb</span></code></p></li>
+<li><p>Type <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">setup-apkcache</span> <span class="pre">/media/usb/cache</span></code></p></li>
+<li><p>Type <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">apk</span> <span class="pre">cache</span> <span class="pre">-v</span> <span class="pre">sync</span></code></p></li>
+<li><p>Type <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">setup-lbu</span> <span class="pre">usb</span></code></p></li>
+<li><p>Type <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">lbu</span> <span class="pre">commit</span> <span class="pre">-d</span></code></p></li>
+<li><p>The bootable system is ready</p>
 <ul>
-<li><p><em>Installer les paquets nécessaires à la construction du produit bootable sur USB</em></p></li>
-<li><p>La configuration sera réalisée sur le support USB</p></li>
-<li><p>Le cas échéant retirer la configuration du réseau et des dépôts pour un boot plus rapide</p></li>
+<li><p><em>Install the necessary packages for building the USB bootable product</em></p></li>
+<li><p>The configuration will be stored on the USB drive</p></li>
+<li><p>Optionally, remove network and repository settings for a faster boot</p></li>
 </ul>
 </li>
 </ul>
-<section id="preparation-de-la-cle-bootable">
-<h3>Préparation de la clé bootable<a class="headerlink" href="#preparation-de-la-cle-bootable" title="Link to this heading">¶</a></h3>
-<p>Taper les commandes suivantes pour préparer la clé bootable (remplacer <code class="docutils literal notranslate"><span class="pre">sdx</span></code> par l’identifiant correct):</p>
-<p><code class="docutils literal notranslate"><span class="pre">wipefs</span> <span class="pre">-a</span> <span class="pre">/dev/sdx</span></code></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="n">fdisk</span> <span class="o">-</span><span class="n">w</span> <span class="n">always</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">sdx</span> <span class="o">&lt;&lt;</span><span class="n">EOF</span>
-  <span class="n">o</span>
-  <span class="n">n</span>
-  <span class="n">p</span>
-  <span class="mi">1</span>
-  <span class="mi">2048</span>
-  <span class="o">-</span><span class="mi">0</span>
-  <span class="n">t</span>
-  <span class="mi">0</span><span class="n">c</span>
-  <span class="n">a</span>
-  <span class="n">w</span>
+<section id="bootable-usb-drive-preparation">
+<h3>Bootable USB Drive Preparation<a class="headerlink" href="#bootable-usb-drive-preparation" title="Link to this heading">¶</a></h3>
+<p>Run the following commands to prepare the bootable USB drive (replace <code class="docutils literal notranslate"><span class="pre">sdx</span></code> with the correct identifier):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># wipefs -a /dev/sdx</span>
+
+<span class="c1"># fdisk -w always /dev/sdx &lt;&lt;EOF</span>
+<span class="n">o</span>
+<span class="n">n</span>
+<span class="n">p</span>
+<span class="mi">1</span>
+<span class="mi">2048</span>
+<span class="o">-</span><span class="mi">0</span>
+<span class="n">t</span>
+<span class="mi">0</span><span class="n">c</span>
+<span class="n">a</span>
+<span class="n">w</span>
 <span class="n">EOF</span>
 </pre></div>
 </div>
-<p>Formater la clé : <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">mkdosfs</span> <span class="pre">-F32</span> <span class="pre">/dev/sdx1</span></code></p>
-<p>La rendre bootable avec Alpine : <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">setup-bootable</span> <span class="pre">-vUfs</span> <span class="pre">/media/sda</span> <span class="pre">/dev/sdx1</span></code>, vérifier d’abord si l’image ISO est montée sur <code class="docutils literal notranslate"><span class="pre">/media/usb</span></code> ou <code class="docutils literal notranslate"><span class="pre">/media/sda</span></code> (par exemple)</p>
+<p>Format the drive: <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">mkdosfs</span> <span class="pre">-F32</span> <span class="pre">/dev/sdx1</span></code></p>
+<p>Make it bootable with Alpine: <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">setup-bootable</span> <span class="pre">-vUfs</span> <span class="pre">/media/sda</span> <span class="pre">/dev/sdx1</span></code>, first check whether the ISO image is mounted on <code class="docutils literal notranslate"><span class="pre">/media/usb</span></code> or <code class="docutils literal notranslate"><span class="pre">/media/sda</span></code> (for example).</p>
 </section>
 </section>
 </section>
@@ -324,12 +324,12 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="build-alpine-packets.html">
+          <a class="next-page" href="debugging.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Compiler des paquets Alpine</div>
+                <div class="title">Debugging</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
@@ -374,9 +374,9 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Créer une clé USB bootable</a><ul>
-<li><a class="reference internal" href="#procedure">Procédure</a><ul>
-<li><a class="reference internal" href="#preparation-de-la-cle-bootable">Préparation de la clé bootable</a></li>
+<li><a class="reference internal" href="#">Create a Bootable USB Drive</a><ul>
+<li><a class="reference internal" href="#procedure">Procedure</a><ul>
+<li><a class="reference internal" href="#bootable-usb-drive-preparation">Bootable USB Drive Preparation</a></li>
 </ul>
 </li>
 </ul>

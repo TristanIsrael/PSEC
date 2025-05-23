@@ -202,7 +202,18 @@
 <ul class="current">
 <li class="toctree-l1 current current-page"><a class="current reference internal" href="#">PSEC python documentation</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="markdown/index.html">Project documentation</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Project documentation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="markdown/architecture.html">Platform Description</a></li>
+<li class="toctree-l2"><a class="reference internal" href="markdown/boot-sequence.html">Boot sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="markdown/boot-usb.html">Create a Bootable USB Drive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="markdown/debugging.html">Debugging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="markdown/documentation.html">Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="markdown/graphical-design.html">Graphical design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="markdown/integration.html">Integration</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/protocol.html">Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="markdown/provisioning.html">Provisioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="markdown/python-api.html">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="markdown/support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="markdown/update-alpine-mirror.html">Create or Update the Alpine Mirror</a></li>
 </ul>
 </li>
 </ul>
@@ -261,6 +272,10 @@
 <h3>Asynchronous<a class="headerlink" href="#asynchronous" title="Link to this heading">¶</a></h3>
 <p>All commands operate asynchronously. The result of executing a command will only be communicated through a notification or a response. Therefore, a callback function must be provided to the API in order to receive responses. The internal topics
 provided in the <a class="reference internal" href="#psec.Topics" title="psec.Topics"><code class="xref py py-class docutils literal notranslate"><span class="pre">Topics</span></code></a> use the suffix <cite>/request</cite> and <cite>/response</cite> to differenciate the query and the answer. When an answer is expected on a topic, it will always be suffixed with <cite>/response</cite>.</p>
+<p><strong>The callbacks are</strong>:
+- API is ready  (see <a class="reference internal" href="#psec.Api.add_ready_callback" title="psec.Api.add_ready_callback"><code class="xref py py-func docutils literal notranslate"><span class="pre">Api.add_ready_callback()</span></code></a>)
+- Message received  (see <a class="reference internal" href="#psec.Api.add_message_callback" title="psec.Api.add_message_callback"><code class="xref py py-func docutils literal notranslate"><span class="pre">Api.add_message_callback()</span></code></a>)
+- The broker acknowledged a subscription (see <a class="reference internal" href="#psec.Api.add_subscription_callback" title="psec.Api.add_subscription_callback"><code class="xref py py-func docutils literal notranslate"><span class="pre">Api.add_subscription_callback()</span></code></a>)</p>
 </section>
 <section id="subscription">
 <h3>Subscription<a class="headerlink" href="#subscription" title="Link to this heading">¶</a></h3>
@@ -269,6 +284,57 @@ provided in the <a class="reference internal" href="#psec.Topics" title="psec.To
 <li><p>The topic has been subscribed (see <a class="reference internal" href="#psec.Api.subscribe" title="psec.Api.subscribe"><code class="xref py py-func docutils literal notranslate"><span class="pre">Api.subscribe()</span></code></a>)</p></li>
 <li><p>A message callback function has been provided (see <a class="reference internal" href="#psec.Api.add_message_callback" title="psec.Api.add_message_callback"><code class="xref py py-func docutils literal notranslate"><span class="pre">Api.add_message_callback()</span></code></a>)</p></li>
 </ul>
+</section>
+<section id="how-to-use-the-api">
+<h3>How to use the API<a class="headerlink" href="#how-to-use-the-api" title="Link to this heading">¶</a></h3>
+<dl class="simple">
+<dt>The sequence to correctly handle the connection and subscriptions on a broker is the following:</dt><dd><ol class="arabic simple">
+<li><p>start</p></li>
+<li><dl class="simple">
+<dt>on ready</dt><dd><ul class="simple">
+<li><p>subscribe</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>on subscribed</dt><dd><ul class="simple">
+<li><p>continue the app</p></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+<p>Here is an example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">psec</span><span class="w"> </span><span class="kn">import</span> <span class="n">MqttFactory</span><span class="p">,</span> <span class="n">Api</span>
+
+<span class="n">event</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
+<span class="n">subscriptions</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">():</span>
+    <span class="n">client</span><span class="o">=</span><span class="n">MqttFactory</span><span class="o">.</span><span class="n">create_mqtt_network_dev</span><span class="p">(</span><span class="s2">&quot;my_app&quot;</span><span class="p">)</span>
+    <span class="n">Api</span><span class="p">()</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
+    <span class="n">Api</span><span class="p">()</span><span class="o">.</span><span class="n">add_ready_callback</span><span class="p">(</span><span class="n">on_connected</span><span class="p">)</span>
+    <span class="n">event</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">on_connected</span><span class="p">():</span>
+    <span class="n">Api</span><span class="p">()</span><span class="o">.</span><span class="n">add_subscription_callback</span><span class="p">(</span><span class="n">on_subscribed</span><span class="p">)</span>
+    <span class="n">Api</span><span class="p">()</span><span class="o">.</span><span class="n">add_message_callback</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_message_received</span><span class="p">)</span>
+    <span class="n">success</span><span class="p">,</span> <span class="n">mid</span> <span class="o">=</span> <span class="n">Api</span><span class="p">()</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="o">&lt;</span><span class="n">topic</span> <span class="n">name</span><span class="o">&gt;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+        <span class="n">subscriptions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mid</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">on_subscribed</span><span class="p">(</span><span class="n">mid</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">mid</span> <span class="ow">in</span> <span class="n">subscriptions</span><span class="p">:</span>
+        <span class="o">&lt;</span><span class="k">continue</span> <span class="n">app</span> <span class="n">starting</span><span class="o">&gt;</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">start</span><span class="p">()</span>
+</pre></div>
+</div>
 <dl class="py method">
 <dt class="sig sig-object py" id="psec.Api.add_message_callback">
 <span class="sig-name descname"><span class="pre">add_message_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">callback_fn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/psec/_api.html#Api.add_message_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.Api.add_message_callback" title="Link to this definition">¶</a></dt>
@@ -309,6 +375,17 @@ provided in the <a class="reference internal" href="#psec.Topics" title="psec.To
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>callback_fn</strong> (<em>Callable</em>) – A function which will be called by the API when the system is shutting down.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="psec.Api.add_subscription_callback">
+<span class="sig-name descname"><span class="pre">add_subscription_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">callback_fn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/psec/_api.html#Api.add_subscription_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.Api.add_subscription_callback" title="Link to this definition">¶</a></dt>
+<dd><p>Adds a callback to notify when a subscription has been acknowledged by the broker.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>callback_fn</strong> (<em>Callable</em>) – A function which will be called by the API when the subscription has been acknowledged.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -507,6 +584,23 @@ the GUI of the system would remain behind the splash screen</strong></p>
 </dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="psec.Api.ping">
+<span class="sig-name descname"><span class="pre">ping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_domain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/psec/_api.html#Api.ping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.Api.ping" title="Link to this definition">¶</a></dt>
+<dd><p>Sends a ping request to a specific user Domain</p>
+<p>The ping request is peer-to-peer, so the topic format is a little different from
+other topics. The name of the target is in the topic so it can be routed by
+the broker.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target_domain</strong> (<em>str</em>) – The name of the targetted Domain.</p></li>
+<li><p><strong>data</strong> (<em>str</em><em>, </em><em>optional</em>) – Data to be sent to the target.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="psec.Api.publish">
 <span class="sig-name descname"><span class="pre">publish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/psec/_api.html#Api.publish"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.Api.publish" title="Link to this definition">¶</a></dt>
 <dd><p>Publish a message on the MQTT broker.</p>
@@ -674,12 +768,18 @@ prepared.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="psec.Api.subscribe">
-<span class="sig-name descname"><span class="pre">subscribe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/psec/_api.html#Api.subscribe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.Api.subscribe" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">subscribe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">bool</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/psec/_api.html#Api.subscribe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.Api.subscribe" title="Link to this definition">¶</a></dt>
 <dd><p>Subscribes to a topic on the broker.</p>
 <p>If the function subscribed to is a PSEC function, the <a class="reference internal" href="#psec.Topics" title="psec.Topics"><code class="xref py py-class docutils literal notranslate"><span class="pre">Topics</span></code></a> class provides the reference of the topic names.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>topic</strong> (<em>str</em>) – The topic to subscribe to.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing the result as bool and the ID of the subscription</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[bool, int | None]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -991,6 +1091,33 @@ prepared.</p>
 <dt class="sig sig-object py" id="psec.Constantes.constantes">
 <span class="sig-name descname"><span class="pre">constantes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'active_journal_local':</span> <span class="pre">True,</span> <span class="pre">'benchmark_inputs_iterations':</span> <span class="pre">1000,</span> <span class="pre">'chemin_depot_dom0':</span> <span class="pre">'/usr/lib/psec/storage',</span> <span class="pre">'chemin_fichier_config_global':</span> <span class="pre">'/etc/psec/global.conf',</span> <span class="pre">'chemin_fichiers_pid':</span> <span class="pre">'/tmp',</span> <span class="pre">'chemin_journal_local':</span> <span class="pre">'/var/log/psec/psec.log',</span> <span class="pre">'chemin_montage_usb':</span> <span class="pre">'/media/usb',</span> <span class="pre">'chemin_socket_input_dom0':</span> <span class="pre">'/var/run/sys-usb-input.sock',</span> <span class="pre">'chemin_socket_input_domu':</span> <span class="pre">'/dev/hvc2',</span> <span class="pre">'depot_local':</span> <span class="pre">'depot_local',</span> <span class="pre">'format_chaine_log_debug':</span> <span class="pre">'%(asctime)s</span> <span class="pre">%(levelname)-8s</span> <span class="pre">%(domaine)-10s</span> <span class="pre">[%(entite)-20s]</span> <span class="pre">%(message)s',</span> <span class="pre">'format_chaine_log_prod':</span> <span class="pre">'%(asctime)s</span> <span class="pre">%(levelname)-8s</span> <span class="pre">%(domaine)-10s</span> <span class="pre">[%(entite)-20s]</span> <span class="pre">%(message)s',</span> <span class="pre">'mqtt_log_broker_socket':</span> <span class="pre">'/tmp/mqtt_log.sock',</span> <span class="pre">'mqtt_log_socket_filter':</span> <span class="pre">'/var/run/*-log.sock',</span> <span class="pre">'mqtt_msg_broker_socket':</span> <span class="pre">'/tmp/mqtt_msg_dom0.sock',</span> <span class="pre">'mqtt_msg_broker_sockets':</span> <span class="pre">'/tmp/mqtt_msg*.sock',</span> <span class="pre">'mqtt_msg_socket_filter':</span> <span class="pre">'/var/run/*-msg.sock',</span> <span class="pre">'nom_domaine_gui':</span> <span class="pre">'sys-gui',</span> <span class="pre">'serial_port_log':</span> <span class="pre">'/dev/hvc2',</span> <span class="pre">'serial_port_msg':</span> <span class="pre">'/dev/hvc1',</span> <span class="pre">'storage_path_domu':</span> <span class="pre">'/mnt/storage',</span> <span class="pre">'taille_trame':</span> <span class="pre">1024,</span> <span class="pre">'xen_sockets_path':</span> <span class="pre">'/var/run'}</span></em><a class="headerlink" href="#psec.Constantes.constantes" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="psec.Debugging">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psec.</span></span><span class="sig-name descname"><span class="pre">Debugging</span></span><a class="reference internal" href="_modules/psec/_debugging.html#Debugging"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.Debugging" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class provides facilities for product debugging.</p>
+<p>Before using the functions of this class you have to start the API.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="psec.Debugging.benchmark_messaging">
+<span class="sig-name descname"><span class="pre">benchmark_messaging</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_domain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback_fn</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_data_size_in_bytes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1024</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/psec/_debugging.html#Debugging.benchmark_messaging"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.Debugging.benchmark_messaging" title="Link to this definition">¶</a></dt>
+<dd><p>Sends ping requests to a specific Domain, verifies the data and measure the performance.</p>
+<p>The payload will be randomly generated.
+The requests are all sent in one time, in a <em>bruteforce</em> style.</p>
+<p><strong>The API must be ready</strong>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>target_domain</strong> (<em>str</em>) – The name of the Domain which will receive the messages.</p></li>
+<li><p><strong>callback_fn</strong> (<em>Callable</em>) – The function which will receive the results of the benchmark.</p></li>
+<li><p><strong>iterations</strong> (<em>int</em><em>, </em><em>optional</em>) – The number of iterations for the test. Default is 100.</p></li>
+<li><p><strong>max_data_size_in_bytes</strong> (<em>int</em><em>, </em><em>optional</em>) – The maximum length of data generated.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 
@@ -1388,6 +1515,11 @@ du nom passé en paramètre</p>
 <span class="sig-name descname"><span class="pre">on_message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dict</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#psec.MqttClient.on_message" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="psec.MqttClient.on_subscribed">
+<span class="sig-name descname"><span class="pre">on_subscribed</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#psec.MqttClient.on_subscribed" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="psec.MqttClient.publish">
 <span class="sig-name descname"><span class="pre">publish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">payload</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/psec/_mqtt_client.html#MqttClient.publish"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.MqttClient.publish" title="Link to this definition">¶</a></dt>
@@ -1405,7 +1537,7 @@ du nom passé en paramètre</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="psec.MqttClient.subscribe">
-<span class="sig-name descname"><span class="pre">subscribe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/psec/_mqtt_client.html#MqttClient.subscribe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.MqttClient.subscribe" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">subscribe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">topic</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">MQTTErrorCode</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/psec/_mqtt_client.html#MqttClient.subscribe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.MqttClient.subscribe" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1761,6 +1893,11 @@ metaclass because it is best suited for this purpose.</p>
 <dd></dd></dl>
 
 <dl class="py method">
+<dt class="sig sig-object py" id="psec.System.domain_name">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">domain_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/psec/_system.html#System.domain_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.System.domain_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt class="sig sig-object py" id="psec.System.get_screen_height">
 <span class="sig-name descname"><span class="pre">get_screen_height</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/psec/_system.html#System.get_screen_height"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.System.get_screen_height" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -1863,6 +2000,11 @@ metaclass because it is best suited for this purpose.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="psec.Topics.DEBUGGING">
+<span class="sig-name descname"><span class="pre">DEBUGGING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'system/debugging'</span></em><a class="headerlink" href="#psec.Topics.DEBUGGING" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="psec.Topics.DELETE_FILE">
 <span class="sig-name descname"><span class="pre">DELETE_FILE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'system/disks/delete_file'</span></em><a class="headerlink" href="#psec.Topics.DELETE_FILE" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -1945,6 +2087,11 @@ metaclass because it is best suited for this purpose.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="psec.Topics.NEW_FILE">
 <span class="sig-name descname"><span class="pre">NEW_FILE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'system/disks/new_file'</span></em><a class="headerlink" href="#psec.Topics.NEW_FILE" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="psec.Topics.PING">
+<span class="sig-name descname"><span class="pre">PING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'system/debugging/ping'</span></em><a class="headerlink" href="#psec.Topics.PING" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -2085,6 +2232,7 @@ metaclass because it is best suited for this purpose.</p>
 <li><a class="reference internal" href="#psec.Api.add_ready_callback"><code class="docutils literal notranslate"><span class="pre">Api.add_ready_callback()</span></code></a></li>
 <li><a class="reference internal" href="#psec.Api.add_restart_callback"><code class="docutils literal notranslate"><span class="pre">Api.add_restart_callback()</span></code></a></li>
 <li><a class="reference internal" href="#psec.Api.add_shutdown_callback"><code class="docutils literal notranslate"><span class="pre">Api.add_shutdown_callback()</span></code></a></li>
+<li><a class="reference internal" href="#psec.Api.add_subscription_callback"><code class="docutils literal notranslate"><span class="pre">Api.add_subscription_callback()</span></code></a></li>
 <li><a class="reference internal" href="#psec.Api.copy_file"><code class="docutils literal notranslate"><span class="pre">Api.copy_file()</span></code></a></li>
 <li><a class="reference internal" href="#psec.Api.create_file"><code class="docutils literal notranslate"><span class="pre">Api.create_file()</span></code></a></li>
 <li><a class="reference internal" href="#psec.Api.critical"><code class="docutils literal notranslate"><span class="pre">Api.critical()</span></code></a></li>
@@ -2100,6 +2248,7 @@ metaclass because it is best suited for this purpose.</p>
 <li><a class="reference internal" href="#psec.Api.notify_disk_added"><code class="docutils literal notranslate"><span class="pre">Api.notify_disk_added()</span></code></a></li>
 <li><a class="reference internal" href="#psec.Api.notify_disk_removed"><code class="docutils literal notranslate"><span class="pre">Api.notify_disk_removed()</span></code></a></li>
 <li><a class="reference internal" href="#psec.Api.notify_gui_ready"><code class="docutils literal notranslate"><span class="pre">Api.notify_gui_ready()</span></code></a></li>
+<li><a class="reference internal" href="#psec.Api.ping"><code class="docutils literal notranslate"><span class="pre">Api.ping()</span></code></a></li>
 <li><a class="reference internal" href="#psec.Api.publish"><code class="docutils literal notranslate"><span class="pre">Api.publish()</span></code></a></li>
 <li><a class="reference internal" href="#psec.Api.publish_components"><code class="docutils literal notranslate"><span class="pre">Api.publish_components()</span></code></a></li>
 <li><a class="reference internal" href="#psec.Api.read_file"><code class="docutils literal notranslate"><span class="pre">Api.read_file()</span></code></a></li>
@@ -2180,6 +2329,10 @@ metaclass because it is best suited for this purpose.</p>
 <li><a class="reference internal" href="#psec.Constantes.REPOSITORY"><code class="docutils literal notranslate"><span class="pre">Constantes.REPOSITORY</span></code></a></li>
 <li><a class="reference internal" href="#psec.Constantes.constante"><code class="docutils literal notranslate"><span class="pre">Constantes.constante()</span></code></a></li>
 <li><a class="reference internal" href="#psec.Constantes.constantes"><code class="docutils literal notranslate"><span class="pre">Constantes.constantes</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#psec.Debugging"><code class="docutils literal notranslate"><span class="pre">Debugging</span></code></a><ul>
+<li><a class="reference internal" href="#psec.Debugging.benchmark_messaging"><code class="docutils literal notranslate"><span class="pre">Debugging.benchmark_messaging()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#psec.DiskMonitor"><code class="docutils literal notranslate"><span class="pre">DiskMonitor</span></code></a><ul>
@@ -2273,6 +2426,7 @@ metaclass because it is best suited for this purpose.</p>
 <li><a class="reference internal" href="#psec.MqttClient.is_starting"><code class="docutils literal notranslate"><span class="pre">MqttClient.is_starting</span></code></a></li>
 <li><a class="reference internal" href="#psec.MqttClient.on_connected"><code class="docutils literal notranslate"><span class="pre">MqttClient.on_connected</span></code></a></li>
 <li><a class="reference internal" href="#psec.MqttClient.on_message"><code class="docutils literal notranslate"><span class="pre">MqttClient.on_message</span></code></a></li>
+<li><a class="reference internal" href="#psec.MqttClient.on_subscribed"><code class="docutils literal notranslate"><span class="pre">MqttClient.on_subscribed</span></code></a></li>
 <li><a class="reference internal" href="#psec.MqttClient.publish"><code class="docutils literal notranslate"><span class="pre">MqttClient.publish()</span></code></a></li>
 <li><a class="reference internal" href="#psec.MqttClient.start"><code class="docutils literal notranslate"><span class="pre">MqttClient.start()</span></code></a></li>
 <li><a class="reference internal" href="#psec.MqttClient.stop"><code class="docutils literal notranslate"><span class="pre">MqttClient.stop()</span></code></a></li>
@@ -2350,6 +2504,7 @@ metaclass because it is best suited for this purpose.</p>
 </li>
 <li><a class="reference internal" href="#psec.System"><code class="docutils literal notranslate"><span class="pre">System</span></code></a><ul>
 <li><a class="reference internal" href="#psec.System.debug_activated"><code class="docutils literal notranslate"><span class="pre">System.debug_activated()</span></code></a></li>
+<li><a class="reference internal" href="#psec.System.domain_name"><code class="docutils literal notranslate"><span class="pre">System.domain_name()</span></code></a></li>
 <li><a class="reference internal" href="#psec.System.get_screen_height"><code class="docutils literal notranslate"><span class="pre">System.get_screen_height()</span></code></a></li>
 <li><a class="reference internal" href="#psec.System.get_screen_rotation"><code class="docutils literal notranslate"><span class="pre">System.get_screen_rotation()</span></code></a></li>
 <li><a class="reference internal" href="#psec.System.get_screen_width"><code class="docutils literal notranslate"><span class="pre">System.get_screen_width()</span></code></a></li>
@@ -2374,6 +2529,7 @@ metaclass because it is best suited for this purpose.</p>
 <li><a class="reference internal" href="#psec.Topics.COPY_FILE"><code class="docutils literal notranslate"><span class="pre">Topics.COPY_FILE</span></code></a></li>
 <li><a class="reference internal" href="#psec.Topics.CREATE_FILE"><code class="docutils literal notranslate"><span class="pre">Topics.CREATE_FILE</span></code></a></li>
 <li><a class="reference internal" href="#psec.Topics.DEBUG"><code class="docutils literal notranslate"><span class="pre">Topics.DEBUG</span></code></a></li>
+<li><a class="reference internal" href="#psec.Topics.DEBUGGING"><code class="docutils literal notranslate"><span class="pre">Topics.DEBUGGING</span></code></a></li>
 <li><a class="reference internal" href="#psec.Topics.DELETE_FILE"><code class="docutils literal notranslate"><span class="pre">Topics.DELETE_FILE</span></code></a></li>
 <li><a class="reference internal" href="#psec.Topics.DISCOVER"><code class="docutils literal notranslate"><span class="pre">Topics.DISCOVER</span></code></a></li>
 <li><a class="reference internal" href="#psec.Topics.DISCOVER_COMPONENTS"><code class="docutils literal notranslate"><span class="pre">Topics.DISCOVER_COMPONENTS</span></code></a></li>
@@ -2391,6 +2547,7 @@ metaclass because it is best suited for this purpose.</p>
 <li><a class="reference internal" href="#psec.Topics.LIST_FILES"><code class="docutils literal notranslate"><span class="pre">Topics.LIST_FILES</span></code></a></li>
 <li><a class="reference internal" href="#psec.Topics.MISC"><code class="docutils literal notranslate"><span class="pre">Topics.MISC</span></code></a></li>
 <li><a class="reference internal" href="#psec.Topics.NEW_FILE"><code class="docutils literal notranslate"><span class="pre">Topics.NEW_FILE</span></code></a></li>
+<li><a class="reference internal" href="#psec.Topics.PING"><code class="docutils literal notranslate"><span class="pre">Topics.PING</span></code></a></li>
 <li><a class="reference internal" href="#psec.Topics.READ_FILE"><code class="docutils literal notranslate"><span class="pre">Topics.READ_FILE</span></code></a></li>
 <li><a class="reference internal" href="#psec.Topics.RESTART_DOMAIN"><code class="docutils literal notranslate"><span class="pre">Topics.RESTART_DOMAIN</span></code></a></li>
 <li><a class="reference internal" href="#psec.Topics.SAVE_LOG"><code class="docutils literal notranslate"><span class="pre">Topics.SAVE_LOG</span></code></a></li>
