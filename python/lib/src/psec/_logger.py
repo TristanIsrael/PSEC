@@ -205,7 +205,7 @@ class Logger(metaclass=SingletonMeta):
     
     @staticmethod
     def format_logline(message:str) -> str:
-        return f"{datetime.now():%Y-%m-%d %H:%M:%S} - {message}"
+        return f"{datetime.now():%Y-%m-%d %H:%M:%S.%f} - {message}"
     
     @staticmethod
     def print(message:str) -> None:

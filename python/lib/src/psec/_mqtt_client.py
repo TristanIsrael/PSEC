@@ -5,6 +5,7 @@ import time
 import json
 import threading
 import select
+import traceback
 from typing import Literal, Callable, Optional
 import serial
 import paho.mqtt.client as mqtt
@@ -46,7 +47,7 @@ class SerialSocket():
 
     def pending(self) -> int:
         if self.serial is not None:
-            return self.serial.in_waiting
+            return self.serial.out_waiting
         
         return 0
 
@@ -60,6 +61,9 @@ class SerialSocket():
 
     def close(self) -> None:
         print("Close serial port")
+        print("Pile d'appels :")
+        traceback.print_stack()
+
         if self.serial is not None and self.serial.is_open:
             self.serial.reset_input_buffer()
             self.serial.reset_output_buffer()
@@ -114,14 +118,14 @@ class SerialMQTTClient(mqtt.Client):
                 return
             
             # if bytes are pending do not wait in select
-            pending_bytes = self._sock.pending()
-            if pending_bytes > 0:
-                timeout = 0.0
+            #pending_bytes = self._sock.pending()
+            #if pending_bytes > 0:
+            #    timeout = 0.0
 
             rlist, wlist, _ = select.select([self._sock], [self._sock], [], timeout)
 
-            if rlist or pending_bytes > 0:
-                rc = self.loop_read()                
+            if rlist: # or pending_bytes > 0:
+                rc = self.loop_read()
                 if rc != MQTTErrorCode.MQTT_ERR_SUCCESS:
                     print(f"Read error {rc}")
                     break
