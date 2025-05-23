@@ -108,6 +108,7 @@ class Api(metaclass=SingletonMeta):
         self.__mqtt_client.on_connected = self.__on_mqtt_connected
         self.__mqtt_client.on_message = self.__on_message_received
         self.__mqtt_client.on_subscribed = self.__on_subscribed
+        self.__mqtt_client.on_log = self.__on_log
 
         self.__mqtt_client.start()
 
@@ -668,6 +669,8 @@ class Api(metaclass=SingletonMeta):
             print(f"WARNING: an exception occured in the callback on_subscribe {cb}")
             print(e)
 
+    def __on_log(self, level, buf):
+        print(f"MQTT event: level={level}, message={buf}")
 
     def __on_restart_domain(self, payload:dict):
         success = payload.get("state", "") == "accepted"

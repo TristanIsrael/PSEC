@@ -50,8 +50,7 @@ class Debugging():
         if success:
             self.__subscriptions.append(mid)
 
-    def __on_subscribed(self, mid):
-        print(mid, self.__subscriptions)
+    def __on_subscribed(self, mid):        
         if mid in self.__subscriptions:
             self.__do_benchmark_messaging()
 
@@ -76,8 +75,7 @@ class Debugging():
         if topic == f"{Topics.PING}/{System.domain_name()}/response":
             payload["received_at"] = datetime.now().timestamp()*1000
             self.__ping_responses.append(payload)
-            threading.Thread(target=self.__handle_ping_response, args=(payload,)).start()
-
+            threading.Thread(target=self.__handle_ping_response, args=(payload,)).start()    
 
     def __handle_ping_response(self, payload:dict):
         """

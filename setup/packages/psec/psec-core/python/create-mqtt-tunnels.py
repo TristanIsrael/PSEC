@@ -5,7 +5,7 @@ broker_msg_socket = Constantes().constante(Cles.MQTT_MSG_BROKER_SOCKETS)
 
 BUFFER_SIZE = 4096
 DEBUG = False
-DEBUG_HEX = False
+DEBUG_HEX = True
 
 def hexdump(data, prefix=""):
     """Print binary data in hexdump format."""
@@ -65,10 +65,15 @@ class UnixSocketTunneler:
                     # If the client sent data
                     if client_sock in readable:
                         try:
-                            data = client_sock.recv(100)
+                            data = client_sock.recv(4096)
+                            if DEBUG:
+                                print(f"received {len(data)} bytes from client")
+
                             if data:
                                 client_to_broker_buffer += data
-                                self.__debug_data(data, messaging_socket_path, "proxy")
+
+                                if DEBUG:
+                                    self.__debug_data(data, messaging_socket_path, "proxy")
                             else:
                                 Logger.print(f"Client socket closed on {messaging_socket_path}.")
                                 break
@@ -78,10 +83,14 @@ class UnixSocketTunneler:
                     # If the broker sent data
                     if broker_sock in readable:
                         try:
-                            data = broker_sock.recv(100)
+                            data = broker_sock.recv(4096)
+                            if DEBUG:
+                                print(f"received {len(data)} bytes from broker")
+
                             if data:
                                 broker_to_client_buffer += data
-                                self.__debug_data(data, broker_socket_path, "proxy")
+                                if DEBUG:
+                                    self.__debug_data(data, broker_socket_path, "proxy")
                             else:
                                 Logger.print(f"Broker socket closed on {broker_socket_path}.")
                                 break
@@ -92,7 +101,11 @@ class UnixSocketTunneler:
                     if broker_sock in writable and client_to_broker_buffer:
                         try:
                             sent = broker_sock.send(client_to_broker_buffer)
-                            self.__debug_data(client_to_broker_buffer, "proxy", broker_socket_path)
+                            
+                            if DEBUG:
+                                print(f"sent {sent} to broker")
+                                self.__debug_data(client_to_broker_buffer, "proxy", broker_socket_path)
+
                             client_to_broker_buffer = client_to_broker_buffer[sent:]
                         except BlockingIOError:
                             pass
@@ -101,8 +114,11 @@ class UnixSocketTunneler:
                     if client_sock in writable and broker_to_client_buffer:
                         try:
                             sent = client_sock.send(broker_to_client_buffer)
+                            
                             if DEBUG:
+                                print(f"sent {sent} to client")
                                 self.__debug_data(client_to_broker_buffer, "proxy", messaging_socket_path)
+
                             broker_to_client_buffer = broker_to_client_buffer[sent:]
                         except BlockingIOError:
                             pass
@@ -112,6 +128,8 @@ class UnixSocketTunneler:
             finally:
                 client_sock.close()
                 broker_sock.close()
+                client_to_broker_buffer = b''
+                broker_to_client_buffer = b''
                 time.sleep(1)  # Wait before retrying
 
     def __create_client_socket_and_wait_for_connection(self) -> socket.socket:

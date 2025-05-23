@@ -32,18 +32,22 @@ class SerialSocket():
 
     def __init__(self, path:str, baudrate:int):
         print(f"Connect to serial port {path}")
-        self.serial = serial.Serial(port=path, baudrate=baudrate, timeout=0, write_timeout=0)
+        self.serial = serial.Serial(port=path, baudrate=baudrate, timeout=1.0, write_timeout=0)
         self.serial.reset_input_buffer()
         self.serial.reset_output_buffer()
 
 
     def recv(self, buffer_size: int) -> bytes:
-        #print("wait for bytes")
+        #print(f"Wants to read {buffer_size} bytes")
         if self.serial is not None and self.serial.is_open:
             data = self.serial.read(buffer_size)
+            #print(f"Read {len(data)} bytes")
             return data
 
-        return b""
+        return b''
+
+    def in_waiting(self) -> int:
+        return self.serial.in_waiting
 
     def pending(self) -> int:
         if self.serial is not None:
@@ -124,7 +128,8 @@ class SerialMQTTClient(mqtt.Client):
 
             rlist, wlist, _ = select.select([self._sock], [self._sock], [], timeout)
 
-            if rlist: # or pending_bytes > 0:
+            if rlist and self._sock.in_waiting() > 0:
+                print(self._sock.in_waiting())
                 rc = self.loop_read()
                 if rc != MQTTErrorCode.MQTT_ERR_SUCCESS:
                     print(f"Read error {rc}")
@@ -180,16 +185,19 @@ class MqttClient():
     on_connected: Optional[Callable[[], None]] = None
     on_message: Optional[Callable[[str, dict], None]] = None
     on_subscribed: Optional[Callable[[], None]] = None
+    on_log: Optional[Callable[[int, str], None]] = None
     __message_callbacks = []
     __connected_callbacks = []
     connected = False
     is_starting = False
+    __debugging = False
 
-    def __init__(self, identifier:str, connection_type:ConnectionType = ConnectionType.UNIX_SOCKET, connection_string:str = ""):
+    def __init__(self, identifier:str, connection_type:ConnectionType = ConnectionType.UNIX_SOCKET, connection_string:str = "", debugging = False):
         self.mqtt_client = None
         self.identifier = identifier
         self.connection_type = connection_type
         self.connection_string = connection_string
+        self.__debugging = debugging
 
     def __del__(self):
         self.stop()
@@ -212,6 +220,8 @@ class MqttClient():
             self.mqtt_client.on_message = self.__on_message
             self.mqtt_client.on_subscribe = self.__on_subscribe
             self.mqtt_client.on_disconnect = self.__on_disconnected
+            if self.__debugging:
+                self.mqtt_client.on_log = self.__on_log
 
             mqtt_host = "undefined"
             try:
@@ -220,7 +230,7 @@ class MqttClient():
                     self.mqtt_client.connect(host=mqtt_host, keepalive=30)
                 elif self.connection_type == ConnectionType.UNIX_SOCKET:
                     mqtt_host = self.connection_string
-                    self.mqtt_client.connect(host=mqtt_host, port=1, keepalive=5)
+                    self.mqtt_client.connect(host=mqtt_host, port=1, keepalive=30)
                 else:
                     print(f"The connection type {self.connection_type} is not handled")
                     return
@@ -242,6 +252,8 @@ class MqttClient():
             self.mqtt_client.on_disconnect = self.__on_disconnected
             self.mqtt_client.on_subscribe = self.__on_subscribe
             self.mqtt_client.on_connection_lost = self.__on_connection_lost
+            if self.__debugging:
+                self.mqtt_client.on_log = self.__on_log
 
             if DEBUG:
                 self.mqtt_client.on_log = self.__on_log
@@ -250,7 +262,7 @@ class MqttClient():
             self.mqtt_client.loop_start()
         else:
             print(f"The connection type {self.connection_type} is not handled")
-            return
+            return        
 
     def add_connected_callback(self, callback):
         self.__connected_callbacks.append(callback)
@@ -278,7 +290,10 @@ class MqttClient():
         return self.mqtt_client.subscribe(topic)
 
     def publish(self, topic:str, payload:dict):
-        self.mqtt_client.publish(topic=topic, payload=json.dumps(payload))
+        data = json.dumps(payload)
+        #print(data)
+        #print(len(data))
+        self.mqtt_client.publish(topic=topic, payload=data)
 
     def __get_transport_type(self) -> Literal['tcp', 'unix']:
         if self.connection_type == ConnectionType.TCP_DEBUG:
@@ -287,7 +302,8 @@ class MqttClient():
             return "unix"
 
     def __on_log(self, client, userdata, level, buf):
-        print(f"[MQTT log]: {buf}")
+        if self.on_log is not None:
+            self.on_log(level, buf)
 
     def __on_message(self, client:mqtt.Client, userdata, msg:mqtt.MQTTMessage):
         #print(f"[{userdata}] Message reçu sur {msg.topic}: {msg.payload.decode()}")        
@@ -317,7 +333,7 @@ class MqttClient():
             cb()
 
     def __on_subscribe(self, client, userdata, mid, reason_code_list, properties):
-        print("Subscribed to a topic")
+        #print("Subscribed to a topic")
 
         if self.on_subscribed is not None:
             self.on_subscribed(mid)
@@ -330,10 +346,11 @@ class MqttClient():
 
     def __on_disconnected(self, *args):
         print("Disconnected from the broker")
-        print("Arguments:")
-        for arg in args:
-            print(arg)
+        #print("Arguments:")
+        #for arg in args:
+        #    print(arg)
 
         #print("Disconnect from the broker")
         #self.mqtt_client.close()
         
+    
