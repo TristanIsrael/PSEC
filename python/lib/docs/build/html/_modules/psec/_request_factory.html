@@ -373,9 +373,22 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">create_request_restart_domain</span><span class="p">(</span><span class="n">domain_name</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span>
             <span class="s2">&quot;domain_name&quot;</span><span class="p">:</span> <span class="n">domain_name</span>
-        <span class="p">}</span>    </div>
+        <span class="p">}</span></div>
+
+    
+<div class="viewcode-block" id="RequestFactory.create_request_ping">
+<a class="viewcode-back" href="../../psec.html#psec.RequestFactory.create_request_ping">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_request_ping</span><span class="p">(</span><span class="n">ping_id</span><span class="p">,</span> <span class="n">source_name</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">datetime</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">ping_id</span><span class="p">,</span>
+            <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">source_name</span><span class="p">,</span>
+            <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">,</span>
+            <span class="s2">&quot;sent_at&quot;</span><span class="p">:</span> <span class="n">datetime</span>
+        <span class="p">}</span></div>
 </div>
 
+        
 </pre></div>
         </article>
       </div>

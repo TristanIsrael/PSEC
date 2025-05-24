@@ -302,6 +302,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">ENERGY_STATE</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">DELETE_FILE</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">DISCOVER_COMPONENTS</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">PING</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">)</span>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__on_mqtt_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
@@ -331,6 +332,8 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">__handle_delete_file</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">topic</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">DISCOVER_COMPONENTS</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__handle_discover_components</span><span class="p">()</span>
+            <span class="k">elif</span> <span class="n">topic</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">PING</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__handle_ping</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="n">Logger</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;An exception occured while handling the message&quot;</span><span class="p">)</span>
 
@@ -508,7 +511,15 @@
             <span class="n">EtatComposant</span><span class="o">.</span><span class="n">READY</span>
         <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">DISCOVER_COMPONENTS</span><span class="si">}</span><span class="s2">/response&quot;</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">DISCOVER_COMPONENTS</span><span class="si">}</span><span class="s2">/response&quot;</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__handle_ping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">):</span>
+        <span class="n">ping_id</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">sent_at</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sent_at&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="n">ResponseFactory</span><span class="o">.</span><span class="n">create_response_ping</span><span class="p">(</span><span class="n">ping_id</span><span class="p">,</span> <span class="s2">&quot;Dom0&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">sent_at</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">PING</span><span class="si">}</span><span class="s2">/response&quot;</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span></div>
 
 </pre></div>
         </article>

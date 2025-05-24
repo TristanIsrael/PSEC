@@ -96,4 +96,14 @@ class RequestFactory():
     def create_request_restart_domain(domain_name:str):
         return {
             "domain_name": domain_name
-        }    
+        }
+    
+    @staticmethod
+    def create_request_ping(ping_id, source_name, data, datetime):
+        return {
+            "id": ping_id,
+            "source": source_name,
+            "data": data,
+            "sent_at": datetime
+        }
+        

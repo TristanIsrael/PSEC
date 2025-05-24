@@ -250,7 +250,7 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for psec._api</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">Constantes</span><span class="p">,</span> <span class="n">RequestFactory</span><span class="p">,</span> <span class="n">Topics</span><span class="p">,</span> <span class="n">NotificationFactory</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">Constantes</span><span class="p">,</span> <span class="n">RequestFactory</span><span class="p">,</span> <span class="n">Topics</span><span class="p">,</span> <span class="n">NotificationFactory</span><span class="p">,</span> <span class="n">ResponseFactory</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">Logger</span><span class="p">,</span> <span class="n">MqttClient</span><span class="p">,</span> <span class="n">System</span><span class="p">,</span> <span class="n">SingletonMeta</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">paho.mqtt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">MQTTErrorCode</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
@@ -364,6 +364,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">on_connected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__on_mqtt_connected</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">on_message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__on_message_received</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">on_subscribed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__on_subscribed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">on_log</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__on_log</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
 
@@ -948,18 +949,15 @@
 <span class="sd">        other topics. The name of the target is in the topic so it can be routed by</span>
 <span class="sd">        the broker.</span>
 
+<span class="sd">        The request should be constructed with :func:`RequestFactory.create_request_ping`.</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            target_domain(str): The name of the targetted Domain.</span>
 <span class="sd">            data(str, optional): Data to be sent to the target.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         
         <span class="bp">self</span><span class="o">.</span><span class="n">__ping_id</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__ping_id</span><span class="p">,</span>
-            <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">System</span><span class="o">.</span><span class="n">domain_name</span><span class="p">(),</span>
-            <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">,</span>
-            <span class="s2">&quot;sent_at&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">timestamp</span><span class="p">()</span><span class="o">*</span><span class="mi">1000</span>
-        <span class="p">}</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="n">RequestFactory</span><span class="o">.</span><span class="n">create_request_ping</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__ping_id</span><span class="p">,</span> <span class="n">System</span><span class="o">.</span><span class="n">domain_name</span><span class="p">(),</span> <span class="n">data</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">timestamp</span><span class="p">()</span><span class="o">*</span><span class="mi">1000</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">PING</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">target_domain</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span></div>
 
 
@@ -1018,6 +1016,8 @@
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;WARNING: an exception occured in the callback on_subscribe </span><span class="si">{</span><span class="n">cb</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
+    <span class="k">def</span><span class="w"> </span><span class="nf">__on_log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">buf</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MQTT event: level=</span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2">, message=</span><span class="si">{</span><span class="n">buf</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__on_restart_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
         <span class="n">success</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;accepted&quot;</span>
@@ -1027,14 +1027,8 @@
         <span class="k">for</span> <span class="n">cb</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__restart_callbacks</span><span class="p">:</span>
             <span class="n">cb</span><span class="p">(</span><span class="n">domain_name</span><span class="p">,</span> <span class="n">success</span><span class="p">,</span> <span class="n">reason</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__on_ping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
-        <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-            <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">System</span><span class="o">.</span><span class="n">domain_name</span><span class="p">(),</span>
-            <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
-            <span class="s2">&quot;sent_at&quot;</span><span class="p">:</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sent_at&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>            
-        <span class="p">}</span>
-
+    <span class="k">def</span><span class="w"> </span><span class="nf">__on_ping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>        
+        <span class="n">payload</span> <span class="o">=</span> <span class="n">ResponseFactory</span><span class="o">.</span><span class="n">create_response_ping</span><span class="p">(</span><span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="n">System</span><span class="o">.</span><span class="n">domain_name</span><span class="p">(),</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sent_at&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">PING</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="p">)</span><span class="si">}</span><span class="s2">/response&quot;</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span></div>
 
 

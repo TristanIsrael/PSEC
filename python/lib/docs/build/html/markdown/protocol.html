@@ -3,7 +3,7 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="prev" title="psec package" href="../psec.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Provisioning" href="provisioning.html" /><link rel="prev" title="Integration" href="integration.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
         <title>Protocol - PSEC 1.0.0 documentation</title>
@@ -200,8 +200,22 @@
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../psec.html">psec package</a></li>
-<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Protocol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../psec.html">PSEC python documentation</a></li>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Project documentation</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Project documentation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">Platform Description</a></li>
+<li class="toctree-l2"><a class="reference internal" href="boot-sequence.html">Boot sequence</a></li>
+<li class="toctree-l2"><a class="reference internal" href="boot-usb.html">Create a Bootable USB Drive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="debugging.html">Debugging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="documentation.html">Documentation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="graphical-design.html">Graphical design</a></li>
+<li class="toctree-l2"><a class="reference internal" href="integration.html">Integration</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Protocol</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provisioning.html">Provisioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="python-api.html">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html">Create or Update the Alpine Mirror</a></li>
+</ul>
+</li>
 </ul>
 
 </div>
@@ -252,10 +266,10 @@
 <section id="list-connected-disks">
 <h3>List connected disks<a class="headerlink" href="#list-connected-disks" title="Link to this heading">¶</a></h3>
 <p><em>Requests the list of external storage disks connected to this system.</em></p>
-<p>Request topic: <code class="docutils literal notranslate"><span class="pre">system/disks/list_disks/request</span></code>
-Request payload : <code class="docutils literal notranslate"><span class="pre">{}</span></code></p>
-<p>Response topic: <code class="docutils literal notranslate"><span class="pre">system/disks/list_disks/response</span></code>
-Response payload :</p>
+<p>Request topic: <code class="docutils literal notranslate"><span class="pre">system/disks/list_disks/request</span></code></p>
+<p>Request payload : <code class="docutils literal notranslate"><span class="pre">{}</span></code></p>
+<p>Response topic: <code class="docutils literal notranslate"><span class="pre">system/disks/list_disks/response</span></code></p>
+<p>Response payload :</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;disks&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;disk1&quot;</span><span class="p">,</span> <span class="s2">&quot;disk2&quot;</span><span class="p">,</span> <span class="o">...</span> <span class="p">]</span>
 <span class="p">}</span>
@@ -269,8 +283,8 @@ Response payload :</p>
 <section id="list-files-of-a-disk">
 <h3>List files of a disk<a class="headerlink" href="#list-files-of-a-disk" title="Link to this heading">¶</a></h3>
 <p><em>Requests the list of files contained in a disk.</em></p>
-<p>Request topic: <code class="docutils literal notranslate"><span class="pre">system/disks/list_files/request</span></code>
-Request payload :</p>
+<p>Request topic: <code class="docutils literal notranslate"><span class="pre">system/disks/list_files/request</span></code></p>
+<p>Request payload :</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;disk&quot;</span><span class="p">:</span> <span class="s2">&quot;disk1&quot;</span><span class="p">,</span>
     <span class="s2">&quot;recursive&quot;</span><span class="p">:</span> <span class="n">false</span><span class="p">,</span>
@@ -284,8 +298,8 @@ Request payload :</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">recursive</span></code> (bool): if <em>true</em>, the listing will be done on every subdirectory in the tree, starting from <em>from_dir</em>. <strong>Default is <em>false</em>.</strong>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">from_dir</span></code>(str): if set, the files list will contain only the files of this directory, and subdirectories if <em>recursive</em> is set. <strong>Default is “”</strong>.</p></li>
 </ul>
-<p>Response topic: <code class="docutils literal notranslate"><span class="pre">system/disks/list_files/response</span></code>
-Response payload :</p>
+<p>Response topic: <code class="docutils literal notranslate"><span class="pre">system/disks/list_files/response</span></code></p>
+<p>Response payload :</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;disk&quot;</span><span class="p">:</span> <span class="s2">&quot;disk1&quot;</span>
     <span class="s2">&quot;files&quot;</span><span class="p">:</span> <span class="p">[</span>
@@ -383,8 +397,8 @@ Response payload :</p>
 <section id="create-a-new-file">
 <h3>Create a new file<a class="headerlink" href="#create-a-new-file" title="Link to this heading">¶</a></h3>
 <p><em>Create a new file on a disk, including the repository</em>.</p>
-<p>Request topic: <code class="docutils literal notranslate"><span class="pre">system/disks/create_file/request</span></code>
-Request payload:</p>
+<p>Request topic: <code class="docutils literal notranslate"><span class="pre">system/disks/create_file/request</span></code></p>
+<p>Request payload:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;disk&quot;</span><span class="p">:</span> <span class="s2">&quot;disk1&quot;</span><span class="p">,</span>
     <span class="s2">&quot;filepath&quot;</span><span class="p">:</span> <span class="s2">&quot;/my/folder/my_file.txt,</span>
@@ -409,10 +423,10 @@ Request payload:</p>
 <section id="shutdown-the-system">
 <h3>Shutdown the system<a class="headerlink" href="#shutdown-the-system" title="Link to this heading">¶</a></h3>
 <p><em>Ask the system to shut down</em>.</p>
-<p>Request topic: <code class="docutils literal notranslate"><span class="pre">system/workflow/shutdown/request</span></code>
-Request payload: <code class="docutils literal notranslate"><span class="pre">{}</span></code></p>
-<p>Response topic: <code class="docutils literal notranslate"><span class="pre">system/workflow/shutdown/response</span></code>
-Response payload:</p>
+<p>Request topic: <code class="docutils literal notranslate"><span class="pre">system/workflow/shutdown/request</span></code></p>
+<p>Request payload: <code class="docutils literal notranslate"><span class="pre">{}</span></code></p>
+<p>Response topic: <code class="docutils literal notranslate"><span class="pre">system/workflow/shutdown/response</span></code></p>
+<p>Response payload:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="s2">&quot;accepted&quot;</span><span class="p">,</span>
     <span class="s2">&quot;reason: &quot;&quot;</span>
@@ -460,8 +474,8 @@ Response payload:</p>
 <p>This chapter presents logging functions.</p>
 <section id="add-a-debug-log">
 <h3>Add a debug log<a class="headerlink" href="#add-a-debug-log" title="Link to this heading">¶</a></h3>
-<p>Topic: <code class="docutils literal notranslate"><span class="pre">system/events/debug</span></code>
-Payload:</p>
+<p>Topic: <code class="docutils literal notranslate"><span class="pre">system/events/debug</span></code></p>
+<p>Payload:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>    <span class="s2">&quot;component&quot;</span><span class="p">:</span> <span class="s2">&quot;my component&quot;</span><span class="p">,</span>
     <span class="s2">&quot;module&quot;</span><span class="p">:</span> <span class="s2">&quot;my module&quot;</span><span class="p">,</span>
     <span class="s2">&quot;datetime&quot;</span><span class="p">:</span> <span class="s2">&quot;2025-04-02 03:04:05&quot;</span><span class="p">,</span>
@@ -499,8 +513,8 @@ Payload:</p>
 <section id="set-the-log-level">
 <h3>Set the log level<a class="headerlink" href="#set-the-log-level" title="Link to this heading">¶</a></h3>
 <p><em>Define the log level under which the events will be ignored</em>.</p>
-<p>Topic: <code class="docutils literal notranslate"><span class="pre">system/events/set_loglevel</span></code>
-Payload:</p>
+<p>Topic: <code class="docutils literal notranslate"><span class="pre">system/events/set_loglevel</span></code></p>
+<p>Payload:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="s2">&quot;info&quot;</span>
 <span class="p">}</span>
@@ -514,8 +528,8 @@ Payload:</p>
 <section id="save-the-log-into-a-file">
 <h3>Save the log into a file<a class="headerlink" href="#save-the-log-into-a-file" title="Link to this heading">¶</a></h3>
 <p><em>Save all logs into a file</em>.</p>
-<p>Topic : <code class="docutils literal notranslate"><span class="pre">system/events/save_log</span></code>
-Payload:</p>
+<p>Topic : <code class="docutils literal notranslate"><span class="pre">system/events/save_log</span></code></p>
+<p>Payload:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;disk&quot;</span><span class="p">:</span> <span class="s2">&quot;disk1&quot;</span><span class="p">,</span>
     <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="s2">&quot;logfile.txt&quot;</span>
@@ -534,15 +548,113 @@ Payload:</p>
 <p>This chapter presents miscellaneous functions of the system.</p>
 <section id="discover-the-components-of-the-system">
 <h3>Discover the components of the system<a class="headerlink" href="#discover-the-components-of-the-system" title="Link to this heading">¶</a></h3>
-<p>Topic : <code class="docutils literal notranslate"><span class="pre">system/disks/list_disks</span></code></p>
+<p><em>Queries all components of the system</em>.</p>
+<p>Request topic : <code class="docutils literal notranslate"><span class="pre">system/discover/components/request</span></code></p>
+<p>Request payload: <code class="docutils literal notranslate"><span class="pre">{}</span></code></p>
+<p>Response topic: <code class="docutils literal notranslate"><span class="pre">system/discover/components/response</span></code></p>
+<p>Response payload:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;components&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;unique id&gt;&quot;</span><span class="p">,</span> 
+            <span class="s2">&quot;domain_name&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;domain hosting the component&gt;&quot;</span><span class="p">,</span> 
+            <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;free label&gt;&quot;</span><span class="p">,</span> 
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;type of component&gt;&quot;</span><span class="p">,</span> 
+            <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;component state&gt;&quot;</span><span class="p">,</span> 
+            <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;version of the component&gt;&quot;</span><span class="p">,</span> 
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;long description&gt;&quot;</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Response fields:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code> (str): A unique ID for the component.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">domain_name</span></code> (str): The Domain on which the component is running.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">label</span></code> (str): A label describing the component.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">type</span></code> (str): The type (category) of the component.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">state</span></code> (int): The state of the component. See :class:<code class="docutils literal notranslate"><span class="pre">EtatComposant</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">version</span></code> (str): The version of the component.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">description</span></code> (str): A long description of the component, for example the aggregated information of the embedded softwares.</p></li>
+</ul>
 </section>
 <section id="get-the-energy-state">
 <h3>Get the energy state<a class="headerlink" href="#get-the-energy-state" title="Link to this heading">¶</a></h3>
-<p>Topic : <code class="docutils literal notranslate"><span class="pre">system/disks/list_disks</span></code></p>
+<p><em>Queries the current energy information including battery level if any.</em></p>
+<p>Topic : <code class="docutils literal notranslate"><span class="pre">system/energy/state</span></code></p>
+<p>Request topic : <code class="docutils literal notranslate"><span class="pre">system/energy/state/request</span></code></p>
+<p>Request payload: <code class="docutils literal notranslate"><span class="pre">{}</span></code></p>
+<p>Response topic: <code class="docutils literal notranslate"><span class="pre">system/energy/state/response</span></code></p>
+<p>Response payload:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;battery_level&quot;</span><span class="p">:</span> <span class="mf">100.0</span><span class="p">,</span>
+    <span class="s2">&quot;plugged&quot;</span><span class="p">:</span> <span class="mi">1</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Response fields:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">battery_level</span></code> (float): The battery level from 0.0 (empty) to 100.0 (full).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">plugged</span></code> (int): 1 if the system is powered by an external source of energy.</p></li>
+</ul>
 </section>
 <section id="get-information-on-the-system">
 <h3>Get information on the system<a class="headerlink" href="#get-information-on-the-system" title="Link to this heading">¶</a></h3>
-<p>Topic : <code class="docutils literal notranslate"><span class="pre">system/disks/list_disks</span></code></p>
+<p><em>Queries information on the hosting system</em>.</p>
+<p>Topic : <code class="docutils literal notranslate"><span class="pre">system/info</span></code></p>
+<p>Request topic : <code class="docutils literal notranslate"><span class="pre">system/info/request</span></code></p>
+<p>Request payload: <code class="docutils literal notranslate"><span class="pre">{}</span></code></p>
+<p>Response topic: <code class="docutils literal notranslate"><span class="pre">system/info/response</span></code></p>
+<p>Response payload:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;core&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.1&quot;</span><span class="p">,</span> 
+            <span class="s2">&quot;debug_on&quot;</span><span class="p">:</span> <span class="n">false</span>
+        <span class="p">},</span> 
+        <span class="s2">&quot;system&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;os&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Linux&quot;</span><span class="p">,</span> 
+                <span class="s2">&quot;release&quot;</span><span class="p">:</span> <span class="s2">&quot;6.12.20-0-lts&quot;</span><span class="p">,</span> 
+                <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;#1-Alpine SMP PREEMPT_DYNAMIC 2025-03-24 08:09:11&quot;</span>
+            <span class="p">},</span> 
+            <span class="s2">&quot;machine&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;arch&quot;</span><span class="p">:</span> <span class="s2">&quot;x86_64&quot;</span><span class="p">,</span> 
+                <span class="s2">&quot;processor&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> 
+                <span class="s2">&quot;platform&quot;</span><span class="p">:</span> <span class="s2">&quot;Linux-6.12.20-0-lts-x86_64-with&quot;</span><span class="p">,</span> 
+                <span class="s2">&quot;cpu&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> 
+                    <span class="s2">&quot;freq_current&quot;</span><span class="p">:</span> <span class="mf">1689.5960000000002</span><span class="p">,</span> 
+                    <span class="s2">&quot;freq_min&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> 
+                    <span class="s2">&quot;freq_max&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> 
+                    <span class="s2">&quot;percent&quot;</span><span class="p">:</span> <span class="mf">0.0</span>
+                <span class="p">},</span> 
+                <span class="s2">&quot;memory&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;total&quot;</span><span class="p">:</span> <span class="mi">405987328</span><span class="p">,</span> 
+                    <span class="s2">&quot;available&quot;</span><span class="p">:</span> <span class="mi">96657408</span><span class="p">,</span> 
+                    <span class="s2">&quot;percent&quot;</span><span class="p">:</span> <span class="mf">76.2</span><span class="p">,</span> 
+                    <span class="s2">&quot;used&quot;</span><span class="p">:</span> <span class="mi">256733184</span><span class="p">,</span> 
+                    <span class="s2">&quot;free&quot;</span><span class="p">:</span> <span class="mi">12472320</span>
+                <span class="p">},</span> 
+                <span class="s2">&quot;load&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;1&quot;</span><span class="p">:</span> <span class="mf">0.5244140625</span><span class="p">,</span> 
+                    <span class="s2">&quot;5&quot;</span><span class="p">:</span> <span class="mf">0.21875</span><span class="p">,</span> 
+                    <span class="s2">&quot;15&quot;</span><span class="p">:</span> <span class="mf">0.08154296875</span>
+                <span class="p">}</span>
+            <span class="p">},</span> 
+            <span class="s2">&quot;boot_time&quot;</span><span class="p">:</span> <span class="mf">1748036696.0</span><span class="p">,</span> 
+            <span class="s2">&quot;uuid&quot;</span><span class="p">:</span> <span class="s2">&quot;11ec0800-4fb9-11ef-bd38-ad993f2e7700&quot;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Response fields:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">core</span></code> (dict): Gives information on the PSEC core.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">system</span></code> (dict): Gives information on the operating system and the machine hardware.</p></li>
+</ul>
 </section>
 </section>
 <section id="notifications">
@@ -551,8 +663,8 @@ Payload:</p>
 <section id="a-new-file-is-available">
 <h3>A new file is available<a class="headerlink" href="#a-new-file-is-available" title="Link to this heading">¶</a></h3>
 <p><em>This notification is sent when a file has been copied or created on a disk, including the repository</em>.</p>
-<p>Topic: <code class="docutils literal notranslate"><span class="pre">system/disks/new_file</span></code>
-Payload:</p>
+<p>Topic: <code class="docutils literal notranslate"><span class="pre">system/disks/new_file</span></code></p>
+<p>Payload:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;disk&quot;</span><span class="p">:</span> <span class="s2">&quot;disk1&quot;</span><span class="p">,</span>
     <span class="s2">&quot;filepath&quot;</span><span class="p">,</span> <span class="s2">&quot;/a/folder/my_file.txt&quot;</span><span class="p">,</span>
@@ -572,8 +684,8 @@ Payload:</p>
 <section id="the-state-of-disk-changed">
 <h3>The state of disk changed<a class="headerlink" href="#the-state-of-disk-changed" title="Link to this heading">¶</a></h3>
 <p>*A disk has been connected or disconnected from the system.</p>
-<p>Topic : <code class="docutils literal notranslate"><span class="pre">system/disks/state</span></code>
-Payload:</p>
+<p>Topic : <code class="docutils literal notranslate"><span class="pre">system/disks/state</span></code></p>
+<p>Payload:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;disk&quot;</span><span class="p">:</span> <span class="s2">&quot;disk1&quot;</span><span class="p">,</span>
     <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="s2">&quot;connected&quot;</span>
@@ -593,6 +705,50 @@ Payload:</p>
 <p>Payload: <code class="docutils literal notranslate"><span class="pre">{}</span></code></p>
 </section>
 </section>
+<section id="debugging">
+<h2>Debugging<a class="headerlink" href="#debugging" title="Link to this heading">¶</a></h2>
+<p>This chapiter gives details about the debugging facilities.</p>
+<section id="ping-a-domain">
+<h3>Ping a Domain<a class="headerlink" href="#ping-a-domain" title="Link to this heading">¶</a></h3>
+<p><em>Pings a Domain like ICMP does.</em></p>
+<p>Topic : <code class="docutils literal notranslate"><span class="pre">system/debugging/ping</span></code></p>
+<p>Request topic : <code class="docutils literal notranslate"><span class="pre">system/debugging/ping/&lt;domain</span> <span class="pre">name&gt;/request</span></code></p>
+<p>Request payload: <code class="docutils literal notranslate"><span class="pre">{}</span></code></p>
+<p>Request payload:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;my-domain&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="s2">&quot;ad6452fbc4a56&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sent_at&quot;</span><span class="p">:</span> <span class="mf">1234567891239.123</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Request fields:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code> (int): The unique and increasing ID of the request</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">source</span></code> (str): The domain of the querying domain. The queried domain will respond to this domain.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">data</span></code> (str): Random data sent for debugging.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sent_at</span></code> (float): Timestamp in milliseconds when the request was sent.</p></li>
+</ul>
+<p>Response topic: <code class="docutils literal notranslate"><span class="pre">system/debugging/ping/&lt;domain</span> <span class="pre">name&gt;/response</span></code></p>
+<p>Response payload:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;my-domain&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="s2">&quot;ad6452fbc4a56&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sent_at&quot;</span><span class="p">:</span> <span class="mf">1234567891239.123</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Response fields:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">id</span></code> (int): The unique and increasing ID of the request</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">source</span></code> (str): The domain of the querying domain. The queried domain will respond to this domain.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">data</span></code> (str): Random data sent for debugging.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sent_at</span></code> (float): Timestamp in milliseconds when the request was sent.</p></li>
+</ul>
+</section>
+</section>
 <section id="notes">
 <h2>Notes<a class="headerlink" href="#notes" title="Link to this heading">¶</a></h2>
 <p>This chapter gives additional information.</p>
@@ -608,15 +764,23 @@ Payload:</p>
       <footer>
         
         <div class="related-pages">
-          
-          <a class="prev-page" href="../psec.html">
+          <a class="next-page" href="provisioning.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Provisioning</div>
+              </div>
+              <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="integration.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">psec package</div>
+                <div class="title">Integration</div>
                 
               </div>
             </a>
@@ -685,6 +849,10 @@ Payload:</p>
 <li><a class="reference internal" href="#a-new-file-is-available">A new file is available</a></li>
 <li><a class="reference internal" href="#the-state-of-disk-changed">The state of disk changed</a></li>
 <li><a class="reference internal" href="#the-gui-is-ready">The GUI is ready</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#debugging">Debugging</a><ul>
+<li><a class="reference internal" href="#ping-a-domain">Ping a Domain</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#notes">Notes</a><ul>

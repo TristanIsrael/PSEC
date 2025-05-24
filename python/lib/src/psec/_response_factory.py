@@ -119,3 +119,12 @@ class ResponseFactory():
         }
 
         return payload
+    
+    @staticmethod
+    def create_response_ping(ping_id, source_name, data, sent_at):
+        return {
+            "id": ping_id,
+            "source": source_name,
+            "data": data,
+            "sent_at": sent_at
+        }

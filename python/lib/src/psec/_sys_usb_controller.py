@@ -59,6 +59,7 @@ class SysUsbController():
         self.mqtt_client.subscribe(f"{Topics.CREATE_FILE}/request")
         self.mqtt_client.subscribe(f"{Topics.DISCOVER_COMPONENTS}/request")
         self.mqtt_client.subscribe(f"{Topics.DELETE_FILE}/request")
+        self.mqtt_client.subscribe(f"{Topics.PING}/request")
 
         # Démarrage de la surveillance des entrées
         if not NO_INPUTS_MONITORING:
@@ -112,6 +113,8 @@ class SysUsbController():
             self.__handle_discover_components(base_topic, payload)
         elif base_topic == Topics.DELETE_FILE:
             self.__handle_delete_file(payload)
+        elif base_topic == Topics.PING:
+            self.__handle_ping(payload)
 
     ####
     # Traitement des commandes
@@ -343,3 +346,10 @@ class SysUsbController():
         else:
             Logger().info(f"Removed file {filepath} from the disk {disk}")
             
+    def __handle_ping(self, payload):
+        ping_id = payload.get("id", "")
+        data = payload.get("data", "")
+        sent_at = payload.get("sent_at", "")
+        payload = ResponseFactory.create_response_ping(ping_id, "sys-usb", data, sent_at)
+
+        self.mqtt_client.publish(f"{Topics.PING}/response", payload)

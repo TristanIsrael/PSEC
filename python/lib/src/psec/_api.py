@@ -1,4 +1,4 @@
-from . import Constantes, RequestFactory, Topics, NotificationFactory
+from . import Constantes, RequestFactory, Topics, NotificationFactory, ResponseFactory
 from . import Logger, MqttClient, System, SingletonMeta
 from paho.mqtt.enums import MQTTErrorCode
 import tempfile
@@ -600,18 +600,15 @@ class Api(metaclass=SingletonMeta):
         other topics. The name of the target is in the topic so it can be routed by
         the broker.
 
+        The request should be constructed with :func:`RequestFactory.create_request_ping`.
+
         Args:
             target_domain(str): The name of the targetted Domain.
             data(str, optional): Data to be sent to the target.
         """
         
         self.__ping_id += 1
-        payload = {
-            "id": self.__ping_id,
-            "source": System.domain_name(),
-            "data": data,
-            "sent_at": datetime.now().timestamp()*1000
-        }
+        payload = RequestFactory.create_request_ping(self.__ping_id, System.domain_name(), data, datetime.now().timestamp()*1000)
         self.__mqtt_client.publish(f"{Topics.PING}/{target_domain}/request", payload)
 
     ####
@@ -680,14 +677,8 @@ class Api(metaclass=SingletonMeta):
         for cb in self.__restart_callbacks:
             cb(domain_name, success, reason)
 
-    def __on_ping(self, payload: dict):
-        payload = {
-            "id": payload.get("id", ""),
-            "source": System.domain_name(),
-            "data": payload.get("data", ""),
-            "sent_at": payload.get("sent_at", "")            
-        }
-
+    def __on_ping(self, payload: dict):        
+        payload = ResponseFactory.create_response_ping(payload.get("id", ""), System.domain_name(), payload.get("data", ""), payload.get("sent_at", ""))
         self.__mqtt_client.publish(f"{Topics.PING}/{payload.get("source", "")}/response", payload)
 
 def cleanup(*args, **kwargs):

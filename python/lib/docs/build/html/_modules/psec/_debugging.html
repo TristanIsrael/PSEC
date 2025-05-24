@@ -307,8 +307,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__subscriptions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mid</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">__on_subscribed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mid</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">mid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__subscriptions</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__on_subscribed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mid</span><span class="p">):</span>        
         <span class="k">if</span> <span class="n">mid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__subscriptions</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__do_benchmark_messaging</span><span class="p">()</span>
 
@@ -333,8 +332,7 @@
         <span class="k">if</span> <span class="n">topic</span> <span class="o">==</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">PING</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">System</span><span class="o">.</span><span class="n">domain_name</span><span class="p">()</span><span class="si">}</span><span class="s2">/response&quot;</span><span class="p">:</span>
             <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;received_at&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">timestamp</span><span class="p">()</span><span class="o">*</span><span class="mi">1000</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__ping_responses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
-            <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__handle_ping_response</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">payload</span><span class="p">,))</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-
+            <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__handle_ping_response</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">payload</span><span class="p">,))</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>    
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__handle_ping_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>

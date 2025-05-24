@@ -287,18 +287,22 @@
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">baudrate</span><span class="p">:</span><span class="nb">int</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Connect to serial port </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">serial</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">baudrate</span><span class="o">=</span><span class="n">baudrate</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">write_timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">serial</span> <span class="o">=</span> <span class="n">serial</span><span class="o">.</span><span class="n">Serial</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="n">path</span><span class="p">,</span> <span class="n">baudrate</span><span class="o">=</span><span class="n">baudrate</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">write_timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">serial</span><span class="o">.</span><span class="n">reset_input_buffer</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">serial</span><span class="o">.</span><span class="n">reset_output_buffer</span><span class="p">()</span>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">recv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buffer_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-        <span class="c1">#print(&quot;wait for bytes&quot;)</span>
+        <span class="c1">#print(f&quot;Wants to read {buffer_size} bytes&quot;)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">serial</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">serial</span><span class="o">.</span><span class="n">is_open</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">serial</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">buffer_size</span><span class="p">)</span>
+            <span class="c1">#print(f&quot;Read {len(data)} bytes&quot;)</span>
             <span class="k">return</span> <span class="n">data</span>
 
-        <span class="k">return</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">in_waiting</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">serial</span><span class="o">.</span><span class="n">in_waiting</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">pending</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">serial</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -390,7 +394,8 @@
 
             <span class="n">rlist</span><span class="p">,</span> <span class="n">wlist</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">select</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">_sock</span><span class="p">],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_sock</span><span class="p">],</span> <span class="p">[],</span> <span class="n">timeout</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">rlist</span><span class="p">:</span> <span class="c1"># or pending_bytes &gt; 0:</span>
+            <span class="k">if</span> <span class="n">rlist</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sock</span><span class="o">.</span><span class="n">in_waiting</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sock</span><span class="o">.</span><span class="n">in_waiting</span><span class="p">())</span>
                 <span class="n">rc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loop_read</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">rc</span> <span class="o">!=</span> <span class="n">MQTTErrorCode</span><span class="o">.</span><span class="n">MQTT_ERR_SUCCESS</span><span class="p">:</span>
                     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Read error </span><span class="si">{</span><span class="n">rc</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -452,16 +457,19 @@
     <span class="n">on_connected</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">on_message</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">on_subscribed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">on_log</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">__message_callbacks</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">__connected_callbacks</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">connected</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">is_starting</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">__debugging</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">connection_type</span><span class="p">:</span><span class="n">ConnectionType</span> <span class="o">=</span> <span class="n">ConnectionType</span><span class="o">.</span><span class="n">UNIX_SOCKET</span><span class="p">,</span> <span class="n">connection_string</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">connection_type</span><span class="p">:</span><span class="n">ConnectionType</span> <span class="o">=</span> <span class="n">ConnectionType</span><span class="o">.</span><span class="n">UNIX_SOCKET</span><span class="p">,</span> <span class="n">connection_string</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">debugging</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="n">identifier</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connection_type</span> <span class="o">=</span> <span class="n">connection_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connection_string</span> <span class="o">=</span> <span class="n">connection_string</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__debugging</span> <span class="o">=</span> <span class="n">debugging</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
@@ -486,6 +494,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">on_message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__on_message</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">on_subscribe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__on_subscribe</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">on_disconnect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__on_disconnected</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__debugging</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">on_log</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__on_log</span>
 
             <span class="n">mqtt_host</span> <span class="o">=</span> <span class="s2">&quot;undefined&quot;</span>
             <span class="k">try</span><span class="p">:</span>
@@ -494,7 +504,7 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="n">mqtt_host</span><span class="p">,</span> <span class="n">keepalive</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
                 <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection_type</span> <span class="o">==</span> <span class="n">ConnectionType</span><span class="o">.</span><span class="n">UNIX_SOCKET</span><span class="p">:</span>
                     <span class="n">mqtt_host</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection_string</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="n">mqtt_host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepalive</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">host</span><span class="o">=</span><span class="n">mqtt_host</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepalive</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The connection type </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">connection_type</span><span class="si">}</span><span class="s2"> is not handled&quot;</span><span class="p">)</span>
                     <span class="k">return</span>
@@ -516,6 +526,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">on_disconnect</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__on_disconnected</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">on_subscribe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__on_subscribe</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">on_connection_lost</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__on_connection_lost</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__debugging</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">on_log</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__on_log</span>
 
             <span class="k">if</span> <span class="n">DEBUG</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">on_log</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__on_log</span>
@@ -524,7 +536,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">loop_start</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The connection type </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">connection_type</span><span class="si">}</span><span class="s2"> is not handled&quot;</span><span class="p">)</span>
-            <span class="k">return</span></div>
+            <span class="k">return</span>        </div>
 
 
 <div class="viewcode-block" id="MqttClient.add_connected_callback">
@@ -567,7 +579,10 @@
 <div class="viewcode-block" id="MqttClient.publish">
 <a class="viewcode-back" href="../../psec.html#psec.MqttClient.publish">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">publish</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">topic</span><span class="o">=</span><span class="n">topic</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">))</span></div>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+        <span class="c1">#print(data)</span>
+        <span class="c1">#print(len(data))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">topic</span><span class="o">=</span><span class="n">topic</span><span class="p">,</span> <span class="n">payload</span><span class="o">=</span><span class="n">data</span><span class="p">)</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__get_transport_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;tcp&#39;</span><span class="p">,</span> <span class="s1">&#39;unix&#39;</span><span class="p">]:</span>
@@ -577,7 +592,8 @@
             <span class="k">return</span> <span class="s2">&quot;unix&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__on_log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">userdata</span><span class="p">,</span> <span class="n">level</span><span class="p">,</span> <span class="n">buf</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[MQTT log]: </span><span class="si">{</span><span class="n">buf</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_log</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">on_log</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="n">buf</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__on_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span><span class="n">mqtt</span><span class="o">.</span><span class="n">Client</span><span class="p">,</span> <span class="n">userdata</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span><span class="n">mqtt</span><span class="o">.</span><span class="n">MQTTMessage</span><span class="p">):</span>
         <span class="c1">#print(f&quot;[{userdata}] Message reçu sur {msg.topic}: {msg.payload.decode()}&quot;)        </span>
@@ -607,7 +623,7 @@
             <span class="n">cb</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__on_subscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">userdata</span><span class="p">,</span> <span class="n">mid</span><span class="p">,</span> <span class="n">reason_code_list</span><span class="p">,</span> <span class="n">properties</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Subscribed to a topic&quot;</span><span class="p">)</span>
+        <span class="c1">#print(&quot;Subscribed to a topic&quot;)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">on_subscribed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">on_subscribed</span><span class="p">(</span><span class="n">mid</span><span class="p">)</span>
@@ -619,15 +635,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__on_disconnected</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Disconnected from the broker&quot;</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Arguments:&quot;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span></div>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Disconnected from the broker&quot;</span><span class="p">)</span></div>
 
+        <span class="c1">#print(&quot;Arguments:&quot;)</span>
+        <span class="c1">#for arg in args:</span>
+        <span class="c1">#    print(arg)</span>
 
         <span class="c1">#print(&quot;Disconnect from the broker&quot;)</span>
         <span class="c1">#self.mqtt_client.close()</span>
         
+    
 </pre></div>
         </article>
       </div>

@@ -45,6 +45,7 @@ class Dom0Controller():
         self.mqtt_client.subscribe(f"{Topics.ENERGY_STATE}/request")
         self.mqtt_client.subscribe(f"{Topics.DELETE_FILE}/request")
         self.mqtt_client.subscribe(Topics.DISCOVER_COMPONENTS)
+        self.mqtt_client.subscribe(f"{Topics.PING}/request")
 
 
     def __on_mqtt_message(self, topic:str, payload:dict):
@@ -74,6 +75,8 @@ class Dom0Controller():
                 self.__handle_delete_file(payload)
             elif topic == f"{Topics.DISCOVER_COMPONENTS}/request":
                 self.__handle_discover_components()
+            elif topic == f"{Topics.PING}/request":
+                self.__handle_ping(payload)
         except Exception:
             Logger.print("An exception occured while handling the message")
 
@@ -252,3 +255,11 @@ class Dom0Controller():
         )
 
         self.mqtt_client.publish(f"{Topics.DISCOVER_COMPONENTS}/response", payload)
+
+    def __handle_ping(self, payload):
+        ping_id = payload.get("id", "")
+        data = payload.get("data", "")
+        sent_at = payload.get("sent_at", "")
+        payload = ResponseFactory.create_response_ping(ping_id, "Dom0", data, sent_at)
+
+        self.mqtt_client.publish(f"{Topics.PING}/response", payload)
