@@ -16,7 +16,7 @@ subpackages=""
 replaces=""
 options="!check"  # no tests provided
 giturl="https://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@github.com/TristanIsrael/psec"
-gitbranch="issue-46-debug-messaging"
+gitbranch=""
 
 PSEC_CONFDIR="$pkgdir/etc/psec"
 PSEC_ROOTDIR="$pkgdir/usr/lib/psec"
