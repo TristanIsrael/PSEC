@@ -18,4 +18,5 @@ Project documentation
    provisioning.md
    python-api.md
    support-infrastructure.md
+   tested-hardware.md
    update-alpine-mirror.md

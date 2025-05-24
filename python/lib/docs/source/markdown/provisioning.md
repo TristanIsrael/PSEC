@@ -8,7 +8,7 @@ Manual provisioning consists of going through an installation process step-by-st
 
 1 - Create an installation USB stick for Alpine Linux.  
   - The Alpine Linux version must match the desired repository version.  
-  - The ISO image used must be **Alpine Standard**.
+  - The ISO image used must be [**Alpine Standard**](https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/x86_64/alpine-standard-3.21.3-x86_64.iso).
 
 2 - Install Alpine Linux on the device.  
   - Assign a network interface with either DHCP or a static IP depending on the context.  

@@ -2,17 +2,22 @@ import QtQuick
 import QtQuick.Controls
 import net.alefbet
 
-ApplicationWindow {
+Item {
     id: window
 
     property bool mode_paysage: width < height
 
-    width: 1280
-    height: 800
+    //width: 1280
+    //height: 800
+    anchors.fill: parent
     visible: true    
 
-    font.family: "Roboto"
-    font.pointSize: 18
+    FontLoader {
+        id: customFont
+        source: "fonts/MyCustomFont.ttf"  // chemin relatif vers ta police
+    }
+    //font.family: "Roboto"
+    //font.pointSize: 18
 
     MainScreen {
         anchors.fill: parent
@@ -30,7 +35,7 @@ ApplicationWindow {
         }
     }  
 
-    onVisibilityChanged: {  
+    onVisibleChanged: {  
         if(visible)      
             console.log("Résolution : " +Qt.application.screens[0].width +"x" +Qt.application.screens[0].height)
     }
