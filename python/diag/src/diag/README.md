@@ -1,45 +1,17 @@
-# Panoptiscan
+# PSEC Diag
 
- Panoptiscan
+PSEC Diagnostic tool is a simple way of veryfing that a platform can run a product based on PSEC and evaluate the level of security offered.
 
-## Use cases à traiter
+You can create an USB disk and use it on multiple platforms to verify their capacity.
 
-- Logger les performances et la consommation mémoire en mode DEBUG
+> ⚠️ **Notice**
+>
+> The platform virtualization and security capabilities depend on the settings of the BIOS or EFI. Please adapt the settings to enable VT-d/AMD-Vi (or IOMMU) and VT-x/AMD-V.
 
-- Désacidifier les fichiers sur la station pour les scanne
+## Screenshot
 
-## Exigences
+![Screenshot of PSEC Diag](docs/images/screenshot.png)
 
-- La station blanche ne doit pas avoir de périphérique de masse connecté (disque dur, carte mémoire)
+## Create an USB disk
 
-- Elle doit être construite à partir d'un master homologué, ce master doit être vérifié
-
-- en cas de détection de virus, ne copier que les fichiers sains
-
-- le journal des scans est copié en même temps que les fichiers
-
-## Pistes envisagées
-
-- Définition d'un master avec YOCTO, facilement modifiable, maîtrisé et déployable -> Sortie au format IMG
-
-## Bug fixes
-
-- OK après l'insertion du support 1 : modifier le message "Insérer une deuxième clé USB"
-
-- après le scan :
-
-- OK cacher la barre de progression
-
-- remonter les chiffres des résultats
-
-- afficher le bouton de copie et le bouton d'éjection côte-à-côte
-
-- ajouter un bouton pour éteindre le dispositif
-
-## Débogage
-
-- https://github.com/pyutils/line_profiler
-
-## Icones
-
-https://iconsplace.com/custom-color/eject-icon-17/
+Download the image file of [psec-diag](https://www.alefbet.net/images/psec-diag.img) and recreate the USB disk using `dd`, or `Rufus` for example.
