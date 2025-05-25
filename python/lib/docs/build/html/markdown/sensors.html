@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Product architecture" href="architecture.html" /><link rel="prev" title="PSEC python documentation" href="../psec.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Creating the Deployment Infrastructure" href="support-infrastructure.html" /><link rel="prev" title="Python API" href="python-api.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
-        <title>Project documentation - PSEC 1.0.0 documentation</title>
+        <title>Sensors - PSEC 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
@@ -201,7 +201,7 @@
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../psec.html">PSEC python documentation</a></li>
-<li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">Project documentation</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Project documentation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Project documentation</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Project documentation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="architecture.html">Product architecture</a></li>
 <li class="toctree-l2"><a class="reference internal" href="boot-sequence.html">Boot sequence</a></li>
 <li class="toctree-l2"><a class="reference internal" href="boot-usb.html">Create a Bootable USB Drive</a></li>
@@ -216,7 +216,7 @@
 <li class="toctree-l2"><a class="reference internal" href="protocol.html">Protocol</a></li>
 <li class="toctree-l2"><a class="reference internal" href="provisioning.html">Provisioning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="python-api.html">Python API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sensors.html">Sensors</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Sensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tested-hardware.html">Tested hardware</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tested-hardware.html#dell-latitude-e5510">Dell Latitude E5510</a></li>
@@ -244,7 +244,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="../_sources/markdown/index.rst.txt" title="View this page">
+  <a class="muted-link" href="../_sources/markdown/sensors.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -264,123 +264,10 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="project-documentation">
-<h1>Project documentation<a class="headerlink" href="#project-documentation" title="Link to this heading">¶</a></h1>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Product architecture</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="architecture.html#design-rules">Design rules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="architecture.html#overview-of-the-product-architecture">Overview of the product architecture</a></li>
-<li class="toctree-l2"><a class="reference internal" href="architecture.html#detailed-architecture">Detailed architecture</a></li>
-<li class="toctree-l2"><a class="reference internal" href="architecture.html#virtual-machines-domains">Virtual Machines (Domains)</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="boot-sequence.html">Boot sequence</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="boot-sequence.html#provisioning">Provisioning</a></li>
-<li class="toctree-l2"><a class="reference internal" href="boot-sequence.html#steps">Steps</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="boot-usb.html">Create a Bootable USB Drive</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="boot-usb.html#procedure">Procedure</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="build-alpine-packages.html">Building Alpine Packages</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="build-alpine-packages.html#references">References</a></li>
-<li class="toctree-l2"><a class="reference internal" href="build-alpine-packages.html#setting-up-an-administrator-workstation">Setting Up an Administrator Workstation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="build-alpine-packages.html#warning">Warning</a></li>
-<li class="toctree-l2"><a class="reference internal" href="build-alpine-packages.html#building-packages">Building Packages</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="capabilities.html">Capabilities</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="capabilities.html#list-of-capabilities">List of capabilities</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="debugging.html#activate-debugging">Activate debugging</a></li>
-<li class="toctree-l2"><a class="reference internal" href="debugging.html#rs-232-serial-link">RS-232 Serial link</a></li>
-<li class="toctree-l2"><a class="reference internal" href="debugging.html#pty-terminal">PTY terminal</a></li>
-<li class="toctree-l2"><a class="reference internal" href="debugging.html#mqtt-console">MQTT console</a></li>
-<li class="toctree-l2"><a class="reference internal" href="debugging.html#log-files">Log files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="debugging.html#verify-whether-debug-is-activated">Verify whether debug is activated</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="design-rules.html">Design rules</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="design-rules.html#use-of-off-the-shelf-software-and-libraries">Use of Off-the-Shelf Software and Libraries</a></li>
-<li class="toctree-l2"><a class="reference internal" href="design-rules.html#use-of-standard-protocols">Use of Standard Protocols</a></li>
-<li class="toctree-l2"><a class="reference internal" href="design-rules.html#components-from-mainstream-channels">Components from Mainstream Channels</a></li>
-<li class="toctree-l2"><a class="reference internal" href="design-rules.html#use-of-lightweight-software-and-libraries">Use of Lightweight Software and Libraries</a></li>
-<li class="toctree-l2"><a class="reference internal" href="design-rules.html#use-of-robust-software-and-libraries">Use of Robust Software and Libraries</a></li>
-<li class="toctree-l2"><a class="reference internal" href="design-rules.html#provision-of-an-api">Provision of an API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="design-rules.html#provision-of-built-in-debugging-tools">Provision of Built-in Debugging Tools</a></li>
-<li class="toctree-l2"><a class="reference internal" href="design-rules.html#stateless-system">Stateless System</a></li>
-<li class="toctree-l2"><a class="reference internal" href="design-rules.html#configuration-management">Configuration Management</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="documentation.html">Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="graphical-design.html">Graphical design</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="graphical-design.html#font">Font</a></li>
-<li class="toctree-l2"><a class="reference internal" href="graphical-design.html#colors-palette">Colors palette</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="integration.html">Integration</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="integration.html#glossary">Glossary</a></li>
-<li class="toctree-l2"><a class="reference internal" href="integration.html#topology-and-security-mechanisms">Topology and security mechanisms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="integration.html#create-a-product">Create a product</a></li>
-<li class="toctree-l2"><a class="reference internal" href="integration.html#compatibiliy-with-the-hardware">Compatibiliy with the hardware</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="logging.html#features">Features</a></li>
-<li class="toctree-l2"><a class="reference internal" href="logging.html#architecture">Architecture</a></li>
-<li class="toctree-l2"><a class="reference internal" href="logging.html#debug-level">Debug Level</a></li>
-<li class="toctree-l2"><a class="reference internal" href="logging.html#emitting-an-event">Emitting an Event</a></li>
-<li class="toctree-l2"><a class="reference internal" href="logging.html#recording">Recording</a></li>
-<li class="toctree-l2"><a class="reference internal" href="logging.html#retrieving-the-log">Retrieving the Log</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="protocol.html">Protocol</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="protocol.html#disks-and-file-management">Disks and file management</a></li>
-<li class="toctree-l2"><a class="reference internal" href="protocol.html#workflow">Workflow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="protocol.html#logging">Logging</a></li>
-<li class="toctree-l2"><a class="reference internal" href="protocol.html#miscellaneous">Miscellaneous</a></li>
-<li class="toctree-l2"><a class="reference internal" href="protocol.html#notifications">Notifications</a></li>
-<li class="toctree-l2"><a class="reference internal" href="protocol.html#debugging">Debugging</a></li>
-<li class="toctree-l2"><a class="reference internal" href="protocol.html#notes">Notes</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="provisioning.html">Provisioning</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="provisioning.html#manual">Manual</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="python-api.html">Python API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="python-api.html#file-locations">File Locations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="python-api.html#packaging">Packaging</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="sensors.html">Sensors</a></li>
-<li class="toctree-l1"><a class="reference internal" href="support-infrastructure.html">Creating the Deployment Infrastructure</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html#steps">Steps</a></li>
-<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html#prerequisites">Prerequisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html#creating-the-virtual-machines">Creating the Virtual Machines</a></li>
-<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html#services-deployment">Services Deployment</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="tested-hardware.html">Tested hardware</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tested-hardware.html#synthesis">Synthesis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tested-hardware.html#durabook-r8">Durabook R8</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="tested-hardware.html#dell-latitude-e5510">Dell Latitude E5510</a></li>
-<li class="toctree-l1"><a class="reference internal" href="topology.html">Topology</a></li>
-<li class="toctree-l1"><a class="reference internal" href="update-alpine-mirror.html">Create or Update the Alpine Mirror</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html#prerequisites">Prerequisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html#principles">Principles</a></li>
-<li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html#procedure">Procedure</a></li>
-</ul>
-</li>
-</ul>
-</div>
+          <section id="sensors">
+<h1>Sensors<a class="headerlink" href="#sensors" title="Link to this heading">¶</a></h1>
+<p>This document describes the sensor monitoring system.</p>
+<p><em>To be completed</em></p>
 </section>
 
         </article>
@@ -388,23 +275,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="architecture.html">
+          <a class="next-page" href="support-infrastructure.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Product architecture</div>
+                <div class="title">Creating the Deployment Infrastructure</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="../psec.html">
+          <a class="prev-page" href="python-api.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">PSEC python documentation</div>
+                <div class="title">Python API</div>
                 
               </div>
             </a>

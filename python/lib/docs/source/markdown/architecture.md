@@ -2,6 +2,10 @@
 
 This document describes the architecture of the security-oriented technical platform.
 
+## Design rules
+
+The architecture of PSEC is made in respect of the [design rules](design-rules.md).
+
 ## Overview of the product architecture
 
 ![Overview of the product architecture](../../images/psec-architecture-overview.png)
@@ -9,6 +13,8 @@ This document describes the architecture of the security-oriented technical plat
 A product is composed of one ore more domains with their own application module. The modules should be designed according to their level of trust. All modules using external data (communicating with USB drives or the network for example) should be considered as not trustable and should be separated from modules which only manipulate commands and user interfaces.
 
 The user interface graphical application (GUI) is hosted in the `sys-gui` Domain which has a high level of trust.
+
+A Domain is a volatile virtual machine created on startup. The virtual machine is created, an Alpine Linux is installed and the application package and its dependencies are installed (see [topology.json](topology.md)). **A Domain only exists in memory as long as the system is running. It is re-created each time the system is started.**
 
 ## Detailed architecture
 

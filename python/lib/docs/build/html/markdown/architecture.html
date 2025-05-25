@@ -205,13 +205,18 @@
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Product architecture</a></li>
 <li class="toctree-l2"><a class="reference internal" href="boot-sequence.html">Boot sequence</a></li>
 <li class="toctree-l2"><a class="reference internal" href="boot-usb.html">Create a Bootable USB Drive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-alpine-packages.html">Building Alpine Packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capabilities.html">Capabilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="debugging.html">Debugging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design-rules.html">Design rules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="documentation.html">Documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="graphical-design.html">Graphical design</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html">Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logging.html">Logging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="protocol.html">Protocol</a></li>
 <li class="toctree-l2"><a class="reference internal" href="provisioning.html">Provisioning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="python-api.html">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sensors.html">Sensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tested-hardware.html">Tested hardware</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tested-hardware.html#dell-latitude-e5510">Dell Latitude E5510</a></li>
@@ -262,11 +267,16 @@
           <section id="product-architecture">
 <h1>Product architecture<a class="headerlink" href="#product-architecture" title="Link to this heading">¶</a></h1>
 <p>This document describes the architecture of the security-oriented technical platform.</p>
+<section id="design-rules">
+<h2>Design rules<a class="headerlink" href="#design-rules" title="Link to this heading">¶</a></h2>
+<p>The architecture of PSEC is made in respect of the <a class="reference internal" href="design-rules.html"><span class="std std-doc">design rules</span></a>.</p>
+</section>
 <section id="overview-of-the-product-architecture">
 <h2>Overview of the product architecture<a class="headerlink" href="#overview-of-the-product-architecture" title="Link to this heading">¶</a></h2>
 <p><img alt="Overview of the product architecture" src="../_images/psec-architecture-overview.png" /></p>
 <p>A product is composed of one ore more domains with their own application module. The modules should be designed according to their level of trust. All modules using external data (communicating with USB drives or the network for example) should be considered as not trustable and should be separated from modules which only manipulate commands and user interfaces.</p>
 <p>The user interface graphical application (GUI) is hosted in the <code class="docutils literal notranslate"><span class="pre">sys-gui</span></code> Domain which has a high level of trust.</p>
+<p>A Domain is a volatile virtual machine created on startup. The virtual machine is created, an Alpine Linux is installed and the application package and its dependencies are installed (see <a class="reference internal" href="topology.html"><span class="std std-doc">topology.json</span></a>). <strong>A Domain only exists in memory as long as the system is running. It is re-created each time the system is started.</strong></p>
 </section>
 <section id="detailed-architecture">
 <h2>Detailed architecture<a class="headerlink" href="#detailed-architecture" title="Link to this heading">¶</a></h2>
@@ -391,6 +401,7 @@
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Product architecture</a><ul>
+<li><a class="reference internal" href="#design-rules">Design rules</a></li>
 <li><a class="reference internal" href="#overview-of-the-product-architecture">Overview of the product architecture</a></li>
 <li><a class="reference internal" href="#detailed-architecture">Detailed architecture</a></li>
 <li><a class="reference internal" href="#virtual-machines-domains">Virtual Machines (Domains)</a><ul>

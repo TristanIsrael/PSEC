@@ -8,15 +8,18 @@ Project documentation
    architecture.md
    boot-sequence.md
    boot-usb.md
-   build-alpine-packets.md
+   build-alpine-packages.md
+   capabilities.md
    debugging.md
+   design-rules.md
    documentation.md
    graphical-design.md
    integration.md
-   logging.mg
+   logging.md
    protocol.md
    provisioning.md
    python-api.md
+   sensors.md
    support-infrastructure.md
    tested-hardware.md
    topology.md

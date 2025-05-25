@@ -202,16 +202,21 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../psec.html">PSEC python documentation</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Project documentation</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Project documentation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="architecture.html">Platform Description</a></li>
+<li class="toctree-l2"><a class="reference internal" href="architecture.html">Product architecture</a></li>
 <li class="toctree-l2"><a class="reference internal" href="boot-sequence.html">Boot sequence</a></li>
 <li class="toctree-l2"><a class="reference internal" href="boot-usb.html">Create a Bootable USB Drive</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-alpine-packages.html">Building Alpine Packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="capabilities.html">Capabilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="debugging.html">Debugging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="design-rules.html">Design rules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="documentation.html">Documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="graphical-design.html">Graphical design</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html">Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="logging.html">Logging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="protocol.html">Protocol</a></li>
 <li class="toctree-l2"><a class="reference internal" href="provisioning.html">Provisioning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="python-api.html">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sensors.html">Sensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tested-hardware.html">Tested hardware</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tested-hardware.html#dell-latitude-e5510">Dell Latitude E5510</a></li>
@@ -275,15 +280,7 @@
         <span class="s2">&quot;screen&quot;</span><span class="p">:</span> <span class="p">{</span>
             <span class="s2">&quot;rotation&quot;</span><span class="p">:</span> <span class="mi">0</span>
         <span class="p">}</span>
-    <span class="p">},</span>
-    
-    <span class="s2">&quot;network&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s2">&quot;repositories&quot;</span><span class="p">:</span> <span class="p">[</span>
-            <span class="s2">&quot;http://&lt;mirror url&gt;/depots/alpine/main&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;http://&lt;mirror url&gt;/depots/alpine/community&quot;</span>
-        <span class="p">],</span>
-        <span class="s2">&quot;releases&quot;</span><span class="p">:</span> <span class="s2">&quot;http://&lt;mirror url&gt;/isos/&quot;</span>
-    <span class="p">}</span>
+    <span class="p">},</span>    
     <span class="s2">&quot;business&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;domains&quot;</span><span class="p">:</span> <span class="p">[</span>
             <span class="p">{</span>
@@ -304,7 +301,59 @@
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>More details to come.</p>
+<p>Here is the detail of the keys:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Key</p></th>
+<th class="head"><p>Type</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>usb.use</p></td>
+<td><p>int</p></td>
+<td><p>Set to 1 if the Domain <code class="docutils literal notranslate"><span class="pre">sys-usb</span></code> should be setup and used, else 0.</p></td>
+</tr>
+<tr class="row-odd"><td><p>gui.use</p></td>
+<td><p>int</p></td>
+<td><p>Set to 1 if the Domain <code class="docutils literal notranslate"><span class="pre">sys-gui</span></code> should be setup and used, else 0. <code class="docutils literal notranslate"><span class="pre">sys-usb</span></code> should be used when the product comes with a GUI.</p></td>
+</tr>
+<tr class="row-even"><td><p>gui.memory</p></td>
+<td><p>int</p></td>
+<td><p>Defines the memory, in MB, which should be allocated to <code class="docutils literal notranslate"><span class="pre">sys-gui</span></code> to run the GUI application.</p></td>
+</tr>
+<tr class="row-odd"><td><p>gui.app-package</p></td>
+<td><p>string</p></td>
+<td><p>When <code class="docutils literal notranslate"><span class="pre">sys-gui</span></code> starts, it must install a package (APK) which provides the GUI application and its dependencies.</p></td>
+</tr>
+<tr class="row-even"><td><p>gui.screen.rotation</p></td>
+<td><p>int</p></td>
+<td><p>Defines the rotation of the screen if needed, for example on a tablet. Accepted valued are: 0, 90, 180 or 270.</p></td>
+</tr>
+<tr class="row-odd"><td><p><em>business.domains</em></p></td>
+<td><p><em>array</em></p></td>
+<td><p><em>This sections defines the domains which will be created on startup.</em></p></td>
+</tr>
+<tr class="row-even"><td><p>business.domains.<entry>.name</p></td>
+<td><p>string</p></td>
+<td><p>Gives a name to the Domain.</p></td>
+</tr>
+<tr class="row-odd"><td><p>business.domains.<entry>.package</p></td>
+<td><p>string</p></td>
+<td><p>Defines the package (APK) which will be installed in the Domain.</p></td>
+</tr>
+<tr class="row-even"><td><p>business.domains.<entry>.memory</p></td>
+<td><p>int</p></td>
+<td><p>Defines the memory, in MB, which whould be allocated to the Domain.</p></td>
+</tr>
+<tr class="row-odd"><td><p>business.domains.<entry>.cpu</p></td>
+<td><p>float</p></td>
+<td><p>Defines the percentage of the whole CPU cores which should be allocated to the Domain. Accepted values are between 0.0 (0%) and 1.0 (100%).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 </section>
 
         </article>

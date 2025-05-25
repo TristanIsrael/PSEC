@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Product architecture" href="architecture.html" /><link rel="prev" title="PSEC python documentation" href="../psec.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Debugging" href="debugging.html" /><link rel="prev" title="Building Alpine Packages" href="build-alpine-packages.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
-        <title>Project documentation - PSEC 1.0.0 documentation</title>
+        <title>Capabilities - PSEC 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
@@ -178,7 +178,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -201,12 +201,12 @@
   <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../psec.html">PSEC python documentation</a></li>
-<li class="toctree-l1 current has-children current-page"><a class="current reference internal" href="#">Project documentation</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Project documentation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Project documentation</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Project documentation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="architecture.html">Product architecture</a></li>
 <li class="toctree-l2"><a class="reference internal" href="boot-sequence.html">Boot sequence</a></li>
 <li class="toctree-l2"><a class="reference internal" href="boot-usb.html">Create a Bootable USB Drive</a></li>
 <li class="toctree-l2"><a class="reference internal" href="build-alpine-packages.html">Building Alpine Packages</a></li>
-<li class="toctree-l2"><a class="reference internal" href="capabilities.html">Capabilities</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Capabilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="design-rules.html">Design rules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="documentation.html">Documentation</a></li>
@@ -244,7 +244,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="../_sources/markdown/index.rst.txt" title="View this page">
+  <a class="muted-link" href="../_sources/markdown/capabilities.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -258,129 +258,55 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="project-documentation">
-<h1>Project documentation<a class="headerlink" href="#project-documentation" title="Link to this heading">¶</a></h1>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="architecture.html">Product architecture</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="architecture.html#design-rules">Design rules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="architecture.html#overview-of-the-product-architecture">Overview of the product architecture</a></li>
-<li class="toctree-l2"><a class="reference internal" href="architecture.html#detailed-architecture">Detailed architecture</a></li>
-<li class="toctree-l2"><a class="reference internal" href="architecture.html#virtual-machines-domains">Virtual Machines (Domains)</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="boot-sequence.html">Boot sequence</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="boot-sequence.html#provisioning">Provisioning</a></li>
-<li class="toctree-l2"><a class="reference internal" href="boot-sequence.html#steps">Steps</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="boot-usb.html">Create a Bootable USB Drive</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="boot-usb.html#procedure">Procedure</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="build-alpine-packages.html">Building Alpine Packages</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="build-alpine-packages.html#references">References</a></li>
-<li class="toctree-l2"><a class="reference internal" href="build-alpine-packages.html#setting-up-an-administrator-workstation">Setting Up an Administrator Workstation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="build-alpine-packages.html#warning">Warning</a></li>
-<li class="toctree-l2"><a class="reference internal" href="build-alpine-packages.html#building-packages">Building Packages</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="capabilities.html">Capabilities</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="capabilities.html#list-of-capabilities">List of capabilities</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="debugging.html">Debugging</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="debugging.html#activate-debugging">Activate debugging</a></li>
-<li class="toctree-l2"><a class="reference internal" href="debugging.html#rs-232-serial-link">RS-232 Serial link</a></li>
-<li class="toctree-l2"><a class="reference internal" href="debugging.html#pty-terminal">PTY terminal</a></li>
-<li class="toctree-l2"><a class="reference internal" href="debugging.html#mqtt-console">MQTT console</a></li>
-<li class="toctree-l2"><a class="reference internal" href="debugging.html#log-files">Log files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="debugging.html#verify-whether-debug-is-activated">Verify whether debug is activated</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="design-rules.html">Design rules</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="design-rules.html#use-of-off-the-shelf-software-and-libraries">Use of Off-the-Shelf Software and Libraries</a></li>
-<li class="toctree-l2"><a class="reference internal" href="design-rules.html#use-of-standard-protocols">Use of Standard Protocols</a></li>
-<li class="toctree-l2"><a class="reference internal" href="design-rules.html#components-from-mainstream-channels">Components from Mainstream Channels</a></li>
-<li class="toctree-l2"><a class="reference internal" href="design-rules.html#use-of-lightweight-software-and-libraries">Use of Lightweight Software and Libraries</a></li>
-<li class="toctree-l2"><a class="reference internal" href="design-rules.html#use-of-robust-software-and-libraries">Use of Robust Software and Libraries</a></li>
-<li class="toctree-l2"><a class="reference internal" href="design-rules.html#provision-of-an-api">Provision of an API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="design-rules.html#provision-of-built-in-debugging-tools">Provision of Built-in Debugging Tools</a></li>
-<li class="toctree-l2"><a class="reference internal" href="design-rules.html#stateless-system">Stateless System</a></li>
-<li class="toctree-l2"><a class="reference internal" href="design-rules.html#configuration-management">Configuration Management</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="documentation.html">Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="graphical-design.html">Graphical design</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="graphical-design.html#font">Font</a></li>
-<li class="toctree-l2"><a class="reference internal" href="graphical-design.html#colors-palette">Colors palette</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="integration.html">Integration</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="integration.html#glossary">Glossary</a></li>
-<li class="toctree-l2"><a class="reference internal" href="integration.html#topology-and-security-mechanisms">Topology and security mechanisms</a></li>
-<li class="toctree-l2"><a class="reference internal" href="integration.html#create-a-product">Create a product</a></li>
-<li class="toctree-l2"><a class="reference internal" href="integration.html#compatibiliy-with-the-hardware">Compatibiliy with the hardware</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="logging.html#features">Features</a></li>
-<li class="toctree-l2"><a class="reference internal" href="logging.html#architecture">Architecture</a></li>
-<li class="toctree-l2"><a class="reference internal" href="logging.html#debug-level">Debug Level</a></li>
-<li class="toctree-l2"><a class="reference internal" href="logging.html#emitting-an-event">Emitting an Event</a></li>
-<li class="toctree-l2"><a class="reference internal" href="logging.html#recording">Recording</a></li>
-<li class="toctree-l2"><a class="reference internal" href="logging.html#retrieving-the-log">Retrieving the Log</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="protocol.html">Protocol</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="protocol.html#disks-and-file-management">Disks and file management</a></li>
-<li class="toctree-l2"><a class="reference internal" href="protocol.html#workflow">Workflow</a></li>
-<li class="toctree-l2"><a class="reference internal" href="protocol.html#logging">Logging</a></li>
-<li class="toctree-l2"><a class="reference internal" href="protocol.html#miscellaneous">Miscellaneous</a></li>
-<li class="toctree-l2"><a class="reference internal" href="protocol.html#notifications">Notifications</a></li>
-<li class="toctree-l2"><a class="reference internal" href="protocol.html#debugging">Debugging</a></li>
-<li class="toctree-l2"><a class="reference internal" href="protocol.html#notes">Notes</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="provisioning.html">Provisioning</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="provisioning.html#manual">Manual</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="python-api.html">Python API</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="python-api.html#file-locations">File Locations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="python-api.html#packaging">Packaging</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="sensors.html">Sensors</a></li>
-<li class="toctree-l1"><a class="reference internal" href="support-infrastructure.html">Creating the Deployment Infrastructure</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html#steps">Steps</a></li>
-<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html#prerequisites">Prerequisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html#creating-the-virtual-machines">Creating the Virtual Machines</a></li>
-<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html#services-deployment">Services Deployment</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="tested-hardware.html">Tested hardware</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tested-hardware.html#synthesis">Synthesis</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tested-hardware.html#durabook-r8">Durabook R8</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="tested-hardware.html#dell-latitude-e5510">Dell Latitude E5510</a></li>
-<li class="toctree-l1"><a class="reference internal" href="topology.html">Topology</a></li>
-<li class="toctree-l1"><a class="reference internal" href="update-alpine-mirror.html">Create or Update the Alpine Mirror</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html#prerequisites">Prerequisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html#principles">Principles</a></li>
-<li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html#procedure">Procedure</a></li>
-</ul>
-</li>
-</ul>
+          <section id="capabilities">
+<h1>Capabilities<a class="headerlink" href="#capabilities" title="Link to this heading">¶</a></h1>
+<p>This document describes the capabilities of the PSEC core.</p>
+<section id="list-of-capabilities">
+<h2>List of capabilities<a class="headerlink" href="#list-of-capabilities" title="Link to this heading">¶</a></h2>
+<p>The PSEC core offers the following capabilities:</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Capability</p></th>
+<th class="head"><p>Since</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Messaging</p></td>
+<td><p>v1.0</p></td>
+<td><p>The messaging is the way to send and receive commands and notifications inside the system in a secure way. The functions of the core are called using the messagging system; It is recommended to use the <a class="reference internal" href="#../../build/html/api.html"><span class="xref myst">API</span></a> to call core functions. Commands and information can be exchanged between the product business Domains using the messaging. The messaging uses a specific <a class="reference internal" href="protocol.html"><span class="std std-doc">protocol</span></a></p></td>
+</tr>
+<tr class="row-odd"><td><p>Logging</p></td>
+<td><p>v1.0</p></td>
+<td><p>The product can use the embedded <a class="reference internal" href="logging.html"><span class="std std-doc">logging</span></a> system to gather debugging or production information in a log file, which can then be stored on an external device.</p></td>
+</tr>
+<tr class="row-even"><td><p>Sensors</p></td>
+<td><p>v1.0</p></td>
+<td><p>The <a class="reference internal" href="sensors.html"><span class="std std-doc">sensors</span></a> of the platform are monitored and their state is notified thru the <a class="reference internal" href="protocol.html"><span class="std std-doc">messaging</span></a> and can be queried in the <a class="reference internal" href="#../../build/html/api.html"><span class="xref myst">API</span></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>External storage</p></td>
+<td><p>v1.0</p></td>
+<td><p>The external storage is monitored and can be used to read or write files. When an external drive is connected or disconnect, a notification is sent. The <a class="reference internal" href="#../../build/html/api.html"><span class="xref myst">API</span></a> can be used to get the directory tree of a drive, read or write a file.</p></td>
+</tr>
+<tr class="row-even"><td><p>Integrity</p></td>
+<td><p>v1.0</p></td>
+<td><p>The system provides different ways of verifying the integrity of the system and the files. For example, when a file is read, its fingerprint is calculated and verified on each operation of reading, writing, moving, etc.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Monitoring</p></td>
+<td><p>v1.0</p></td>
+<td><p>The components (or modules) can be monitored by querying their state or listening to their state change notification. The monitoring can be done thru the <a class="reference internal" href="#../../build/html/api.html"><span class="xref myst">API</span></a>.</p></td>
+</tr>
+</tbody>
+</table>
 </div>
+</section>
 </section>
 
         </article>
@@ -388,23 +314,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="architecture.html">
+          <a class="next-page" href="debugging.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Product architecture</div>
+                <div class="title">Debugging</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="../psec.html">
+          <a class="prev-page" href="build-alpine-packages.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">PSEC python documentation</div>
+                <div class="title">Building Alpine Packages</div>
                 
               </div>
             </a>
@@ -426,8 +352,27 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Capabilities</a><ul>
+<li><a class="reference internal" href="#list-of-capabilities">List of capabilities</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
