@@ -215,6 +215,7 @@
 <li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tested-hardware.html">Tested hardware</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tested-hardware.html#dell-latitude-e5510">Dell Latitude E5510</a></li>
+<li class="toctree-l2"><a class="reference internal" href="topology.html">Topology</a></li>
 <li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html">Create or Update the Alpine Mirror</a></li>
 </ul>
 </li>
@@ -315,8 +316,11 @@
 <span class="n">EOF</span>
 </pre></div>
 </div>
-<p>Format the drive: <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">mkdosfs</span> <span class="pre">-F32</span> <span class="pre">/dev/sdx1</span></code></p>
-<p>Make it bootable with Alpine: <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">setup-bootable</span> <span class="pre">-vUfs</span> <span class="pre">/media/sda</span> <span class="pre">/dev/sdx1</span></code>, first check whether the ISO image is mounted on <code class="docutils literal notranslate"><span class="pre">/media/usb</span></code> or <code class="docutils literal notranslate"><span class="pre">/media/sda</span></code> (for example).</p>
+<ul class="simple">
+<li><p>Format the drive: <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">mkdosfs</span> <span class="pre">-F32</span> <span class="pre">/dev/sdx1</span></code></p></li>
+<li><p>Identify the installation USB disk with <code class="docutils literal notranslate"><span class="pre">lsblk</span></code> (probably <code class="docutils literal notranslate"><span class="pre">/dev/sdb</span></code>)</p></li>
+<li><p>Make it bootable with Alpine: <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">setup-bootable</span> <span class="pre">-vUfs</span> <span class="pre">/media/sda</span> <span class="pre">/dev/sdx1</span></code>, first check whether the ISO image is mounted on <code class="docutils literal notranslate"><span class="pre">/media/usb</span></code> or <code class="docutils literal notranslate"><span class="pre">/media/sdb</span></code> (for example).</p></li>
+</ul>
 </section>
 </section>
 </section>

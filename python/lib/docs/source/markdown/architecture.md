@@ -1,4 +1,4 @@
-# Platform Description
+# Product architecture
 
 This document describes the architecture of the security-oriented technical platform.
 

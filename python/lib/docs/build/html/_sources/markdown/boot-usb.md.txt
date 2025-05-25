@@ -48,6 +48,6 @@ w
 EOF
 ``` 
 
-Format the drive: `# mkdosfs -F32 /dev/sdx1`
-
-Make it bootable with Alpine: `# setup-bootable -vUfs /media/sda /dev/sdx1`, first check whether the ISO image is mounted on `/media/usb` or `/media/sda` (for example).
+- Format the drive: `# mkdosfs -F32 /dev/sdx1`
+- Identify the installation USB disk with `lsblk` (probably `/dev/sdb`)
+- Make it bootable with Alpine: `# setup-bootable -vUfs /media/sda /dev/sdx1`, first check whether the ISO image is mounted on `/media/usb` or `/media/sdb` (for example).

@@ -25,44 +25,7 @@ We strongly *encourage* to urbanize the system with this rule in mind : *One fun
 
 The file `topology.json` lets you to define the domains list and the relations between them, in the case you want to establish communication channels between your domains or to send/receive messages or inputs.
 
-The default typical `topology.json` is:
-
-```
-{
-    "usb": {
-        "use": 1
-    },
-    "gui": {
-        "use": 1,
-        "app-package": "saphir-gui"
-    },
-    "network": {
-        "repositories": [
-            "http://192.168.2.1/depots/alpine/main",
-            "http://192.168.2.1/depots/alpine/community"
-        ],
-        "releases": "http://192.168.2.1/isos/"
-    }
-    "business": {
-        "repository": "https://repository.local/myrepo",
-        "domains": [
-            {
-                "name": "myapp-function1",
-                "package": "myapp-function1",
-                "memory": 4096,
-                "cpu": 0.5
-            },
-            {
-                "name": "myapp-function2",
-                "package": "myapp-function2",
-                "memory": 4096,
-                "cpu": 0.5
-            }
-        ]
-    }
-
-}
-```
+See [topology documentation](topology.md) for details about the file format.
 
 ## Create a product
 

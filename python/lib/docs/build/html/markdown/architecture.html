@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Boot sequence" href="boot-sequence.html" /><link rel="prev" title="Project documentation" href="index.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
-        <title>Platform Description - PSEC 1.0.0 documentation</title>
+        <title>Product architecture - PSEC 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
@@ -202,7 +202,7 @@
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../psec.html">PSEC python documentation</a></li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Project documentation</a><input checked="" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><div class="visually-hidden">Toggle navigation of Project documentation</div><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul class="current">
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Platform Description</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Product architecture</a></li>
 <li class="toctree-l2"><a class="reference internal" href="boot-sequence.html">Boot sequence</a></li>
 <li class="toctree-l2"><a class="reference internal" href="boot-usb.html">Create a Bootable USB Drive</a></li>
 <li class="toctree-l2"><a class="reference internal" href="debugging.html">Debugging</a></li>
@@ -213,6 +213,9 @@
 <li class="toctree-l2"><a class="reference internal" href="provisioning.html">Provisioning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="python-api.html">Python API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tested-hardware.html">Tested hardware</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tested-hardware.html#dell-latitude-e5510">Dell Latitude E5510</a></li>
+<li class="toctree-l2"><a class="reference internal" href="topology.html">Topology</a></li>
 <li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html">Create or Update the Alpine Mirror</a></li>
 </ul>
 </li>
@@ -256,9 +259,21 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="platform-description">
-<h1>Platform Description<a class="headerlink" href="#platform-description" title="Link to this heading">¶</a></h1>
+          <section id="product-architecture">
+<h1>Product architecture<a class="headerlink" href="#product-architecture" title="Link to this heading">¶</a></h1>
 <p>This document describes the architecture of the security-oriented technical platform.</p>
+<section id="overview-of-the-product-architecture">
+<h2>Overview of the product architecture<a class="headerlink" href="#overview-of-the-product-architecture" title="Link to this heading">¶</a></h2>
+<p><img alt="Overview of the product architecture" src="../_images/psec-architecture-overview.png" /></p>
+<p>A product is composed of one ore more domains with their own application module. The modules should be designed according to their level of trust. All modules using external data (communicating with USB drives or the network for example) should be considered as not trustable and should be separated from modules which only manipulate commands and user interfaces.</p>
+<p>The user interface graphical application (GUI) is hosted in the <code class="docutils literal notranslate"><span class="pre">sys-gui</span></code> Domain which has a high level of trust.</p>
+</section>
+<section id="detailed-architecture">
+<h2>Detailed architecture<a class="headerlink" href="#detailed-architecture" title="Link to this heading">¶</a></h2>
+<p><img alt="Detailed architecture" src="../_images/psec-architecture-detailed.png" /></p>
+<p>In the <code class="docutils literal notranslate"><span class="pre">sys-gui</span></code> domain, the graphical user interface application has access to an X server whose display is rendered on a virtual graphics card provided by <code class="docutils literal notranslate"><span class="pre">QEMU</span></code> in the Dom0. The display of <code class="docutils literal notranslate"><span class="pre">QEMU</span></code> is then made in a GTK borderless window in an X server running on the real graphics card.</p>
+<p>The integration of the product GUI is made with the section <code class="docutils literal notranslate"><span class="pre">gui.app-package</span></code> of the <a class="reference internal" href="topology.html"><span class="std std-doc">topology.json</span></a> file.</p>
+</section>
 <section id="virtual-machines-domains">
 <h2>Virtual Machines (Domains)<a class="headerlink" href="#virtual-machines-domains" title="Link to this heading">¶</a></h2>
 <p>The platform includes the following virtual machines:</p>
@@ -272,16 +287,16 @@
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Dom0</p></td>
-<td><p>Domain 0 is a special virtual machine used to manage user domains and interface with the XenBus</p></td>
+<td><p>Domain 0 is a special virtual machine used to manage user domains and interface with the XenBus.</p></td>
 <td><p>High</p></td>
 </tr>
-<tr class="row-odd"><td><p>vm-sys-usb</p></td>
-<td><p>This user domain is responsible for managing USB devices (keyboard, mouse, storage devices) and isolating them from the rest of the system</p></td>
-<td><p>Low</p></td>
+<tr class="row-odd"><td><p>sys-gui</p></td>
+<td><p>This domain displays the product graphical interface.</p></td>
+<td><p>High</p></td>
 </tr>
-<tr class="row-even"><td><p></p></td>
-<td><p></p></td>
-<td><p></p></td>
+<tr class="row-even"><td><p>sys-usb</p></td>
+<td><p>This user domain is responsible for managing USB devices (keyboard, mouse, storage devices) and isolating them from the rest of the system.</p></td>
+<td><p>Low</p></td>
 </tr>
 </tbody>
 </table>
@@ -289,57 +304,33 @@
 <section id="dom0">
 <h3>Dom0<a class="headerlink" href="#dom0" title="Link to this heading">¶</a></h3>
 <p>This section provides technical details about <code class="docutils literal notranslate"><span class="pre">Domain</span> <span class="pre">0</span></code>.</p>
-<p><strong>The XEN toolstack must be installed on Dom0. It is typically provided by the PXE installation during network boot.</strong></p>
 <p>Installed packages:</p>
 <ul class="simple">
-<li><p>python (<code class="docutils literal notranslate"><span class="pre">python3</span></code>)</p></li>
+<li><p>python (<code class="docutils literal notranslate"><span class="pre">psec-core</span></code>)</p></li>
 </ul>
 </section>
-<section id="vm-sys-usb">
-<h3>vm-sys-usb<a class="headerlink" href="#vm-sys-usb" title="Link to this heading">¶</a></h3>
-<p>This section provides technical details about the user domain <code class="docutils literal notranslate"><span class="pre">vm-sys-usb</span></code>.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">vm-sys-usb</span></code> domain provides the following functions via XenStore:</p>
+<section id="sys-usb">
+<h3>sys-usb<a class="headerlink" href="#sys-usb" title="Link to this heading">¶</a></h3>
+<p>This section provides technical details about the core domain <code class="docutils literal notranslate"><span class="pre">sys-usb</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">sys-usb</span></code> domain provides the following functions via a special data channel:</p>
 <ul class="simple">
 <li><p>keyboard input</p></li>
 <li><p>mouse position</p></li>
 <li><p>mouse button states</p></li>
-<li><p>touchscreen position</p></li>
+<li><p>touch position</p></li>
 <li><p>reading the file catalog from a USB device</p></li>
 <li><p>reading a file from a USB device</p></li>
 <li><p>writing a file to a USB device</p></li>
 </ul>
-<p>Resources:</p>
-<div class="table-wrapper colwidths-auto docutils container">
-<table class="docutils align-default">
-<thead>
-<tr class="row-odd"><th class="head"><p>Resource</p></th>
-<th class="head"><p>Capacity</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>RAM</p></td>
-<td><p>400 MB</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<p>Installed packages:</p>
-<ul class="simple">
-<li><p>python3</p></li>
-<li><p>py3-pyserial</p></li>
-<li><p>ntfs-3g</p></li>
-<li><p>evtest (development only)</p></li>
-<li><p>py3-libevdev</p></li>
-</ul>
-<p>Removed files:</p>
-<ul class="simple">
-<li><p>none</p></li>
-</ul>
-<section id="usb-device-detection">
-<h4>USB Device Detection<a class="headerlink" href="#usb-device-detection" title="Link to this heading">¶</a></h4>
-<p>USB device detection is handled by <code class="docutils literal notranslate"><span class="pre">udev</span></code>. A specific rule is added using the <code class="docutils literal notranslate"><span class="pre">99-usbdisks.rules</span></code> file placed in the <code class="docutils literal notranslate"><span class="pre">/etc/udev/rules.d</span></code> directory.</p>
-<p>When a USB device is connected, the <code class="docutils literal notranslate"><span class="pre">mdev-usb-storage</span></code> script is executed. It checks for the presence of the device and creates a mount point in <code class="docutils literal notranslate"><span class="pre">/media/usb</span></code> with the same name as the connected disk. A notification is then sent on the Xenbus via the messaging system.</p>
 </section>
+<section id="sys-gui">
+<h3>sys-gui<a class="headerlink" href="#sys-gui" title="Link to this heading">¶</a></h3>
+<p>This section provides technical details about the core domain <code class="docutils literal notranslate"><span class="pre">sys-gui</span></code>.</p>
+</section>
+<section id="sys-net">
+<h3>sys-net<a class="headerlink" href="#sys-net" title="Link to this heading">¶</a></h3>
+<p>This section provides technical details about the core domain <code class="docutils literal notranslate"><span class="pre">sys-net</span></code>.</p>
+<p><em>This Domain is currently not available.</em></p>
 </section>
 </section>
 </section>
@@ -399,13 +390,14 @@
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">Platform Description</a><ul>
+<li><a class="reference internal" href="#">Product architecture</a><ul>
+<li><a class="reference internal" href="#overview-of-the-product-architecture">Overview of the product architecture</a></li>
+<li><a class="reference internal" href="#detailed-architecture">Detailed architecture</a></li>
 <li><a class="reference internal" href="#virtual-machines-domains">Virtual Machines (Domains)</a><ul>
 <li><a class="reference internal" href="#dom0">Dom0</a></li>
-<li><a class="reference internal" href="#vm-sys-usb">vm-sys-usb</a><ul>
-<li><a class="reference internal" href="#usb-device-detection">USB Device Detection</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#sys-usb">sys-usb</a></li>
+<li><a class="reference internal" href="#sys-gui">sys-gui</a></li>
+<li><a class="reference internal" href="#sys-net">sys-net</a></li>
 </ul>
 </li>
 </ul>
