@@ -12,6 +12,9 @@ You can create an USB disk and use it on multiple platforms to verify their capa
 
 ![Screenshot of PSEC Diag](docs/images/screenshot.png)
 
-## Create an USB disk
+## Create an USB disk (x86 only)
 
-Download the image file of [psec-diag](https://www.alefbet.net/images/psec-diag.img) and recreate the USB disk using `dd`, or `Rufus` for example.
+- Download the image file [psec-diag-latest-x86.7z](https://www.alefbet.net/images/psec-diag-latest-x86.7z).
+- Format the USB disk in FAT32 with MBR (Master boot record) or bootable option.
+- Uncompress the archive file.
+- Copy all the files from the archive to the USB disk.

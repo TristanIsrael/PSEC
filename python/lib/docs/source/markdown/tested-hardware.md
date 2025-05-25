@@ -8,6 +8,7 @@ This document describes tested hardware configurations.
 |--|--|--|--|--|--|--|--|--|
 | Tablet | Durabook | [R8](#durabook-r8) | Intel Core i5 1230U (12) | i915 | Yes | Yes | UEFI | 100% (1) |
 | Laptop | Dell | [Latitude E5510](#dell-latitude-e5510) | Intel Core i5 M560 (4) | i915 | Yes | Yes | BIOS | 100% (1) |
+| Tablet | GETAC | T800 G2 | Atom x7-Z8750 (4) | Integrated Intel HD Graphics | No | No | UEFI | No |
 
 (1) specific configuration is needed.
 
