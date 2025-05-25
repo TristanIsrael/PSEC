@@ -10,9 +10,9 @@ This procedure describes the process of creating a bootable USB drive.
 - Log in as `root`
 - Type `# setup-alpine` and configure the system without disk installation or config storage
   - The script will fail
-- Type `# apk add dosfstools wipefs`
+- Type `# apk add dosfstools wipefs lsblk`
 - Plug in the new USB drive that will become the bootable system
-  - Use `dmesg` to identify the new drive (e.g., `sdx`)
+  - Use `lsblk` to identify the new drive (e.g., `sdx`)
 - Prepare the drive (see the *Bootable USB Drive Preparation* section)
 - Unplug the ISO USB and keep only the new bootable USB drive
 - Reboot from the new bootable USB drive

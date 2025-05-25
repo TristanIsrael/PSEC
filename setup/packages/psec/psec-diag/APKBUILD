@@ -1,8 +1,8 @@
 # Contributor:
 # Maintainer: Tristan Israël <tristan.israel@alefbet.net>
 pkgname=psec-diag
-pkgver=1.0
-pkgrel=1
+pkgver=1.1
+pkgrel=0
 pkgdesc="PSEC - Diagnostic tool"
 url="https://www.alefbet.net/"
 arch="noarch"

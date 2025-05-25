@@ -3,7 +3,7 @@
 name="psec-diag"
 
 depend() {
-    before *
+    after udev-trigger
 }
 
 start() {

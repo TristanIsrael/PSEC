@@ -7,17 +7,8 @@ Item {
 
     property bool mode_paysage: width < height
 
-    //width: 1280
-    //height: 800
     anchors.fill: parent
     visible: true    
-
-    FontLoader {
-        id: customFont
-        source: "fonts/MyCustomFont.ttf"  // chemin relatif vers ta police
-    }
-    //font.family: "Roboto"
-    //font.pointSize: 18
 
     MainScreen {
         anchors.fill: parent

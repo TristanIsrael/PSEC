@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Components
+import net.alefbet
 
 Rectangle {
     implicitWidth: 800
@@ -108,7 +109,7 @@ Rectangle {
             }
 
             PButton {
-                text: qsTr("Quit app")
+                text: qsTr("Quit app (Ctrl-C)")
 
                 onClicked: function() {
                     Qt.quit()

@@ -1,13 +1,12 @@
 import cpuinfo
 import subprocess
-import os
-import psutil
+import re
 from Singleton import SingletonMeta
 from PySide6.QtCore import QObject, Property, Slot
 
 class AppController(QObject):
 
-    def __get_system_info(self) -> dict:        
+    def __get_system_info(self) -> dict:
         cpu = cpuinfo.get_cpu_info()
         return cpu
     
@@ -18,7 +17,12 @@ class AppController(QObject):
         try:
             result = subprocess.run(cmd, shell=True, capture_output=True, text=True, check=True)
 
-            if result.returncode == 0 and "DMAR: Intel(R) Virtualization Technology for Directed I/O" in result.stdout:
+            sentences = [
+                "DMAR: Intel(R) Virtualization Technology for Directed I/O",
+                "DMAR: IOMMU enabled"
+            ]
+
+            if result.returncode == 0 and any(sentence in result.stdout for sentence in sentences):
                 return True
         except subprocess.CalledProcessError:
             return False
@@ -39,18 +43,47 @@ class AppController(QObject):
         return False
     
     def has_hvm(self):
-        return os.path.exists("/dev/kvm")
+        result = subprocess.run(['xl', 'info'], capture_output=True, text=True)
+        for line in result.stdout.splitlines():
+            if line.startswith('virt_caps'):
+                return 'hvm_directio' in line
+        return False
+    
+    def has_vtx(self):
+        result = subprocess.run(['xl', 'dmesg'], capture_output=True, text=True)
+        return "VMX enabled" in result.stdout
     
     def get_installed_memory_in_gb(self):
-        mem = psutil.virtual_memory()
-        total_gb = mem.total / (1024 ** 3)
-        return total_gb
+        try:
+            result = subprocess.run(['xl', 'info'], stdout=subprocess.PIPE, text=True, check=True)
+            match = re.search(r'^total_memory\s*:\s*(\d+)', result.stdout, re.MULTILINE)
+            if match:
+                total_mb = int(match.group(1))
+                return total_mb / 1024 
+            else:
+                raise ValueError("total_memory not found in xl info.")
+        except subprocess.CalledProcessError as e:
+            raise RuntimeError(f"Error during execution of xl info : {e}")
     
+    def get_bogomips(self):
+        total = 0.0
+        with open("/proc/cpuinfo", "r") as f:
+            for line in f:
+                if "bogomips" in line.lower():
+                    try:
+                        value = float(line.split(":")[1])
+                        total += value
+                    except (IndexError, ValueError):
+                        pass
+        return total
+
     @Slot()
     def shutdown(self):
-        subprocess.run("shutdown", check=False)
+        subprocess.run("poweroff", check=False)
 
     cpuInfo = Property(type=dict, fget=__get_system_info, constant=True)
     hasVTd = Property(type=bool, fget=has_vtd, constant=True)
+    hasVTx = Property(type=bool, fget=has_vtx, constant=True)
     hasHVM = Property(type=bool, fget=has_hvm, constant=True)
     installedMemory = Property(type=float, fget=get_installed_memory_in_gb, constant=True)
+    bogoMips = Property(type=float, fget=get_bogomips, constant=True)

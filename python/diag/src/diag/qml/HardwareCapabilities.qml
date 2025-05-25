@@ -57,8 +57,8 @@ ColumnLayout {
 
     PCapability {
         text: qsTr("VT-x")
-        state: flags["vmx"] !== undefined ? qsTr("OK") : qsTr("KO")
-        stateColor: flags["vmx"] !== undefined ? Colors.green : Colors.red
+        state: AppController.hasVTx ? qsTr("OK") : qsTr("KO")
+        stateColor: AppController.hasVTx !== undefined ? Colors.green : Colors.red
     }
 
     PCapability {
@@ -66,6 +66,11 @@ ColumnLayout {
         state: AppController.installedMemory >= 4 ? qsTr("OK") : AppController.installedMemory >= 2 ? qsTr("Passable") : "KO"
         stateColor: AppController.installedMemory >= 4 ? Colors.green : AppController.installedMemory >= 2 ? Colors.yellow : Colors.red
         stateDescription: qsTr("Installed memory: %1 GB").arg(AppController.installedMemory)
+    }
+
+    PCapability {
+        text: qsTr("BogoMIPS")
+        state: AppController.bogoMips        
     }
 
     Item {

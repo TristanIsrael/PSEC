@@ -13,9 +13,9 @@ from AppController import AppController
 
 class MyView(QQuickView):
     def keyPressEvent(self, event: QKeyEvent):
-        # Vérifie si Ctrl+C est pressé
-        print(event.modifiers(), Qt.ControlModifier, event.key())
-        if event.modifiers() == Qt.ControlModifier and event.key() == Qt.Key_C:            
+        # print(event.modifiers(), Qt.ControlModifier, event.key())
+        if event.modifiers() == Qt.ControlModifier and event.key() == Qt.Key_C:
+            # Ctrl+C has been pressed
             self.close()
             QGuiApplication.quit()
         else:

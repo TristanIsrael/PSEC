@@ -213,6 +213,8 @@
 <li class="toctree-l2"><a class="reference internal" href="provisioning.html">Provisioning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="python-api.html">Python API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tested-hardware.html">Tested hardware</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tested-hardware.html#dell-latitude-e5510">Dell Latitude E5510</a></li>
 <li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html">Create or Update the Alpine Mirror</a></li>
 </ul>
 </li>
@@ -271,10 +273,10 @@
 <li><p>The script will fail</p></li>
 </ul>
 </li>
-<li><p>Type <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">apk</span> <span class="pre">add</span> <span class="pre">dosfstools</span> <span class="pre">wipefs</span></code></p></li>
+<li><p>Type <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">apk</span> <span class="pre">add</span> <span class="pre">dosfstools</span> <span class="pre">wipefs</span> <span class="pre">lsblk</span></code></p></li>
 <li><p>Plug in the new USB drive that will become the bootable system</p>
 <ul>
-<li><p>Use <code class="docutils literal notranslate"><span class="pre">dmesg</span></code> to identify the new drive (e.g., <code class="docutils literal notranslate"><span class="pre">sdx</span></code>)</p></li>
+<li><p>Use <code class="docutils literal notranslate"><span class="pre">lsblk</span></code> to identify the new drive (e.g., <code class="docutils literal notranslate"><span class="pre">sdx</span></code>)</p></li>
 </ul>
 </li>
 <li><p>Prepare the drive (see the <em>Bootable USB Drive Preparation</em> section)</p></li>

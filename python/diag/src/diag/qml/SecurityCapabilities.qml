@@ -2,9 +2,13 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Components
+import net.alefbet
 
 ColumnLayout {
     id: root
+
+    property var cpuInfo: AppController.cpuInfo
+    property var cpuFlags: cpuInfo["flags"]
 
     spacing: 20
 
@@ -23,8 +27,8 @@ ColumnLayout {
     
     PCapability {
         text: qsTr("Page tables")
-        state: flags["ept"] !== undefined ? qsTr("OK") : qsTr("KO")
-        stateColor: flags["ept"] !== undefined ? Colors.green : Colors.yellow
+        state: cpuFlags["ept"] !== undefined ? qsTr("OK") : qsTr("KO")
+        stateColor: cpuFlags["ept"] !== undefined ? Colors.green : Colors.yellow
     }
 
     PCapability {
