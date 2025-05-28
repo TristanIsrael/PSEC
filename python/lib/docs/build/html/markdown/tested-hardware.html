@@ -219,7 +219,6 @@
 <li class="toctree-l2"><a class="reference internal" href="sensors.html">Sensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Tested hardware</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#dell-latitude-e5510">Dell Latitude E5510</a></li>
 <li class="toctree-l2"><a class="reference internal" href="topology.html">Topology</a></li>
 <li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html">Create or Update the Alpine Mirror</a></li>
 </ul>
@@ -292,7 +291,7 @@
 <td><p>Yes</p></td>
 <td><p>Yes</p></td>
 <td><p>UEFI</p></td>
-<td><p>100% (1)</p></td>
+<td><p>Excellent</p></td>
 </tr>
 <tr class="row-odd"><td><p>Laptop</p></td>
 <td><p>Dell</p></td>
@@ -302,7 +301,7 @@
 <td><p>Yes</p></td>
 <td><p>Yes</p></td>
 <td><p>BIOS</p></td>
-<td><p>100% (1)</p></td>
+<td><p>Excellent</p></td>
 </tr>
 <tr class="row-even"><td><p>Tablet</p></td>
 <td><p>GETAC</p></td>
@@ -314,25 +313,47 @@
 <td><p>UEFI</p></td>
 <td><p>No</p></td>
 </tr>
+<tr class="row-odd"><td><p>Laptop</p></td>
+<td><p>HP</p></td>
+<td><p><a class="reference internal" href="#hp-zbook-15-g3"><span class="xref myst">ZBook 15 G3</span></a></p></td>
+<td><p>Intel Core i5-6440HQ (4)</p></td>
+<td><p>Integrated Intel HD Graphics 530</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>UEFI</p></td>
+<td><p>Excellent</p></td>
+</tr>
+<tr class="row-even"><td><p>Laptop</p></td>
+<td><p>Dell</p></td>
+<td><p><a class="reference internal" href="#dell-precision-m4800"><span class="xref myst">Precision M4800</span></a></p></td>
+<td><p>Intel Core i5-4200MCPU</p></td>
+<td><p>Intel HD Graphics + Radeon</p></td>
+<td><p>Yes</p></td>
+<td><p>No</p></td>
+<td><p>UEFI</p></td>
+<td><p>Poor (2)</p></td>
+</tr>
 </tbody>
 </table>
 </div>
-<p>(1) specific configuration is needed.</p>
+<ul class="simple">
+<li><p>(1) Specific configuration is needed.</p></li>
+<li><p>(2) Without IOMMU the platform is not secured enough.</p></li>
+</ul>
 </section>
 <section id="durabook-r8">
 <h2>Durabook R8<a class="headerlink" href="#durabook-r8" title="Link to this heading">¶</a></h2>
 <p>Quirks:</p>
 <ul class="simple">
 <li><p>This tablet is know to work with the exclusion of the PCI bus <code class="docutils literal notranslate"><span class="pre">00:0d.0</span></code> which causes an hangout during the boot.</p></li>
-<li><p>Kernel options: <code class="docutils literal notranslate"><span class="pre">no-real-mode</span> <span class="pre">edd=off</span></code></p></li>
+<li><p>XEN kernel options: <code class="docutils literal notranslate"><span class="pre">no-real-mode</span> <span class="pre">edd=off</span></code></p></li>
 <li><p>BIOS settings: disable VMD</p></li>
 </ul>
 <p>Notes:</p>
-<p>All peripherals are accessible as USB devices.</p>
-</section>
+<p>All peripherals are accessible as USB devices, not PCI.</p>
 </section>
 <section id="dell-latitude-e5510">
-<h1>Dell Latitude E5510<a class="headerlink" href="#dell-latitude-e5510" title="Link to this heading">¶</a></h1>
+<h2>Dell Latitude E5510<a class="headerlink" href="#dell-latitude-e5510" title="Link to this heading">¶</a></h2>
 <p>This system must be booted on BIOS.</p>
 <p>Disable Intel graphics : append <code class="docutils literal notranslate"><span class="pre">nomodeset</span> <span class="pre">modprobe.blacklist=i915</span></code> to the kernel command line.</p>
 <p>Enable Intel graphics requires to disable IOMMU for graphics: append <code class="docutils literal notranslate"><span class="pre">intel_iommu=on</span> <span class="pre">iommu=no-igfx</span></code> to both XEN and Linux kernel command lines.</p>
@@ -353,6 +374,17 @@
 <span class="n">MENU</span> <span class="n">SEPARATOR</span>
 </pre></div>
 </div>
+</section>
+<section id="hp-zbook-15-g3">
+<h2>HP ZBook 15 G3<a class="headerlink" href="#hp-zbook-15-g3" title="Link to this heading">¶</a></h2>
+<p>Disable Intel graphics : append <code class="docutils literal notranslate"><span class="pre">nomodeset</span> <span class="pre">modprobe.blacklist=i915</span></code> to the kernel command line.</p>
+<p>Enable Intel graphics requires to disable IOMMU for graphics: append <code class="docutils literal notranslate"><span class="pre">intel_iommu=on</span> <span class="pre">iommu=no-igfx</span></code> to both XEN and Linux kernel command lines.</p>
+</section>
+<section id="dell-precision-m4800">
+<h2>Dell Precision M4800<a class="headerlink" href="#dell-precision-m4800" title="Link to this heading">¶</a></h2>
+<p>Disable Intel graphics : append <code class="docutils literal notranslate"><span class="pre">nomodeset</span> <span class="pre">modprobe.blacklist=i915</span></code> to the kernel command line.</p>
+<p>Enable Intel graphics requires to disable IOMMU for graphics: append <code class="docutils literal notranslate"><span class="pre">intel_iommu=on</span> <span class="pre">iommu=no-igfx</span></code> to both XEN and Linux kernel command lines.</p>
+</section>
 </section>
 
         </article>
@@ -413,9 +445,11 @@
 <li><a class="reference internal" href="#">Tested hardware</a><ul>
 <li><a class="reference internal" href="#synthesis">Synthesis</a></li>
 <li><a class="reference internal" href="#durabook-r8">Durabook R8</a></li>
+<li><a class="reference internal" href="#dell-latitude-e5510">Dell Latitude E5510</a></li>
+<li><a class="reference internal" href="#hp-zbook-15-g3">HP ZBook 15 G3</a></li>
+<li><a class="reference internal" href="#dell-precision-m4800">Dell Precision M4800</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#dell-latitude-e5510">Dell Latitude E5510</a></li>
 </ul>
 
           </div>

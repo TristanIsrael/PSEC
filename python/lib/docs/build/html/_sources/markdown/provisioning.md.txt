@@ -28,7 +28,7 @@ Manual provisioning consists of going through an installation process step-by-st
   - Run `# cd /etc/apk/keys` then `# wget [PSEC repository URL]/psec.rsa.pub`, and repeat the process for other product-specific repositories.  
   - Run `# apk update`.
 
-7 - (Optional) Allow the `admin` user to execute root commands  
+7 - (Optional, only in development phase) Allow the `admin` user to execute root commands  
   - Run `# apk add sudo`, then `# visudo`  
   - Edit the line `# %wheel ALL=(ALL:ALL) NOPASSWD: ALL` and remove the `#` to uncomment it.  
   - Save and exit with `:wq`  

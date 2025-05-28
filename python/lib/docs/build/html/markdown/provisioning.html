@@ -219,7 +219,6 @@
 <li class="toctree-l2"><a class="reference internal" href="sensors.html">Sensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tested-hardware.html">Tested hardware</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tested-hardware.html#dell-latitude-e5510">Dell Latitude E5510</a></li>
 <li class="toctree-l2"><a class="reference internal" href="topology.html">Topology</a></li>
 <li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html">Create or Update the Alpine Mirror</a></li>
 </ul>
@@ -294,7 +293,7 @@
 <li><p>Run <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">cd</span> <span class="pre">/etc/apk/keys</span></code> then <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">wget</span> <span class="pre">[PSEC</span> <span class="pre">repository</span> <span class="pre">URL]/psec.rsa.pub</span></code>, and repeat the process for other product-specific repositories.</p></li>
 <li><p>Run <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">apk</span> <span class="pre">update</span></code>.</p></li>
 </ul>
-<p>7 - (Optional) Allow the <code class="docutils literal notranslate"><span class="pre">admin</span></code> user to execute root commands</p>
+<p>7 - (Optional, only in development phase) Allow the <code class="docutils literal notranslate"><span class="pre">admin</span></code> user to execute root commands</p>
 <ul class="simple">
 <li><p>Run <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">apk</span> <span class="pre">add</span> <span class="pre">sudo</span></code>, then <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">visudo</span></code></p></li>
 <li><p>Edit the line <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">%wheel</span> <span class="pre">ALL=(ALL:ALL)</span> <span class="pre">NOPASSWD:</span> <span class="pre">ALL</span></code> and remove the <code class="docutils literal notranslate"><span class="pre">#</span></code> to uncomment it.</p></li>
