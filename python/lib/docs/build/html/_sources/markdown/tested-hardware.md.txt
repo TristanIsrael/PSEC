@@ -13,18 +13,18 @@ This document describes tested hardware configurations.
 | Laptop | Dell | [Precision M4800](#dell-precision-m4800) | Intel Core i5-4200MCPU | Intel HD Graphics + Radeon | Yes | No | UEFI | Poor (2) |
 
 - (1) Specific configuration is needed.
-- (2) Without IOMMU the platform is not secured enough.
+- (2) Without IOMMU the isolation between components is reduced.
 
 ## Durabook R8
 
 Quirks:
-- This tablet is know to work with the exclusion of the PCI bus `00:0d.0` which causes an hangout during the boot.
-- XEN kernel options: `no-real-mode edd=off`
-- BIOS settings: disable VMD
+- This tablet is known to work with the exclusion of the PCI bus `00:0d.0` which causes an hangout during the boot.
+- XEN kernel options: `no-real-mode edd=off`.
+- BIOS settings: disable VMD.
 
 Notes:
 
-All peripherals are accessible as USB devices, not PCI.
+- All peripherals are accessible as USB devices, not PCI, except WLAN card.
 
 ## Dell Latitude E5510
 

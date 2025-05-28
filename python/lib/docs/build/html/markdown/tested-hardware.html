@@ -338,19 +338,21 @@
 </div>
 <ul class="simple">
 <li><p>(1) Specific configuration is needed.</p></li>
-<li><p>(2) Without IOMMU the platform is not secured enough.</p></li>
+<li><p>(2) Without IOMMU the isolation between components is reduced.</p></li>
 </ul>
 </section>
 <section id="durabook-r8">
 <h2>Durabook R8<a class="headerlink" href="#durabook-r8" title="Link to this heading">¶</a></h2>
 <p>Quirks:</p>
 <ul class="simple">
-<li><p>This tablet is know to work with the exclusion of the PCI bus <code class="docutils literal notranslate"><span class="pre">00:0d.0</span></code> which causes an hangout during the boot.</p></li>
-<li><p>XEN kernel options: <code class="docutils literal notranslate"><span class="pre">no-real-mode</span> <span class="pre">edd=off</span></code></p></li>
-<li><p>BIOS settings: disable VMD</p></li>
+<li><p>This tablet is known to work with the exclusion of the PCI bus <code class="docutils literal notranslate"><span class="pre">00:0d.0</span></code> which causes an hangout during the boot.</p></li>
+<li><p>XEN kernel options: <code class="docutils literal notranslate"><span class="pre">no-real-mode</span> <span class="pre">edd=off</span></code>.</p></li>
+<li><p>BIOS settings: disable VMD.</p></li>
 </ul>
 <p>Notes:</p>
-<p>All peripherals are accessible as USB devices, not PCI.</p>
+<ul class="simple">
+<li><p>All peripherals are accessible as USB devices, not PCI, except WLAN card.</p></li>
+</ul>
 </section>
 <section id="dell-latitude-e5510">
 <h2>Dell Latitude E5510<a class="headerlink" href="#dell-latitude-e5510" title="Link to this heading">¶</a></h2>
