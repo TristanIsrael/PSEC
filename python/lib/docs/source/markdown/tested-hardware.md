@@ -6,24 +6,27 @@ This document describes tested hardware configurations.
 
 | Type | Manufacturer | Model | CPU (cores) | GPU | Virt. | IOMMU | Boot mode | Compatibility |
 |--|--|--|--|--|--|--|--|--|
-| Tablet | Durabook | [R8](#durabook-r8) | Intel Core i5 1230U (12) | i915 | Yes | Yes | UEFI | 100% (1) |
-| Laptop | Dell | [Latitude E5510](#dell-latitude-e5510) | Intel Core i5 M560 (4) | i915 | Yes | Yes | BIOS | 100% (1) |
+| Tablet | Durabook | [R8](#durabook-r8) | Intel Core i5 1230U (12) | i915 | Yes | Yes | UEFI | Excellent |
+| Laptop | Dell | [Latitude E5510](#dell-latitude-e5510) | Intel Core i5 M560 (4) | i915 | Yes | Yes | BIOS | Excellent |
 | Tablet | GETAC | T800 G2 | Atom x7-Z8750 (4) | Integrated Intel HD Graphics | No | No | UEFI | No |
+| Laptop | HP | [ZBook 15 G3](#hp-zbook-15-g3) | Intel Core i5-6440HQ (4) | Integrated Intel HD Graphics 530 | Yes | Yes | UEFI | Excellent |
+| Laptop | Dell | [Precision M4800](#dell-precision-m4800) | Intel Core i5-4200MCPU | Intel HD Graphics + Radeon | Yes | No | UEFI | Poor (2) |
 
-(1) specific configuration is needed.
+- (1) Specific configuration is needed.
+- (2) Without IOMMU the platform is not secured enough.
 
 ## Durabook R8
 
 Quirks:
 - This tablet is know to work with the exclusion of the PCI bus `00:0d.0` which causes an hangout during the boot.
-- Kernel options: `no-real-mode edd=off`
+- XEN kernel options: `no-real-mode edd=off`
 - BIOS settings: disable VMD
 
 Notes:
 
-All peripherals are accessible as USB devices.
+All peripherals are accessible as USB devices, not PCI.
 
-# Dell Latitude E5510
+## Dell Latitude E5510
 
 This system must be booted on BIOS.
 
@@ -48,3 +51,15 @@ LABEL xen-lts
 
 MENU SEPARATOR
 ```
+
+## HP ZBook 15 G3
+
+Disable Intel graphics : append `nomodeset modprobe.blacklist=i915` to the kernel command line.
+
+Enable Intel graphics requires to disable IOMMU for graphics: append `intel_iommu=on iommu=no-igfx` to both XEN and Linux kernel command lines.
+
+## Dell Precision M4800
+
+Disable Intel graphics : append `nomodeset modprobe.blacklist=i915` to the kernel command line.
+
+Enable Intel graphics requires to disable IOMMU for graphics: append `intel_iommu=on iommu=no-igfx` to both XEN and Linux kernel command lines.

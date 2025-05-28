@@ -3,7 +3,8 @@
 name="psec-diag"
 
 depend() {
-    after xenstored udev-trigger
+    need xenstored udev-trigger
+    after *
 }
 
 start() {

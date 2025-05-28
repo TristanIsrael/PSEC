@@ -58,7 +58,7 @@ ColumnLayout {
     PCapability {
         text: qsTr("VT-x")
         state: AppController.hasVTx ? qsTr("OK") : qsTr("KO")
-        stateColor: AppController.hasVTx !== undefined ? Colors.green : Colors.red
+        stateColor: AppController.hasVTx ? Colors.green : Colors.red
     }
 
     PCapability {
