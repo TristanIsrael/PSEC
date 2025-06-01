@@ -4,16 +4,21 @@ This document describes tested hardware configurations.
 
 ## Synthesis
 
-| Type | Manufacturer | Model | CPU (cores) | GPU | Virt. | IOMMU | Boot mode | Compatibility |
-|--|--|--|--|--|--|--|--|--|
-| Tablet | Durabook | [R8](#durabook-r8) | Intel Core i5 1230U (12) | i915 | Yes | Yes | UEFI | Excellent |
-| Laptop | Dell | [Latitude E5510](#dell-latitude-e5510) | Intel Core i5 M560 (4) | i915 | Yes | Yes | BIOS | Excellent |
-| Tablet | GETAC | T800 G2 | Atom x7-Z8750 (4) | Integrated Intel HD Graphics | No | No | UEFI | No |
-| Laptop | HP | [ZBook 15 G3](#hp-zbook-15-g3) | Intel Core i5-6440HQ (4) | Integrated Intel HD Graphics 530 | Yes | Yes | UEFI | Excellent |
-| Laptop | Dell | [Precision M4800](#dell-precision-m4800) | Intel Core i5-4200MCPU | Intel HD Graphics + Radeon | Yes | No | UEFI | Poor (2) |
+| Type | Manufacturer | Model | CPU (cores) | GPU | Virt. | IOMMU | EPT | Boot mode | Compatibility |
+|--|--|--|--|--|--|--|--|--|--|
+| Laptop | Dell | [Latitude E5510](#dell-latitude-e5510) | Intel Core i5 M560 (4) | i915 | Yes | Yes | | BIOS | ★★★★★ |
+| Laptop | Dell | [Precision M4800](#dell-precision-m4800) | Intel Core i5-4200MCPU | Intel HD Graphics + Radeon | Yes | No | | UEFI | ★☆☆☆☆ (2) |
+| Laptop | Dell | VOSTRO V131 | Intel Core i5-2410M | Intel HD Graphics 3000 | Yes | No | | UEFI | ★☆☆☆☆ (2) |
+| Laptop | Dell | VOSTRO V131 | Intel Celeron ULV 847 | Intel HD Graphics 3000 | Yes | No | No | UEFI | ★☆☆☆☆ (2) |
+| Desktop | Dell | Optiplex 3020 | Intel Core i3-4150 (2) | Intel HD Graphics 4400 | Yes | No |  | BIOS | ★☆☆☆☆ (2) |
+| Tablet | Durabook | [R8](#durabook-r8) | Intel Core i5 1230U (12) | i915 | Yes | Yes | | UEFI | ★★★★★ |
+| Laptop | HP | [ZBook 15 G3](#hp-zbook-15-g3) | Intel Core i5-6440HQ (4) | Intel HD Graphics 530 | Yes | Yes | | UEFI | ★★★★★ |
+| Desktop | HP | Compaq 6300 Pro MT | Intel Core i5-3470 (4) | Intel HD Graphics 2500 | Yes | Yes | | | ★★★★★ (3) |
+| Tablet | GETAC | T800 G2 | Atom x7-Z8750 (4) | Integrated Intel HD Graphics | No | No | | UEFI | ☆☆☆☆☆ |
 
 - (1) Specific configuration is needed.
 - (2) Without IOMMU the isolation between components is reduced.
+- (3) Not tested yet.
 
 ## Durabook R8
 
