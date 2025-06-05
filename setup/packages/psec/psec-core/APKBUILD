@@ -52,6 +52,7 @@ conf/rc.conf
 conf/motd
 conf/grub/grub.default
 conf/grub/grub.cfg-durabook-r8
+conf/10-stty-cols.sh
 
 python/rotate-screen.py
 python/create-domains.py
@@ -113,6 +114,7 @@ package() {
     #install -D -m644 "$srcdir"/grub.cfg-durabook-r8 "$pkgdir"/boot/grub/grub.cfg
     install -D -m644 "$srcdir"/rc.conf "$pkgdir/etc/rc.conf"
     install -D -m644 "$srcdir"/constants.sh "$pkgdir/$PSEC_CONFDIR"/constants.sh
+    install -D -m644 "$srcdir"/10-stty-cols.sh "$pkgdir/etc/profile.d"/10-stty-cols.sh
         
     #install -D -m755 "$srcdir"/connect-to-gui.initd "$pkgdir"/etc/init.d/connect-to-gui
     #install -D -m644 "$srcdir"/sys-usb.conf "$pkgdir/$PSEC_CONFDIR/xen/sys-usb.conf"
@@ -163,5 +165,5 @@ package() {
     install -D -m755 "$srcdir"/create-tty-tunnel.sh "$pkgdir/$PSEC_BINDIR"/create-tty-tunnel.sh
     install -D -m755 "$srcdir"/create-tty-terminal.sh "$pkgdir/$PSEC_BINDIR"/create-tty-terminal.sh
     install -D -m755 "$srcdir"/start-mqtt-logger.sh "$pkgdir/$PSEC_BINDIR"/start-mqtt-logger.sh
-    install -D -m644 "$srcdir"/motd "$pkgdir/etc/motd"
+    install -D -m755 "$srcdir"/motd "$pkgdir/etc/motd"
 }

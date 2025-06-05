@@ -48,6 +48,9 @@ rc-update add orchestrator
 
 rc-update add debug
 
+# Re-enable colored prompt
+mv /etc/profile.d/color_prompt.sh.disabled /etv/profile.d/color_prompt.sh
+
 # finish-core-init est exécuté par le script post-install du produit...
 #/usr/lib/psec/bin/finish-core-init.sh
 
