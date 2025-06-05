@@ -122,20 +122,19 @@ class SerialMQTTClient(mqtt.Client):
                 return
             
             # if bytes are pending do not wait in select
-            #pending_bytes = self._sock.pending()
-            #if pending_bytes > 0:
-            #    timeout = 0.0
+            pending_bytes = self._sock.pending()
+            if pending_bytes > 0:
+                timeout = 0.0
 
-            rlist, wlist, _ = select.select([self._sock], [self._sock], [], timeout)
+            rlist, _, _ = select.select([self._sock], [], [], timeout)
 
             if rlist and self._sock.in_waiting() > 0:
-                print(self._sock.in_waiting())
                 rc = self.loop_read()
                 if rc != MQTTErrorCode.MQTT_ERR_SUCCESS:
                     print(f"Read error {rc}")
                     break
 
-            if self.want_write() and wlist:
+            if self.want_write():
                 rc = self.loop_write()
                 if rc != MQTTErrorCode.MQTT_ERR_SUCCESS:
                     print(f"Write error {rc}")
