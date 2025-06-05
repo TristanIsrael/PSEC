@@ -480,36 +480,36 @@ class Api(metaclass=SingletonMeta):
                     "os": {
                         "name": "Linux", 
                         "release": "6.12.20-0-lts", 
-                        "version": "#1-Alpine SMP PREEMPT_DYNAMIC 2025-03-24 08:09:11"}, 
-                        "machine": {
-                            "arch": "x86_64", 
-                            "processor": "", 
-                            "platform": "Linux-6.12.20-0-lts-x86_64-with", 
-                            "cpu": {
-                                "count": 12, 
-                                "freq_current": 1689.5970000000004, 
-                                "freq_min": 0.0, 
-                                "freq_max": 0.0, 
-                                "percent": 0.0
-                            }, 
-                            "memory": {
-                                "total": 405987328, 
-                                "available": 103829504, 
-                                "percent": 74.4, 
-                                "used": 252207104, 
-                                "free": 20271104
-                            }, 
-                            "load": {
-                                "1": 0.4306640625, 
-                                "5": 0.16650390625, 
-                                "15": 0.0595703125
-                            }
+                        "version": "#1-Alpine SMP PREEMPT_DYNAMIC 2025-03-24 08:09:11"
+                    }, 
+                    "machine": {
+                        "arch": "x86_64", 
+                        "processor": "", 
+                        "platform": "Linux-6.12.20-0-lts-x86_64-with", 
+                        "cpu": {
+                            "count": 12, 
+                            "freq_current": 1689.5970000000004, 
+                            "freq_min": 0.0, 
+                            "freq_max": 0.0, 
+                            "percent": 0.0
                         }, 
-                        "boot_time": 1747205332.0, 
-                        "uuid": "11ec0800-4fb9-11ef-bd38-ad993f2e7700"
-                    }
+                        "memory": {
+                            "total": 405987328, 
+                            "available": 103829504, 
+                            "percent": 74.4, 
+                            "used": 252207104, 
+                            "free": 20271104
+                        }, 
+                        "load": {
+                            "1": 0.4306640625, 
+                            "5": 0.16650390625, 
+                            "15": 0.0595703125
+                        }
+                    }, 
+                    "boot_time": 1747205332.0, 
+                    "uuid": "11ec0800-4fb9-11ef-bd38-ad993f2e7700"
                 }
-            }
+            }        
 
         The response is provided on the topic :attr:`Topic.SYSTEM_INFO`
         """

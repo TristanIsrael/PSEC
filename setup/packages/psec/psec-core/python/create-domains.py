@@ -1,5 +1,6 @@
 import json, sys, subprocess, multiprocessing
 from configparser import ConfigParser
+import os
 
 class DomainsFactory:
     topology:dict = None
@@ -7,7 +8,8 @@ class DomainsFactory:
     #alpine_repo = ""
 
     def __init__(self, topology:dict):
-        self.topology = topology    
+        self.topology = topology
+        self.__cpu_count = os.cpu_count()
         #self.alpine_repo = alpine_repo
 
     def create_domains(self):
@@ -36,7 +38,7 @@ class DomainsFactory:
     def __create_domd_usb(self):
         print("Create Driver Domain USB")
 
-        conf = self.__create_domain_sys_usb(memory_in_mb=500, nb_cpus=1)
+        conf = self.__create_domain_sys_usb(memory_in_mb=500, nb_cpus=4 if self.__cpu_count >= 4 else min(self.__cpu_count /2, 1))
 
         if conf is not None:
             with open('/etc/psec/xen/sys-usb.conf', 'w') as f:
@@ -54,7 +56,7 @@ class DomainsFactory:
                 memory = json_memory
                 print("Setting {} MB for memory".format(memory))
 
-        conf = self.__create_domain_sys_gui(memory_in_mb=memory, nb_cpus=1)
+        conf = self.__create_domain_sys_gui(memory_in_mb=memory, nb_cpus=4 if self.__cpu_count >= 4 else min(self.__cpu_count /2, 1))
 
         if conf is not None:
             with open('/etc/psec/xen/sys-gui.conf', 'w') as f:

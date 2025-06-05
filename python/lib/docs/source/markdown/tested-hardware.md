@@ -4,21 +4,23 @@ This document describes tested hardware configurations.
 
 ## Synthesis
 
-| Type | Manufacturer | Model | CPU (cores) | GPU | Virt. | IOMMU | EPT | Boot mode | Compatibility |
+| Type | Manufacturer | Model | CPU (cores) | GPU | Virt. | IOMMU | EPT (4) | Boot mode | Compatibility |
 |--|--|--|--|--|--|--|--|--|--|
-| Laptop | Dell | [Latitude E5510](#dell-latitude-e5510) | Intel Core i5 M560 (4) | i915 | Yes | Yes | | BIOS | ★★★★★ |
-| Laptop | Dell | [Precision M4800](#dell-precision-m4800) | Intel Core i5-4200MCPU | Intel HD Graphics + Radeon | Yes | No | | UEFI | ★☆☆☆☆ (2) |
-| Laptop | Dell | VOSTRO V131 | Intel Core i5-2410M | Intel HD Graphics 3000 | Yes | No | | UEFI | ★☆☆☆☆ (2) |
-| Laptop | Dell | VOSTRO V131 | Intel Celeron ULV 847 | Intel HD Graphics 3000 | Yes | No | No | UEFI | ★☆☆☆☆ (2) |
-| Desktop | Dell | Optiplex 3020 | Intel Core i3-4150 (2) | Intel HD Graphics 4400 | Yes | No |  | BIOS | ★☆☆☆☆ (2) |
-| Tablet | Durabook | [R8](#durabook-r8) | Intel Core i5 1230U (12) | i915 | Yes | Yes | | UEFI | ★★★★★ |
-| Laptop | HP | [ZBook 15 G3](#hp-zbook-15-g3) | Intel Core i5-6440HQ (4) | Intel HD Graphics 530 | Yes | Yes | | UEFI | ★★★★★ |
-| Desktop | HP | Compaq 6300 Pro MT | Intel Core i5-3470 (4) | Intel HD Graphics 2500 | Yes | Yes | | | ★★★★★ (3) |
-| Tablet | GETAC | T800 G2 | Atom x7-Z8750 (4) | Integrated Intel HD Graphics | No | No | | UEFI | ☆☆☆☆☆ |
+| Laptop | Dell | [Latitude E5510](#dell-latitude-e5510) | Intel Core i5-560M (2) | i915 | Yes | Yes | No | BIOS | ★★★★★ |
+| Laptop | Dell | [Precision M4800](#dell-precision-m4800) | Intel Core i5-4200M (2) | Intel HD Graphics + Radeon | Yes | No | No | UEFI | ★☆☆☆☆ (2) |
+| Laptop | Dell | VOSTRO V131 | Intel Core i5-2410M (2) | Intel HD Graphics 3000 | Yes | No | Yes | UEFI | ★☆☆☆☆ (2) |
+| Laptop | Dell | VOSTRO V131 | Intel Celeron ULV 847 (2) | Intel HD Graphics 3000 | Yes | No | No | UEFI | ★☆☆☆☆ (2) |
+| Desktop | Dell | Optiplex 3020 | Intel Core i3-4150 (2) | Intel HD Graphics 4400 | Yes | No | Yes | BIOS | ★☆☆☆☆ (2) |
+| Tablet | Durabook | [R8](#durabook-r8) | Intel Core i5 1230U (12) | i915 | Yes | Yes | Yes | UEFI | ★★★★★ |
+| Laptop | HP | [ZBook 15 G3](#hp-zbook-15-g3) | Intel Core i5-6440HQ (4) | Intel HD Graphics 530 | Yes | Yes | Yes | UEFI | ★★★★★ |
+| Desktop | HP | Compaq 6300 Pro MT | Intel Core i5-3470 (4) | Intel HD Graphics 2500 | Yes | Yes | Yes | | ★★★★★ (3) |
+| Tablet | GETAC | T800 G2 | Atom x7-Z8750 (4) | Intel HD Graphics | Yes | Yes | Yes | UEFI | ★★★★★ (3) |
+| Tablet | GETAC | UX10 G2 | Core i5-10210U vPro (12) | Intel UHD Graphics | Yes | Yes | Yes | UEFI | ☆☆☆☆☆ |
 
 - (1) Specific configuration is needed.
 - (2) Without IOMMU the isolation between components is reduced.
 - (3) Not tested yet.
+- (4) Without EPT the performance is lower.
 
 ## Durabook R8
 
