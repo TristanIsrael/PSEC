@@ -1,8 +1,8 @@
 #!/bin/sh
 
-if [ "$APK_PHASE" != "post-install" ]; then
-    exit 0
-fi
+#if [ "$APK_PHASE" != "post-install" ]; then
+#    exit 0
+#fi
 
 echo
 echo --------------------------------------------
@@ -16,6 +16,7 @@ echo "" >> /etc/profile
 echo "export DISPLAY=:0" >> /etc/profile
 
 echo "**** Resizing shared memory"
+# Note : non-persistent setting
 mount -o remount,size=16M /dev/shm
 
 rc-update add splash boot
@@ -27,38 +28,14 @@ rc-service xenconsoled start
 rc-update add xenconsoled
 rc-service xenstored start
 rc-update add xenstored
-#rc-service xenqemu start
-#rc-update add xen-pci
-
 rc-update add mosquitto
-#rc-service mosquitto start
-
 rc-update add create-mqtt-tunnels
-#rc-service create-mqtt-tunnels start
-
-#rc-update add attach-pci-devices
 rc-update add psec-core-controller
-#rc-service psec-core-controller start
-
 rc-update add start-x
-#rc-service start-x start
-
 rc-update add orchestrator
-#rc-service orchestrator start
-
 rc-update add debug
 
-# Re-enable colored prompt
-mv /etc/profile.d/color_prompt.sh.disabled /etv/profile.d/color_prompt.sh
-
-# finish-core-init est exécuté par le script post-install du produit...
-#/usr/lib/psec/bin/finish-core-init.sh
-
-#rc-update add start-domains
-#rc-service start-domains start
-
-# Transféré dans le script post-install qui sera appelé par le produit
-#rc-update add connect-to-gui
-#rc-service connect-to-gui start
+# Re-enable colored prompt   
+mv "/etc/profile.d/color_prompt.sh.disabled" "/etc/profile.d/color_prompt.sh"
 
 exit 0

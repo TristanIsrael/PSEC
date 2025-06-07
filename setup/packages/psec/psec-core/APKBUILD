@@ -52,7 +52,8 @@ conf/rc.conf
 conf/motd
 conf/grub/grub.default
 conf/grub/grub.cfg-durabook-r8
-conf/10-stty-cols.sh
+conf/10-stty.sh
+conf/inittab
 
 python/rotate-screen.py
 python/create-domains.py
@@ -108,13 +109,14 @@ package() {
     
     # Configuration
     install -D -m644 "$srcdir"/topology.json "$pkgdir/$PSEC_CONFDIR"/topology.json
-    install -D -m644 "$srcdir"/psec.conf "$pkgdir/etc/modules-load.d/psec.conf"
+    install -D -m644 "$srcdir"/psec.conf "$pkgdir"/etc/modules-load.d/psec.conf
     install -D -m644 "$srcdir"/10-energy-saving.conf "$pkgdir"/etc/X11/xorg.conf.d/10-energy-saving.conf
-    install -D -m644 "$srcdir"/grub.default "$pkgdir/etc/default/grub"
+    install -D -m644 "$srcdir"/grub.default "$pkgdir"/etc/default/grub
     #install -D -m644 "$srcdir"/grub.cfg-durabook-r8 "$pkgdir"/boot/grub/grub.cfg
     install -D -m644 "$srcdir"/rc.conf "$pkgdir/etc/rc.conf"
     install -D -m644 "$srcdir"/constants.sh "$pkgdir/$PSEC_CONFDIR"/constants.sh
-    install -D -m644 "$srcdir"/10-stty-cols.sh "$pkgdir/etc/profile.d"/10-stty-cols.sh
+    install -D -m644 "$srcdir"/10-stty.sh "$pkgdir"/etc/profile.d/10-stty.sh
+    install -D -m644 "$srcdir"/inittab "$pkgdir"/etc/inittab
         
     #install -D -m755 "$srcdir"/connect-to-gui.initd "$pkgdir"/etc/init.d/connect-to-gui
     #install -D -m644 "$srcdir"/sys-usb.conf "$pkgdir/$PSEC_CONFDIR/xen/sys-usb.conf"

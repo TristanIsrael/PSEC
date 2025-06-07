@@ -4,4 +4,5 @@
 
 if [ "$TERM" = "vt100" ]; then 
     stty cols 200
+    stty rows 50
 fi

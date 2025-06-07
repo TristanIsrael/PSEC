@@ -54,7 +54,7 @@ class DomainsFactory:
             json_memory = json_gui.get("memory")
             if json_memory != None:
                 memory = json_memory
-                print("Setting {} MB for memory".format(memory))
+                print(f"Setting {memory} MB for memory")
 
         conf = self.__create_domain_sys_gui(memory_in_mb=memory, nb_cpus=4 if self.__cpu_count >= 4 else min(self.__cpu_count /2, 1))
 
@@ -64,16 +64,16 @@ class DomainsFactory:
     
     def __parse_business_domains(self, json:dict):
         repository = json.get("repository")
-        if repository != None:
+        if repository is not None:
             pass # Todo
 
         domains = json.get("domains")
-        if domains != None:
+        if domains is not None:
             for domain in domains:
                 name = domain.get("name")
                 package = domain.get("app-package")
                 memory = self.get_max_memory_size()
-                if domain.get("memory") != None:
+                if domain.get("memory") is not None:
                     memory = domain.get("memory")
                 
                 cpus = 1
@@ -88,14 +88,14 @@ class DomainsFactory:
                     domain_name= name,
                     memory_in_mb= memory,
                     nb_cpus= 1 if cpus == 0 else cpus,
-                    boot_iso_location= "bootiso-{}.iso".format(name),
+                    boot_iso_location= f"bootiso-{name}.iso",
                     share_packages= True,
                     share_storage= True,
                     share_system= False
                     #rxtx_inputs= False
                 )
 
-                with open("/etc/psec/xen/{}.conf".format(name), 'w') as f:
+                with open(f"/etc/psec/xen/{name}.conf", 'w') as f:
                     f.write(conf)
 
                 self.__fetch_alpine_packages(package)     
@@ -118,7 +118,6 @@ p9 = [
 'tag=system, path=/usr/lib/psec/system, backend=0, security_model=none'
 ]
 channel = [
-'name=console, connection=pty',
 'name=sys-usb-msg, connection=socket, path=/var/run/sys-usb-msg.sock',
 'name=sys-usb-input, connection=socket, path=/var/run/sys-usb-input.sock',
 'name=sys-usb-tty, connection=socket, path=/var/run/sys-usb-tty.sock'
@@ -147,7 +146,6 @@ p9 = [
     'tag=system, path=/usr/lib/psec/system, backend=0, security_model=none'
 ]
 channel = [
-'name=console, connection=pty',
 'name=sys-gui-msg, connection=socket, path=/var/run/sys-gui-msg.sock',
 'name=sys-gui-input, connection=socket, path=/var/run/sys-gui-input.sock'
 ]
@@ -198,12 +196,10 @@ vnc=0
 
         # Add serial channels
         channels = []
-        channels.append("'name=console, connection=pty'") # /dev/hvc0
-        channels.append("'name={}-msg, connection=socket, path=/var/run/{}-msg.sock'".format(domain_name, domain_name)) # /dev/hvc1
-        #channels.append("'name={}-log, connection=socket, path=/var/run/{}-log.sock'".format(domain_name, domain_name)) # /dev/hvc2        
+        channels.append(f"'name={domain_name}-msg, connection=socket, path=/var/run/{domain_name}-msg.sock'") # /dev/hvc1
         
         if len(channels) > 0:
-            txt += "channel = [\n{}\n]\n".format(",\n".join(channels))        
+            txt += "channel = [\n{}\n]\n".format(",\n".join(channels))
 
         return txt
 
@@ -243,7 +239,7 @@ vnc=0
         try:
             result = subprocess.run(['python3', '/usr/lib/psec/bin/get-total-memory.py'], capture_output=True, text=True)            
             memory = int(result.stdout)
-            print("Memory detected: {}MB".format(memory))
+            print(f"Memory detected: {memory} MB")
 
             # Then we apply a 90% factor
             memory *= 0.9
