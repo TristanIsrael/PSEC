@@ -41,7 +41,7 @@ Add the following in `/etc/apk/repositories`:
 https://alefbet.net/repositories/PSEC
 ```
 
-The [public key file](https://alefbet.net/repositories/PSEC/psec.rsa.pub) must be downloaded into `/etc/apk/keys`.
+The [public key file](https://alefbet.net/repositories/PGP/psec.rsa.pub) must be downloaded into `/etc/apk/keys`.
 
 ## First use
 
