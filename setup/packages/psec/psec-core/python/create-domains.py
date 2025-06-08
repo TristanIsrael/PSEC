@@ -50,9 +50,9 @@ class DomainsFactory:
         max_memory = self.get_max_memory_size()
         rotation = 0
         json_gui = self.topology.get("gui")
-        if json_gui != None:
+        if json_gui is not None:
             json_memory = json_gui.get("memory")
-            if json_memory != None:
+            if json_memory is not None:
                 memory = json_memory
                 print(f"Setting {memory} MB for memory")
 
