@@ -1,6 +1,10 @@
 from . import Parametres, Cles, Constantes, Logger
 from pathlib import Path
-import os, hashlib, subprocess
+import os
+import hashlib
+import subprocess
+import shutil
+
 
 class FichierHelper():   
 
@@ -123,22 +127,20 @@ class FichierHelper():
         La fonction renvoie vrai si la copie s'est bien déroulée et que les empreintes coincident.
         '''
         
-        #cmd = ['cp', f"{source_location}{filepath}", f"{destination_folder}{filepath}"]
-        cmd = f"cp {source_location}{filepath} {destination_folder}{filepath}"
+        cmd = ['cp', f"{source_location}{filepath}", f"{destination_folder}{filepath}"]
+        #cmd = ['rsync', '-a', f"{source_location}{filepath}", f"{destination_folder}{filepath}"]
         #print(f"Run command {cmd}")
         
         try:
-            subprocess.run(cmd, check= True, shell= True)
-            #print("File copied")
+            subprocess.run(cmd, check= True, shell= False)
+            #shutil.copy2(f"{source_location}{filepath}", f"{destination_folder}{filepath}")
         except subprocess.CalledProcessError as e:
             Logger().debug(f"The file {filepath} could not be copied to {destination_folder}. Error: {e}")
             return ""
 
         # Calculate the new file's footprint
         destination_file = f"{destination_folder}{filepath}"
-        #print(f"Calculate footprint of {destination_file}")
         dest_footprint = FichierHelper.calculate_footprint(destination_file)
-        #print("footprint calculated")
 
         if source_footprint == dest_footprint:
             return dest_footprint

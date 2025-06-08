@@ -11,4 +11,4 @@ GRUB_PRELOAD_MODULES="all_video gfxterm png"
 GRUB_GFXPAYLOAD_LINUX=keep
 #GRUB_TERMINAL_OUTPUT="gfxterm_debug"
 GRUB_CMDLINE_XEN="loglevel=0 console=null no-real-mode edd=off"
-GRUB_CMDLINE_XEN_DEFAULT="dom0_mem=512M,max:1024M"
+GRUB_CMDLINE_XEN_DEFAULT="dom0_mem=512M,max:1024M dom0_max_vcpus=2 dom0_vcpus_pin=true"

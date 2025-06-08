@@ -38,7 +38,7 @@ class DomainsFactory:
     def __create_domd_usb(self):
         print("Create Driver Domain USB")
 
-        conf = self.__create_domain_sys_usb(memory_in_mb=700, nb_cpus=4 if self.__cpu_count >= 4 else min(self.__cpu_count /2, 1))
+        conf = self.__create_domain_sys_usb()
 
         if conf is not None:
             with open('/etc/psec/xen/sys-usb.conf', 'w') as f:
@@ -56,7 +56,7 @@ class DomainsFactory:
                 memory = json_memory
                 print(f"Setting {memory} MB for memory")
 
-        conf = self.__create_domain_sys_gui(memory_in_mb=memory, nb_cpus=4 if self.__cpu_count >= 4 else min(self.__cpu_count /2, 1))
+        conf = self.__create_domain_sys_gui(memory_in_mb=memory)
 
         if conf is not None:
             with open('/etc/psec/xen/sys-gui.conf', 'w') as f:
@@ -98,14 +98,14 @@ class DomainsFactory:
                 with open(f"/etc/psec/xen/{name}.conf", 'w') as f:
                     f.write(conf)
 
-                self.__fetch_alpine_packages(package)     
+                self.__fetch_alpine_packages(package)
 
-    def __create_domain_sys_usb(self, memory_in_mb:int, nb_cpus:int) -> None:
-        txt = '''
+    def __create_domain_sys_usb(self) -> None:
+        txt = f'''
 type = "hvm"
 name = "sys-usb"
-memory={}
-vcpus = {}
+memory=700
+vcpus = { 2 if os.cpu_count() > 1 else 1 }
 disk = [
 	'format=raw, vdev=xvdc, access=r, devtype=cdrom, target=/usr/lib/psec/system/bootiso-sys-usb.iso'
 ]
@@ -125,18 +125,18 @@ device_model_version = "qemu-xen"
 usb=0
 vnc=0
 vif=[]
-'''.format(memory_in_mb, nb_cpus)
+'''
 
         return txt
 
-    def __create_domain_sys_gui(self, memory_in_mb:int, nb_cpus:int) -> None:
+    def __create_domain_sys_gui(self, memory_in_mb) -> None:
         max_memory = self.get_max_memory_size()
 
-        txt = '''
+        txt = f'''
 type = "hvm"
 name = "sys-gui"
-memory={}
-vcpus = {}
+memory={memory_in_mb}
+vcpus = { 4 if os.cpu_count() >= 4 else 2 if os.cpu_count() >= 2 else 1 }
 disk = [
 	'format=raw, vdev=xvdc, access=r, devtype=cdrom, target=/usr/lib/psec/system/bootiso-sys-gui.iso'
 ]
@@ -161,26 +161,26 @@ device_model_args = [
 usb=0
 vnc=0
 vif=[]
-'''.format(memory_in_mb, nb_cpus)
+'''
 
         return txt
 
     def __create_new_domain(self, domain_name:str, memory_in_mb:int, nb_cpus:int, boot_iso_location:str, share_packages:bool=True, share_storage:bool=True, share_system:bool=False):
-        txt = '''
+        txt = f'''
 type = "pv"
-name = "{}"
+name = "{domain_name}"
 kernel = "/var/lib/xen/boot/vmlinuz-virt"
 ramdisk = "/var/lib/xen/boot/initramfs-virt"
 extra = "modules=loop,squashfs,iso9660 console=hvc0  module_blacklist=af_packet,network,video,sound,drm,snd,snd_hda_intel,bluetooth,btusb,r8153_ecm,r8152,usbnet,uvcvideo,pcspkr,videobuf2_v4l2,joydev,videodev,videobuf2_common,libphy,mc,mii"
-memory={}
-vcpus = {}
+memory={memory_in_mb}
+vcpus = {nb_cpus}
 disk = [
-	'format=raw, vdev=xvdc, access=r, devtype=cdrom, target=/usr/lib/psec/system/{}'
+	'format=raw, vdev=xvdc, access=r, devtype=cdrom, target=/usr/lib/psec/system/{boot_iso_location}'
 ]
 device_model_override = "/usr/bin/qemu-system-x86_64"
 device_model_version = "qemu-xen"
 vnc=0
-'''.format(domain_name, memory_in_mb, nb_cpus, boot_iso_location)
+'''
         
         # Add P9 shares
         shares = []

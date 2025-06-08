@@ -2,6 +2,7 @@ from . import Constantes, Parametres, MqttClient, Topics
 from . import FichierHelper, ResponseFactory, EtatComposant
 from . import Logger, Cles, BenchmarkId, MqttClient, DiskMonitor, MqttHelper
 import time
+from queue import Queue
 try:
     from . import DemonInputs
     NO_INPUTS_MONITORING = False
@@ -17,14 +18,16 @@ class SysUsbController():
 
     __nb_mqtt_conn = 0
     __can_run = True
-    __read_files_queue = list()
-    __copy_files_queue = list()    
+    __messages_queue = Queue()
+    __read_files_queue = Queue()
+    __copy_files_queue = Queue()
 
     def __init__(self, mqtt_client:MqttClient):
         self.mqtt_client = mqtt_client
         self.__disk_monitor = None
-        self.__thread_read_files = threading.Thread(target=self.__read_files_worker)
-        self.__thread_copy_files = threading.Thread(target=self.__copy_files_worker)
+        self.__thread_read_files = threading.Thread(target=self.__read_files_worker, name="read_file_worker")
+        self.__thread_copy_files = threading.Thread(target=self.__copy_files_worker, name="copy_file_worker")
+        self.__thread_messages = threading.Thread(target=self.__message_worker, name="message_worker")
 
 
     def __del__(self):
@@ -54,11 +57,10 @@ class SysUsbController():
         self.mqtt_client.subscribe(f"{Topics.COPY_FILE}/request")
         self.mqtt_client.subscribe(f"{Topics.READ_FILE}/request")
         self.mqtt_client.subscribe(f"{Topics.DELETE_FILE}/request")
-        self.mqtt_client.subscribe(f"{Topics.BENCHMARK}/request")
+        #self.mqtt_client.subscribe(f"{Topics.BENCHMARK}/request")
         self.mqtt_client.subscribe(f"{Topics.FILE_FOOTPRINT}/request")
         self.mqtt_client.subscribe(f"{Topics.CREATE_FILE}/request")
         self.mqtt_client.subscribe(f"{Topics.DISCOVER_COMPONENTS}/request")
-        self.mqtt_client.subscribe(f"{Topics.DELETE_FILE}/request")
         self.mqtt_client.subscribe(f"{Topics.PING}/request")
 
         # Démarrage de la surveillance des entrées
@@ -69,6 +71,7 @@ class SysUsbController():
         # Start threads
         self.__thread_read_files.start()
         self.__thread_copy_files.start()
+        self.__thread_messages.start()
 
         self.__disk_monitor = DiskMonitor(Constantes().constante(Cles.CHEMIN_MONTAGE_USB), self.mqtt_client)
         threading.Thread(target=self.__disk_monitor.start).start()
@@ -86,37 +89,48 @@ class SysUsbController():
     def __on_mqtt_message(self, topic:str, payload:dict):
         #Logger().debug("Message received : topic={}, payload={}".format(topic, payload))
 
-        threading.Thread(target=self.__message_worker, args=(topic, payload,)).start()
-        #self.__thread_pool.submit(self.__message_worker, topic, payload)
+        self.__messages_queue.put((topic, payload))
+        #threading.Thread(target=self.__message_worker, args=(topic, payload,), name="mqtt_message").start()
 
 
-    def __message_worker(self, topic:str, payload:dict):
-        #Logger().debug("Handle message {}".format(topic))
+    def __message_worker(self):
+        #Logger().debug("Handle message {}".format(topic))        
 
-        base_topic, _ = topic.rsplit("/", 1)
+        while self.__can_run:
+            if not self.__messages_queue.empty():
+                print(f"{self.__messages_queue.qsize()} messages in queue")
 
-        if base_topic == Topics.LIST_DISKS:
-            self.__handle_list_disks(base_topic)
-        elif base_topic == Topics.LIST_FILES:
-            self.__handle_list_files(base_topic, payload)
-        elif base_topic == Topics.COPY_FILE:
-            self.__handle_copy_file(base_topic, payload)
-        elif base_topic == Topics.READ_FILE:
-            self.__handle_read_file(base_topic, payload)
-        elif base_topic == Topics.DELETE_FILE:
-            self.__handle_remove_file(base_topic, payload)
-        elif base_topic == Topics.BENCHMARK:
-            self.__handle_benchmark(base_topic, payload)
-        elif base_topic == Topics.FILE_FOOTPRINT:
-            self.__handle_file_footprint(base_topic, payload)
-        elif base_topic == Topics.CREATE_FILE:
-            self.__handle_create_file(base_topic, payload)
-        elif base_topic == Topics.DISCOVER_COMPONENTS:
-            self.__handle_discover_components(base_topic, payload)
-        elif base_topic == Topics.DELETE_FILE:
-            self.__handle_delete_file(payload)
-        elif base_topic == Topics.PING:
-            self.__handle_ping(payload)
+                message = self.__messages_queue.get() # We get a tuple
+                topic = message[0]
+                payload = message[1]
+                print(f"Handle message {topic}")
+
+                base_topic, _ = topic.rsplit("/", 1)
+
+                if base_topic == Topics.LIST_DISKS:
+                    self.__handle_list_disks(base_topic)
+                elif base_topic == Topics.LIST_FILES:
+                    self.__handle_list_files(base_topic, payload)
+                elif base_topic == Topics.COPY_FILE:
+                    self.__handle_copy_file(base_topic, payload)
+                elif base_topic == Topics.READ_FILE:
+                    self.__handle_read_file(base_topic, payload)
+                elif base_topic == Topics.DELETE_FILE:
+                    self.__handle_remove_file(base_topic, payload)
+                elif base_topic == Topics.BENCHMARK:
+                    self.__handle_benchmark(base_topic, payload)
+                elif base_topic == Topics.FILE_FOOTPRINT:
+                    self.__handle_file_footprint(base_topic, payload)
+                elif base_topic == Topics.CREATE_FILE:
+                    self.__handle_create_file(base_topic, payload)
+                elif base_topic == Topics.DISCOVER_COMPONENTS:
+                    self.__handle_discover_components(base_topic, payload)
+                elif base_topic == Topics.DELETE_FILE:
+                    self.__handle_delete_file(payload)
+                elif base_topic == Topics.PING:
+                    self.__handle_ping(payload)
+
+            time.sleep(0.1)
 
     ####
     # Traitement des commandes
@@ -179,7 +193,7 @@ class SysUsbController():
             print(f"Création du répertoire {dest_parent_path} dans le dépôt")
             os.makedirs(dest_parent_path.as_posix(), exist_ok= True)
 
-        self.__read_files_queue.append(
+        self.__read_files_queue.put(
             {
                 "source_location": source_location, 
                 "source_disk": source_disk, 
@@ -191,7 +205,7 @@ class SysUsbController():
             #self.task_runner.run_task(self.__do_read_file, args=(source_location, source_disk, filepath, repository_path, source_footprint,))    
 
     def __handle_remove_file(self, topic:str, payload: dict):
-        Logger().error("The command remove file is not implemented")
+        #Logger().error("The command remove file is not implemented")
         pass
 
 
@@ -208,7 +222,7 @@ class SysUsbController():
         destination_location = f"{Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)}/{target_disk}"
 
         try:
-            self.__copy_files_queue.append(
+            self.__copy_files_queue.put(
                 {
                     "source_location": source_location, 
                     "source_disk": source_disk, 
@@ -222,7 +236,7 @@ class SysUsbController():
         except Exception:
             Logger().error(f"An error occured while copying the file {filepath} on {target_disk}")
         
-        #FichierHelper.copy_file(disk, filepath, destination_folder)    
+        #FichierHelper.copy_file(disk, filepath, destination_folder)
 
 
     def __handle_benchmark(self, topic:str, payload:dict):
@@ -345,9 +359,9 @@ class SysUsbController():
 
     def __read_files_worker(self):
         while self.__can_run:
-            if len(self.__read_files_queue) > 0:
-                next_file = self.__read_files_queue.pop()
-                source_location = next_file.get("source_location", "") 
+            if not self.__read_files_queue.empty():
+                next_file = self.__read_files_queue.get()
+                source_location = next_file.get("source_location", "")
                 source_disk = next_file.get("source_disk", "")
                 filepath = next_file.get("filepath", "")
                 repository_path = next_file.get("repository_path", "")
@@ -358,8 +372,8 @@ class SysUsbController():
 
     def __copy_files_worker(self):
         while self.__can_run:
-            if len(self.__copy_files_queue) > 0:
-                next_file = self.__copy_files_queue.pop()
+            if not self.__copy_files_queue.empty():
+                next_file = self.__copy_files_queue.get()
                 source_location = next_file.get("source_location", "") 
                 filepath = next_file.get("filepath", "")
                 target_disk = next_file.get("target_disk", "")
@@ -369,6 +383,8 @@ class SysUsbController():
             time.sleep(0.5)
 
     def __do_read_file(self, source_location:str, source_disk:str, filepath:str, repository_path:str, source_footprint:str):
+        #self.__debug_threads()
+
         dest_footprint = FichierHelper.copy_file(source_location, filepath, repository_path, source_footprint)
         if dest_footprint != "":
             notif = NotificationFactory.create_notification_new_file(Constantes.REPOSITORY, filepath, source_footprint, dest_footprint)
@@ -401,3 +417,8 @@ class SysUsbController():
             Logger().error(f"La copie du fichier {filepath} dans le dépôt a échoué.")
 
         self.mqtt_client.publish(f"{Topics.COPY_FILE}/response", response)
+
+    def __debug_threads(self):
+        print(f"Active threads: {threading.active_count()}")
+        for thread in threading.enumerate():
+            print(f"   -> {thread.name}")
