@@ -38,7 +38,7 @@ class DomainsFactory:
     def __create_domd_usb(self):
         print("Create Driver Domain USB")
 
-        conf = self.__create_domain_sys_usb(memory_in_mb=500, nb_cpus=4 if self.__cpu_count >= 4 else min(self.__cpu_count /2, 1))
+        conf = self.__create_domain_sys_usb(memory_in_mb=700, nb_cpus=4 if self.__cpu_count >= 4 else min(self.__cpu_count /2, 1))
 
         if conf is not None:
             with open('/etc/psec/xen/sys-usb.conf', 'w') as f:

@@ -103,11 +103,11 @@ class FichierHelper():
     @staticmethod
     def calculate_footprint(filepath:str) -> str:
         try:
-            with open(filepath, "rb") as f:            
-                hash = hashlib.file_digest(f, Constantes.FOOTPRINT_METHOD)
-                return hash.hexdigest()                
+            with open(filepath, "rb") as f:
+                h = hashlib.file_digest(f, Constantes.FOOTPRINT_METHOD)
+                return h.hexdigest()
         except Exception as e:
-            print("An error occured while calculating the footprint of the file {}".format(filepath))
+            print(f"An error occured while calculating the footprint of the file {filepath}")
             print(e)
 
         return ""
@@ -123,23 +123,29 @@ class FichierHelper():
         La fonction renvoie vrai si la copie s'est bien déroulée et que les empreintes coincident.
         '''
         
-        cmd = ['cp', "{}/{}".format(source_location, filepath), "{}/{}".format(destination_folder, filepath)]
-        print("Exécution de la commande {}".format(cmd))
+        #cmd = ['cp', f"{source_location}{filepath}", f"{destination_folder}{filepath}"]
+        cmd = f"cp {source_location}{filepath} {destination_folder}{filepath}"
+        #print(f"Run command {cmd}")
         
-        proc = subprocess.run(cmd, check= True, shell= False)        
-        if proc.returncode != 0:
-            Logger().debug("The file {} could not be copied to {}. Error: {}".format(filepath, destination_folder, proc.stderr))
+        try:
+            subprocess.run(cmd, check= True, shell= True)
+            #print("File copied")
+        except subprocess.CalledProcessError as e:
+            Logger().debug(f"The file {filepath} could not be copied to {destination_folder}. Error: {e}")
             return ""
-        else:
-            # Calculate the new file's footprint
-            destination_file = "{}{}".format(destination_folder, filepath)
-            dest_footprint = FichierHelper.calculate_footprint(destination_file)
 
-            if source_footprint == dest_footprint:
-                return dest_footprint
-            else:
-                Logger().debug("The file {} has been copied to {} but the footprints differ".format(filepath, destination_folder))
-                return ""
+        # Calculate the new file's footprint
+        destination_file = f"{destination_folder}{filepath}"
+        #print(f"Calculate footprint of {destination_file}")
+        dest_footprint = FichierHelper.calculate_footprint(destination_file)
+        #print("footprint calculated")
+
+        if source_footprint == dest_footprint:
+            return dest_footprint
+        else:
+            Logger().debug(f"The file {filepath} has been copied to {destination_folder} but the footprints differ")
+            return ""
+
 
     @staticmethod
     def copy_file_to_repository(source_location:str, filepath:str, footprint:str):

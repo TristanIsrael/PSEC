@@ -17,13 +17,12 @@ from concurrent.futures import ThreadPoolExecutor
 class SysUsbController():
     """ Cette classe traite les messages échangés par la sys-usb avec le Dom0 ou les autres domaines. """
 
-    task_runner = TaskRunner()
+    task_runner = TaskRunner(1) # We want the files to copied one after the other so we set 1 only 1 task
     nb_mqtt_conn = 0
 
     def __init__(self, mqtt_client:MqttClient):
         self.mqtt_client = mqtt_client
         self.__disk_monitor = None
-        #self.__thread_pool = ThreadPoolExecutor(max_workers=1)
 
 
     def __del__(self):
@@ -63,8 +62,7 @@ class SysUsbController():
 
         # Démarrage de la surveillance des entrées
         if not NO_INPUTS_MONITORING:
-            DemonInputs().start(self.mqtt_client)
-            #threading.Thread(target= DemonInputs().demarre()).start()        
+            DemonInputs().start(self.mqtt_client)  
 
         #ControleurBenchmark().setup(self.mqtt_client)
 
@@ -169,22 +167,27 @@ class SysUsbController():
         filepath = payload.get("filepath", "")
         repository_path:str = Parametres().parametre(Cles.STORAGE_PATH_DOMU)
     
-        source_location = "{}/{}".format(Parametres().parametre(Cles.CHEMIN_MONTAGE_USB), source_disk) 
-        source_footprint = FichierHelper.calculate_footprint("{}/{}".format(source_location, filepath))     
+        source_location = f"{Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)}/{source_disk}"
+        source_footprint = FichierHelper.calculate_footprint(f"{source_location}/{filepath}")
 
-        dest_parent_path = Path("{}/{}".format(repository_path, filepath)).parent
+        dest_parent_path = Path(f"{repository_path}/{filepath}").parent
         if not dest_parent_path.exists():
-            print("Création du répertoire {} dans le dépôt".format(dest_parent_path))
+            print(f"Création du répertoire {dest_parent_path} dans le dépôt")
             os.makedirs(dest_parent_path.as_posix(), exist_ok= True)
 
+        try:
+            self.task_runner.run_task(self.__do_read_file, args=(source_location, source_disk, filepath, repository_path, source_footprint,))
+        except Exception:
+            Logger().error(f"An error occured while copying the file {filepath} in repository")
+
+    def __do_read_file(self, source_location:str, source_disk:str, filepath:str, repository_path:str, source_footprint:str):
         dest_footprint = FichierHelper.copy_file(source_location, filepath, repository_path, source_footprint)
-        if dest_footprint != "":            
+        if dest_footprint != "":
             notif = NotificationFactory.create_notification_new_file(Constantes.REPOSITORY, filepath, source_footprint, dest_footprint)
             self.mqtt_client.publish(Topics.NEW_FILE, notif)
         else:
             notif = NotificationFactory.create_notification_error(source_disk, filepath, "The file could not be copied")
             self.mqtt_client.publish(Topics.ERROR, notif)
-
 
     def __handle_remove_file(self, topic:str, payload: dict):
         Logger().error("The command remove file is not implemented")
@@ -193,17 +196,17 @@ class SysUsbController():
 
     def __handle_copy_file(self, topic:str, payload:dict):
         if not MqttHelper.check_payload(payload, ["disk", "filepath", "destination"]):
-            Logger().error("Mising arguments for the request {}".format(topic))
+            Logger().error(f"Missing arguments for the request {topic}")
             return
         
         source_disk = payload.get("disk", "")
         filepath = payload.get("filepath", "")
         target_disk = payload.get("destination", "")
         
-        source_location = "{}/{}".format(Parametres().parametre(Cles.CHEMIN_MONTAGE_USB), source_disk)        
-        destination_location = "{}/{}".format(Parametres().parametre(Cles.CHEMIN_MONTAGE_USB), target_disk)
+        source_location = f"{Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)}/{source_disk}"        
+        destination_location = f"{Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)}/{target_disk}"
 
-        try:                   
+        try:
             self.task_runner.run_task(self.__do_copy_file, args=(source_location, filepath, target_disk, destination_location,))
         except Exception:
             Logger().error(f"An error occured while copying the file {filepath} on {target_disk}")

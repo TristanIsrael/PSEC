@@ -1,10 +1,13 @@
 #!/bin/sh
 
+mount -o remount,size=2M /dev/shm
+
 mkdir -p /var/log/psec
 
 modprobe exfat
 modprobe vfat
 modprobe ntfs3
+modprobe ext4
 
 rc-update add psec-sys-usb-controller
 rc-service psec-sys-usb-controller start
