@@ -102,11 +102,8 @@ class DomainsFactory:
 
     def __create_domain_sys_usb(self, memory_in_mb:int, nb_cpus:int) -> None:
         txt = '''
-type = "pv"
+type = "hvm"
 name = "sys-usb"
-kernel = "/var/lib/xen/boot/vmlinuz-lts"
-ramdisk = "/var/lib/xen/boot/initramfs-lts"
-extra = "modules=loop,squashfs,iso9660 console=hvc0 module_blacklist=af_packet,network,video,sound,drm,snd,snd_hda_intel,bluetooth,btusb,r8153_ecm,r8152,usbnet,uvcvideo,pcspkr,videobuf2_v4l2,joydev,videodev,videobuf2_common,libphy,mc,mii"
 memory={}
 vcpus = {}
 disk = [
@@ -122,9 +119,12 @@ channel = [
 'name=sys-usb-input, connection=socket, path=/var/run/sys-usb-input.sock',
 'name=sys-usb-tty, connection=socket, path=/var/run/sys-usb-tty.sock'
 ]
+vga = "none"
 device_model_override = "/usr/bin/qemu-system-x86_64"
 device_model_version = "qemu-xen"
+usb=0
 vnc=0
+vif=[]
 '''.format(memory_in_mb, nb_cpus)
 
         return txt
