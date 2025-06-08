@@ -1,10 +1,9 @@
 from . import Constantes, Parametres, MqttClient, Topics
 from . import FichierHelper, ResponseFactory, EtatComposant
 from . import Logger, Cles, BenchmarkId, MqttClient, DiskMonitor, MqttHelper
-from . import TaskRunner
+import time
 try:
     from . import DemonInputs
-    #from . import ControleurBenchmark
     NO_INPUTS_MONITORING = False
 except:
     NO_INPUTS_MONITORING = True
@@ -12,21 +11,24 @@ except:
 from . import NotificationFactory, FichierHelper
 import threading, os, base64, zlib
 from pathlib import Path
-from concurrent.futures import ThreadPoolExecutor
 
 class SysUsbController():
     """ Cette classe traite les messages échangés par la sys-usb avec le Dom0 ou les autres domaines. """
 
-    task_runner = TaskRunner(1) # We want the files to copied one after the other so we set 1 only 1 task
-    nb_mqtt_conn = 0
+    __nb_mqtt_conn = 0
+    __can_run = True
+    __read_files_queue = list()
+    __copy_files_queue = list()    
 
     def __init__(self, mqtt_client:MqttClient):
         self.mqtt_client = mqtt_client
         self.__disk_monitor = None
+        self.__thread_read_files = threading.Thread(target=self.__read_files_worker)
+        self.__thread_copy_files = threading.Thread(target=self.__copy_files_worker)
 
 
     def __del__(self):
-        self.task_runner.stop()
+        self.__can_run = False
 
 
     def start(self):
@@ -35,12 +37,11 @@ class SysUsbController():
 
         self.mqtt_client.start()
 
-        # Start the worker
-        self.task_runner.start()
+        self.__can_run = True
 
         
     def stop(self):
-        self.task_runner.stop()
+        self.__can_run = False
         DemonInputs().stop()
 
 
@@ -62,9 +63,12 @@ class SysUsbController():
 
         # Démarrage de la surveillance des entrées
         if not NO_INPUTS_MONITORING:
-            DemonInputs().start(self.mqtt_client)  
+            DemonInputs().start(self.mqtt_client)
 
         #ControleurBenchmark().setup(self.mqtt_client)
+        # Start threads
+        self.__thread_read_files.start()
+        self.__thread_copy_files.start()
 
         self.__disk_monitor = DiskMonitor(Constantes().constante(Cles.CHEMIN_MONTAGE_USB), self.mqtt_client)
         threading.Thread(target=self.__disk_monitor.start).start()
@@ -175,19 +179,16 @@ class SysUsbController():
             print(f"Création du répertoire {dest_parent_path} dans le dépôt")
             os.makedirs(dest_parent_path.as_posix(), exist_ok= True)
 
-        try:
-            self.task_runner.run_task(self.__do_read_file, args=(source_location, source_disk, filepath, repository_path, source_footprint,))
-        except Exception:
-            Logger().error(f"An error occured while copying the file {filepath} in repository")
-
-    def __do_read_file(self, source_location:str, source_disk:str, filepath:str, repository_path:str, source_footprint:str):
-        dest_footprint = FichierHelper.copy_file(source_location, filepath, repository_path, source_footprint)
-        if dest_footprint != "":
-            notif = NotificationFactory.create_notification_new_file(Constantes.REPOSITORY, filepath, source_footprint, dest_footprint)
-            self.mqtt_client.publish(Topics.NEW_FILE, notif)
-        else:
-            notif = NotificationFactory.create_notification_error(source_disk, filepath, "The file could not be copied")
-            self.mqtt_client.publish(Topics.ERROR, notif)
+        self.__read_files_queue.append(
+            {
+                "source_location": source_location, 
+                "source_disk": source_disk, 
+                "filepath": filepath, 
+                "repository_path": repository_path, 
+                "source_footprint": source_footprint
+            }
+        )
+            #self.task_runner.run_task(self.__do_read_file, args=(source_location, source_disk, filepath, repository_path, source_footprint,))    
 
     def __handle_remove_file(self, topic:str, payload: dict):
         Logger().error("The command remove file is not implemented")
@@ -207,37 +208,21 @@ class SysUsbController():
         destination_location = f"{Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)}/{target_disk}"
 
         try:
-            self.task_runner.run_task(self.__do_copy_file, args=(source_location, filepath, target_disk, destination_location,))
+            self.__copy_files_queue.append(
+                {
+                    "source_location": source_location, 
+                    "source_disk": source_disk, 
+                    "filepath": filepath, 
+                    "target_disk": target_disk, 
+                    "destination_location": destination_location
+                    #"source_footprint": source_footprint
+                }
+            )
+            #self.task_runner.run_task(self.__do_copy_file, args=(source_location, filepath, target_disk, destination_location,))
         except Exception:
             Logger().error(f"An error occured while copying the file {filepath} on {target_disk}")
         
-        #FichierHelper.copy_file(disk, filepath, destination_folder)
-
-
-    def __do_copy_file(self, source_location:str, filepath:str, target_disk: str, target_location:str):        
-        #source_filepath = "{}/{}/{}".format(Parametres().parametre(Cles.CHEMIN_MONTAGE_USB), source_disk, filepath)        
-        source_footprint = FichierHelper.calculate_footprint("{}/{}".format(source_location, filepath))
-        
-        # Création du répertoire de destination si nécessaire
-        parent_path = Path(filepath).parent
-        if not parent_path.exists():
-            print(f"Création du répertoire {parent_path} dans le dépôt")
-            os.makedirs(f"{target_location}/{parent_path}", exist_ok= True)
-
-        dest_footprint = FichierHelper.copy_file(source_location, filepath, target_location, source_footprint)
-        if dest_footprint != "":
-            Logger().debug(f"The file {filepath} has been copied to {target_location}. The footprint is {source_footprint}")
-
-            # Envoi d'une notification pour informer de la présence d'un nouveau fichier
-            notif = NotificationFactory.create_notification_new_file(disk= target_disk, filepath= filepath, source_footprint= source_footprint, dest_footprint= dest_footprint)
-            self.mqtt_client.publish(f"{Topics.NEW_FILE}/notification", notif)
-
-            response = ResponseFactory.create_response_copy_file(filepath, target_disk, True, dest_footprint)            
-        else:
-            response = ResponseFactory.create_response_copy_file(filepath, target_disk, False, dest_footprint)
-            Logger().error(f"La copie du fichier {filepath} dans le dépôt a échoué.")
-
-        self.mqtt_client.publish(f"{Topics.COPY_FILE}/response", response)
+        #FichierHelper.copy_file(disk, filepath, destination_folder)    
 
 
     def __handle_benchmark(self, topic:str, payload:dict):
@@ -356,3 +341,63 @@ class SysUsbController():
         payload = ResponseFactory.create_response_ping(ping_id, "sys-usb", data, sent_at)
 
         self.mqtt_client.publish(f"{Topics.PING}/response", payload)
+
+
+    def __read_files_worker(self):
+        while self.__can_run:
+            if len(self.__read_files_queue) > 0:
+                next_file = self.__read_files_queue.pop()
+                source_location = next_file.get("source_location", "") 
+                source_disk = next_file.get("source_disk", "")
+                filepath = next_file.get("filepath", "")
+                repository_path = next_file.get("repository_path", "")
+                source_footprint = next_file.get("source_footprint", "")
+                self.__do_read_file(source_location, source_disk, filepath, repository_path, source_footprint)
+            
+            time.sleep(0.5)
+
+    def __copy_files_worker(self):
+        while self.__can_run:
+            if len(self.__copy_files_queue) > 0:
+                next_file = self.__copy_files_queue.pop()
+                source_location = next_file.get("source_location", "") 
+                filepath = next_file.get("filepath", "")
+                target_disk = next_file.get("target_disk", "")
+                destination_location = next_file.get("destination_location", "")
+                self.__do_copy_file(source_location, filepath, target_disk, destination_location)
+            
+            time.sleep(0.5)
+
+    def __do_read_file(self, source_location:str, source_disk:str, filepath:str, repository_path:str, source_footprint:str):
+        dest_footprint = FichierHelper.copy_file(source_location, filepath, repository_path, source_footprint)
+        if dest_footprint != "":
+            notif = NotificationFactory.create_notification_new_file(Constantes.REPOSITORY, filepath, source_footprint, dest_footprint)
+            self.mqtt_client.publish(Topics.NEW_FILE, notif)
+        else:
+            notif = NotificationFactory.create_notification_error(source_disk, filepath, "The file could not be copied")
+            self.mqtt_client.publish(Topics.ERROR, notif)
+
+    def __do_copy_file(self, source_location:str, filepath:str, target_disk: str, target_location:str):        
+        #source_filepath = "{}/{}/{}".format(Parametres().parametre(Cles.CHEMIN_MONTAGE_USB), source_disk, filepath)        
+        source_footprint = FichierHelper.calculate_footprint("{}/{}".format(source_location, filepath))
+        
+        # Création du répertoire de destination si nécessaire
+        parent_path = Path(filepath).parent
+        if not parent_path.exists():
+            print(f"Création du répertoire {parent_path} dans le dépôt")
+            os.makedirs(f"{target_location}/{parent_path}", exist_ok= True)
+
+        dest_footprint = FichierHelper.copy_file(source_location, filepath, target_location, source_footprint)
+        if dest_footprint != "":
+            Logger().debug(f"The file {filepath} has been copied to {target_location}. The footprint is {source_footprint}")
+
+            # Envoi d'une notification pour informer de la présence d'un nouveau fichier
+            notif = NotificationFactory.create_notification_new_file(disk= target_disk, filepath= filepath, source_footprint= source_footprint, dest_footprint= dest_footprint)
+            self.mqtt_client.publish(f"{Topics.NEW_FILE}/notification", notif)
+
+            response = ResponseFactory.create_response_copy_file(filepath, target_disk, True, dest_footprint)            
+        else:
+            response = ResponseFactory.create_response_copy_file(filepath, target_disk, False, dest_footprint)
+            Logger().error(f"La copie du fichier {filepath} dans le dépôt a échoué.")
+
+        self.mqtt_client.publish(f"{Topics.COPY_FILE}/response", response)
