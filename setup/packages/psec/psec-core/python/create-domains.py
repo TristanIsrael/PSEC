@@ -104,7 +104,7 @@ class DomainsFactory:
         txt = f'''
 type = "hvm"
 name = "sys-usb"
-memory=700
+memory=300
 vcpus = { 2 if os.cpu_count() > 1 else 1 }
 disk = [
 	'format=raw, vdev=xvdc, access=r, devtype=cdrom, target=/usr/lib/psec/system/bootiso-sys-usb.iso'
