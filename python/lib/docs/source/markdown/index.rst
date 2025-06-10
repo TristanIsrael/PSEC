@@ -15,6 +15,7 @@ Project documentation
    documentation.md
    graphical-design.md
    integration.md
+   known-problems.md
    logging.md
    protocol.md
    provisioning.md
