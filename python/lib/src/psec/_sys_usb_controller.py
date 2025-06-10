@@ -368,7 +368,7 @@ class SysUsbController():
                 source_footprint = next_file.get("source_footprint", "")
                 self.__do_read_file(source_location, source_disk, filepath, repository_path, source_footprint)
             
-            time.sleep(0.5)
+            time.sleep(0.1)
 
     def __copy_files_worker(self):
         while self.__can_run:
@@ -380,7 +380,7 @@ class SysUsbController():
                 destination_location = next_file.get("destination_location", "")
                 self.__do_copy_file(source_location, filepath, target_disk, destination_location)
             
-            time.sleep(0.5)
+            time.sleep(0.1)
 
     def __do_read_file(self, source_location:str, source_disk:str, filepath:str, repository_path:str, source_footprint:str):
         #self.__debug_threads()
