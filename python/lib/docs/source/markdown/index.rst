@@ -20,6 +20,7 @@ Project documentation
    protocol.md
    provisioning.md
    python-api.md
+   roles.md
    sensors.md
    support-infrastructure.md
    tested-hardware.md
