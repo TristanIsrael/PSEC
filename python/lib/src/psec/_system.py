@@ -115,9 +115,10 @@ class System(metaclass=SingletonMeta):
             for line in output.splitlines():
                 if line.startswith('nr_cpus'):
                     self.__cpu_count = int(line.split(':')[1].strip())
-            return 1
         except Exception:
-            return 12
+            return 1
+        
+        return self.__cpu_count
 
 
     @staticmethod
@@ -194,18 +195,6 @@ class System(metaclass=SingletonMeta):
         vcpu_groups = vcpu.get("groups", {})
 
         topo_domains = {}
-        for domain in business_domains:
-            # Business domains
-            domain_name = domain.get("name", "unknown")
-            group_name = domain.get("vcpu_group", "")
-            topo_domains[domain_name] = {
-                "name": domain.get("name", "unknown"),
-                "type": "business",
-                "memory": domain.get("memory", 0),
-                "package": domain.get("package", ""),
-                "vcpus": System.compute_vcpus_for_group(group_name, vcpu_groups),
-                "cpus": System().compute_cpus_for_group(group_name, vcpu_groups)
-            }
 
         # sys-usb domain
         topo_domains["sys-usb"] = {
@@ -224,6 +213,19 @@ class System(metaclass=SingletonMeta):
             "vcpus": System.compute_vcpus_for_group("sys-gui", vcpu_groups),
             "cpus": System().compute_cpus_for_group("sys-gui", vcpu_groups),            
         }
+
+        for domain in business_domains:
+            # Business domains
+            domain_name = domain.get("name", "unknown")
+            group_name = domain.get("vcpu_group", domain_name) # If there is no group we will create a default configuration
+            topo_domains[domain_name] = {
+                "name": domain.get("name", "unknown"),
+                "type": "business",
+                "memory": domain.get("memory", 0),
+                "package": domain.get("app-package", ""),
+                "vcpus": System.compute_vcpus_for_group(group_name, vcpu_groups),
+                "cpus": System().compute_cpus_for_group(group_name, vcpu_groups)
+            }
 
         topo_struct["domains"] = topo_domains
 
@@ -267,10 +269,16 @@ class System(metaclass=SingletonMeta):
 
         if group_name == "sys-usb":
             return dom0_vcpus
-        
+
         reserved_vcpus = dom0_vcpus + sys_usb_vcpus
 
-        if group_name in groups.keys():
+        # If there is no group defined we force the cpu count
+        if len(groups) == 0:
+            print(f"There are no groups for {group_name}")
+            print(platform_cpus, reserved_vcpus)
+            return platform_cpus - reserved_vcpus
+
+        if group_name in groups:
             vcpu_rate = groups.get(group_name, None)
 
             # Override cpu rate for sys-gui if not provided
@@ -278,8 +286,11 @@ class System(metaclass=SingletonMeta):
 
             if vcpu_rate is not None:
                 vcpus = int(round(vcpu_rate*(platform_cpus-reserved_vcpus), 0))
- 
                 return max(vcpus, 1)
+        else:
+            # If there is no group defined we consider using 100% of the remaining cores
+            print(f"default case for {group_name}:{platform_cpus - reserved_vcpus}")
+            return platform_cpus - reserved_vcpus
 
         return vcpus
 
@@ -289,8 +300,13 @@ class System(metaclass=SingletonMeta):
         The first CPU is assigned to Dom0 and sys-usb Domain. 
         If there are at least 4 CPUs the second CPU is also assigned to Dom0 and sys-usb.
         The other CPUs are assigned to sys-gui and the other groups by trying to avoid overlapping.
-        """
-        
+        """        
+        cpu_count = System().get_platform_cpu_count()
+
+        if group_name not in groups and group_name not in [ "sys-usb", "Dom0" ]:
+            # If the group does not exist we return the default configuration
+            return list(range(1 if cpu_count <= 4 else 2, cpu_count))
+
         if self.__cpu_assignments is not None:
             # If the groups are in cache we take them
             cpu_assignments = self.__cpu_assignments
@@ -298,11 +314,11 @@ class System(metaclass=SingletonMeta):
             # Otherwise we calculate them before
             cpu_assignments = {
                 "Dom0": [ 0 ],
-                "sys-usb": [ 0 ]
+                "sys-usb": [ 0 ],
+                "sys-gui": [ 1 ]
             }
 
             next_pin = 1
-            cpu_count = System().get_platform_cpu_count()
             if cpu_count > 4:
                 # If there are more than 4 CPUs/cores we add one to Dom0 and sys-usb
                 cpu_assignments["Dom0"].append(next_pin)
@@ -310,19 +326,20 @@ class System(metaclass=SingletonMeta):
                 next_pin += 1
 
             # Then we assign sys-gui
-            if cpu_count < 2:
-                cpu_assignments["sys-gui"] = [ 1 ] # sys-usb is shared with sys-gui
-            elif cpu_count > 4:
+            if cpu_count > 4:
                 vcpus = System.compute_vcpus_for_group("sys-gui", groups)
                 cpu_assignments["sys-gui"] = list(range(2, next_pin + vcpus))
                 next_pin += 2
 
             # Then the other groups
-            for group_name in groups.keys():
-                vcpus = System.compute_vcpus_for_group(group_name, groups)
-                cpu_assignments[group_name] = list(range(next_pin, next_pin + vcpus))
+            for gname in groups.keys():
+                if gname in [ "sys-gui" ]:
+                    continue # We ignore sys-gui because we already worked on it
+                
+                vcpus = System.compute_vcpus_for_group(gname, groups)
+                cpu_assignments[gname] = list(range(next_pin, next_pin + vcpus))
 
             self.__cpu_assignments = cpu_assignments
 
         # Finally we return the value
-        return cpu_assignments.get(group_name, 1)
+        return cpu_assignments.get(group_name, [ 0 ])

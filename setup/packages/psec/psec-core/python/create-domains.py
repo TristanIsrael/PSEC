@@ -54,25 +54,25 @@ class DomainsFactory:
     def __provision_business_domains(self):
         domains = self.__topology.get("domains", {})
         if domains is not None:
-            for domain in domains:
-                name = domain.get("name")
-                type = domain.get("type")
+            for domain_name in domains:
+                config = domains[domain_name]
+                domain_type = config.get("type")
 
-                if type != "business":
+                if domain_type != "business":
                     continue
 
-                package = domain.get("package")
+                package = config.get("package")
 
-                self.__provision_domain(name, package)
+                self.__provision_domain(domain_name, package)
                 conf = self.__create_new_domain(
-                    domain_name= name,                    
-                    boot_iso_location= f"bootiso-{name}.iso",
+                    domain_name= domain_name,                    
+                    boot_iso_location= f"bootiso-{domain_name}.iso",
                     share_packages= True,
                     share_storage= True,
                     share_system= False
                 )
 
-                with open(f"/etc/psec/xen/{name}.conf", 'w') as f:
+                with open(f"/etc/psec/xen/{domain_name}.conf", 'w') as f:
                     f.write(conf)
 
                 self.__fetch_alpine_packages(package)
@@ -86,7 +86,7 @@ type = "hvm"
 name = "sys-usb"
 memory= { sys_usb.get("memory") }
 vcpus = { sys_usb.get("vcpus") }
-cpus = { self.__cpus_list_to_string(sys_usb.get("cpus")) }
+cpus = "{ self.__cpus_list_to_string(sys_usb.get("cpus", [])) }"
 disk = [
 	'format=raw, vdev=xvdc, access=r, devtype=cdrom, target=/usr/lib/psec/system/bootiso-sys-usb.iso'
 ]
@@ -119,7 +119,7 @@ type = "hvm"
 name = "sys-gui"
 memory={ sys_gui.get("memory", 512 ) }
 vcpus = { sys_gui.get("vcpus") }
-cpus = { self.__cpus_list_to_string(sys_gui.get("cpus")) }
+cpus = "{ self.__cpus_list_to_string(sys_gui.get("cpus", [])) }"
 disk = [
 	'format=raw, vdev=xvdc, access=r, devtype=cdrom, target=/usr/lib/psec/system/bootiso-sys-gui.iso'
 ]
@@ -152,6 +152,8 @@ vif=[]
         domains = self.__topology.get("domains", {})
         dom = domains.get(domain_name, {})
 
+        print("domain:", domain_name, "cpus=", dom.get("cpus"))
+
         txt = f'''
 type = "pv"
 name = "{ domain_name }"
@@ -160,7 +162,7 @@ ramdisk = "/var/lib/xen/boot/initramfs-virt"
 extra = "modules=loop,squashfs,iso9660 console=hvc0  module_blacklist=af_packet,network,video,sound,drm,snd,snd_hda_intel,bluetooth,btusb,r8153_ecm,r8152,usbnet,uvcvideo,pcspkr,videobuf2_v4l2,joydev,videodev,videobuf2_common,libphy,mc,mii"
 memory = { dom.get("memory", 512) }
 vcpus = { dom.get("vcpus") }
-cpus = { self.__cpus_list_to_string(dom.get("cpus")) }
+cpus = "{ self.__cpus_list_to_string(dom.get("cpus", [])) }"
 disk = [
 	'format=raw, vdev=xvdc, access=r, devtype=cdrom, target=/usr/lib/psec/system/{boot_iso_location}'
 ]
