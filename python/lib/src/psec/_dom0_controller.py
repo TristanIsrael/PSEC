@@ -197,7 +197,7 @@ class Dom0Controller():
                     "processor": platform.processor(),
                     "platform": platform.platform(),
                     "cpu": {
-                        "count": psutil.cpu_count(),
+                        "count": System.get_platform_cpu_count(),
                         "freq_current": psutil.cpu_freq().current,
                         "freq_min": psutil.cpu_freq().min,
                         "freq_max": psutil.cpu_freq().max,

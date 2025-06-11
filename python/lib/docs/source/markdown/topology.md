@@ -2,7 +2,6 @@
 
 This document describes the format of the topology file.
 
-
 This is a typical `topology.json`:
 ```
 {
@@ -18,25 +17,33 @@ This is a typical `topology.json`:
             "rotation": 0
         }
     },    
+    "vcpu": {
+        "groups": {
+            "sys-gui": 0.2,
+            "my_group": 0.8
+        }
+    },
     "business": {
         "domains": [
             {
                 "name": "myapp-function1",
                 "package": "myapp-function1",
                 "memory": 4096,
-                "cpu": 0.5
+                "vcpu_group": "my_group"
             },
             {
                 "name": "myapp-function2",
                 "package": "myapp-function2",
                 "memory": 4096,
-                "cpu": 0.5
+                "vcpu_group": "my_group"
             }
         ]
     }
 
 }
 ```
+
+## Keywords details
 
 Here is the detail of the keys:
 | Key | Type | Description |
@@ -50,4 +57,50 @@ Here is the detail of the keys:
 | business.domains.<entry>.name | string | Gives a name to the Domain. |
 | business.domains.<entry>.package | string | Defines the package (APK) which will be installed in the Domain. |
 | business.domains.<entry>.memory | int | Defines the memory, in MB, which whould be allocated to the Domain. |
-| business.domains.<entry>.cpu | float | Defines the percentage of the whole CPU cores which should be allocated to the Domain. Accepted values are between 0.0 (0%) and 1.0 (100%). |
+
+## Resource management
+
+This sections explains how resources can be distributed into the system.
+
+Resources (CPU, memory) can be affected to Domains (sys-gui and business Domains) as portions of the platform resources.
+
+### vCPU management
+
+The following rules apply:
+
+- the Dom0 and sys-usb Domains can't be configured. 
+  - Dom0 will have the 2 first vCPUs unless the system has less than 4, so he gets only the first.
+  - sys-usb will have the same vCPUs as Dom0
+- the configurable groups are:
+  - sys-gui will have the 2 next vCPUs by default unless the system has less than 4, so he gets only the second one. This value can be modified in topology.json.
+  - the rest can be divided in groups and affected to the Domains.
+
+The proportions are:
+- 15% to Dom0/sys-usb (shared) -> minimum value is 1
+- 75% for the rest of the system:
+  - 20% to sys-gui by default (overridable)
+  - 80% to the business Domains divisible into groups.
+
+Groups of vCPUs are declared in the section `vcpu.groups` which represents 100% of the allocatable vCPUs (75% of the system).
+
+Then each business domain can have a group allocated using the keyword `vcpu_group`.
+
+Example :
+
+```
+"vcpu": {
+    "groups": {
+        "my_group": 0.8
+    }
+} 
+
+"business": {
+    "domains": [
+        {
+            "name": "myapp-function1",            
+            "vcpu_group": "my_group"
+        }
+    ]
+}
+
+```

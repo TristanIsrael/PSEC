@@ -1,35 +1,32 @@
 import json, sys, subprocess, multiprocessing
 from configparser import ConfigParser
+from psec import System
 import os
 
 class DomainsFactory:
-    topology:dict = None
-    xen_conn = None
-    #alpine_repo = ""
+    __topology:dict = {}
 
     def __init__(self, topology:dict):
-        self.topology = topology
-        self.__cpu_count = os.cpu_count()
-        #self.alpine_repo = alpine_repo
+        self.__topology = topology
 
     def create_domains(self):
         print("Start creating domains from topology")
 
-        usb = self.topology.get("usb")
-        if usb != None and usb.get("use") == 1:
+        system = self.__topology.get("system", {})
+        use_usb = system.get("use_usb", False)
+        use_gui = system.get("use_gui", False)
+
+        if use_usb:
             self.__provision_domain("sys-usb", "psec-sys-usb", "lts")
             self.__create_domd_usb()
 
-        gui = self.topology.get("gui")
-        if gui != None and gui.get("use") == 1:
-            package = gui.get("app-package")            
+        if use_gui:
+            package = system.get("gui_app_package")
             self.__provision_domain("sys-gui", "psec-sys-gui" if package is None else package)
             self.__create_domd_gui()
             self.__fetch_alpine_packages(package)
-
-        business = self.topology.get("business")
-        if business != None:
-            self.__parse_business_domains(business)
+        
+        self.__provision_business_domains()
             
 
     ###
@@ -44,55 +41,35 @@ class DomainsFactory:
             with open('/etc/psec/xen/sys-usb.conf', 'w') as f:
                 f.write(conf)
 
+
     def __create_domd_gui(self):
         print("Create Driver Domain GUI")
-        
-        max_memory = self.get_max_memory_size()
-        rotation = 0
-        json_gui = self.topology.get("gui")
-        if json_gui is not None:
-            json_memory = json_gui.get("memory")
-            if json_memory is not None:
-                memory = json_memory
-                print(f"Setting {memory} MB for memory")
 
-        conf = self.__create_domain_sys_gui(memory_in_mb=memory)
+        conf = self.__create_domain_sys_gui()
 
         if conf is not None:
             with open('/etc/psec/xen/sys-gui.conf', 'w') as f:
                 f.write(conf)
     
-    def __parse_business_domains(self, json:dict):
-        repository = json.get("repository")
-        if repository is not None:
-            pass # Todo
-
-        domains = json.get("domains")
+    def __provision_business_domains(self):
+        domains = self.__topology.get("domains", {})
         if domains is not None:
             for domain in domains:
                 name = domain.get("name")
-                package = domain.get("app-package")
-                memory = self.get_max_memory_size()
-                if domain.get("memory") is not None:
-                    memory = domain.get("memory")
-                
-                cpus = 1
-                cpu_rate = domain.get("cpu", 1)
-                if cpu_rate > 1:
-                    cpu_rate = 1
-                cpu_count = multiprocessing.cpu_count()
-                cpus = round(cpu_count*cpu_rate)
+                type = domain.get("type")
+
+                if type != "business":
+                    continue
+
+                package = domain.get("package")
 
                 self.__provision_domain(name, package)
                 conf = self.__create_new_domain(
-                    domain_name= name,
-                    memory_in_mb= memory,
-                    nb_cpus= 1 if cpus == 0 else cpus,
+                    domain_name= name,                    
                     boot_iso_location= f"bootiso-{name}.iso",
                     share_packages= True,
                     share_storage= True,
                     share_system= False
-                    #rxtx_inputs= False
                 )
 
                 with open(f"/etc/psec/xen/{name}.conf", 'w') as f:
@@ -101,11 +78,15 @@ class DomainsFactory:
                 self.__fetch_alpine_packages(package)
 
     def __create_domain_sys_usb(self) -> None:
+        domains = self.__topology.get("domains", {})
+        sys_usb = domains.get("sys-usb", {})
+
         txt = f'''
 type = "hvm"
 name = "sys-usb"
-memory=300
-vcpus = { 2 if os.cpu_count() > 1 else 1 }
+memory= { sys_usb.get("memory") }
+vcpus = { sys_usb.get("vcpus") }
+cpus = { self.__cpus_list_to_string(sys_usb.get("cpus")) }
 disk = [
 	'format=raw, vdev=xvdc, access=r, devtype=cdrom, target=/usr/lib/psec/system/bootiso-sys-usb.iso'
 ]
@@ -129,14 +110,16 @@ vif=[]
 
         return txt
 
-    def __create_domain_sys_gui(self, memory_in_mb) -> None:
-        max_memory = self.get_max_memory_size()
+    def __create_domain_sys_gui(self) -> None:
+        domains = self.__topology.get("domains", {})
+        sys_gui = domains.get("sys-gui", {})
 
         txt = f'''
 type = "hvm"
 name = "sys-gui"
-memory={memory_in_mb}
-vcpus = { 4 if os.cpu_count() >= 4 else 2 if os.cpu_count() >= 2 else 1 }
+memory={ sys_gui.get("memory", 512 ) }
+vcpus = { sys_gui.get("vcpus") }
+cpus = { self.__cpus_list_to_string(sys_gui.get("cpus")) }
 disk = [
 	'format=raw, vdev=xvdc, access=r, devtype=cdrom, target=/usr/lib/psec/system/bootiso-sys-gui.iso'
 ]
@@ -165,15 +148,19 @@ vif=[]
 
         return txt
 
-    def __create_new_domain(self, domain_name:str, memory_in_mb:int, nb_cpus:int, boot_iso_location:str, share_packages:bool=True, share_storage:bool=True, share_system:bool=False):
+    def __create_new_domain(self, domain_name:str, boot_iso_location:str, share_packages:bool=True, share_storage:bool=True, share_system:bool=False):
+        domains = self.__topology.get("domains", {})
+        dom = domains.get(domain_name, {})
+
         txt = f'''
 type = "pv"
-name = "{domain_name}"
+name = "{ domain_name }"
 kernel = "/var/lib/xen/boot/vmlinuz-virt"
 ramdisk = "/var/lib/xen/boot/initramfs-virt"
 extra = "modules=loop,squashfs,iso9660 console=hvc0  module_blacklist=af_packet,network,video,sound,drm,snd,snd_hda_intel,bluetooth,btusb,r8153_ecm,r8152,usbnet,uvcvideo,pcspkr,videobuf2_v4l2,joydev,videodev,videobuf2_common,libphy,mc,mii"
-memory={memory_in_mb}
-vcpus = {nb_cpus}
+memory = { dom.get("memory", 512) }
+vcpus = { dom.get("vcpus") }
+cpus = { self.__cpus_list_to_string(dom.get("cpus")) }
 disk = [
 	'format=raw, vdev=xvdc, access=r, devtype=cdrom, target=/usr/lib/psec/system/{boot_iso_location}'
 ]
@@ -213,7 +200,7 @@ vnc=0
             print(e)    
 
     def __fetch_alpine_packages(self, package):
-        # Fetch Alpine packages   
+        # Fetch Alpine packages
         if package is None:
             print("Error: package is empty")
 
@@ -224,62 +211,26 @@ vnc=0
         )
 
         subprocess.run(
-            args= ["/usr/lib/psec/bin/reindex-and-sign-repository.sh"], 
+            args= ["/usr/lib/psec/bin/reindex-and-sign-repository.sh"],
             check= True
         )  
 
-    def get_max_memory_size(self) -> int:
-        ''' Returns the default memory size for a Domain
-
-        When not specified, the memory size is 90% of the system memory
-        '''
-
-        memory = 1024
-
-        try:
-            result = subprocess.run(['python3', '/usr/lib/psec/bin/get-total-memory.py'], capture_output=True, text=True)            
-            memory = int(result.stdout)
-            print(f"Memory detected: {memory} MB")
-
-            # Then we apply a 90% factor
-            memory *= 0.9
-        except:
-            print("Impossible d'obtenir la quantité de mémoire disponible sur le système")
-
-        return round(memory)
-
 ###
 ### Local functions
-def read_topology_file() -> str:
-    try:
-        with open('/etc/psec/topology.json', 'r') as f:
-            topo = f.read()
-            f.close()
-            return topo
-    except Exception as e:
-        print("An error occured while reading the file /etc/psec/topology.json")
-        print(e)
-        return ""
-
-def decode_topology_data(data:str) -> dict:
-    try:
-        data = json.loads(data)
-        return data
-    except Exception as e:
-        print("An error occured while decoding JSON file")
-        print(e)
-        return None    
+    def __cpus_list_to_string(self, cpus:list) -> str:
+        if not cpus:
+            return "0"
+        elif len(cpus) == 1:
+            return str(cpus[0])
+        return f"{cpus[0]}-{cpus[-1]}"
 
 ###
 ### Entry point
 if __name__ == "__main__":
     print("Starting Domains creation process")
 
-    print("Open topology file")
-    f = read_topology_file()
-
     print("Decode topology file")
-    topology = decode_topology_data(f)
+    topology = System.get_topology()
 
     print("Start topology factory")
     #alpine_repo = sys.argv[1]
