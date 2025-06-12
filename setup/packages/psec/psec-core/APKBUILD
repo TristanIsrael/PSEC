@@ -53,6 +53,7 @@ conf/motd
 conf/grub/grub.default
 conf/grub/grub.cfg-durabook-r8
 conf/10-stty.sh
+conf/color_prompt.sh
 conf/inittab
 
 python/rotate-screen.py
