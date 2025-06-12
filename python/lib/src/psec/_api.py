@@ -515,6 +515,10 @@ class Api(metaclass=SingletonMeta):
         """
         self.__mqtt_client.publish("{}/request".format(Topics.SYSTEM_INFO), {})
 
+    def clear_sys_usb_queues(self):
+        """ Queries sys-usb to clear its queues.
+        """
+        Api().publish(f"{Topics.SYS_USB_CLEAR_QUEUES}/request", {})
 
     ####
     # Fonctions de notification
@@ -587,6 +591,7 @@ class Api(metaclass=SingletonMeta):
         """
         payload = RequestFactory.create_request_restart_domain(domain_name)
         self.__mqtt_client.publish(f"{Topics.RESTART_DOMAIN}/request", payload)
+
 
 
     ####

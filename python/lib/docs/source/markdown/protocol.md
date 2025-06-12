@@ -428,6 +428,30 @@ Response fields:
 - `core` (dict): Gives information on the PSEC core.
 - `system` (dict): Gives information on the operating system and the machine hardware.
  
+### Clear sys-usb commands queue
+
+*Queries sys-usb to clear its commands queues*.
+
+Topic : `system/sys-usb/clear-queues`
+
+Request topic : `system/sys-usb/clear-queues/request`
+
+Request payload: `{}`
+
+Response topic: `system/sys-usb/clear-queues/request`
+
+Response payload:
+```
+{
+    "success": True|False,
+    "reason: "Description"
+}
+```
+
+Response fields:
+- `success` (bool): True if the queue has been cleared.
+- `reason` (str): If not success, this field contains the reason of the failure.
+
 ## Notifications
  
 This chapter presents the notifications sent by different components.

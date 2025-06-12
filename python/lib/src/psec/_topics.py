@@ -7,6 +7,7 @@ class Topics():
     DISCOVER = f"{SYSTEM}/discover"
     WORKFLOW = f"{SYSTEM}/workflow"
     ENERGY = f"{SYSTEM}/energy"
+    SYS_USB = f"{SYSTEM}/sys-usb"
 
     DEBUGGING = f"{SYSTEM}/debugging"
 
@@ -32,6 +33,7 @@ class Topics():
     ENERGY_STATE = f"{ENERGY}/state"
     SYSTEM_INFO = f"{SYSTEM}/info"
     BENCHMARK = f"{MISC}/benchmark"
+    SYS_USB_CLEAR_QUEUES = f"{SYS_USB}/clear-queues"
 
     # Logging
     ERROR = f"{EVENTS}/error"

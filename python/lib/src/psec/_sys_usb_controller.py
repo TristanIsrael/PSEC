@@ -21,13 +21,14 @@ class SysUsbController():
     __messages_queue = Queue()
     __read_files_queue = Queue()
     __copy_files_queue = Queue()
+    __high_priority_messages = [ Topics.LIST_DISKS, Topics.LIST_FILES, Topics.DISCOVER_COMPONENTS, Topics.PING, Topics.SYS_USB_CLEAR_QUEUES ]
 
     def __init__(self, mqtt_client:MqttClient):
         self.mqtt_client = mqtt_client
         self.__disk_monitor = None
         self.__thread_read_files = threading.Thread(target=self.__read_files_worker, name="read_file_worker")
         self.__thread_copy_files = threading.Thread(target=self.__copy_files_worker, name="copy_file_worker")
-        self.__thread_messages = threading.Thread(target=self.__message_worker, name="message_worker")
+        self.__thread_messages = threading.Thread(target=self.__message_worker, name="message_worker")        
 
 
     def __del__(self):
@@ -50,7 +51,7 @@ class SysUsbController():
 
     def __on_mqtt_connected(self):
         Logger().setup("USB controller", self.mqtt_client)
-        Logger().debug("Starting PSEC disk controller")
+        Logger().debug("Starting PSEC disk controller")        
 
         self.mqtt_client.subscribe(f"{Topics.LIST_DISKS}/request")
         self.mqtt_client.subscribe(f"{Topics.LIST_FILES}/request")
@@ -62,6 +63,7 @@ class SysUsbController():
         self.mqtt_client.subscribe(f"{Topics.CREATE_FILE}/request")
         self.mqtt_client.subscribe(f"{Topics.DISCOVER_COMPONENTS}/request")
         self.mqtt_client.subscribe(f"{Topics.PING}/request")
+        self.mqtt_client.subscribe(f"{Topics.SYS_USB_CLEAR_QUEUES}/request")
 
         # Démarrage de la surveillance des entrées
         if not NO_INPUTS_MONITORING:
@@ -89,52 +91,58 @@ class SysUsbController():
     def __on_mqtt_message(self, topic:str, payload:dict):
         #Logger().debug("Message received : topic={}, payload={}".format(topic, payload))
 
-        self.__messages_queue.put((topic, payload))
-        #threading.Thread(target=self.__message_worker, args=(topic, payload,), name="mqtt_message").start()
+        base_topic, _ = topic.rsplit("/", 1)
+
+        # Some messages have a high priority, we don't put them into the queue
+        # These tasks should only be small tasks, otherwise they go in the queue
+        if base_topic in self.__high_priority_messages:
+            threading.Thread(target=self.__handle_message(base_topic, payload)).start()
+
+        self.__messages_queue.put((base_topic, payload))
 
 
     def __message_worker(self):
-        #Logger().debug("Handle message {}".format(topic))        
+        #Logger().debug("Handle message {}".format(topic))
 
         while self.__can_run:
             if not self.__messages_queue.empty():
-                print(f"{self.__messages_queue.qsize()} messages in queue")
-
                 message = self.__messages_queue.get() # We get a tuple
                 topic = message[0]
                 payload = message[1]
-                print(f"Handle message {topic}")
 
-                base_topic, _ = topic.rsplit("/", 1)
-
-                if base_topic == Topics.LIST_DISKS:
-                    self.__handle_list_disks(base_topic)
-                elif base_topic == Topics.LIST_FILES:
-                    self.__handle_list_files(base_topic, payload)
-                elif base_topic == Topics.COPY_FILE:
-                    self.__handle_copy_file(base_topic, payload)
-                elif base_topic == Topics.READ_FILE:
-                    self.__handle_read_file(base_topic, payload)
-                elif base_topic == Topics.DELETE_FILE:
-                    self.__handle_remove_file(base_topic, payload)
-                elif base_topic == Topics.BENCHMARK:
-                    self.__handle_benchmark(base_topic, payload)
-                elif base_topic == Topics.FILE_FOOTPRINT:
-                    self.__handle_file_footprint(base_topic, payload)
-                elif base_topic == Topics.CREATE_FILE:
-                    self.__handle_create_file(base_topic, payload)
-                elif base_topic == Topics.DISCOVER_COMPONENTS:
-                    self.__handle_discover_components(base_topic, payload)
-                elif base_topic == Topics.DELETE_FILE:
-                    self.__handle_delete_file(payload)
-                elif base_topic == Topics.PING:
-                    self.__handle_ping(payload)
+                self.__handle_message(topic, payload)
 
             time.sleep(0.1)
 
     ####
     # Traitement des commandes
     #
+    def __handle_message(self, topic:str, payload:dict):
+        if topic == Topics.LIST_DISKS:
+            self.__handle_list_disks(topic)
+        elif topic == Topics.LIST_FILES:
+            self.__handle_list_files(topic, payload)
+        elif topic == Topics.COPY_FILE:
+            self.__handle_copy_file(topic, payload)
+        elif topic == Topics.READ_FILE:
+            self.__handle_read_file(topic, payload)
+        elif topic == Topics.DELETE_FILE:
+            self.__handle_remove_file(topic, payload)
+        elif topic == Topics.BENCHMARK:
+            self.__handle_benchmark(topic, payload)
+        elif topic == Topics.FILE_FOOTPRINT:
+            self.__handle_file_footprint(topic, payload)
+        elif topic == Topics.CREATE_FILE:
+            self.__handle_create_file(topic, payload)
+        elif topic == Topics.DISCOVER_COMPONENTS:
+            self.__handle_discover_components(topic, payload)
+        elif topic == Topics.DELETE_FILE:
+            self.__handle_delete_file(payload)
+        elif topic == Topics.PING:
+            self.__handle_ping(payload)
+        elif topic == Topics.SYS_USB_CLEAR_QUEUES:
+            self.__handle_clear_queue()
+
     def __handle_list_disks(self, topic:str) -> None:
         Logger().debug("Disks list requested")
 
@@ -418,6 +426,16 @@ class SysUsbController():
 
         self.mqtt_client.publish(f"{Topics.COPY_FILE}/response", response)
 
+    def __handle_clear_queue(self):
+        while not self.__copy_files_queue.empty():
+            self.__copy_files_queue.get()
+
+        while not self.__read_files_queue.empty():
+            self.__read_files_queue.get()
+
+    ######## 
+    ## Special functions
+    ##
     def __debug_threads(self):
         print(f"Active threads: {threading.active_count()}")
         for thread in threading.enumerate():
