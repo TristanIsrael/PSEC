@@ -1,5 +1,5 @@
 from . import Constantes, RequestFactory, Topics, NotificationFactory, ResponseFactory
-from . import Logger, MqttClient, System, SingletonMeta
+from . import Logger, MqttClient, System, SingletonMeta, MqttFactory
 from paho.mqtt.enums import MQTTErrorCode
 import tempfile
 import os
@@ -60,8 +60,7 @@ class Api(metaclass=SingletonMeta):
         subscriptions = []
 
         def start():
-            client=MqttFactory.create_mqtt_network_dev("my_app")
-            Api().start(client)
+            Api().start(domain_identifier="my-domain")
             Api().add_ready_callback(on_connected)
             event.wait()
 
@@ -81,27 +80,35 @@ class Api(metaclass=SingletonMeta):
 
     """
 
-    __ready_callbacks = list()
-    __message_callbacks = list()
-    __subscriptions = list()
-    __shutdown_callbacks = list()
-    __restart_callbacks = list()    
-    __subscription_callbacks = list()
+    __ready_callbacks = []
+    __message_callbacks = []
+    __subscriptions = []
+    __shutdown_callbacks = []
+    __restart_callbacks = []
+    __subscription_callbacks = []
     __recording = False
     __mqtt_client = None
     __ping_id = 0
+    __logfile = "/var/log/psec.log"
 
 
-    def start(self, mqtt_client:MqttClient, recording = False, logfile = os.path.join(tempfile.gettempdir(), "journal.log")):
+    def start(self, mqtt_client:MqttClient = None, domain_identifier:str = "undefined", recording:bool = False, logfile:str = os.path.join(tempfile.gettempdir(), "psec.log")):
         """
         Starts the API by connecting to the MQTT broker and opening a log file if asked.
 
+        When no mqtt_client argument is provided the API tries to create a DomU client with the identifier provided.
+
         Args:
             mqtt_client (MqttClient): The instance of the MqttClient class which handles the connexion to the MQTT broker.
+            domain_identifier (str): The unique identifier (label) for the domain connection.
             recording (bool): If true, the events will be recorded in a log file.
             logfile (str): If recording is true, the location of the log file can provided with this parameter.
         """
-        self.__mqtt_client = mqtt_client
+        if mqtt_client is None:
+            self.__mqtt_client = MqttFactory.create_mqtt_client_domu(domain_identifier)
+        else:
+            self.__mqtt_client = mqtt_client
+
         self.__recording = recording
         self.__logfile = logfile
 

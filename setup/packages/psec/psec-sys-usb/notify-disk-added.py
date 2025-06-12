@@ -2,8 +2,8 @@ import sys, threading
 from psec import Api, MqttFactory
 
 if len(sys.argv) < 2:
-    print("Argument missing : {} disk_name".format(sys.argv[0]))
-    exit(-1)
+    print(f"Argument missing : {sys.argv[0]} disk_name")
+    exit(1)
 
 name = sys.argv[1]
 
@@ -19,7 +19,7 @@ api.start(mqtt_client)
 
 api_ready.wait()
 
-api.info("The disk {} has been connected to the system.".format(name))
+api.info(f"The disk {name} has been connected to the system.")
 api.notify_disk_added(name)
 api.stop()
 mqtt_client.stop()

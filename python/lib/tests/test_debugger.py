@@ -26,7 +26,7 @@ class TestDebugger():
         client=MqttFactory.create_mqtt_network_dev("test")
         #client=MqttFactory.create_mqtt_client_domu("test")
         Api().add_ready_callback(self.on_connected)
-        Api().start(client)        
+        Api().start(mqtt_client=client)
         self.event.wait()
 
 if __name__ == "__main__":

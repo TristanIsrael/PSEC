@@ -41,7 +41,7 @@ class InterfaceSocle(QObject):
 
         Api().add_message_callback(self.__on_message_received)
         Api().add_ready_callback(ready_callback)
-        Api().start(self.mqtt_client)
+        Api().start(mqtt_client=self.mqtt_client)
 
     @Slot()
     def get_disks_list(self):
