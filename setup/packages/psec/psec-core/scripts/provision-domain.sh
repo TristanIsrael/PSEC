@@ -8,9 +8,9 @@ export LOCAL_PGP_PUBKEY="/etc/apk/keys/local.rsa.pub"
 ## Local variables
 export WORKDIR="/usr/lib/psec/tmp/domu.tmp"
 
-if [ $# -lt 3 ]; then
+if [ $# -lt 4 ]; then
   echo "Mandatory arguments missing."
-  echo "$0 [Domain name] [Main package] [Alpine branch (virt|lts)]"
+  echo "$0 [Domain name] [Main package] [Alpine branch (virt|lts)] [blacklist.conf file path]"
   exit 1
 fi
 
@@ -18,6 +18,7 @@ DOMAIN=$1
 MAIN_PACKAGE=$2
 ALPINE_BRANCH=$3
 ALPINE_BRANCH=${ALPINE_BRANCH:-virt}
+BLACKLIST_CONF=$4
 
 # Vérifier la valeur de $ALPINE_BRANCH et définir $BOOTISO_FILENAME en conséquence
 case "$ALPINE_BRANCH" in
@@ -86,6 +87,11 @@ cp $LOCAL_PGP_PUBKEY $WORKDIR/apkovl/etc/apk/keys
 echo ... Set permissions
 chmod +x etc/init.d/*
 chown 0:0 etc/init.d/*
+
+if [ -e "$BLACLIST_CONF" ]; do
+    echo ... Patch modules blacklist
+    cat $BLACKLIST_CONF >> etc/modprobe.d/blacklist.conf
+done
 
 echo ... Create new APK overlay
 cd $WORKDIR/apkovl

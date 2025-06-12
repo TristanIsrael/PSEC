@@ -1,6 +1,6 @@
-import json, sys, subprocess, multiprocessing
-from configparser import ConfigParser
+import subprocess
 from psec import System
+import tempfile
 import os
 
 class DomainsFactory:
@@ -17,12 +17,14 @@ class DomainsFactory:
         use_gui = system.get("use_gui", False)
 
         if use_usb:
-            self.__provision_domain("sys-usb", "psec-sys-usb", "lts")
+            blacklist_conf = self.__create_blacklist_conf("sys-usb")
+            self.__provision_domain("sys-usb", "psec-sys-usb", "lts", blacklist_conf)
             self.__create_domd_usb()
 
         if use_gui:
+            blacklist_conf = self.__create_blacklist_conf("sys-gui")
             package = system.get("gui_app_package")
-            self.__provision_domain("sys-gui", "psec-sys-gui" if package is None else package)
+            self.__provision_domain("sys-gui", "psec-sys-gui" if package is None else package, "virt", blacklist_conf)
             self.__create_domd_gui()
             self.__fetch_alpine_packages(package)
         
@@ -35,7 +37,7 @@ class DomainsFactory:
     def __create_domd_usb(self):
         print("Create Driver Domain USB")
 
-        conf = self.__create_domain_sys_usb()
+        conf = self.__create_xl_conf_sys_usb()
 
         if conf is not None:
             with open('/etc/psec/xen/sys-usb.conf', 'w') as f:
@@ -45,7 +47,7 @@ class DomainsFactory:
     def __create_domd_gui(self):
         print("Create Driver Domain GUI")
 
-        conf = self.__create_domain_sys_gui()
+        conf = self.__create_xl_conf_sys_gui()
 
         if conf is not None:
             with open('/etc/psec/xen/sys-gui.conf', 'w') as f:
@@ -63,8 +65,9 @@ class DomainsFactory:
 
                 package = config.get("package")
 
-                self.__provision_domain(domain_name, package)
-                conf = self.__create_new_domain(
+                blacklist_conf = self.__create_blacklist_conf()
+                self.__provision_domain(domain_name, package, "virt", blacklist_conf)
+                conf = self.__create_xl_conf_domain(
                     domain_name= domain_name,                    
                     boot_iso_location= f"bootiso-{domain_name}.iso",
                     share_packages= True,
@@ -77,15 +80,15 @@ class DomainsFactory:
 
                 self.__fetch_alpine_packages(package)
 
-    def __create_domain_sys_usb(self) -> None:
+    def __create_xl_conf_sys_usb(self) -> None:
         domains = self.__topology.get("domains", {})
         sys_usb = domains.get("sys-usb", {})
 
         txt = f'''
 type = "hvm"
 name = "sys-usb"
-memory= { sys_usb.get("memory") }
-vcpus = { sys_usb.get("vcpus") }
+memory= { sys_usb.get("memory", 512) }
+vcpus = { sys_usb.get("vcpus", 1) }
 cpus = "{ self.__cpus_list_to_string(sys_usb.get("cpus", [])) }"
 disk = [
 	'format=raw, vdev=xvdc, access=r, devtype=cdrom, target=/usr/lib/psec/system/bootiso-sys-usb.iso'
@@ -110,7 +113,7 @@ vif=[]
 
         return txt
 
-    def __create_domain_sys_gui(self) -> None:
+    def __create_xl_conf_sys_gui(self) -> None:
         domains = self.__topology.get("domains", {})
         sys_gui = domains.get("sys-gui", {})
 
@@ -118,7 +121,7 @@ vif=[]
 type = "hvm"
 name = "sys-gui"
 memory={ sys_gui.get("memory", 512 ) }
-vcpus = { sys_gui.get("vcpus") }
+vcpus = { sys_gui.get("vcpus", 1) }
 cpus = "{ self.__cpus_list_to_string(sys_gui.get("cpus", [])) }"
 disk = [
 	'format=raw, vdev=xvdc, access=r, devtype=cdrom, target=/usr/lib/psec/system/bootiso-sys-gui.iso'
@@ -148,20 +151,17 @@ vif=[]
 
         return txt
 
-    def __create_new_domain(self, domain_name:str, boot_iso_location:str, share_packages:bool=True, share_storage:bool=True, share_system:bool=False):
+    def __create_xl_conf_domain(self, domain_name:str, boot_iso_location:str, share_packages:bool=True, share_storage:bool=True, share_system:bool=False):
         domains = self.__topology.get("domains", {})
         dom = domains.get(domain_name, {})
 
         print("domain:", domain_name, "cpus=", dom.get("cpus"))
 
         txt = f'''
-type = "pv"
+type = "hvm"
 name = "{ domain_name }"
-kernel = "/var/lib/xen/boot/vmlinuz-virt"
-ramdisk = "/var/lib/xen/boot/initramfs-virt"
-extra = "modules=loop,squashfs,iso9660 console=hvc0  module_blacklist=af_packet,network,video,sound,drm,snd,snd_hda_intel,bluetooth,btusb,r8153_ecm,r8152,usbnet,uvcvideo,pcspkr,videobuf2_v4l2,joydev,videodev,videobuf2_common,libphy,mc,mii"
 memory = { dom.get("memory", 512) }
-vcpus = { dom.get("vcpus") }
+vcpus = { dom.get("vcpus", 1) }
 cpus = "{ self.__cpus_list_to_string(dom.get("cpus", [])) }"
 disk = [
 	'format=raw, vdev=xvdc, access=r, devtype=cdrom, target=/usr/lib/psec/system/{boot_iso_location}'
@@ -169,6 +169,8 @@ disk = [
 device_model_override = "/usr/bin/qemu-system-x86_64"
 device_model_version = "qemu-xen"
 vnc=0
+usb=0
+vif=[]
 '''
         
         # Add P9 shares
@@ -192,11 +194,14 @@ vnc=0
 
         return txt
 
-    def __provision_domain(self, domain_name:str, main_package:str, alpine_branch:str = "virt"):
+    def __provision_domain(self, domain_name:str, main_package:str, alpine_branch:str = "virt", blacklist_conf:str = None):
         cmd = "/usr/lib/psec/bin/provision-domain.sh"
 
         try:
-            subprocess.run([cmd, domain_name, main_package, alpine_branch], check=True)
+            subprocess.run([cmd, domain_name, main_package, alpine_branch, blacklist_conf], check=True)
+
+            # When finished we remove the blacklist.conf file
+            os.unlink(blacklist_conf)
         except Exception as e:
             print("An error occured during domain provisioning")
             print(e)    
@@ -207,7 +212,7 @@ vnc=0
             print("Error: package is empty")
 
         subprocess.run(
-            args= ["apk", "fetch", "-R", package], 
+            args= ["apk", "fetch", "-R", package],
             cwd= "/usr/lib/psec/packages/alpine/x86_64",
             check= True
         )
@@ -215,16 +220,38 @@ vnc=0
         subprocess.run(
             args= ["/usr/lib/psec/bin/reindex-and-sign-repository.sh"],
             check= True
-        )  
+        )
 
 ###
-### Local functions
+### Private functions
     def __cpus_list_to_string(self, cpus:list) -> str:
         if not cpus:
             return "0"
         elif len(cpus) == 1:
             return str(cpus[0])
         return f"{cpus[0]}-{cpus[-1]}"
+
+    def __create_blacklist_conf(self, domain_name:str = ""):
+        print(f"Create blacklist.conf file for { domain_name if domain_name != "" else "standard Domain" }")
+
+        modules = []
+
+        if domain_name == "sys-usb":
+            modules.extend([ "af_packet", "network", "video", "sound", "drm", "snd", "snd_hda_intel", "bluetooth", "btusb", "r8153_ecm", "r8152", "usbnet", "uvcvideo", "pcspkr", "videobuf2_v4l2", "joydev", "videodev", "videobuf2_common", "libphy", "mc", "mii" ])
+        elif domain_name == "sys-gui":
+            modules.extend([ "af_packet", "network", "sound", "drm", "snd", "snd_hda_intel", "bluetooth", "btusb", "r8153_ecm", "r8152", "usbnet", "uvcvideo", "pcspkr", "joydev", "videodev", "libphy", "mc", "mii", "sd_mod", "usb_common", "usbcore", "usb_storage" ])
+        else:
+            modules.extend([ "af_packet", "network", "video", "sound", "drm", "snd", "snd_hda_intel", "bluetooth", "btusb", "r8153_ecm", "r8152", "usbnet", "uvcvideo", "pcspkr", "videobuf2_v4l2", "joydev", "videodev", "videobuf2_common", "libphy", "mc", "mii", "sd_mod", "usb_common", "usbcore", "usb_storage" ])
+
+        data = [f"blacklist {module}\n" for module in modules]
+
+        fd, blacklist_conf = tempfile.mkstemp()
+        with os.open(fd, 'w') as tmpfile:
+            tmpfile.write("\nBlacklisted by PSEC\n")
+            tmpfile.write(data)
+            tmpfile.write("\n")
+
+        return blacklist_conf
 
 ###
 ### Entry point
