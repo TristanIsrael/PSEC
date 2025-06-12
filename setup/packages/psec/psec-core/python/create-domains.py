@@ -236,22 +236,31 @@ vif=[]
 
     def __create_blacklist_conf(self, domain_name:str = "") -> str:
         print(f"Create blacklist.conf file for { domain_name if domain_name != "" else "standard Domain" }")
+        print("DISABLED")
 
-        modules = []
+        modules_multimedia = [ "simpledrm", "drm", "snd", "snd_hda_intel", "bluetooth", "btusb", "uvcvideo", "pcspkr", "videobuf2_v4l2", "joydev", "videodev", "videobuf2_common" ]
+        modules_usb = [ "sd_mod", "usb_common", "usbcore", "usb_storage" ]
+        modules_networking = [ "af_packet", "network", "usbnet", "libphy", "mc", "mii" ]
+        blacklisted_modules = [ ]
 
         if domain_name == "sys-usb":
-            modules.extend([ "af_packet", "network", "video", "sound", "simpledrm", "drm", "snd", "snd_hda_intel", "bluetooth", "btusb", "r8153_ecm", "r8152", "usbnet", "uvcvideo", "pcspkr", "videobuf2_v4l2", "joydev", "videodev", "videobuf2_common", "libphy", "mc", "mii" ])
+            # modules.extend([ "af_packet", "network", "video", "sound", "simpledrm", "drm", "snd", "snd_hda_intel", "bluetooth", "btusb", "r8153_ecm", "r8152", "usbnet", "uvcvideo", "pcspkr", "videobuf2_v4l2", "joydev", "videodev", "videobuf2_common", "libphy", "mc", "mii" ])
+            blacklisted_modules.extend( modules_multimedia )
         elif domain_name == "sys-gui":
-            modules.extend([ "af_packet", "network", "sound", "snd", "snd_hda_intel", "bluetooth", "btusb", "r8153_ecm", "r8152", "usbnet", "uvcvideo", "pcspkr", "joydev", "videodev", "libphy", "mc", "mii", "sd_mod", "usb_common", "usbcore", "usb_storage" ])
+            #blacklisted_modules.extend([ "af_packet", "network", "sound", "snd", "snd_hda_intel", "bluetooth", "btusb", "r8153_ecm", "r8152", "usbnet", "uvcvideo", "pcspkr", "joydev", "videodev", "libphy", "mc", "mii", "sd_mod", "usb_common", "usbcore", "usb_storage" ])
+            blacklisted_modules.extend( modules_usb )
+            blacklisted_modules.extend( modules_networking )
         else:
-            modules.extend([ "af_packet", "network", "video", "sound", "simpledrm", "drm", "snd", "snd_hda_intel", "bluetooth", "btusb", "r8153_ecm", "r8152", "usbnet", "uvcvideo", "pcspkr", "videobuf2_v4l2", "joydev", "videodev", "videobuf2_common", "libphy", "mc", "mii", "sd_mod", "usb_common", "usbcore", "usb_storage" ])
+            # [ "af_packet", "network", "video", "sound", "simpledrm", "drm", "snd", "snd_hda_intel", "bluetooth", "btusb", "r8153_ecm", "r8152", "usbnet", "uvcvideo", "pcspkr", "videobuf2_v4l2", "joydev", "videodev", "videobuf2_common", "libphy", "mc", "mii", "sd_mod", "usb_common", "usbcore", "usb_storage" ]
+            blacklisted_modules.extend( modules_usb )
+            blacklisted_modules.extend( modules_networking )
 
-        data = [f"blacklist {module}" for module in modules]
+        data = [f"blacklist {module}" for module in blacklisted_modules]
 
         fd, blacklist_conf = tempfile.mkstemp()
 
         try: 
-            os.write(fd, b"\nBlacklisted by PSEC\n")
+            os.write(fd, b"\n#Blacklisted by PSEC\n")
             os.write(fd, "\n".join(data).encode())
             os.write(fd, b"\n")
         except Exception as e:
