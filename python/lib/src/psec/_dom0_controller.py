@@ -4,6 +4,7 @@ import subprocess
 import time
 import psutil
 import os
+import shutil
 from . import Constantes, __version__
 from . import Logger, FichierHelper, Parametres, Cles
 from . import ResponseFactory
@@ -197,7 +198,7 @@ class Dom0Controller():
                     "processor": platform.processor(),
                     "platform": platform.platform(),
                     "cpu": {
-                        "count": System.get_platform_cpu_count(),
+                        "count": System().get_platform_cpu_count(),
                         "freq_current": psutil.cpu_freq().current,
                         "freq_min": psutil.cpu_freq().min,
                         "freq_max": psutil.cpu_freq().max,
@@ -209,8 +210,9 @@ class Dom0Controller():
                         "percent": psutil.virtual_memory().percent,
                         "used": psutil.virtual_memory().used,
                         "free": psutil.virtual_memory().free
-                    }                    
+                    }
                 },
+                "storage": self.__get_storage_info(),
                 "boot_time": psutil.boot_time(),
                 "uuid": System().get_system_uuid()
             }
@@ -263,3 +265,29 @@ class Dom0Controller():
         payload = ResponseFactory.create_response_ping(ping_id, "Dom0", data, sent_at)
 
         self.mqtt_client.publish(f"{Topics.PING}/response", payload)
+
+    def __get_storage_info(self) -> dict:
+        info = {
+            "total": 0,
+            "used": 0,
+            "free": 0,
+            "files": 0
+        }
+        
+        storage_path = Constantes().constante(Cles.CHEMIN_DEPOT_DOM0)
+        print(f"Looking for storage information into {storage_path}")
+
+        # Get information about the disk
+        try:
+            usage = shutil.disk_usage(storage_path)
+            info["total"] = usage.total
+            info["used"] = usage.used
+            info["free"] = usage.free
+        except Exception as e:
+            Logger().error(f"Could not get storage information : {e}")
+
+        # Get information about the files
+        for _, _, files in os.walk(storage_path):
+            info["files"] += len(files)
+
+        return info

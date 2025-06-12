@@ -514,7 +514,13 @@ class Api(metaclass=SingletonMeta):
                         }
                     }, 
                     "boot_time": 1747205332.0, 
-                    "uuid": "11ec0800-4fb9-11ef-bd38-ad993f2e7700"
+                    "uuid": "11ec0800-4fb9-11ef-bd38-ad993f2e7700",
+                    "storage": {
+                        "total": 12345678,
+                        "used": 0,
+                        "free": 12345678,
+                        "files": 0
+                    }
                 }
             }        
 
@@ -522,10 +528,12 @@ class Api(metaclass=SingletonMeta):
         """
         self.__mqtt_client.publish("{}/request".format(Topics.SYSTEM_INFO), {})
 
+
     def clear_sys_usb_queues(self):
         """ Queries sys-usb to clear its queues.
         """
         Api().publish(f"{Topics.SYS_USB_CLEAR_QUEUES}/request", {})
+
 
     ####
     # Fonctions de notification

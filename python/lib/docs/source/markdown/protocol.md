@@ -419,6 +419,12 @@ Response payload:
             }, 
             "boot_time": 1748036696.0, 
             "uuid": "11ec0800-4fb9-11ef-bd38-ad993f2e7700"
+            "storage": {
+                "total": 12345678,
+                "used": 0,
+                "free": 12345678,
+                "files_count": 0
+            }
         }
     }
 }
