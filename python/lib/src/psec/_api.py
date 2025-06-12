@@ -1,4 +1,4 @@
-from . import Constantes, RequestFactory, Topics, NotificationFactory, ResponseFactory
+from . import RequestFactory, Topics, NotificationFactory, ResponseFactory
 from . import Logger, MqttClient, System, SingletonMeta, MqttFactory
 from paho.mqtt.enums import MQTTErrorCode
 import tempfile
@@ -7,7 +7,6 @@ import zlib
 import base64
 import atexit
 import signal
-import threading
 from datetime import datetime
 
 class Api(metaclass=SingletonMeta):

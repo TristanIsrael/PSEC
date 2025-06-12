@@ -1,17 +1,19 @@
+import time
+import threading
+import os
+import base64
+import zlib
+from pathlib import Path
+from queue import Queue
 from . import Constantes, Parametres, MqttClient, Topics
 from . import FichierHelper, ResponseFactory, EtatComposant
-from . import Logger, Cles, BenchmarkId, MqttClient, DiskMonitor, MqttHelper
-import time
-from queue import Queue
+from . import Logger, Cles, DiskMonitor, NotificationFactory
 try:
     from . import DemonInputs
     NO_INPUTS_MONITORING = False
 except:
     NO_INPUTS_MONITORING = True
     print("Importing ControleurVmSysUsb without inputs monitoring nor benchmarking capacity")
-from . import NotificationFactory, FichierHelper
-import threading, os, base64, zlib
-from pathlib import Path
 
 class SysUsbController():
     """ Cette classe traite les messages échangés par la sys-usb avec le Dom0 ou les autres domaines. """

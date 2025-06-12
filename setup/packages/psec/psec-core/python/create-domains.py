@@ -87,6 +87,7 @@ class DomainsFactory:
         txt = f'''
 type = "hvm"
 name = "sys-usb"
+serial = "pty" 
 memory= { sys_usb.get("memory", 512) }
 vcpus = { sys_usb.get("vcpus", 1) }
 cpus = "{ self.__cpus_list_to_string(sys_usb.get("cpus", [])) }"
@@ -120,6 +121,7 @@ vif=[]
         txt = f'''
 type = "hvm"
 name = "sys-gui"
+serial = "pty" 
 memory={ sys_gui.get("memory", 512 ) }
 vcpus = { sys_gui.get("vcpus", 1) }
 cpus = "{ self.__cpus_list_to_string(sys_gui.get("cpus", [])) }"
@@ -159,6 +161,7 @@ vif=[]
 
         txt = f'''
 type = "hvm"
+serial = "pty" 
 name = "{ domain_name }"
 memory = { dom.get("memory", 512) }
 vcpus = { dom.get("vcpus", 1) }
@@ -204,7 +207,7 @@ vif=[]
             os.unlink(blacklist_conf)
         except Exception as e:
             print("An error occured during domain provisioning")
-            print(e)    
+            print(e)
 
     def __fetch_alpine_packages(self, package):
         # Fetch Alpine packages
@@ -231,25 +234,29 @@ vif=[]
             return str(cpus[0])
         return f"{cpus[0]}-{cpus[-1]}"
 
-    def __create_blacklist_conf(self, domain_name:str = ""):
+    def __create_blacklist_conf(self, domain_name:str = "") -> str:
         print(f"Create blacklist.conf file for { domain_name if domain_name != "" else "standard Domain" }")
 
         modules = []
 
         if domain_name == "sys-usb":
-            modules.extend([ "af_packet", "network", "video", "sound", "drm", "snd", "snd_hda_intel", "bluetooth", "btusb", "r8153_ecm", "r8152", "usbnet", "uvcvideo", "pcspkr", "videobuf2_v4l2", "joydev", "videodev", "videobuf2_common", "libphy", "mc", "mii" ])
+            modules.extend([ "af_packet", "network", "video", "sound", "simpledrm", "drm", "snd", "snd_hda_intel", "bluetooth", "btusb", "r8153_ecm", "r8152", "usbnet", "uvcvideo", "pcspkr", "videobuf2_v4l2", "joydev", "videodev", "videobuf2_common", "libphy", "mc", "mii" ])
         elif domain_name == "sys-gui":
-            modules.extend([ "af_packet", "network", "sound", "drm", "snd", "snd_hda_intel", "bluetooth", "btusb", "r8153_ecm", "r8152", "usbnet", "uvcvideo", "pcspkr", "joydev", "videodev", "libphy", "mc", "mii", "sd_mod", "usb_common", "usbcore", "usb_storage" ])
+            modules.extend([ "af_packet", "network", "sound", "snd", "snd_hda_intel", "bluetooth", "btusb", "r8153_ecm", "r8152", "usbnet", "uvcvideo", "pcspkr", "joydev", "videodev", "libphy", "mc", "mii", "sd_mod", "usb_common", "usbcore", "usb_storage" ])
         else:
-            modules.extend([ "af_packet", "network", "video", "sound", "drm", "snd", "snd_hda_intel", "bluetooth", "btusb", "r8153_ecm", "r8152", "usbnet", "uvcvideo", "pcspkr", "videobuf2_v4l2", "joydev", "videodev", "videobuf2_common", "libphy", "mc", "mii", "sd_mod", "usb_common", "usbcore", "usb_storage" ])
+            modules.extend([ "af_packet", "network", "video", "sound", "simpledrm", "drm", "snd", "snd_hda_intel", "bluetooth", "btusb", "r8153_ecm", "r8152", "usbnet", "uvcvideo", "pcspkr", "videobuf2_v4l2", "joydev", "videodev", "videobuf2_common", "libphy", "mc", "mii", "sd_mod", "usb_common", "usbcore", "usb_storage" ])
 
-        data = [f"blacklist {module}\n" for module in modules]
+        data = [f"blacklist {module}" for module in modules]
 
         fd, blacklist_conf = tempfile.mkstemp()
-        with os.open(fd, 'w') as tmpfile:
-            tmpfile.write("\nBlacklisted by PSEC\n")
-            tmpfile.write(data)
-            tmpfile.write("\n")
+
+        try: 
+            os.write(fd, b"\nBlacklisted by PSEC\n")
+            os.write(fd, "\n".join(data).encode())
+            os.write(fd, b"\n")
+        except Exception as e:
+            print(f"Error: Could not write into the temp file {blacklist_conf} : {e}")
+            return ""
 
         return blacklist_conf
 

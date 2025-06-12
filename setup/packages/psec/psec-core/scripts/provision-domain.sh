@@ -40,6 +40,7 @@ echo Create new XEN User Domain $DOMAIN
 echo - main package : $MAIN_PACKAGE
 echo - Alpine branch : $ALPINE_BRANCH
 echo - Alpine ISO comes from : $ALPINE_ISO_LOCAL
+echo - Kernel modules blacklist : $BLACKLIST_CONF
 
 modprobe iso9660
 
@@ -88,10 +89,11 @@ echo ... Set permissions
 chmod +x etc/init.d/*
 chown 0:0 etc/init.d/*
 
-if [ -e "$BLACLIST_CONF" ]; do
+if [ -e "$BLACKLIST_CONF" ]; then
+    mkdir -p etc/modprobe.d
     echo ... Patch modules blacklist
     cat $BLACKLIST_CONF >> etc/modprobe.d/blacklist.conf
-done
+fi
 
 echo ... Create new APK overlay
 cd $WORKDIR/apkovl

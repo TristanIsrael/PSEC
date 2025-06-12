@@ -1,7 +1,6 @@
 ''' \author Tristan Israël
 '''
 from enum import StrEnum
-import time
 import json
 import threading
 import select

@@ -1,10 +1,8 @@
 from . import MqttClient, SingletonMeta, Topics, MqttHelper, RequestFactory
 from . import System
-import os
 import zlib
 import base64
 import logging
-import platform
 from datetime import datetime
 
 class FileHandler:

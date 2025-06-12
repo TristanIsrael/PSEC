@@ -34,11 +34,11 @@ try:
     from ._sys_usb_controller import SysUsbController
 except Exception as e:
     print("The class SysUsbController won't be available due to missing dependancy")
-from ._api import Api
 #from ._inputs_proxy import InputsProxy
 from ._dom0_controller import Dom0Controller
 from ._components_helper import ComponentsHelper
 from ._mqtt_factory import MqttFactory
+from ._api import Api
 from ._mock_sys_usb_controller import MockSysUsbController
 from ._debugging import Debugging
 
