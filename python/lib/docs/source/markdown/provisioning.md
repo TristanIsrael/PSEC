@@ -23,6 +23,7 @@ Manual provisioning consists of going through an installation process step-by-st
   - Type `$ su - root` and enter the `root` password.  
   - Run `# vi /etc/apk/repositories` and add the `community` repository, the `PSEC` repository, and any product-specific repositories.  
   - Save and exit with `:wq`.
+  - Run `# apk update`
 
 6 - Add PGP keys  
   - Run `# cd /etc/apk/keys` then `# wget [PSEC repository URL]/psec.rsa.pub`, and repeat the process for other product-specific repositories.  

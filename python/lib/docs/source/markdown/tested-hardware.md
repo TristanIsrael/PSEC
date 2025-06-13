@@ -32,6 +32,7 @@ Quirks:
 Notes:
 
 - All peripherals are accessible as USB devices, not PCI, except WLAN card.
+- When using the Dock and running XEN, eth0 and eth1 are inverted.
 
 ## Dell Latitude E5510
 

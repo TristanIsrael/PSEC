@@ -18,7 +18,7 @@ class DomainsFactory:
 
         if use_usb:
             blacklist_conf = self.__create_blacklist_conf("sys-usb")
-            self.__provision_domain("sys-usb", "psec-sys-usb", "lts", blacklist_conf)
+            self.__provision_domain("sys-usb", "psec-sys-usb", "virt", blacklist_conf)
             self.__create_domd_usb()
 
         if use_gui:
@@ -100,6 +100,7 @@ p9 = [
 'tag=system, path=/usr/lib/psec/system, backend=0, security_model=none'
 ]
 channel = [
+'name=console, connection=pty'
 'name=sys-usb-msg, connection=socket, path=/var/run/sys-usb-msg.sock',
 'name=sys-usb-input, connection=socket, path=/var/run/sys-usb-input.sock',
 'name=sys-usb-tty, connection=socket, path=/var/run/sys-usb-tty.sock'
@@ -134,6 +135,7 @@ p9 = [
     'tag=system, path=/usr/lib/psec/system, backend=0, security_model=none'
 ]
 channel = [
+'name=console, connection=pty'
 'name=sys-gui-msg, connection=socket, path=/var/run/sys-gui-msg.sock',
 'name=sys-gui-input, connection=socket, path=/var/run/sys-gui-input.sock'
 ]
@@ -178,6 +180,7 @@ vif=[]
         
         # Add P9 shares
         shares = []
+        shares.append("'name=console, connection=pty'")
         if share_packages:
             shares.append("'tag=packages, path=/usr/lib/psec/packages, backend=0, security_model=none'")
         if share_storage:
@@ -244,16 +247,16 @@ vif=[]
         blacklisted_modules = [ ]
 
         if domain_name == "sys-usb":
-            # modules.extend([ "af_packet", "network", "video", "sound", "simpledrm", "drm", "snd", "snd_hda_intel", "bluetooth", "btusb", "r8153_ecm", "r8152", "usbnet", "uvcvideo", "pcspkr", "videobuf2_v4l2", "joydev", "videodev", "videobuf2_common", "libphy", "mc", "mii" ])
-            blacklisted_modules.extend( modules_multimedia )
+            pass
+            #blacklisted_modules.extend( modules_multimedia )
         elif domain_name == "sys-gui":
-            #blacklisted_modules.extend([ "af_packet", "network", "sound", "snd", "snd_hda_intel", "bluetooth", "btusb", "r8153_ecm", "r8152", "usbnet", "uvcvideo", "pcspkr", "joydev", "videodev", "libphy", "mc", "mii", "sd_mod", "usb_common", "usbcore", "usb_storage" ])
-            blacklisted_modules.extend( modules_usb )
-            blacklisted_modules.extend( modules_networking )
+            pass
+            #blacklisted_modules.extend( modules_usb )
+            #blacklisted_modules.extend( modules_networking )
         else:
-            # [ "af_packet", "network", "video", "sound", "simpledrm", "drm", "snd", "snd_hda_intel", "bluetooth", "btusb", "r8153_ecm", "r8152", "usbnet", "uvcvideo", "pcspkr", "videobuf2_v4l2", "joydev", "videodev", "videobuf2_common", "libphy", "mc", "mii", "sd_mod", "usb_common", "usbcore", "usb_storage" ]
-            blacklisted_modules.extend( modules_usb )
-            blacklisted_modules.extend( modules_networking )
+            pass
+            #blacklisted_modules.extend( modules_usb )
+            #blacklisted_modules.extend( modules_networking )
 
         data = [f"blacklist {module}" for module in blacklisted_modules]
 
