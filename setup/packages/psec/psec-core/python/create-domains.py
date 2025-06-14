@@ -100,7 +100,7 @@ p9 = [
 'tag=system, path=/usr/lib/psec/system, backend=0, security_model=none'
 ]
 channel = [
-'name=console, connection=pty'
+#'name=console, connection=pty',
 'name=sys-usb-msg, connection=socket, path=/var/run/sys-usb-msg.sock',
 'name=sys-usb-input, connection=socket, path=/var/run/sys-usb-input.sock',
 'name=sys-usb-tty, connection=socket, path=/var/run/sys-usb-tty.sock'
@@ -135,7 +135,7 @@ p9 = [
     'tag=system, path=/usr/lib/psec/system, backend=0, security_model=none'
 ]
 channel = [
-'name=console, connection=pty'
+#'name=console, connection=pty',
 'name=sys-gui-msg, connection=socket, path=/var/run/sys-gui-msg.sock',
 'name=sys-gui-input, connection=socket, path=/var/run/sys-gui-input.sock'
 ]
@@ -180,7 +180,7 @@ vif=[]
         
         # Add P9 shares
         shares = []
-        shares.append("'name=console, connection=pty'")
+        #shares.append("'name=console, connection=pty'")
         if share_packages:
             shares.append("'tag=packages, path=/usr/lib/psec/packages, backend=0, security_model=none'")
         if share_storage:

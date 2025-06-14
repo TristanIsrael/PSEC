@@ -20,7 +20,7 @@ Manual provisioning consists of going through an installation process step-by-st
 4 - After reboot, log in as `admin`.
 
 5 - Add binary repositories  
-  - Type `$ su - root` and enter the `root` password.  
+  - Type `$ su - root` and enter the password defined during the installation.  
   - Run `# vi /etc/apk/repositories` and add the `community` repository, the `PSEC` repository, and any product-specific repositories.  
   - Save and exit with `:wq`.
   - Run `# apk update`
