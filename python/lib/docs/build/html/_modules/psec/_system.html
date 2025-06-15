@@ -208,17 +208,19 @@
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/capabilities.html">Capabilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/debugging.html">Debugging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/design-rules.html">Design rules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/development.html">Development of PSEC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/documentation.html">Documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/graphical-design.html">Graphical design</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/integration.html">Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/known-problems.html">Known problems</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/logging.html">Logging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/protocol.html">Protocol</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/provisioning.html">Provisioning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/python-api.html">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/roles.html">Roles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/sensors.html">Sensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/tested-hardware.html">Tested hardware</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../markdown/tested-hardware.html#dell-latitude-e5510">Dell Latitude E5510</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/topology.html">Topology</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/update-alpine-mirror.html">Create or Update the Alpine Mirror</a></li>
 </ul>
@@ -258,36 +260,40 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for psec._system</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingletonMeta</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">platform</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingletonMeta</span>
 
 <div class="viewcode-block" id="System">
 <a class="viewcode-back" href="../../psec.html#psec.System">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">System</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">SingletonMeta</span><span class="p">):</span>
 
-    <span class="n">_DEFAULT_SCREEN_SIZE</span> <span class="o">=</span> <span class="s2">&quot;1100,750&quot;</span>
-    <span class="n">width</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-    <span class="n">height</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-    <span class="n">rotation</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">__DEFAULT_SCREEN_SIZE</span> <span class="o">=</span> <span class="s2">&quot;1100,750&quot;</span>
+    <span class="n">__width</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">__height</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">__rotation</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">__system_uuid</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">__cpu_count</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">__cpu_assignments</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="System.get_screen_width">
 <a class="viewcode-back" href="../../psec.html#psec.System.get_screen_width">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_screen_width</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__width</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__width</span>
         
         <span class="n">screen_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_screen_size</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="s2">&quot;,&quot;</span> <span class="ow">in</span> <span class="n">screen_size</span><span class="p">:</span>            
             <span class="n">rotation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_screen_rotation</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">rotation</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">rotation</span> <span class="o">==</span> <span class="mi">180</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">screen_size</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">screen_size</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span> 
-                <span class="bp">self</span><span class="o">.</span><span class="n">width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">screen_size</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">screen_size</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
 
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">width</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__width</span>
         
         <span class="k">return</span> <span class="mi">1024</span></div>
 
@@ -295,19 +301,19 @@
 <div class="viewcode-block" id="System.get_screen_height">
 <a class="viewcode-back" href="../../psec.html#psec.System.get_screen_height">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_screen_height</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__height</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__height</span>
         
         <span class="n">screen_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_screen_size</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="s2">&quot;,&quot;</span> <span class="ow">in</span> <span class="n">screen_size</span><span class="p">:</span>            
             <span class="n">rotation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_screen_rotation</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">rotation</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">rotation</span> <span class="o">==</span> <span class="mi">180</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">screen_size</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">screen_size</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span> 
-                <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">screen_size</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">screen_size</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
 
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__height</span>
         
         <span class="k">return</span> <span class="mi">768</span></div>
 
@@ -315,8 +321,8 @@
 <div class="viewcode-block" id="System.get_screen_rotation">
 <a class="viewcode-back" href="../../psec.html#psec.System.get_screen_rotation">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_screen_rotation</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rotation</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rotation</span>
         
         <span class="k">try</span><span class="p">:</span>
             <span class="n">res</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="s2">&quot;xenstore-read&quot;</span><span class="p">,</span> <span class="s2">&quot;/local/domain/system/screen_rotation&quot;</span><span class="p">],</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -334,43 +340,64 @@
             <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">returncode</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">stdout</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DEFAULT_SCREEN_SIZE</span>    
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__DEFAULT_SCREEN_SIZE</span>    
         
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_DEFAULT_SCREEN_SIZE</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__DEFAULT_SCREEN_SIZE</span>
     
 <div class="viewcode-block" id="System.get_system_uuid">
 <a class="viewcode-back" href="../../psec.html#psec.System.get_system_uuid">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_system_uuid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">system</span> <span class="o">=</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+        <span class="c1"># If we have it in cache...</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__system_uuid</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__system_uuid</span>
         
         <span class="k">if</span> <span class="n">system</span> <span class="o">==</span> <span class="s1">&#39;linux&#39;</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;/sys/class/dmi/id/product_uuid&#39;</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__system_uuid</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
             <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># UUID non disponible sur cette machine Linux</span>
+                <span class="k">return</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># UUID non disponible sur cette machine Linux</span>
         
         <span class="k">elif</span> <span class="n">system</span> <span class="o">==</span> <span class="s1">&#39;windows&#39;</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">output</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="s1">&#39;wmic csproduct get uuid&#39;</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="n">lines</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
                 <span class="n">uuid</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span> <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">and</span> <span class="s2">&quot;UUID&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">line</span><span class="p">]</span>
-                <span class="k">return</span> <span class="n">uuid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">uuid</span> <span class="k">else</span> <span class="kc">None</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__system_uuid</span> <span class="o">=</span> <span class="n">uuid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">uuid</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
             <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># Erreur lors de l&#39;exécution de wmic</span>
+                <span class="k">return</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># Erreur lors de l&#39;exécution de wmic</span>
         
         <span class="k">elif</span> <span class="n">system</span> <span class="o">==</span> <span class="s1">&#39;darwin&#39;</span><span class="p">:</span>  <span class="c1"># macOS</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">output</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span><span class="s1">&#39;ioreg -rd1 -c IOPlatformExpertDevice&#39;</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">output</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
                     <span class="k">if</span> <span class="s1">&#39;IOPlatformUUID&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
-                <span class="k">return</span> <span class="kc">None</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">__system_uuid</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span>
+                <span class="k">return</span> <span class="s2">&quot;&quot;</span>
             <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># Erreur lors de l&#39;exécution de ioreg</span>
+                <span class="k">return</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># Erreur lors de l&#39;exécution de ioreg</span>
         
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>  <span class="c1"># Système non supporté</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__system_uuid</span></div>
+
+
+<div class="viewcode-block" id="System.get_platform_cpu_count">
+<a class="viewcode-back" href="../../psec.html#psec.System.get_platform_cpu_count">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_platform_cpu_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cpu_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cpu_count</span>
+        
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s1">&#39;xl&#39;</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">],</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">output</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;nr_cpus&#39;</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__cpu_count</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cpu_count</span></div>
+
 
 
 <div class="viewcode-block" id="System.debug_activated">
@@ -379,7 +406,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">debug_activated</span><span class="p">():</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">fd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;/proc/cmdline&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">O_RDONLY</span><span class="p">)</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>            
+            <span class="n">data</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
             <span class="k">return</span> <span class="sa">b</span><span class="s1">&#39;debug=on&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span></div>
@@ -390,6 +417,231 @@
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">domain_name</span><span class="p">():</span>
         <span class="k">return</span> <span class="n">platform</span><span class="o">.</span><span class="n">node</span><span class="p">()</span></div>
+
+    
+
+<div class="viewcode-block" id="System.get_topology">
+<a class="viewcode-back" href="../../psec.html#psec.System.get_topology">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_topology</span><span class="p">(</span><span class="n">override_topology_file</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Returns the topology of the current system</span>
+
+<span class="sd">        The topology structure is different from the configuration file topology.json because the file will</span>
+<span class="sd">        evolve from its original format and it must be dissociated from the internal structure to avoid</span>
+<span class="sd">        future compatibility problems.</span>
+
+<span class="sd">        The topology is defined in the file `topology.json`. This function returns a data structure</span>
+<span class="sd">        representing the topology as a dict. Instead of returning the JSON data as the function </span>
+<span class="sd">        :func:`read_topology_file` does, it returns a structure representing the objects::</span>
+
+<span class="sd">            &gt;&gt;&gt; {</span>
+<span class="sd">            &gt;&gt;&gt;     &quot;domains&quot;: [</span>
+<span class="sd">            &gt;&gt;&gt;         &quot;my-domain&quot;: {</span>
+<span class="sd">            &gt;&gt;&gt;             &quot;vcpu_group&quot;: &quot;group1&quot;,</span>
+<span class="sd">            &gt;&gt;&gt;             &quot;memory&quot;: 4000,</span>
+<span class="sd">            &gt;&gt;&gt;             &quot;vcpus&quot;: 2,</span>
+<span class="sd">            &gt;&gt;&gt;             &quot;cpus&quot;: &quot;3-4&quot;,</span>
+<span class="sd">            &gt;&gt;&gt;             &quot;package&quot;: &quot;&quot;</span>
+<span class="sd">            &gt;&gt;&gt;         }</span>
+<span class="sd">            &gt;&gt;&gt;     ],</span>
+<span class="sd">            &gt;&gt;&gt;     &quot;system&quot;: {</span>
+<span class="sd">            &gt;&gt;&gt;         &quot;use_usb&quot;: 1,</span>
+<span class="sd">            &gt;&gt;&gt;         &quot;use_gui&quot;: 1,</span>
+<span class="sd">            &gt;&gt;&gt;         &quot;screen_rotation&quot;: 0,</span>
+<span class="sd">            &gt;&gt;&gt;         &quot;gui_app_package&quot;: &quot;&quot;,</span>
+<span class="sd">            &gt;&gt;&gt;         &quot;gui_memory&quot;: 1000,</span>
+<span class="sd">            &gt;&gt;&gt;     }</span>
+<span class="sd">            &gt;&gt;&gt; }</span>
+<span class="sd">        &quot;&quot;&quot;</span>        
+
+        <span class="n">topo_struct</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">topo_data</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">get_topology_data</span><span class="p">(</span><span class="n">override_topology_file</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">topo_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No topology data available. Aborting&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{}</span>
+
+        <span class="n">usb</span> <span class="o">=</span> <span class="n">topo_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;usb&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">gui</span> <span class="o">=</span> <span class="n">topo_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gui&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">screen</span> <span class="o">=</span> <span class="n">gui</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;screen&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">vcpu</span> <span class="o">=</span> <span class="n">topo_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;vcpu&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">business</span> <span class="o">=</span> <span class="n">topo_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;business&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">business_domains</span> <span class="o">=</span> <span class="n">business</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;domains&quot;</span><span class="p">,</span> <span class="p">[])</span>
+
+        <span class="n">use_usb</span> <span class="o">=</span> <span class="n">usb</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;use&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">use_gui</span> <span class="o">=</span> <span class="n">gui</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;use&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="n">gui_app_package</span> <span class="o">=</span> <span class="n">gui</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;app-package&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">screen_rotation</span> <span class="o">=</span> <span class="n">screen</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rotation&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                
+        <span class="n">topo_struct</span><span class="p">[</span><span class="s2">&quot;system&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;use_usb&quot;</span><span class="p">:</span> <span class="n">use_usb</span><span class="p">,</span>
+            <span class="s2">&quot;use_gui&quot;</span><span class="p">:</span> <span class="n">use_gui</span><span class="p">,</span>
+            <span class="s2">&quot;screen_rotation&quot;</span><span class="p">:</span> <span class="n">screen_rotation</span><span class="p">,</span>
+            <span class="s2">&quot;gui_app_package&quot;</span><span class="p">:</span> <span class="n">gui_app_package</span>
+        <span class="p">}</span>
+
+        <span class="n">vcpu_groups</span> <span class="o">=</span> <span class="n">vcpu</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;groups&quot;</span><span class="p">,</span> <span class="p">{})</span>
+
+        <span class="n">topo_domains</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># sys-usb domain</span>
+        <span class="n">topo_domains</span><span class="p">[</span><span class="s2">&quot;sys-usb&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sys-usb&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;core&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;memory&quot;</span><span class="p">:</span> <span class="mi">300</span><span class="p">,</span>
+            <span class="s2">&quot;vcpus&quot;</span><span class="p">:</span> <span class="n">System</span><span class="o">.</span><span class="n">compute_vcpus_for_group</span><span class="p">(</span><span class="s2">&quot;sys-usb&quot;</span><span class="p">,</span> <span class="n">vcpu_groups</span><span class="p">),</span>
+            <span class="s2">&quot;cpus&quot;</span><span class="p">:</span> <span class="n">System</span><span class="p">()</span><span class="o">.</span><span class="n">compute_cpus_for_group</span><span class="p">(</span><span class="s2">&quot;sys-usb&quot;</span><span class="p">,</span> <span class="n">vcpu_groups</span><span class="p">)</span>
+        <span class="p">}</span>
+
+        <span class="c1"># sys-gui domain</span>
+        <span class="n">topo_domains</span><span class="p">[</span><span class="s2">&quot;sys-gui&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sys-gui&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;core&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;memory&quot;</span><span class="p">:</span> <span class="n">gui</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;memory&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;vcpus&quot;</span><span class="p">:</span> <span class="n">System</span><span class="o">.</span><span class="n">compute_vcpus_for_group</span><span class="p">(</span><span class="s2">&quot;sys-gui&quot;</span><span class="p">,</span> <span class="n">vcpu_groups</span><span class="p">),</span>
+            <span class="s2">&quot;cpus&quot;</span><span class="p">:</span> <span class="n">System</span><span class="p">()</span><span class="o">.</span><span class="n">compute_cpus_for_group</span><span class="p">(</span><span class="s2">&quot;sys-gui&quot;</span><span class="p">,</span> <span class="n">vcpu_groups</span><span class="p">),</span>            
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">domain</span> <span class="ow">in</span> <span class="n">business_domains</span><span class="p">:</span>
+            <span class="c1"># Business domains</span>
+            <span class="n">domain_name</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">)</span>
+            <span class="n">group_name</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;vcpu_group&quot;</span><span class="p">,</span> <span class="n">domain_name</span><span class="p">)</span> <span class="c1"># If there is no group we will create a default configuration</span>
+            <span class="n">topo_domains</span><span class="p">[</span><span class="n">domain_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">domain</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;business&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;memory&quot;</span><span class="p">:</span> <span class="n">domain</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;memory&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                <span class="s2">&quot;package&quot;</span><span class="p">:</span> <span class="n">domain</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;app-package&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;vcpus&quot;</span><span class="p">:</span> <span class="n">System</span><span class="o">.</span><span class="n">compute_vcpus_for_group</span><span class="p">(</span><span class="n">group_name</span><span class="p">,</span> <span class="n">vcpu_groups</span><span class="p">),</span>
+                <span class="s2">&quot;cpus&quot;</span><span class="p">:</span> <span class="n">System</span><span class="p">()</span><span class="o">.</span><span class="n">compute_cpus_for_group</span><span class="p">(</span><span class="n">group_name</span><span class="p">,</span> <span class="n">vcpu_groups</span><span class="p">)</span>
+            <span class="p">}</span>
+
+        <span class="n">topo_struct</span><span class="p">[</span><span class="s2">&quot;domains&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">topo_domains</span>
+
+        <span class="k">return</span> <span class="n">topo_struct</span></div>
+
+
+
+<div class="viewcode-block" id="System.read_topology_file">
+<a class="viewcode-back" href="../../psec.html#psec.System.read_topology_file">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_topology_file</span><span class="p">(</span><span class="n">override_topology_file</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">&#39;/etc/psec/topology.json&#39;</span> <span class="k">if</span> <span class="n">override_topology_file</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="k">else</span> <span class="n">override_topology_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">topo</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+                <span class="k">return</span> <span class="n">topo</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;An error occured while reading the file /etc/psec/topology.json&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="System.get_topology_data">
+<a class="viewcode-back" href="../../psec.html#psec.System.get_topology_data">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_topology_data</span><span class="p">(</span><span class="n">override_topology_file</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">topo_data</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">read_topology_file</span><span class="p">(</span><span class="n">override_topology_file</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">topo_data</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">data</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;An error occured while decoding JSON file&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+        
+
+<div class="viewcode-block" id="System.compute_vcpus_for_group">
+<a class="viewcode-back" href="../../psec.html#psec.System.compute_vcpus_for_group">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_vcpus_for_group</span><span class="p">(</span><span class="n">group_name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">groups</span><span class="p">:</span><span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Computes the number of vCPUs which will be pinned to each Domain of a group.</span>
+
+<span class="sd">        The number of vCPUs depends on the value of the parameter vcpu.groups defined in the file topology.json.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vcpus</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">platform_cpus</span> <span class="o">=</span> <span class="n">System</span><span class="p">()</span><span class="o">.</span><span class="n">get_platform_cpu_count</span><span class="p">()</span>
+        <span class="n">dom0_vcpus</span> <span class="o">=</span> <span class="mi">2</span> <span class="k">if</span> <span class="n">platform_cpus</span> <span class="o">&gt;</span> <span class="mi">4</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="n">sys_usb_vcpus</span> <span class="o">=</span> <span class="mi">0</span> <span class="c1">#Dom0 and sys-usb share the same vcpus</span>
+
+        <span class="k">if</span> <span class="n">group_name</span> <span class="o">==</span> <span class="s2">&quot;sys-usb&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">dom0_vcpus</span>
+
+        <span class="n">reserved_vcpus</span> <span class="o">=</span> <span class="n">dom0_vcpus</span> <span class="o">+</span> <span class="n">sys_usb_vcpus</span>
+
+        <span class="c1"># If there is no group defined we force the cpu count</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;There are no groups for </span><span class="si">{</span><span class="n">group_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">platform_cpus</span><span class="p">,</span> <span class="n">reserved_vcpus</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">platform_cpus</span> <span class="o">-</span> <span class="n">reserved_vcpus</span>
+
+        <span class="k">if</span> <span class="n">group_name</span> <span class="ow">in</span> <span class="n">groups</span><span class="p">:</span>
+            <span class="n">vcpu_rate</span> <span class="o">=</span> <span class="n">groups</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">group_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+            <span class="c1"># Override cpu rate for sys-gui if not provided</span>
+            <span class="n">vcpu_rate</span> <span class="o">=</span> <span class="mf">0.2</span> <span class="k">if</span> <span class="n">vcpu_rate</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">group_name</span> <span class="o">==</span> <span class="s2">&quot;sys-gui&quot;</span> <span class="k">else</span> <span class="n">vcpu_rate</span>
+
+            <span class="k">if</span> <span class="n">vcpu_rate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">vcpus</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">vcpu_rate</span><span class="o">*</span><span class="p">(</span><span class="n">platform_cpus</span><span class="o">-</span><span class="n">reserved_vcpus</span><span class="p">),</span> <span class="mi">0</span><span class="p">))</span>
+                <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">vcpus</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># If there is no group defined we consider using 100% of the remaining cores</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;default case for </span><span class="si">{</span><span class="n">group_name</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">platform_cpus</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">reserved_vcpus</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">platform_cpus</span> <span class="o">-</span> <span class="n">reserved_vcpus</span>
+
+        <span class="k">return</span> <span class="n">vcpus</span></div>
+
+
+<div class="viewcode-block" id="System.compute_cpus_for_group">
+<a class="viewcode-back" href="../../psec.html#psec.System.compute_cpus_for_group">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_cpus_for_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">groups</span><span class="p">:</span><span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Computes the CPUs (or cores) which will be pinned to the Domains of the group.</span>
+
+<span class="sd">        The first CPU is assigned to Dom0 and sys-usb Domain. </span>
+<span class="sd">        If there are at least 4 CPUs the second CPU is also assigned to Dom0 and sys-usb.</span>
+<span class="sd">        The other CPUs are assigned to sys-gui and the other groups by trying to avoid overlapping.</span>
+<span class="sd">        &quot;&quot;&quot;</span>        
+        <span class="n">cpu_count</span> <span class="o">=</span> <span class="n">System</span><span class="p">()</span><span class="o">.</span><span class="n">get_platform_cpu_count</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">group_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">groups</span> <span class="ow">and</span> <span class="n">group_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span> <span class="s2">&quot;sys-usb&quot;</span><span class="p">,</span> <span class="s2">&quot;Dom0&quot;</span> <span class="p">]:</span>
+            <span class="c1"># If the group does not exist we return the default configuration</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span> <span class="k">if</span> <span class="n">cpu_count</span> <span class="o">&lt;=</span> <span class="mi">4</span> <span class="k">else</span> <span class="mi">2</span><span class="p">,</span> <span class="n">cpu_count</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cpu_assignments</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># If the groups are in cache we take them</span>
+            <span class="n">cpu_assignments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cpu_assignments</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Otherwise we calculate them before</span>
+            <span class="n">cpu_assignments</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;Dom0&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="mi">0</span> <span class="p">],</span>
+                <span class="s2">&quot;sys-usb&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="mi">0</span> <span class="p">],</span>
+                <span class="s2">&quot;sys-gui&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="mi">1</span> <span class="p">]</span>
+            <span class="p">}</span>
+
+            <span class="n">next_pin</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">cpu_count</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="c1"># If there are more than 4 CPUs/cores we add one to Dom0 and sys-usb</span>
+                <span class="n">cpu_assignments</span><span class="p">[</span><span class="s2">&quot;Dom0&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">next_pin</span><span class="p">)</span>
+                <span class="n">cpu_assignments</span><span class="p">[</span><span class="s2">&quot;sys-usb&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">next_pin</span><span class="p">)</span>
+                <span class="n">next_pin</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="c1"># Then we assign sys-gui</span>
+            <span class="k">if</span> <span class="n">cpu_count</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="n">vcpus</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">compute_vcpus_for_group</span><span class="p">(</span><span class="s2">&quot;sys-gui&quot;</span><span class="p">,</span> <span class="n">groups</span><span class="p">)</span>
+                <span class="n">cpu_assignments</span><span class="p">[</span><span class="s2">&quot;sys-gui&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">next_pin</span> <span class="o">+</span> <span class="n">vcpus</span><span class="p">))</span>
+                <span class="n">next_pin</span> <span class="o">+=</span> <span class="mi">2</span>
+
+            <span class="c1"># Then the other groups</span>
+            <span class="k">for</span> <span class="n">gname</span> <span class="ow">in</span> <span class="n">groups</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">gname</span> <span class="ow">in</span> <span class="p">[</span> <span class="s2">&quot;sys-gui&quot;</span> <span class="p">]:</span>
+                    <span class="k">continue</span> <span class="c1"># We ignore sys-gui because we already worked on it</span>
+                
+                <span class="n">vcpus</span> <span class="o">=</span> <span class="n">System</span><span class="o">.</span><span class="n">compute_vcpus_for_group</span><span class="p">(</span><span class="n">gname</span><span class="p">,</span> <span class="n">groups</span><span class="p">)</span>
+                <span class="n">cpu_assignments</span><span class="p">[</span><span class="n">gname</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">next_pin</span><span class="p">,</span> <span class="n">next_pin</span> <span class="o">+</span> <span class="n">vcpus</span><span class="p">))</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">__cpu_assignments</span> <span class="o">=</span> <span class="n">cpu_assignments</span>
+
+        <span class="c1"># Finally we return the value</span>
+        <span class="k">return</span> <span class="n">cpu_assignments</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">group_name</span><span class="p">,</span> <span class="p">[</span> <span class="mi">0</span> <span class="p">])</span></div>
 </div>
 
 </pre></div>

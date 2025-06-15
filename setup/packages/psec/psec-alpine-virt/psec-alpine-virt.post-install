@@ -1,0 +1,6 @@
+#!/bin/sh
+
+cd /var/lib/xen/images
+
+rm -rf alpine-virt.iso
+ln -s $(ls alpine-virt-*.iso) alpine-virt.iso

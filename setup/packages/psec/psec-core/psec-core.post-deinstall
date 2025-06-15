@@ -4,8 +4,13 @@ echo Clean system
 rm -rf /etc/psec
 rm -rf /usr/lib/psec
 
-# Reset QEMU binary files
+# Restore QEMU binary files
 rm /usr/bin/qemu-system-x86_64 /usr/bin/qemu-system-x86_64.cmd
 mv /usr/bin/qemu-system-x86_64.real /usr/bin/qemu-system-x86_64
+
+# Restore Grub file
+rm /etc/default/grub
+mv /etc/default/grub.orig /etc/default/grub
+update-grub
 
 exit 0

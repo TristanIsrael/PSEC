@@ -209,17 +209,19 @@
 <li class="toctree-l2"><a class="reference internal" href="capabilities.html">Capabilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="design-rules.html">Design rules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development.html">Development of PSEC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="documentation.html">Documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="graphical-design.html">Graphical design</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html">Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="known-problems.html">Known problems</a></li>
 <li class="toctree-l2"><a class="reference internal" href="logging.html">Logging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="protocol.html">Protocol</a></li>
 <li class="toctree-l2"><a class="reference internal" href="provisioning.html">Provisioning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="python-api.html">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="roles.html">Roles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sensors.html">Sensors</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Creating the Deployment Infrastructure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tested-hardware.html">Tested hardware</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tested-hardware.html#dell-latitude-e5510">Dell Latitude E5510</a></li>
 <li class="toctree-l2"><a class="reference internal" href="topology.html">Topology</a></li>
 <li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html">Create or Update the Alpine Mirror</a></li>
 </ul>
@@ -268,7 +270,75 @@
 <h1>Creating the Deployment Infrastructure<a class="headerlink" href="#creating-the-deployment-infrastructure" title="Link to this heading">¶</a></h1>
 <p><em>This document is not up-to-date</em></p>
 <p>This documentation explains how to implement the deployment infrastructure.</p>
-<p>The PXE deployment infrastructure relies on the following services:</p>
+<section id="topologies">
+<h2>Topologies<a class="headerlink" href="#topologies" title="Link to this heading">¶</a></h2>
+<p>Different topologies can be implemented depending on whether you rely on Internet or not for Alpine mirrors.</p>
+<section id="using-internet">
+<h3>Using Internet<a class="headerlink" href="#using-internet" title="Link to this heading">¶</a></h3>
+<p>If you will be using Internet to provide Alpine and PSEC mirrors you will only need to host you own products packages on standard HTTP server.</p>
+</section>
+<section id="using-local-mirror">
+<h3>Using local mirror<a class="headerlink" href="#using-local-mirror" title="Link to this heading">¶</a></h3>
+<p>If your systems are offline with no access to Internet, <em>or</em> if you want to implement local mirrors for better performance, you will have to provide a standard HTTP
+server for Alpine and PSEC packages, and for your own packages.</p>
+</section>
+<section id="using-network-boot">
+<h3>Using network boot<a class="headerlink" href="#using-network-boot" title="Link to this heading">¶</a></h3>
+<p>If your system will boot on the network you will have to implement the DHCP, TFTP and NFS servers.</p>
+</section>
+<section id="summary">
+<h3>Summary<a class="headerlink" href="#summary" title="Link to this heading">¶</a></h3>
+<p>This section summarizes the cases and the services to provide locally.</p>
+<div class="table-wrapper colwidths-auto docutils container">
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Use case</p></th>
+<th class="head"><p>DHCP</p></th>
+<th class="head"><p>TFTP</p></th>
+<th class="head"><p>NFS</p></th>
+<th class="head"><p>HTTP</p></th>
+<th class="head"><p>ADMIN</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Network boot</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes (1)</p></td>
+<td><p>No (2)</p></td>
+<td><p>Yes</p></td>
+</tr>
+<tr class="row-odd"><td><p>USB / embedded boot</p></td>
+<td><p>No</p></td>
+<td><p>No</p></td>
+<td><p>No (2)</p></td>
+<td><p>No</p></td>
+<td><p>Yes</p></td>
+</tr>
+<tr class="row-even"><td><p>Local cache</p></td>
+<td><p>No</p></td>
+<td><p>No</p></td>
+<td><p>No</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+</tr>
+<tr class="row-odd"><td><p>Offline (no Internet)</p></td>
+<td><p>No</p></td>
+<td><p>No</p></td>
+<td><p>No</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><em>(1) If you want to manage user or specific hardware configurations.</em>
+<em>(2) Only for your own products’ packets.</em></p>
+</section>
+</section>
+<section id="common-implementation">
+<h2>Common implementation<a class="headerlink" href="#common-implementation" title="Link to this heading">¶</a></h2>
+<p>In all the cases you will have to implement the following services on your local area network (LAN):</p>
 <div class="table-wrapper colwidths-auto docutils container">
 <table class="docutils align-default">
 <thead>
@@ -305,16 +375,41 @@
 </tbody>
 </table>
 </div>
-<section id="steps">
-<h2>Steps<a class="headerlink" href="#steps" title="Link to this heading">¶</a></h2>
+</section>
+<section id="assisted-deployment">
+<h2>Assisted deployment<a class="headerlink" href="#assisted-deployment" title="Link to this heading">¶</a></h2>
+<p>The assisted deployment offers a simple way to create the support infrastructure using the deployment system <code class="docutils literal notranslate"><span class="pre">Ansible</span></code>.</p>
+<p>The operations consist in describing the configuration (services and machines) in an Ansible file in a format derived from JSON, and execute the deployment which runs
+automatically. This process can also be used to update the support infrastructure.</p>
+<section id="prerequisites">
+<h3>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">¶</a></h3>
+<p>The first step is to define which topology you want to implement (see <a class="reference internal" href="#topologies"><span class="xref myst">Topologies</span></a>).</p>
+<p>(To be continued)</p>
+</section>
+<section id="configure-ansible">
+<h3>Configure Ansible<a class="headerlink" href="#configure-ansible" title="Link to this heading">¶</a></h3>
+<p>(To be continued)</p>
+</section>
+</section>
+<section id="keep-the-mirrors-up-to-date">
+<h2>Keep the mirrors up-to-date<a class="headerlink" href="#keep-the-mirrors-up-to-date" title="Link to this heading">¶</a></h2>
+<p>The mirrors should be kept up-to-date as frequently as possible (daily to weekly) in order to benefit from the bug and security fixes.</p>
+<p>The script <code class="docutils literal notranslate"><span class="pre">infrastructure/scripts/update-alpine-mirror.sh</span></code> is dedicated to updating a local Alpine mirror. It should be placed in the path of the mirror on the HTTP server.</p>
+<p>Run the script: <code class="docutils literal notranslate"><span class="pre">./update-alpine-mirror.sh</span> <span class="pre">[arch]</span> <span class="pre">[version]</span></code> where arch is <code class="docutils literal notranslate"><span class="pre">x86_64</span></code>, <code class="docutils literal notranslate"><span class="pre">armv7</span></code> or <code class="docutils literal notranslate"><span class="pre">aarch64</span></code> and version is the version of Alpine to update, for example <code class="docutils literal notranslate"><span class="pre">3.22</span></code>.</p>
+<p>The following command will update the local mirror:</p>
+<p><code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">./udpate-alpine-mirror.sh</span> <span class="pre">x86_64</span> <span class="pre">3.22</span></code></p>
+<p>It will update all files in the folder <code class="docutils literal notranslate"><span class="pre">./alpine/v3.22/main/x86_64</span></code> and <code class="docutils literal notranslate"><span class="pre">./alpine/v3.22/community/x86_64</span></code>. The local mirror will be an exact copy of the remote, meaning that all files removed from the official repository will be removed from the local mirror and all files added on the official repository will be added in the local mirror.</p>
+</section>
+<section id="steps-original-documentation-to-be-refreshed-starting-here">
+<h2>Steps [ORIGINAL DOCUMENTATION to be refreshed starting here]<a class="headerlink" href="#steps-original-documentation-to-be-refreshed-starting-here" title="Link to this heading">¶</a></h2>
 <p>The creation of the infrastructure is done in two steps:</p>
 <ol class="arabic simple">
 <li><p>Creation of virtual machines</p></li>
 <li><p>Deployment and configuration of services</p></li>
 </ol>
 </section>
-<section id="prerequisites">
-<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Link to this heading">¶</a></h2>
+<section id="id1">
+<h2>Prerequisites<a class="headerlink" href="#id1" title="Link to this heading">¶</a></h2>
 <p>The administrator must have available:</p>
 <ul class="simple">
 <li><p>the installation kit which includes this documentation</p></li>
@@ -552,8 +647,22 @@ The virtual machine will be configured as a normal network server with a hostnam
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Creating the Deployment Infrastructure</a><ul>
-<li><a class="reference internal" href="#steps">Steps</a></li>
+<li><a class="reference internal" href="#topologies">Topologies</a><ul>
+<li><a class="reference internal" href="#using-internet">Using Internet</a></li>
+<li><a class="reference internal" href="#using-local-mirror">Using local mirror</a></li>
+<li><a class="reference internal" href="#using-network-boot">Using network boot</a></li>
+<li><a class="reference internal" href="#summary">Summary</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#common-implementation">Common implementation</a></li>
+<li><a class="reference internal" href="#assisted-deployment">Assisted deployment</a><ul>
 <li><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li><a class="reference internal" href="#configure-ansible">Configure Ansible</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#keep-the-mirrors-up-to-date">Keep the mirrors up-to-date</a></li>
+<li><a class="reference internal" href="#steps-original-documentation-to-be-refreshed-starting-here">Steps [ORIGINAL DOCUMENTATION to be refreshed starting here]</a></li>
+<li><a class="reference internal" href="#id1">Prerequisites</a></li>
 <li><a class="reference internal" href="#creating-the-virtual-machines">Creating the Virtual Machines</a><ul>
 <li><a class="reference internal" href="#administration-workstation">Administration Workstation</a></li>
 <li><a class="reference internal" href="#embedded-repositories">Embedded Repositories</a></li>

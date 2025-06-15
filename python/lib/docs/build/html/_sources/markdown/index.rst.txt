@@ -12,13 +12,16 @@ Project documentation
    capabilities.md
    debugging.md
    design-rules.md
+   development.md
    documentation.md
    graphical-design.md
    integration.md
+   known-problems.md
    logging.md
    protocol.md
    provisioning.md
    python-api.md
+   roles.md
    sensors.md
    support-infrastructure.md
    tested-hardware.md

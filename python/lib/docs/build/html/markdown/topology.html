@@ -178,7 +178,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -209,17 +209,19 @@
 <li class="toctree-l2"><a class="reference internal" href="capabilities.html">Capabilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="design-rules.html">Design rules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development.html">Development of PSEC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="documentation.html">Documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="graphical-design.html">Graphical design</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html">Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="known-problems.html">Known problems</a></li>
 <li class="toctree-l2"><a class="reference internal" href="logging.html">Logging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="protocol.html">Protocol</a></li>
 <li class="toctree-l2"><a class="reference internal" href="provisioning.html">Provisioning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="python-api.html">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="roles.html">Roles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sensors.html">Sensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tested-hardware.html">Tested hardware</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tested-hardware.html#dell-latitude-e5510">Dell Latitude E5510</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Topology</a></li>
 <li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html">Create or Update the Alpine Mirror</a></li>
 </ul>
@@ -258,7 +260,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -281,19 +283,25 @@
             <span class="s2">&quot;rotation&quot;</span><span class="p">:</span> <span class="mi">0</span>
         <span class="p">}</span>
     <span class="p">},</span>    
+    <span class="s2">&quot;vcpu&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;groups&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;sys-gui&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+            <span class="s2">&quot;my_group&quot;</span><span class="p">:</span> <span class="mf">0.8</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
     <span class="s2">&quot;business&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;domains&quot;</span><span class="p">:</span> <span class="p">[</span>
             <span class="p">{</span>
                 <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;myapp-function1&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;package&quot;</span><span class="p">:</span> <span class="s2">&quot;myapp-function1&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;memory&quot;</span><span class="p">:</span> <span class="mi">4096</span><span class="p">,</span>
-                <span class="s2">&quot;cpu&quot;</span><span class="p">:</span> <span class="mf">0.5</span>
+                <span class="s2">&quot;vcpu_group&quot;</span><span class="p">:</span> <span class="s2">&quot;my_group&quot;</span>
             <span class="p">},</span>
             <span class="p">{</span>
                 <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;myapp-function2&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;package&quot;</span><span class="p">:</span> <span class="s2">&quot;myapp-function2&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;memory&quot;</span><span class="p">:</span> <span class="mi">4096</span><span class="p">,</span>
-                <span class="s2">&quot;cpu&quot;</span><span class="p">:</span> <span class="mf">0.5</span>
+                <span class="s2">&quot;vcpu_group&quot;</span><span class="p">:</span> <span class="s2">&quot;my_group&quot;</span>
             <span class="p">}</span>
         <span class="p">]</span>
     <span class="p">}</span>
@@ -301,6 +309,8 @@
 <span class="p">}</span>
 </pre></div>
 </div>
+<section id="keywords-details">
+<h2>Keywords details<a class="headerlink" href="#keywords-details" title="Link to this heading">¶</a></h2>
 <p>Here is the detail of the keys:</p>
 <div class="table-wrapper colwidths-auto docutils container">
 <table class="docutils align-default">
@@ -347,13 +357,63 @@
 <td><p>int</p></td>
 <td><p>Defines the memory, in MB, which whould be allocated to the Domain.</p></td>
 </tr>
-<tr class="row-odd"><td><p>business.domains.<entry>.cpu</p></td>
-<td><p>float</p></td>
-<td><p>Defines the percentage of the whole CPU cores which should be allocated to the Domain. Accepted values are between 0.0 (0%) and 1.0 (100%).</p></td>
-</tr>
 </tbody>
 </table>
 </div>
+</section>
+<section id="resource-management">
+<h2>Resource management<a class="headerlink" href="#resource-management" title="Link to this heading">¶</a></h2>
+<p>This sections explains how resources can be distributed into the system.</p>
+<p>Resources (CPU, memory) can be affected to Domains (sys-gui and business Domains) as portions of the platform resources.</p>
+<section id="vcpu-management">
+<h3>vCPU management<a class="headerlink" href="#vcpu-management" title="Link to this heading">¶</a></h3>
+<p>The following rules apply:</p>
+<ul class="simple">
+<li><p>the Dom0 and sys-usb Domains can’t be configured.</p>
+<ul>
+<li><p>Dom0 will have the 2 first vCPUs unless the system has less than 4, so he gets only the first.</p></li>
+<li><p>sys-usb will have the same vCPUs as Dom0</p></li>
+</ul>
+</li>
+<li><p>the configurable groups are:</p>
+<ul>
+<li><p>sys-gui will have the 2 next vCPUs by default unless the system has less than 4, so he gets only the second one. This value can be modified in topology.json.</p></li>
+<li><p>the rest can be divided in groups and affected to the Domains.</p></li>
+</ul>
+</li>
+</ul>
+<p>The proportions are:</p>
+<ul class="simple">
+<li><p>15% to Dom0/sys-usb (shared) -&gt; minimum value is 1</p></li>
+<li><p>75% for the rest of the system:</p>
+<ul>
+<li><p>20% to sys-gui by default (overridable)</p></li>
+<li><p>80% to the business Domains divisible into groups.</p></li>
+</ul>
+</li>
+</ul>
+<p>Groups of vCPUs are declared in the section <code class="docutils literal notranslate"><span class="pre">vcpu.groups</span></code> which represents 100% of the allocatable vCPUs (75% of the system).</p>
+<p>Then each business domain can have a group allocated using the keyword <code class="docutils literal notranslate"><span class="pre">vcpu_group</span></code>.</p>
+<p>Example :</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;vcpu&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;groups&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;my_group&quot;</span><span class="p">:</span> <span class="mf">0.8</span>
+    <span class="p">}</span>
+<span class="p">}</span> 
+
+<span class="s2">&quot;business&quot;</span><span class="p">:</span> <span class="p">{</span>
+    <span class="s2">&quot;domains&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;myapp-function1&quot;</span><span class="p">,</span>            
+            <span class="s2">&quot;vcpu_group&quot;</span><span class="p">:</span> <span class="s2">&quot;my_group&quot;</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+
+</pre></div>
+</div>
+</section>
+</section>
 </section>
 
         </article>
@@ -399,8 +459,31 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Topology</a><ul>
+<li><a class="reference internal" href="#keywords-details">Keywords details</a></li>
+<li><a class="reference internal" href="#resource-management">Resource management</a><ul>
+<li><a class="reference internal" href="#vcpu-management">vCPU management</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>

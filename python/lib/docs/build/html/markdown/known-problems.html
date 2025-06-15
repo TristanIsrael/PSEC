@@ -3,10 +3,10 @@
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Python API" href="python-api.html" /><link rel="prev" title="Protocol" href="protocol.html" />
+<link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="Logging" href="logging.html" /><link rel="prev" title="Integration" href="integration.html" />
 
     <!-- Generated with Sphinx 8.2.3 and Furo 2024.08.06 -->
-        <title>Provisioning - PSEC 1.0.0 documentation</title>
+        <title>Known problems - PSEC 1.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
@@ -178,7 +178,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -213,10 +213,10 @@
 <li class="toctree-l2"><a class="reference internal" href="documentation.html">Documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="graphical-design.html">Graphical design</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html">Integration</a></li>
-<li class="toctree-l2"><a class="reference internal" href="known-problems.html">Known problems</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Known problems</a></li>
 <li class="toctree-l2"><a class="reference internal" href="logging.html">Logging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="protocol.html">Protocol</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Provisioning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="provisioning.html">Provisioning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="python-api.html">Python API</a></li>
 <li class="toctree-l2"><a class="reference internal" href="roles.html">Roles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sensors.html">Sensors</a></li>
@@ -246,7 +246,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="../_sources/markdown/provisioning.md.txt" title="View this page">
+  <a class="muted-link" href="../_sources/markdown/known-problems.md.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -260,60 +260,15 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="provisioning">
-<h1>Provisioning<a class="headerlink" href="#provisioning" title="Link to this heading">¶</a></h1>
-<p>This document describes various methods to provision a device with a PSEC-based system.</p>
-<section id="manual">
-<h2>Manual<a class="headerlink" href="#manual" title="Link to this heading">¶</a></h2>
-<p>Manual provisioning consists of going through an installation process step-by-step using a USB drive.</p>
-<p>1 - Create an installation USB stick for Alpine Linux.</p>
-<ul class="simple">
-<li><p>The Alpine Linux version must match the desired repository version.</p></li>
-<li><p>The ISO image used must be <a class="reference external" href="https://dl-cdn.alpinelinux.org/alpine/v3.21/releases/x86_64/alpine-standard-3.21.3-x86_64.iso"><strong>Alpine Standard</strong></a>.</p></li>
-</ul>
-<p>2 - Install Alpine Linux on the device.</p>
-<ul class="simple">
-<li><p>Assign a network interface with either DHCP or a static IP depending on the context.</p></li>
-<li><p>In the APK Mirror section, if using an internet repository, select <code class="docutils literal notranslate"><span class="pre">f</span></code>, otherwise do not select any menu entry but manually enter the URL of the local Alpine <code class="docutils literal notranslate"><span class="pre">main</span></code> repository.</p></li>
-<li><p>Create an <code class="docutils literal notranslate"><span class="pre">admin</span></code> user account.</p></li>
-</ul>
-<p>3 - Reboot the system at the end of the installation.</p>
-<p>4 - After reboot, log in as <code class="docutils literal notranslate"><span class="pre">admin</span></code>.</p>
-<p>5 - Add binary repositories</p>
-<ul class="simple">
-<li><p>Type <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">su</span> <span class="pre">-</span> <span class="pre">root</span></code> and enter the password defined during the installation.</p></li>
-<li><p>Run <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">vi</span> <span class="pre">/etc/apk/repositories</span></code> and add the <code class="docutils literal notranslate"><span class="pre">community</span></code> repository, the <code class="docutils literal notranslate"><span class="pre">PSEC</span></code> repository, and any product-specific repositories.</p></li>
-<li><p>Save and exit with <code class="docutils literal notranslate"><span class="pre">:wq</span></code>.</p></li>
-<li><p>Run <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">apk</span> <span class="pre">update</span></code></p></li>
-</ul>
-<p>6 - Add PGP keys</p>
-<ul class="simple">
-<li><p>Run <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">cd</span> <span class="pre">/etc/apk/keys</span></code> then <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">wget</span> <span class="pre">[PSEC</span> <span class="pre">repository</span> <span class="pre">URL]/psec.rsa.pub</span></code>, and repeat the process for other product-specific repositories.</p></li>
-<li><p>Run <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">apk</span> <span class="pre">update</span></code>.</p></li>
-</ul>
-<p>7 - (Optional, only in development phase) Allow the <code class="docutils literal notranslate"><span class="pre">admin</span></code> user to execute root commands</p>
-<ul class="simple">
-<li><p>Run <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">apk</span> <span class="pre">add</span> <span class="pre">sudo</span></code>, then <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">visudo</span></code></p></li>
-<li><p>Edit the line <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">%wheel</span> <span class="pre">ALL=(ALL:ALL)</span> <span class="pre">NOPASSWD:</span> <span class="pre">ALL</span></code> and remove the <code class="docutils literal notranslate"><span class="pre">#</span></code> to uncomment it.</p></li>
-<li><p>Save and exit with <code class="docutils literal notranslate"><span class="pre">:wq</span></code></p></li>
-<li><p>Type <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">exit</span></code></p></li>
-</ul>
-<p>8 - Install XEN</p>
-<ul class="simple">
-<li><p>Run <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">sudo</span> <span class="pre">apk</span> <span class="pre">add</span> <span class="pre">xen</span> <span class="pre">xen-hypervisor</span></code></p></li>
-<li><p>Run <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">sudo</span> <span class="pre">reboot</span></code></p></li>
-<li><p>On reboot, select the first GRUB entry labeled with <code class="docutils literal notranslate"><span class="pre">Xen</span></code></p></li>
-<li><p>After booting, log in as <code class="docutils literal notranslate"><span class="pre">root</span></code></p></li>
-<li><p>Start the Xen service with <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">rc-service</span> <span class="pre">xenstored</span> <span class="pre">start</span></code></p></li>
-</ul>
-<p>9 - Install the product following the provided documentation.</p>
-</section>
+          <section id="known-problems">
+<h1>Known problems<a class="headerlink" href="#known-problems" title="Link to this heading">¶</a></h1>
+<p>This document helps solving different kinds of problems.</p>
 </section>
 
         </article>
@@ -321,23 +276,23 @@
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="python-api.html">
+          <a class="next-page" href="logging.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">Python API</div>
+                <div class="title">Logging</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="protocol.html">
+          <a class="prev-page" href="integration.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">Protocol</div>
+                <div class="title">Integration</div>
                 
               </div>
             </a>
@@ -359,27 +314,8 @@
         
       </footer>
     </div>
-    <aside class="toc-drawer">
+    <aside class="toc-drawer no-toc">
       
-      
-      <div class="toc-sticky toc-scroll">
-        <div class="toc-title-container">
-          <span class="toc-title">
-            On this page
-          </span>
-        </div>
-        <div class="toc-tree-container">
-          <div class="toc-tree">
-            <ul>
-<li><a class="reference internal" href="#">Provisioning</a><ul>
-<li><a class="reference internal" href="#manual">Manual</a></li>
-</ul>
-</li>
-</ul>
-
-          </div>
-        </div>
-      </div>
       
       
     </aside>

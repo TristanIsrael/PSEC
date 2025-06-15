@@ -207,13 +207,16 @@
 <li class="toctree-l2"><a class="reference internal" href="markdown/capabilities.html">Capabilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/debugging.html">Debugging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/design-rules.html">Design rules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="markdown/development.html">Development of PSEC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/documentation.html">Documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/graphical-design.html">Graphical design</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/integration.html">Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="markdown/known-problems.html">Known problems</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/logging.html">Logging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/protocol.html">Protocol</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/provisioning.html">Provisioning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/python-api.html">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="markdown/roles.html">Roles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/sensors.html">Sensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/tested-hardware.html">Tested hardware</a></li>
@@ -258,7 +261,7 @@
           
 <section class="genindex-section">
   <h1 id="index">Index</h1>
-  <div class="genindex-jumpbox"><a href="#A"><strong>A</strong></a> | <a href="#B"><strong>B</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#H"><strong>H</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#K"><strong>K</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#O"><strong>O</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#Q"><strong>Q</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#U"><strong>U</strong></a> | <a href="#W"><strong>W</strong></a> | <a href="#X"><strong>X</strong></a> | <a href="#Y"><strong>Y</strong></a></div>
+  <div class="genindex-jumpbox"><a href="#A"><strong>A</strong></a> | <a href="#B"><strong>B</strong></a> | <a href="#C"><strong>C</strong></a> | <a href="#D"><strong>D</strong></a> | <a href="#E"><strong>E</strong></a> | <a href="#F"><strong>F</strong></a> | <a href="#G"><strong>G</strong></a> | <a href="#I"><strong>I</strong></a> | <a href="#K"><strong>K</strong></a> | <a href="#L"><strong>L</strong></a> | <a href="#M"><strong>M</strong></a> | <a href="#N"><strong>N</strong></a> | <a href="#O"><strong>O</strong></a> | <a href="#P"><strong>P</strong></a> | <a href="#R"><strong>R</strong></a> | <a href="#S"><strong>S</strong></a> | <a href="#T"><strong>T</strong></a> | <a href="#U"><strong>U</strong></a> | <a href="#W"><strong>W</strong></a> | <a href="#X"><strong>X</strong></a> | <a href="#Y"><strong>Y</strong></a></div>
 </section>
 <section id="A" class="genindex-section">
   <h2>A</h2>
@@ -354,11 +357,17 @@
 </li>
         <li><a href="psec.html#psec.TypeEntree.CLAVIER">CLAVIER (psec.TypeEntree attribute)</a>
 </li>
+        <li><a href="psec.html#psec.Api.clear_sys_usb_queues">clear_sys_usb_queues() (psec.Api method)</a>
+</li>
         <li><a href="psec.html#psec.Cles">Cles (class in psec)</a>
 </li>
         <li><a href="psec.html#psec.SerialMQTTClient.close">close() (psec.SerialMQTTClient method)</a>
 </li>
         <li><a href="psec.html#psec.ComponentsHelper">ComponentsHelper (class in psec)</a>
+</li>
+        <li><a href="psec.html#psec.System.compute_cpus_for_group">compute_cpus_for_group() (psec.System method)</a>
+</li>
+        <li><a href="psec.html#psec.System.compute_vcpus_for_group">compute_vcpus_for_group() (psec.System static method)</a>
 </li>
         <li><a href="psec.html#psec.MqttClient.connected">connected (psec.MqttClient attribute)</a>
 </li>
@@ -386,14 +395,14 @@
 </li>
         <li><a href="psec.html#psec.Topics.CREATE_FILE">CREATE_FILE (psec.Topics attribute)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="psec.html#psec.Api.create_file">create_file() (psec.Api method)</a>
 
         <ul>
           <li><a href="psec.html#psec.FichierHelper.create_file">(psec.FichierHelper static method)</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="psec.html#psec.MqttFactory.create_mqtt_client_dom0">create_mqtt_client_dom0() (psec.MqttFactory static method)</a>
 </li>
         <li><a href="psec.html#psec.MqttFactory.create_mqtt_client_domu">create_mqtt_client_domu() (psec.MqttFactory static method)</a>
@@ -600,11 +609,13 @@
 </li>
         <li><a href="psec.html#psec.ComponentsHelper.get_ids">get_ids() (psec.ComponentsHelper method)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="psec.html#psec.ComponentsHelper.get_ids_by_type">get_ids_by_type() (psec.ComponentsHelper method)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="psec.html#psec.Api.get_mqtt_client">get_mqtt_client() (psec.Api method)</a>
+</li>
+        <li><a href="psec.html#psec.System.get_platform_cpu_count">get_platform_cpu_count() (psec.System method)</a>
 </li>
         <li><a href="psec.html#psec.System.get_screen_height">get_screen_height() (psec.System method)</a>
 </li>
@@ -618,19 +629,13 @@
 </li>
         <li><a href="psec.html#psec.System.get_system_uuid">get_system_uuid() (psec.System method)</a>
 </li>
+        <li><a href="psec.html#psec.System.get_topology">get_topology() (psec.System static method)</a>
+</li>
+        <li><a href="psec.html#psec.System.get_topology_data">get_topology_data() (psec.System static method)</a>
+</li>
         <li><a href="psec.html#psec.ComponentsHelper.get_type">get_type() (psec.ComponentsHelper method)</a>
 </li>
         <li><a href="psec.html#psec.Topics.GUI_READY">GUI_READY (psec.Topics attribute)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
-<section id="H" class="genindex-section">
-  <h2>H</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="psec.html#psec.System.height">height (psec.System attribute)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -704,8 +709,6 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="psec.html#psec.FichierHelper.make_filepath">make_filepath() (psec.FichierHelper static method)</a>
 </li>
-        <li><a href="psec.html#psec.TaskRunner.max_tasks_">max_tasks_ (psec.TaskRunner attribute)</a>
-</li>
         <li><a href="psec.html#psec.MouseButton.MIDDLE">MIDDLE (psec.MouseButton attribute)</a>
 </li>
         <li><a href="psec.html#psec.BoutonSouris.MILIEU">MILIEU (psec.BoutonSouris attribute)</a>
@@ -725,10 +728,10 @@
 </li>
         <li><a href="psec.html#psec.MouseButton">MouseButton (class in psec)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="psec.html#psec.MouseMove">MouseMove (class in psec)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="psec.html#psec.MouseWheel">MouseWheel (class in psec)</a>
 </li>
         <li><a href="psec.html#psec.Mouse.move">move (psec.Mouse attribute)</a>
@@ -757,8 +760,6 @@
   <h2>N</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="psec.html#psec.SysUsbController.nb_mqtt_conn">nb_mqtt_conn (psec.SysUsbController attribute)</a>
-</li>
         <li><a href="psec.html#psec.Topics.NEW_FILE">NEW_FILE (psec.Topics attribute)</a>
 </li>
         <li><a href="psec.html#psec.Cles.NIVEAU_JOURNAL">NIVEAU_JOURNAL (psec.Cles attribute)</a>
@@ -767,10 +768,10 @@
 </li>
         <li><a href="psec.html#psec.Parametres.niveau_journalisation_to_string">niveau_journalisation_to_string() (psec.Parametres static method)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="psec.html#psec.MouseWheel.NO_MOVE">NO_MOVE (psec.MouseWheel attribute)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="psec.html#psec.Cles.NOM_DOMAINE_GUI">NOM_DOMAINE_GUI (psec.Cles attribute)</a>
 </li>
         <li><a href="psec.html#psec.NotificationFactory">NotificationFactory (class in psec)</a>
@@ -850,16 +851,6 @@
   </tr></table>
 </section>
 
-<section id="Q" class="genindex-section">
-  <h2>Q</h2>
-  <table style="width: 100%" class="indextable genindextable"><tr>
-    <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="psec.html#psec.TaskRunner.queue_">queue_ (psec.TaskRunner attribute)</a>
-</li>
-    </ul></td>
-  </tr></table>
-</section>
-
 <section id="R" class="genindex-section">
   <h2>R</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
@@ -867,6 +858,8 @@
         <li><a href="psec.html#psec.Topics.READ_FILE">READ_FILE (psec.Topics attribute)</a>
 </li>
         <li><a href="psec.html#psec.Api.read_file">read_file() (psec.Api method)</a>
+</li>
+        <li><a href="psec.html#psec.System.read_topology_file">read_topology_file() (psec.System static method)</a>
 </li>
         <li><a href="psec.html#psec.EtatComposant.READY">READY (psec.EtatComposant attribute)</a>
 </li>
@@ -876,12 +869,12 @@
 </li>
         <li><a href="psec.html#psec.Constantes.REPOSITORY">REPOSITORY (psec.Constantes attribute)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="psec.html#psec.Api.request_energy_state">request_energy_state() (psec.Api method)</a>
 </li>
         <li><a href="psec.html#psec.Api.request_system_info">request_system_info() (psec.Api method)</a>
 </li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="psec.html#psec.RequestFactory">RequestFactory (class in psec)</a>
 </li>
         <li><a href="psec.html#psec.ResponseFactory">ResponseFactory (class in psec)</a>
@@ -892,11 +885,7 @@
 </li>
         <li><a href="psec.html#psec.MouseButton.RIGHT">RIGHT (psec.MouseButton attribute)</a>
 </li>
-        <li><a href="psec.html#psec.System.rotation">rotation (psec.System attribute)</a>
-</li>
         <li><a href="psec.html#psec.TaskRunner.run_task">run_task() (psec.TaskRunner method)</a>
-</li>
-        <li><a href="psec.html#psec.TaskRunner.running_">running_ (psec.TaskRunner attribute)</a>
 </li>
     </ul></td>
   </tr></table>
@@ -974,6 +963,10 @@
           <li><a href="psec.html#psec.MqttClient.subscribe">(psec.MqttClient method)</a>
 </li>
         </ul></li>
+        <li><a href="psec.html#psec.Topics.SYS_USB">SYS_USB (psec.Topics attribute)</a>
+</li>
+        <li><a href="psec.html#psec.Topics.SYS_USB_CLEAR_QUEUES">SYS_USB_CLEAR_QUEUES (psec.Topics attribute)</a>
+</li>
         <li><a href="psec.html#psec.System">System (class in psec)</a>
 </li>
         <li><a href="psec.html#psec.Topics.SYSTEM">SYSTEM (psec.Topics attribute)</a>
@@ -992,16 +985,12 @@
     <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="psec.html#psec.Cles.TAILLE_TRAME">TAILLE_TRAME (psec.Cles attribute)</a>
 </li>
-        <li><a href="psec.html#psec.SysUsbController.task_runner">task_runner (psec.SysUsbController attribute)</a>
-</li>
         <li><a href="psec.html#psec.TaskRunner">TaskRunner (class in psec)</a>
 </li>
         <li><a href="psec.html#psec.ConnectionType.TCP_DEBUG">TCP_DEBUG (psec.ConnectionType attribute)</a>
 </li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
-        <li><a href="psec.html#psec.TaskRunner.threads_">threads_ (psec.TaskRunner attribute)</a>
-</li>
         <li><a href="psec.html#psec.Topics">Topics (class in psec)</a>
 </li>
         <li><a href="psec.html#psec.TypeEntree.TOUCH">TOUCH (psec.TypeEntree attribute)</a>
@@ -1055,8 +1044,6 @@
         <li><a href="psec.html#psec.Mouse.wheel_equals">wheel_equals() (psec.Mouse method)</a>
 </li>
         <li><a href="psec.html#psec.Mouse.wheel_moved">wheel_moved() (psec.Mouse method)</a>
-</li>
-        <li><a href="psec.html#psec.System.width">width (psec.System attribute)</a>
 </li>
         <li><a href="psec.html#psec.Topics.WORKFLOW">WORKFLOW (psec.Topics attribute)</a>
 </li>

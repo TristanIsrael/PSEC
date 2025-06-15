@@ -3,7 +3,7 @@
 pkgname=psec-alpine-iso
 pkgver=3.21
 pkgrel=3
-pkgdesc="PSEC - Alpine ISO images"
+pkgdesc="PSEC - Alpine ISO images [DEPRECATED]"
 url="https://www.alefbet.net/"
 arch="x86_64"
 license="MIT"

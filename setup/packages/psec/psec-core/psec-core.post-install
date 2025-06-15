@@ -35,6 +35,11 @@ rc-update add start-x
 rc-update add orchestrator
 rc-update add debug
 
+# Install new Grub file
+mv /etc/default/grub /etc/default/grub.orig
+mv /etc/default/grub.apk-new /etc/default/grub
+# update-grub is automatically called at the end
+
 # Re-enable colored prompt   
 #mv "/etc/profile.d/color_prompt.sh.disabled" "/etc/profile.d/color_prompt.sh"
 

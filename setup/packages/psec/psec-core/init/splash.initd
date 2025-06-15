@@ -7,6 +7,11 @@ depend() {
 }
 
 start() {
+    if grep -qw "nosplash" /proc/cmdline; then
+        ewarn "Splash explicitely disabled on kernel command line"
+        return 0
+    fi
+
     width=`cat /sys/class/graphics/fb0/virtual_size | cut -d, -f1`
     height=`cat /sys/class/graphics/fb0/virtual_size | cut -d, -f2`
     splash_file="/boot/Splash_${width}_${height}.ppm"

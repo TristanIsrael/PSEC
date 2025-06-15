@@ -2,7 +2,7 @@
 # Symlink this file to color_prompt.sh to actually enable it.
 
 _normal=$'\e[0m'
-if [ "$USER" = root ] && [ -n "${SUDO_USER:-}" ]; then
+if [ "$USER" = "root" ] || [ -n "$SUDO_USER" ]; then
         _color=$'\e[1;31m'
         _symbol='#'
 else

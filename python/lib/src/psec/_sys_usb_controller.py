@@ -5,7 +5,7 @@ import base64
 import zlib
 from pathlib import Path
 from queue import Queue
-from . import Constantes, Parametres, MqttClient, Topics
+from . import Constantes, Parametres, MqttClient, Topics, MqttHelper
 from . import FichierHelper, ResponseFactory, EtatComposant
 from . import Logger, Cles, DiskMonitor, NotificationFactory
 try:

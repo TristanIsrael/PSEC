@@ -208,17 +208,19 @@
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/capabilities.html">Capabilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/debugging.html">Debugging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/design-rules.html">Design rules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/development.html">Development of PSEC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/documentation.html">Documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/graphical-design.html">Graphical design</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/integration.html">Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/known-problems.html">Known problems</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/logging.html">Logging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/protocol.html">Protocol</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/provisioning.html">Provisioning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/python-api.html">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/roles.html">Roles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/sensors.html">Sensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/tested-hardware.html">Tested hardware</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../markdown/tested-hardware.html#dell-latitude-e5510">Dell Latitude E5510</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/topology.html">Topology</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/update-alpine-mirror.html">Create or Update the Alpine Mirror</a></li>
 </ul>
@@ -258,38 +260,45 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for psec._sys_usb_controller</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">Constantes</span><span class="p">,</span> <span class="n">Parametres</span><span class="p">,</span> <span class="n">MqttClient</span><span class="p">,</span> <span class="n">Topics</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">base64</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">zlib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">queue</span><span class="w"> </span><span class="kn">import</span> <span class="n">Queue</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">Constantes</span><span class="p">,</span> <span class="n">Parametres</span><span class="p">,</span> <span class="n">MqttClient</span><span class="p">,</span> <span class="n">Topics</span><span class="p">,</span> <span class="n">MqttHelper</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">FichierHelper</span><span class="p">,</span> <span class="n">ResponseFactory</span><span class="p">,</span> <span class="n">EtatComposant</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">Logger</span><span class="p">,</span> <span class="n">Cles</span><span class="p">,</span> <span class="n">BenchmarkId</span><span class="p">,</span> <span class="n">MqttClient</span><span class="p">,</span> <span class="n">DiskMonitor</span><span class="p">,</span> <span class="n">MqttHelper</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">TaskRunner</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">Logger</span><span class="p">,</span> <span class="n">Cles</span><span class="p">,</span> <span class="n">DiskMonitor</span><span class="p">,</span> <span class="n">NotificationFactory</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">DemonInputs</span>
-    <span class="c1">#from . import ControleurBenchmark</span>
     <span class="n">NO_INPUTS_MONITORING</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="k">except</span><span class="p">:</span>
     <span class="n">NO_INPUTS_MONITORING</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Importing ControleurVmSysUsb without inputs monitoring nor benchmarking capacity&quot;</span><span class="p">)</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">NotificationFactory</span><span class="p">,</span> <span class="n">FichierHelper</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span><span class="o">,</span><span class="w"> </span><span class="nn">os</span><span class="o">,</span><span class="w"> </span><span class="nn">base64</span><span class="o">,</span><span class="w"> </span><span class="nn">zlib</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">concurrent.futures</span><span class="w"> </span><span class="kn">import</span> <span class="n">ThreadPoolExecutor</span>
 
 <div class="viewcode-block" id="SysUsbController">
 <a class="viewcode-back" href="../../psec.html#psec.SysUsbController">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SysUsbController</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; Cette classe traite les messages échangés par la sys-usb avec le Dom0 ou les autres domaines. &quot;&quot;&quot;</span>
 
-    <span class="n">task_runner</span> <span class="o">=</span> <span class="n">TaskRunner</span><span class="p">()</span>
-    <span class="n">nb_mqtt_conn</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">__nb_mqtt_conn</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">__can_run</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">__messages_queue</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
+    <span class="n">__read_files_queue</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
+    <span class="n">__copy_files_queue</span> <span class="o">=</span> <span class="n">Queue</span><span class="p">()</span>
+    <span class="n">__high_priority_messages</span> <span class="o">=</span> <span class="p">[</span> <span class="n">Topics</span><span class="o">.</span><span class="n">LIST_DISKS</span><span class="p">,</span> <span class="n">Topics</span><span class="o">.</span><span class="n">LIST_FILES</span><span class="p">,</span> <span class="n">Topics</span><span class="o">.</span><span class="n">DISCOVER_COMPONENTS</span><span class="p">,</span> <span class="n">Topics</span><span class="o">.</span><span class="n">PING</span><span class="p">,</span> <span class="n">Topics</span><span class="o">.</span><span class="n">SYS_USB_CLEAR_QUEUES</span> <span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mqtt_client</span><span class="p">:</span><span class="n">MqttClient</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span> <span class="o">=</span> <span class="n">mqtt_client</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__disk_monitor</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="c1">#self.__thread_pool = ThreadPoolExecutor(max_workers=1)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__thread_read_files</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__read_files_worker</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;read_file_worker&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__thread_copy_files</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__copy_files_worker</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;copy_file_worker&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__thread_messages</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__message_worker</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;message_worker&quot;</span><span class="p">)</span>        
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">task_runner</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__can_run</span> <span class="o">=</span> <span class="kc">False</span>
 
 
 <div class="viewcode-block" id="SysUsbController.start">
@@ -300,41 +309,43 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
-        <span class="c1"># Start the worker</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">task_runner</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__can_run</span> <span class="o">=</span> <span class="kc">True</span></div>
 
 
         
 <div class="viewcode-block" id="SysUsbController.stop">
 <a class="viewcode-back" href="../../psec.html#psec.SysUsbController.stop">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">task_runner</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__can_run</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="n">DemonInputs</span><span class="p">()</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span></div>
 
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__on_mqtt_connected</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="s2">&quot;USB controller&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="p">)</span>
-        <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Starting PSEC disk controller&quot;</span><span class="p">)</span>
+        <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Starting PSEC disk controller&quot;</span><span class="p">)</span>        
 
         <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">LIST_DISKS</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">LIST_FILES</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">COPY_FILE</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">READ_FILE</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">DELETE_FILE</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">BENCHMARK</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">)</span>
+        <span class="c1">#self.mqtt_client.subscribe(f&quot;{Topics.BENCHMARK}/request&quot;)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">FILE_FOOTPRINT</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">CREATE_FILE</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">DISCOVER_COMPONENTS</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">DELETE_FILE</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">PING</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">SYS_USB_CLEAR_QUEUES</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">)</span>
 
         <span class="c1"># Démarrage de la surveillance des entrées</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">NO_INPUTS_MONITORING</span><span class="p">:</span>
             <span class="n">DemonInputs</span><span class="p">()</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="p">)</span>
-            <span class="c1">#threading.Thread(target= DemonInputs().demarre()).start()        </span>
 
         <span class="c1">#ControleurBenchmark().setup(self.mqtt_client)</span>
+        <span class="c1"># Start threads</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__thread_read_files</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__thread_copy_files</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__thread_messages</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__disk_monitor</span> <span class="o">=</span> <span class="n">DiskMonitor</span><span class="p">(</span><span class="n">Constantes</span><span class="p">()</span><span class="o">.</span><span class="n">constante</span><span class="p">(</span><span class="n">Cles</span><span class="o">.</span><span class="n">CHEMIN_MONTAGE_USB</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="p">)</span>
         <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__disk_monitor</span><span class="o">.</span><span class="n">start</span><span class="p">)</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
@@ -352,41 +363,58 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">__on_mqtt_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
         <span class="c1">#Logger().debug(&quot;Message received : topic={}, payload={}&quot;.format(topic, payload))</span>
 
-        <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__message_worker</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="n">payload</span><span class="p">,))</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-        <span class="c1">#self.__thread_pool.submit(self.__message_worker, topic, payload)</span>
-
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">__message_worker</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
-        <span class="c1">#Logger().debug(&quot;Handle message {}&quot;.format(topic))</span>
-
         <span class="n">base_topic</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">topic</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">base_topic</span> <span class="o">==</span> <span class="n">Topics</span><span class="o">.</span><span class="n">LIST_DISKS</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__handle_list_disks</span><span class="p">(</span><span class="n">base_topic</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">base_topic</span> <span class="o">==</span> <span class="n">Topics</span><span class="o">.</span><span class="n">LIST_FILES</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__handle_list_files</span><span class="p">(</span><span class="n">base_topic</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">base_topic</span> <span class="o">==</span> <span class="n">Topics</span><span class="o">.</span><span class="n">COPY_FILE</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__handle_copy_file</span><span class="p">(</span><span class="n">base_topic</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">base_topic</span> <span class="o">==</span> <span class="n">Topics</span><span class="o">.</span><span class="n">READ_FILE</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__handle_read_file</span><span class="p">(</span><span class="n">base_topic</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">base_topic</span> <span class="o">==</span> <span class="n">Topics</span><span class="o">.</span><span class="n">DELETE_FILE</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__handle_remove_file</span><span class="p">(</span><span class="n">base_topic</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">base_topic</span> <span class="o">==</span> <span class="n">Topics</span><span class="o">.</span><span class="n">BENCHMARK</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__handle_benchmark</span><span class="p">(</span><span class="n">base_topic</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">base_topic</span> <span class="o">==</span> <span class="n">Topics</span><span class="o">.</span><span class="n">FILE_FOOTPRINT</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__handle_file_footprint</span><span class="p">(</span><span class="n">base_topic</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">base_topic</span> <span class="o">==</span> <span class="n">Topics</span><span class="o">.</span><span class="n">CREATE_FILE</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__handle_create_file</span><span class="p">(</span><span class="n">base_topic</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">base_topic</span> <span class="o">==</span> <span class="n">Topics</span><span class="o">.</span><span class="n">DISCOVER_COMPONENTS</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__handle_discover_components</span><span class="p">(</span><span class="n">base_topic</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">base_topic</span> <span class="o">==</span> <span class="n">Topics</span><span class="o">.</span><span class="n">DELETE_FILE</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__handle_delete_file</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">base_topic</span> <span class="o">==</span> <span class="n">Topics</span><span class="o">.</span><span class="n">PING</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__handle_ping</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+        <span class="c1"># Some messages have a high priority, we don&#39;t put them into the queue</span>
+        <span class="c1"># These tasks should only be small tasks, otherwise they go in the queue</span>
+        <span class="k">if</span> <span class="n">base_topic</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__high_priority_messages</span><span class="p">:</span>
+            <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__handle_message</span><span class="p">(</span><span class="n">base_topic</span><span class="p">,</span> <span class="n">payload</span><span class="p">))</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__messages_queue</span><span class="o">.</span><span class="n">put</span><span class="p">((</span><span class="n">base_topic</span><span class="p">,</span> <span class="n">payload</span><span class="p">))</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__message_worker</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1">#Logger().debug(&quot;Handle message {}&quot;.format(topic))</span>
+
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">__can_run</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__messages_queue</span><span class="o">.</span><span class="n">empty</span><span class="p">():</span>
+                <span class="n">message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__messages_queue</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="c1"># We get a tuple</span>
+                <span class="n">topic</span> <span class="o">=</span> <span class="n">message</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">payload</span> <span class="o">=</span> <span class="n">message</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">__handle_message</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
 
     <span class="c1">####</span>
     <span class="c1"># Traitement des commandes</span>
     <span class="c1">#</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__handle_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">topic</span> <span class="o">==</span> <span class="n">Topics</span><span class="o">.</span><span class="n">LIST_DISKS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__handle_list_disks</span><span class="p">(</span><span class="n">topic</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">topic</span> <span class="o">==</span> <span class="n">Topics</span><span class="o">.</span><span class="n">LIST_FILES</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__handle_list_files</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">topic</span> <span class="o">==</span> <span class="n">Topics</span><span class="o">.</span><span class="n">COPY_FILE</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__handle_copy_file</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">topic</span> <span class="o">==</span> <span class="n">Topics</span><span class="o">.</span><span class="n">READ_FILE</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__handle_read_file</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">topic</span> <span class="o">==</span> <span class="n">Topics</span><span class="o">.</span><span class="n">DELETE_FILE</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__handle_remove_file</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">topic</span> <span class="o">==</span> <span class="n">Topics</span><span class="o">.</span><span class="n">BENCHMARK</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__handle_benchmark</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">topic</span> <span class="o">==</span> <span class="n">Topics</span><span class="o">.</span><span class="n">FILE_FOOTPRINT</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__handle_file_footprint</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">topic</span> <span class="o">==</span> <span class="n">Topics</span><span class="o">.</span><span class="n">CREATE_FILE</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__handle_create_file</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">topic</span> <span class="o">==</span> <span class="n">Topics</span><span class="o">.</span><span class="n">DISCOVER_COMPONENTS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__handle_discover_components</span><span class="p">(</span><span class="n">topic</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">topic</span> <span class="o">==</span> <span class="n">Topics</span><span class="o">.</span><span class="n">DELETE_FILE</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__handle_delete_file</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">topic</span> <span class="o">==</span> <span class="n">Topics</span><span class="o">.</span><span class="n">PING</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__handle_ping</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">topic</span> <span class="o">==</span> <span class="n">Topics</span><span class="o">.</span><span class="n">SYS_USB_CLEAR_QUEUES</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__handle_clear_queue</span><span class="p">()</span>
+
     <span class="k">def</span><span class="w"> </span><span class="nf">__handle_list_disks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Disks list requested&quot;</span><span class="p">)</span>
 
@@ -437,72 +465,58 @@
         <span class="n">filepath</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;filepath&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="n">repository_path</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="n">Parametres</span><span class="p">()</span><span class="o">.</span><span class="n">parametre</span><span class="p">(</span><span class="n">Cles</span><span class="o">.</span><span class="n">STORAGE_PATH_DOMU</span><span class="p">)</span>
     
-        <span class="n">source_location</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Parametres</span><span class="p">()</span><span class="o">.</span><span class="n">parametre</span><span class="p">(</span><span class="n">Cles</span><span class="o">.</span><span class="n">CHEMIN_MONTAGE_USB</span><span class="p">),</span> <span class="n">source_disk</span><span class="p">)</span> 
-        <span class="n">source_footprint</span> <span class="o">=</span> <span class="n">FichierHelper</span><span class="o">.</span><span class="n">calculate_footprint</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">source_location</span><span class="p">,</span> <span class="n">filepath</span><span class="p">))</span>     
+        <span class="n">source_location</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Parametres</span><span class="p">()</span><span class="o">.</span><span class="n">parametre</span><span class="p">(</span><span class="n">Cles</span><span class="o">.</span><span class="n">CHEMIN_MONTAGE_USB</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">source_disk</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">source_footprint</span> <span class="o">=</span> <span class="n">FichierHelper</span><span class="o">.</span><span class="n">calculate_footprint</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">source_location</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-        <span class="n">dest_parent_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">repository_path</span><span class="p">,</span> <span class="n">filepath</span><span class="p">))</span><span class="o">.</span><span class="n">parent</span>
+        <span class="n">dest_parent_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">repository_path</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">dest_parent_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Création du répertoire </span><span class="si">{}</span><span class="s2"> dans le dépôt&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dest_parent_path</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Création du répertoire </span><span class="si">{</span><span class="n">dest_parent_path</span><span class="si">}</span><span class="s2"> dans le dépôt&quot;</span><span class="p">)</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dest_parent_path</span><span class="o">.</span><span class="n">as_posix</span><span class="p">(),</span> <span class="n">exist_ok</span><span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 
-        <span class="n">dest_footprint</span> <span class="o">=</span> <span class="n">FichierHelper</span><span class="o">.</span><span class="n">copy_file</span><span class="p">(</span><span class="n">source_location</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">repository_path</span><span class="p">,</span> <span class="n">source_footprint</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">dest_footprint</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>            
-            <span class="n">notif</span> <span class="o">=</span> <span class="n">NotificationFactory</span><span class="o">.</span><span class="n">create_notification_new_file</span><span class="p">(</span><span class="n">Constantes</span><span class="o">.</span><span class="n">REPOSITORY</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">source_footprint</span><span class="p">,</span> <span class="n">dest_footprint</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">NEW_FILE</span><span class="p">,</span> <span class="n">notif</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">notif</span> <span class="o">=</span> <span class="n">NotificationFactory</span><span class="o">.</span><span class="n">create_notification_error</span><span class="p">(</span><span class="n">source_disk</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;The file could not be copied&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span> <span class="n">notif</span><span class="p">)</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">__read_files_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;source_location&quot;</span><span class="p">:</span> <span class="n">source_location</span><span class="p">,</span> 
+                <span class="s2">&quot;source_disk&quot;</span><span class="p">:</span> <span class="n">source_disk</span><span class="p">,</span> 
+                <span class="s2">&quot;filepath&quot;</span><span class="p">:</span> <span class="n">filepath</span><span class="p">,</span> 
+                <span class="s2">&quot;repository_path&quot;</span><span class="p">:</span> <span class="n">repository_path</span><span class="p">,</span> 
+                <span class="s2">&quot;source_footprint&quot;</span><span class="p">:</span> <span class="n">source_footprint</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+            <span class="c1">#self.task_runner.run_task(self.__do_read_file, args=(source_location, source_disk, filepath, repository_path, source_footprint,))    </span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__handle_remove_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="nb">dict</span><span class="p">):</span>
-        <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;The command remove file is not implemented&quot;</span><span class="p">)</span>
+        <span class="c1">#Logger().error(&quot;The command remove file is not implemented&quot;)</span>
         <span class="k">pass</span>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__handle_copy_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">MqttHelper</span><span class="o">.</span><span class="n">check_payload</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;disk&quot;</span><span class="p">,</span> <span class="s2">&quot;filepath&quot;</span><span class="p">,</span> <span class="s2">&quot;destination&quot;</span><span class="p">]):</span>
-            <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Mising arguments for the request </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">topic</span><span class="p">))</span>
+            <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing arguments for the request </span><span class="si">{</span><span class="n">topic</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">return</span>
         
         <span class="n">source_disk</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;disk&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="n">filepath</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;filepath&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="n">target_disk</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;destination&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
         
-        <span class="n">source_location</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Parametres</span><span class="p">()</span><span class="o">.</span><span class="n">parametre</span><span class="p">(</span><span class="n">Cles</span><span class="o">.</span><span class="n">CHEMIN_MONTAGE_USB</span><span class="p">),</span> <span class="n">source_disk</span><span class="p">)</span>        
-        <span class="n">destination_location</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Parametres</span><span class="p">()</span><span class="o">.</span><span class="n">parametre</span><span class="p">(</span><span class="n">Cles</span><span class="o">.</span><span class="n">CHEMIN_MONTAGE_USB</span><span class="p">),</span> <span class="n">target_disk</span><span class="p">)</span>
+        <span class="n">source_location</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Parametres</span><span class="p">()</span><span class="o">.</span><span class="n">parametre</span><span class="p">(</span><span class="n">Cles</span><span class="o">.</span><span class="n">CHEMIN_MONTAGE_USB</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">source_disk</span><span class="si">}</span><span class="s2">&quot;</span>        
+        <span class="n">destination_location</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Parametres</span><span class="p">()</span><span class="o">.</span><span class="n">parametre</span><span class="p">(</span><span class="n">Cles</span><span class="o">.</span><span class="n">CHEMIN_MONTAGE_USB</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">target_disk</span><span class="si">}</span><span class="s2">&quot;</span>
 
-        <span class="k">try</span><span class="p">:</span>                   
-            <span class="bp">self</span><span class="o">.</span><span class="n">task_runner</span><span class="o">.</span><span class="n">run_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__do_copy_file</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">source_location</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">target_disk</span><span class="p">,</span> <span class="n">destination_location</span><span class="p">,))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__copy_files_queue</span><span class="o">.</span><span class="n">put</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;source_location&quot;</span><span class="p">:</span> <span class="n">source_location</span><span class="p">,</span> 
+                    <span class="s2">&quot;source_disk&quot;</span><span class="p">:</span> <span class="n">source_disk</span><span class="p">,</span> 
+                    <span class="s2">&quot;filepath&quot;</span><span class="p">:</span> <span class="n">filepath</span><span class="p">,</span> 
+                    <span class="s2">&quot;target_disk&quot;</span><span class="p">:</span> <span class="n">target_disk</span><span class="p">,</span> 
+                    <span class="s2">&quot;destination_location&quot;</span><span class="p">:</span> <span class="n">destination_location</span>
+                    <span class="c1">#&quot;source_footprint&quot;: source_footprint</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+            <span class="c1">#self.task_runner.run_task(self.__do_copy_file, args=(source_location, filepath, target_disk, destination_location,))</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;An error occured while copying the file </span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2"> on </span><span class="si">{</span><span class="n">target_disk</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         
         <span class="c1">#FichierHelper.copy_file(disk, filepath, destination_folder)</span>
-
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">__do_copy_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_location</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">target_disk</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target_location</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>        
-        <span class="c1">#source_filepath = &quot;{}/{}/{}&quot;.format(Parametres().parametre(Cles.CHEMIN_MONTAGE_USB), source_disk, filepath)        </span>
-        <span class="n">source_footprint</span> <span class="o">=</span> <span class="n">FichierHelper</span><span class="o">.</span><span class="n">calculate_footprint</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">source_location</span><span class="p">,</span> <span class="n">filepath</span><span class="p">))</span>
-        
-        <span class="c1"># Création du répertoire de destination si nécessaire</span>
-        <span class="n">parent_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">parent_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Création du répertoire </span><span class="si">{</span><span class="n">parent_path</span><span class="si">}</span><span class="s2"> dans le dépôt&quot;</span><span class="p">)</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">target_location</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">parent_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
-
-        <span class="n">dest_footprint</span> <span class="o">=</span> <span class="n">FichierHelper</span><span class="o">.</span><span class="n">copy_file</span><span class="p">(</span><span class="n">source_location</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">target_location</span><span class="p">,</span> <span class="n">source_footprint</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">dest_footprint</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-            <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The file </span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2"> has been copied to </span><span class="si">{</span><span class="n">target_location</span><span class="si">}</span><span class="s2">. The footprint is </span><span class="si">{</span><span class="n">source_footprint</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-            <span class="c1"># Envoi d&#39;une notification pour informer de la présence d&#39;un nouveau fichier</span>
-            <span class="n">notif</span> <span class="o">=</span> <span class="n">NotificationFactory</span><span class="o">.</span><span class="n">create_notification_new_file</span><span class="p">(</span><span class="n">disk</span><span class="o">=</span> <span class="n">target_disk</span><span class="p">,</span> <span class="n">filepath</span><span class="o">=</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">source_footprint</span><span class="o">=</span> <span class="n">source_footprint</span><span class="p">,</span> <span class="n">dest_footprint</span><span class="o">=</span> <span class="n">dest_footprint</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">NEW_FILE</span><span class="si">}</span><span class="s2">/notification&quot;</span><span class="p">,</span> <span class="n">notif</span><span class="p">)</span>
-
-            <span class="n">response</span> <span class="o">=</span> <span class="n">ResponseFactory</span><span class="o">.</span><span class="n">create_response_copy_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">target_disk</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">dest_footprint</span><span class="p">)</span>            
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">response</span> <span class="o">=</span> <span class="n">ResponseFactory</span><span class="o">.</span><span class="n">create_response_copy_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">target_disk</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">dest_footprint</span><span class="p">)</span>
-            <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;La copie du fichier </span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2"> dans le dépôt a échoué.&quot;</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">COPY_FILE</span><span class="si">}</span><span class="s2">/response&quot;</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__handle_benchmark</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
@@ -620,7 +634,84 @@
         <span class="n">sent_at</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sent_at&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="n">payload</span> <span class="o">=</span> <span class="n">ResponseFactory</span><span class="o">.</span><span class="n">create_response_ping</span><span class="p">(</span><span class="n">ping_id</span><span class="p">,</span> <span class="s2">&quot;sys-usb&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">sent_at</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">PING</span><span class="si">}</span><span class="s2">/response&quot;</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">PING</span><span class="si">}</span><span class="s2">/response&quot;</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__read_files_worker</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">__can_run</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__read_files_queue</span><span class="o">.</span><span class="n">empty</span><span class="p">():</span>
+                <span class="n">next_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__read_files_queue</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                <span class="n">source_location</span> <span class="o">=</span> <span class="n">next_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source_location&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">source_disk</span> <span class="o">=</span> <span class="n">next_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source_disk&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">filepath</span> <span class="o">=</span> <span class="n">next_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;filepath&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">repository_path</span> <span class="o">=</span> <span class="n">next_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;repository_path&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">source_footprint</span> <span class="o">=</span> <span class="n">next_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source_footprint&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__do_read_file</span><span class="p">(</span><span class="n">source_location</span><span class="p">,</span> <span class="n">source_disk</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">repository_path</span><span class="p">,</span> <span class="n">source_footprint</span><span class="p">)</span>
+            
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__copy_files_worker</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">__can_run</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__copy_files_queue</span><span class="o">.</span><span class="n">empty</span><span class="p">():</span>
+                <span class="n">next_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__copy_files_queue</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+                <span class="n">source_location</span> <span class="o">=</span> <span class="n">next_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source_location&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> 
+                <span class="n">filepath</span> <span class="o">=</span> <span class="n">next_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;filepath&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">target_disk</span> <span class="o">=</span> <span class="n">next_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;target_disk&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="n">destination_location</span> <span class="o">=</span> <span class="n">next_file</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;destination_location&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__do_copy_file</span><span class="p">(</span><span class="n">source_location</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">target_disk</span><span class="p">,</span> <span class="n">destination_location</span><span class="p">)</span>
+            
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__do_read_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_location</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">source_disk</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">repository_path</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">source_footprint</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+        <span class="c1">#self.__debug_threads()</span>
+
+        <span class="n">dest_footprint</span> <span class="o">=</span> <span class="n">FichierHelper</span><span class="o">.</span><span class="n">copy_file</span><span class="p">(</span><span class="n">source_location</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">repository_path</span><span class="p">,</span> <span class="n">source_footprint</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dest_footprint</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">notif</span> <span class="o">=</span> <span class="n">NotificationFactory</span><span class="o">.</span><span class="n">create_notification_new_file</span><span class="p">(</span><span class="n">Constantes</span><span class="o">.</span><span class="n">REPOSITORY</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">source_footprint</span><span class="p">,</span> <span class="n">dest_footprint</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">NEW_FILE</span><span class="p">,</span> <span class="n">notif</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">notif</span> <span class="o">=</span> <span class="n">NotificationFactory</span><span class="o">.</span><span class="n">create_notification_error</span><span class="p">(</span><span class="n">source_disk</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;The file could not be copied&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span> <span class="n">notif</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__do_copy_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_location</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">target_disk</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target_location</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>        
+        <span class="c1">#source_filepath = &quot;{}/{}/{}&quot;.format(Parametres().parametre(Cles.CHEMIN_MONTAGE_USB), source_disk, filepath)        </span>
+        <span class="n">source_footprint</span> <span class="o">=</span> <span class="n">FichierHelper</span><span class="o">.</span><span class="n">calculate_footprint</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">source_location</span><span class="p">,</span> <span class="n">filepath</span><span class="p">))</span>
+        
+        <span class="c1"># Création du répertoire de destination si nécessaire</span>
+        <span class="n">parent_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">filepath</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">parent_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Création du répertoire </span><span class="si">{</span><span class="n">parent_path</span><span class="si">}</span><span class="s2"> dans le dépôt&quot;</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">target_location</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">parent_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">dest_footprint</span> <span class="o">=</span> <span class="n">FichierHelper</span><span class="o">.</span><span class="n">copy_file</span><span class="p">(</span><span class="n">source_location</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">target_location</span><span class="p">,</span> <span class="n">source_footprint</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dest_footprint</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The file </span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2"> has been copied to </span><span class="si">{</span><span class="n">target_location</span><span class="si">}</span><span class="s2">. The footprint is </span><span class="si">{</span><span class="n">source_footprint</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Envoi d&#39;une notification pour informer de la présence d&#39;un nouveau fichier</span>
+            <span class="n">notif</span> <span class="o">=</span> <span class="n">NotificationFactory</span><span class="o">.</span><span class="n">create_notification_new_file</span><span class="p">(</span><span class="n">disk</span><span class="o">=</span> <span class="n">target_disk</span><span class="p">,</span> <span class="n">filepath</span><span class="o">=</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">source_footprint</span><span class="o">=</span> <span class="n">source_footprint</span><span class="p">,</span> <span class="n">dest_footprint</span><span class="o">=</span> <span class="n">dest_footprint</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">NEW_FILE</span><span class="si">}</span><span class="s2">/notification&quot;</span><span class="p">,</span> <span class="n">notif</span><span class="p">)</span>
+
+            <span class="n">response</span> <span class="o">=</span> <span class="n">ResponseFactory</span><span class="o">.</span><span class="n">create_response_copy_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">target_disk</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">dest_footprint</span><span class="p">)</span>            
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">ResponseFactory</span><span class="o">.</span><span class="n">create_response_copy_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">target_disk</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">dest_footprint</span><span class="p">)</span>
+            <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;La copie du fichier </span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2"> dans le dépôt a échoué.&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">COPY_FILE</span><span class="si">}</span><span class="s2">/response&quot;</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__handle_clear_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__copy_files_queue</span><span class="o">.</span><span class="n">empty</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__copy_files_queue</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+
+        <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__read_files_queue</span><span class="o">.</span><span class="n">empty</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__read_files_queue</span><span class="o">.</span><span class="n">get</span><span class="p">()</span>
+
+    <span class="c1">######## </span>
+    <span class="c1">## Special functions</span>
+    <span class="c1">##</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__debug_threads</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Active threads: </span><span class="si">{</span><span class="n">threading</span><span class="o">.</span><span class="n">active_count</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">thread</span> <span class="ow">in</span> <span class="n">threading</span><span class="o">.</span><span class="n">enumerate</span><span class="p">():</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   -&gt; </span><span class="si">{</span><span class="n">thread</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 </pre></div>
         </article>

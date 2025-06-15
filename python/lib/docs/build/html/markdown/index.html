@@ -209,13 +209,16 @@
 <li class="toctree-l2"><a class="reference internal" href="capabilities.html">Capabilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="design-rules.html">Design rules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development.html">Development of PSEC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="documentation.html">Documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="graphical-design.html">Graphical design</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html">Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="known-problems.html">Known problems</a></li>
 <li class="toctree-l2"><a class="reference internal" href="logging.html">Logging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="protocol.html">Protocol</a></li>
 <li class="toctree-l2"><a class="reference internal" href="provisioning.html">Provisioning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="python-api.html">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="roles.html">Roles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sensors.html">Sensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tested-hardware.html">Tested hardware</a></li>
@@ -286,9 +289,10 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="build-alpine-packages.html">Building Alpine Packages</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="build-alpine-packages.html#references">References</a></li>
-<li class="toctree-l2"><a class="reference internal" href="build-alpine-packages.html#setting-up-an-administrator-workstation">Setting Up an Administrator Workstation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-alpine-packages.html#setting-up-an-maintainer-workstation">Setting Up an Maintainer workstation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="build-alpine-packages.html#warning">Warning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="build-alpine-packages.html#building-packages">Building Packages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build-alpine-packages.html#implement-an-automatic-building-environment">Implement an automatic building environment</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="capabilities.html">Capabilities</a><ul>
@@ -316,6 +320,11 @@
 <li class="toctree-l2"><a class="reference internal" href="design-rules.html#configuration-management">Configuration Management</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Development of PSEC</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="development.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development.html#build-the-packages">Build the packages</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="documentation.html">Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="graphical-design.html">Graphical design</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="graphical-design.html#font">Font</a></li>
@@ -329,6 +338,7 @@
 <li class="toctree-l2"><a class="reference internal" href="integration.html#compatibiliy-with-the-hardware">Compatibiliy with the hardware</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="known-problems.html">Known problems</a></li>
 <li class="toctree-l1"><a class="reference internal" href="logging.html">Logging</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="logging.html#features">Features</a></li>
 <li class="toctree-l2"><a class="reference internal" href="logging.html#architecture">Architecture</a></li>
@@ -357,10 +367,18 @@
 <li class="toctree-l2"><a class="reference internal" href="python-api.html#packaging">Packaging</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="sensors.html">Sensors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="roles.html">Roles</a></li>
+<li class="toctree-l1"><a class="reference internal" href="sensors.html">Sensors</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sensors.html#sensors-list">Sensors list</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="support-infrastructure.html">Creating the Deployment Infrastructure</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html#steps">Steps</a></li>
-<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html#topologies">Topologies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html#common-implementation">Common implementation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html#assisted-deployment">Assisted deployment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html#keep-the-mirrors-up-to-date">Keep the mirrors up-to-date</a></li>
+<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html#steps-original-documentation-to-be-refreshed-starting-here">Steps [ORIGINAL DOCUMENTATION to be refreshed starting here]</a></li>
+<li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html#id1">Prerequisites</a></li>
 <li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html#creating-the-virtual-machines">Creating the Virtual Machines</a></li>
 <li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html#services-deployment">Services Deployment</a></li>
 </ul>
@@ -373,7 +391,11 @@
 <li class="toctree-l2"><a class="reference internal" href="tested-hardware.html#dell-precision-m4800">Dell Precision M4800</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="topology.html">Topology</a></li>
+<li class="toctree-l1"><a class="reference internal" href="topology.html">Topology</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="topology.html#keywords-details">Keywords details</a></li>
+<li class="toctree-l2"><a class="reference internal" href="topology.html#resource-management">Resource management</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="update-alpine-mirror.html">Create or Update the Alpine Mirror</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html#prerequisites">Prerequisites</a></li>
 <li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html#principles">Principles</a></li>

@@ -12,6 +12,7 @@ Project documentation
    capabilities.md
    debugging.md
    design-rules.md
+   development.md
    documentation.md
    graphical-design.md
    integration.md

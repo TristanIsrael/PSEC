@@ -4,7 +4,40 @@
 
 This documentation explains how to implement the deployment infrastructure.
 
-The PXE deployment infrastructure relies on the following services:
+## Topologies
+
+Different topologies can be implemented depending on whether you rely on Internet or not for Alpine mirrors.
+
+### Using Internet 
+
+If you will be using Internet to provide Alpine and PSEC mirrors you will only need to host you own products packages on standard HTTP server. 
+
+### Using local mirror
+
+If your systems are offline with no access to Internet, *or* if you want to implement local mirrors for better performance, you will have to provide a standard HTTP
+server for Alpine and PSEC packages, and for your own packages.
+
+### Using network boot
+
+If your system will boot on the network you will have to implement the DHCP, TFTP and NFS servers.
+
+### Summary
+
+This section summarizes the cases and the services to provide locally.
+
+| Use case | DHCP | TFTP | NFS | HTTP | ADMIN |
+|--|--|--|--|--|--|
+| Network boot | Yes | Yes | Yes (1) | No (2) | Yes |
+| USB / embedded boot | No | No | No (2) | No | Yes |
+| Local cache | No | No | No | Yes | Yes |
+| Offline (no Internet) | No | No | No | Yes | Yes |
+
+*(1) If you want to manage user or specific hardware configurations.*
+*(2) Only for your own products' packets.*
+
+## Common implementation
+
+In all the cases you will have to implement the following services on your local area network (LAN):
 
 | Name    | IPv4 Address    | Description |
 |---------|-----------------|-------------|
@@ -15,7 +48,39 @@ The PXE deployment infrastructure relies on the following services:
 | REPOSITORIES | 192.168.10.3 | HTTP server serving Alpine packages (APK) |
 | ADMIN   | 192.168.10.250  | Machine enabling the administrator to install and configure the deployment infrastructure |
 
-## Steps
+## Assisted deployment
+
+The assisted deployment offers a simple way to create the support infrastructure using the deployment system `Ansible`.
+
+The operations consist in describing the configuration (services and machines) in an Ansible file in a format derived from JSON, and execute the deployment which runs
+automatically. This process can also be used to update the support infrastructure.
+
+### Prerequisites
+
+The first step is to define which topology you want to implement (see [Topologies](#topologies)).
+
+(To be continued)
+
+### Configure Ansible
+
+(To be continued)
+
+## Keep the mirrors up-to-date
+
+The mirrors should be kept up-to-date as frequently as possible (daily to weekly) in order to benefit from the bug and security fixes.
+
+The script `infrastructure/scripts/update-alpine-mirror.sh` is dedicated to updating a local Alpine mirror. It should be placed in the path of the mirror on the HTTP server.
+
+Run the script: `./update-alpine-mirror.sh [arch] [version]` where arch is `x86_64`, `armv7` or `aarch64` and version is the version of Alpine to update, for example `3.22`.
+
+The following command will update the local mirror:
+
+`$ ./udpate-alpine-mirror.sh x86_64 3.22`
+
+It will update all files in the folder `./alpine/v3.22/main/x86_64` and `./alpine/v3.22/community/x86_64`. The local mirror will be an exact copy of the remote, meaning that all files removed from the official repository will be removed from the local mirror and all files added on the official repository will be added in the local mirror.
+
+
+## Steps [ORIGINAL DOCUMENTATION to be refreshed starting here]
 
 The creation of the infrastructure is done in two steps:
 

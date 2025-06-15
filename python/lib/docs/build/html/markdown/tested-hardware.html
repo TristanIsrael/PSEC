@@ -209,13 +209,16 @@
 <li class="toctree-l2"><a class="reference internal" href="capabilities.html">Capabilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="design-rules.html">Design rules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development.html">Development of PSEC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="documentation.html">Documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="graphical-design.html">Graphical design</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html">Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="known-problems.html">Known problems</a></li>
 <li class="toctree-l2"><a class="reference internal" href="logging.html">Logging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="protocol.html">Protocol</a></li>
 <li class="toctree-l2"><a class="reference internal" href="provisioning.html">Provisioning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="python-api.html">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="roles.html">Roles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sensors.html">Sensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Tested hardware</a></li>
@@ -278,7 +281,7 @@
 <th class="head"><p>GPU</p></th>
 <th class="head"><p>Virt.</p></th>
 <th class="head"><p>IOMMU</p></th>
-<th class="head"><p>EPT</p></th>
+<th class="head"><p>EPT (4)</p></th>
 <th class="head"><p>Boot mode</p></th>
 <th class="head"><p>Compatibility</p></th>
 </tr>
@@ -287,40 +290,40 @@
 <tr class="row-even"><td><p>Laptop</p></td>
 <td><p>Dell</p></td>
 <td><p><a class="reference internal" href="#dell-latitude-e5510"><span class="xref myst">Latitude E5510</span></a></p></td>
-<td><p>Intel Core i5 M560 (4)</p></td>
+<td><p>Intel Core i5-560M (2)</p></td>
 <td><p>i915</p></td>
 <td><p>Yes</p></td>
 <td><p>Yes</p></td>
-<td><p></p></td>
+<td><p>No</p></td>
 <td><p>BIOS</p></td>
 <td><p>★★★★★</p></td>
 </tr>
 <tr class="row-odd"><td><p>Laptop</p></td>
 <td><p>Dell</p></td>
 <td><p><a class="reference internal" href="#dell-precision-m4800"><span class="xref myst">Precision M4800</span></a></p></td>
-<td><p>Intel Core i5-4200MCPU</p></td>
+<td><p>Intel Core i5-4200M (2)</p></td>
 <td><p>Intel HD Graphics + Radeon</p></td>
 <td><p>Yes</p></td>
 <td><p>No</p></td>
-<td><p></p></td>
+<td><p>No</p></td>
 <td><p>UEFI</p></td>
 <td><p>★☆☆☆☆ (2)</p></td>
 </tr>
 <tr class="row-even"><td><p>Laptop</p></td>
 <td><p>Dell</p></td>
 <td><p>VOSTRO V131</p></td>
-<td><p>Intel Core i5-2410M</p></td>
+<td><p>Intel Core i5-2410M (2)</p></td>
 <td><p>Intel HD Graphics 3000</p></td>
 <td><p>Yes</p></td>
 <td><p>No</p></td>
-<td><p></p></td>
+<td><p>Yes</p></td>
 <td><p>UEFI</p></td>
 <td><p>★☆☆☆☆ (2)</p></td>
 </tr>
 <tr class="row-odd"><td><p>Laptop</p></td>
 <td><p>Dell</p></td>
 <td><p>VOSTRO V131</p></td>
-<td><p>Intel Celeron ULV 847</p></td>
+<td><p>Intel Celeron ULV 847 (2)</p></td>
 <td><p>Intel HD Graphics 3000</p></td>
 <td><p>Yes</p></td>
 <td><p>No</p></td>
@@ -335,7 +338,7 @@
 <td><p>Intel HD Graphics 4400</p></td>
 <td><p>Yes</p></td>
 <td><p>No</p></td>
-<td><p></p></td>
+<td><p>Yes</p></td>
 <td><p>BIOS</p></td>
 <td><p>★☆☆☆☆ (2)</p></td>
 </tr>
@@ -346,7 +349,7 @@
 <td><p>i915</p></td>
 <td><p>Yes</p></td>
 <td><p>Yes</p></td>
-<td><p></p></td>
+<td><p>Yes</p></td>
 <td><p>UEFI</p></td>
 <td><p>★★★★★</p></td>
 </tr>
@@ -357,7 +360,7 @@
 <td><p>Intel HD Graphics 530</p></td>
 <td><p>Yes</p></td>
 <td><p>Yes</p></td>
-<td><p></p></td>
+<td><p>Yes</p></td>
 <td><p>UEFI</p></td>
 <td><p>★★★★★</p></td>
 </tr>
@@ -368,7 +371,7 @@
 <td><p>Intel HD Graphics 2500</p></td>
 <td><p>Yes</p></td>
 <td><p>Yes</p></td>
-<td><p></p></td>
+<td><p>Yes</p></td>
 <td><p></p></td>
 <td><p>★★★★★ (3)</p></td>
 </tr>
@@ -376,10 +379,21 @@
 <td><p>GETAC</p></td>
 <td><p>T800 G2</p></td>
 <td><p>Atom x7-Z8750 (4)</p></td>
-<td><p>Integrated Intel HD Graphics</p></td>
-<td><p>No</p></td>
-<td><p>No</p></td>
-<td><p></p></td>
+<td><p>Intel HD Graphics</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>UEFI</p></td>
+<td><p>★★★★★ (3)</p></td>
+</tr>
+<tr class="row-odd"><td><p>Tablet</p></td>
+<td><p>GETAC</p></td>
+<td><p>UX10 G2</p></td>
+<td><p>Core i5-10210U vPro (12)</p></td>
+<td><p>Intel UHD Graphics</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
 <td><p>UEFI</p></td>
 <td><p>☆☆☆☆☆</p></td>
 </tr>
@@ -390,6 +404,7 @@
 <li><p>(1) Specific configuration is needed.</p></li>
 <li><p>(2) Without IOMMU the isolation between components is reduced.</p></li>
 <li><p>(3) Not tested yet.</p></li>
+<li><p>(4) Without EPT the performance is lower.</p></li>
 </ul>
 </section>
 <section id="durabook-r8">
@@ -403,6 +418,7 @@
 <p>Notes:</p>
 <ul class="simple">
 <li><p>All peripherals are accessible as USB devices, not PCI, except WLAN card.</p></li>
+<li><p>When using the Dock and running XEN, eth0 and eth1 are inverted.</p></li>
 </ul>
 </section>
 <section id="dell-latitude-e5510">

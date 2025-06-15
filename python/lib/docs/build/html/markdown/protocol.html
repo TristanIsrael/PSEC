@@ -209,17 +209,19 @@
 <li class="toctree-l2"><a class="reference internal" href="capabilities.html">Capabilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="debugging.html">Debugging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="design-rules.html">Design rules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development.html">Development of PSEC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="documentation.html">Documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="graphical-design.html">Graphical design</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html">Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="known-problems.html">Known problems</a></li>
 <li class="toctree-l2"><a class="reference internal" href="logging.html">Logging</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Protocol</a></li>
 <li class="toctree-l2"><a class="reference internal" href="provisioning.html">Provisioning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="python-api.html">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="roles.html">Roles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sensors.html">Sensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tested-hardware.html">Tested hardware</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tested-hardware.html#dell-latitude-e5510">Dell Latitude E5510</a></li>
 <li class="toctree-l2"><a class="reference internal" href="topology.html">Topology</a></li>
 <li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html">Create or Update the Alpine Mirror</a></li>
 </ul>
@@ -653,6 +655,12 @@ Response payload:</p>
             <span class="p">},</span> 
             <span class="s2">&quot;boot_time&quot;</span><span class="p">:</span> <span class="mf">1748036696.0</span><span class="p">,</span> 
             <span class="s2">&quot;uuid&quot;</span><span class="p">:</span> <span class="s2">&quot;11ec0800-4fb9-11ef-bd38-ad993f2e7700&quot;</span>
+            <span class="s2">&quot;storage&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;total&quot;</span><span class="p">:</span> <span class="mi">12345678</span><span class="p">,</span>
+                <span class="s2">&quot;used&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">&quot;free&quot;</span><span class="p">:</span> <span class="mi">12345678</span><span class="p">,</span>
+                <span class="s2">&quot;files_count&quot;</span><span class="p">:</span> <span class="mi">0</span>
+            <span class="p">}</span>
         <span class="p">}</span>
     <span class="p">}</span>
 <span class="p">}</span>
@@ -662,6 +670,26 @@ Response payload:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">core</span></code> (dict): Gives information on the PSEC core.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">system</span></code> (dict): Gives information on the operating system and the machine hardware.</p></li>
+</ul>
+</section>
+<section id="clear-sys-usb-commands-queue">
+<h3>Clear sys-usb commands queue<a class="headerlink" href="#clear-sys-usb-commands-queue" title="Link to this heading">¶</a></h3>
+<p><em>Queries sys-usb to clear its commands queues</em>.</p>
+<p>Topic : <code class="docutils literal notranslate"><span class="pre">system/sys-usb/clear-queues</span></code></p>
+<p>Request topic : <code class="docutils literal notranslate"><span class="pre">system/sys-usb/clear-queues/request</span></code></p>
+<p>Request payload: <code class="docutils literal notranslate"><span class="pre">{}</span></code></p>
+<p>Response topic: <code class="docutils literal notranslate"><span class="pre">system/sys-usb/clear-queues/request</span></code></p>
+<p>Response payload:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="o">|</span><span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;reason: &quot;</span><span class="n">Description</span><span class="s2">&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Response fields:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">success</span></code> (bool): True if the queue has been cleared.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reason</span></code> (str): If not success, this field contains the reason of the failure.</p></li>
 </ul>
 </section>
 </section>
@@ -851,6 +879,7 @@ Response payload:</p>
 <li><a class="reference internal" href="#discover-the-components-of-the-system">Discover the components of the system</a></li>
 <li><a class="reference internal" href="#get-the-energy-state">Get the energy state</a></li>
 <li><a class="reference internal" href="#get-information-on-the-system">Get information on the system</a></li>
+<li><a class="reference internal" href="#clear-sys-usb-commands-queue">Clear sys-usb commands queue</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#notifications">Notifications</a><ul>

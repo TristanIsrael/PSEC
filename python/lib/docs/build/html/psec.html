@@ -209,17 +209,19 @@
 <li class="toctree-l2"><a class="reference internal" href="markdown/capabilities.html">Capabilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/debugging.html">Debugging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/design-rules.html">Design rules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="markdown/development.html">Development of PSEC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/documentation.html">Documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/graphical-design.html">Graphical design</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/integration.html">Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="markdown/known-problems.html">Known problems</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/logging.html">Logging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/protocol.html">Protocol</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/provisioning.html">Provisioning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/python-api.html">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="markdown/roles.html">Roles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/sensors.html">Sensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/tested-hardware.html">Tested hardware</a></li>
-<li class="toctree-l2"><a class="reference internal" href="markdown/tested-hardware.html#dell-latitude-e5510">Dell Latitude E5510</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/topology.html">Topology</a></li>
 <li class="toctree-l2"><a class="reference internal" href="markdown/update-alpine-mirror.html">Create or Update the Alpine Mirror</a></li>
 </ul>
@@ -323,8 +325,7 @@ provided in the <a class="reference internal" href="#psec.Topics" title="psec.To
 <span class="n">subscriptions</span> <span class="o">=</span> <span class="p">[]</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">():</span>
-    <span class="n">client</span><span class="o">=</span><span class="n">MqttFactory</span><span class="o">.</span><span class="n">create_mqtt_network_dev</span><span class="p">(</span><span class="s2">&quot;my_app&quot;</span><span class="p">)</span>
-    <span class="n">Api</span><span class="p">()</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">client</span><span class="p">)</span>
+    <span class="n">Api</span><span class="p">()</span><span class="o">.</span><span class="n">start</span><span class="p">(</span><span class="n">domain_identifier</span><span class="o">=</span><span class="s2">&quot;my-domain&quot;</span><span class="p">)</span>
     <span class="n">Api</span><span class="p">()</span><span class="o">.</span><span class="n">add_ready_callback</span><span class="p">(</span><span class="n">on_connected</span><span class="p">)</span>
     <span class="n">event</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
 
@@ -396,6 +397,12 @@ provided in the <a class="reference internal" href="#psec.Topics" title="psec.To
 <dd class="field-odd"><p><strong>callback_fn</strong> (<em>Callable</em>) – A function which will be called by the API when the subscription has been acknowledged.</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="psec.Api.clear_sys_usb_queues">
+<span class="sig-name descname"><span class="pre">clear_sys_usb_queues</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/psec/_api.html#Api.clear_sys_usb_queues"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.Api.clear_sys_usb_queues" title="Link to this definition">¶</a></dt>
+<dd><p>Queries sys-usb to clear its queues.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -684,33 +691,39 @@ the broker.</p>
         <span class="s2">&quot;os&quot;</span><span class="p">:</span> <span class="p">{</span>
             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Linux&quot;</span><span class="p">,</span>
             <span class="s2">&quot;release&quot;</span><span class="p">:</span> <span class="s2">&quot;6.12.20-0-lts&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;#1-Alpine SMP PREEMPT_DYNAMIC 2025-03-24 08:09:11&quot;</span><span class="p">},</span>
-            <span class="s2">&quot;machine&quot;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s2">&quot;arch&quot;</span><span class="p">:</span> <span class="s2">&quot;x86_64&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;processor&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;platform&quot;</span><span class="p">:</span> <span class="s2">&quot;Linux-6.12.20-0-lts-x86_64-with&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;cpu&quot;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>
-                    <span class="s2">&quot;freq_current&quot;</span><span class="p">:</span> <span class="mf">1689.5970000000004</span><span class="p">,</span>
-                    <span class="s2">&quot;freq_min&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-                    <span class="s2">&quot;freq_max&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-                    <span class="s2">&quot;percent&quot;</span><span class="p">:</span> <span class="mf">0.0</span>
-                <span class="p">},</span>
-                <span class="s2">&quot;memory&quot;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s2">&quot;total&quot;</span><span class="p">:</span> <span class="mi">405987328</span><span class="p">,</span>
-                    <span class="s2">&quot;available&quot;</span><span class="p">:</span> <span class="mi">103829504</span><span class="p">,</span>
-                    <span class="s2">&quot;percent&quot;</span><span class="p">:</span> <span class="mf">74.4</span><span class="p">,</span>
-                    <span class="s2">&quot;used&quot;</span><span class="p">:</span> <span class="mi">252207104</span><span class="p">,</span>
-                    <span class="s2">&quot;free&quot;</span><span class="p">:</span> <span class="mi">20271104</span>
-                <span class="p">},</span>
-                <span class="s2">&quot;load&quot;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s2">&quot;1&quot;</span><span class="p">:</span> <span class="mf">0.4306640625</span><span class="p">,</span>
-                    <span class="s2">&quot;5&quot;</span><span class="p">:</span> <span class="mf">0.16650390625</span><span class="p">,</span>
-                    <span class="s2">&quot;15&quot;</span><span class="p">:</span> <span class="mf">0.0595703125</span>
-                <span class="p">}</span>
+            <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;#1-Alpine SMP PREEMPT_DYNAMIC 2025-03-24 08:09:11&quot;</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;machine&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;arch&quot;</span><span class="p">:</span> <span class="s2">&quot;x86_64&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;processor&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;platform&quot;</span><span class="p">:</span> <span class="s2">&quot;Linux-6.12.20-0-lts-x86_64-with&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;cpu&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span>
+                <span class="s2">&quot;freq_current&quot;</span><span class="p">:</span> <span class="mf">1689.5970000000004</span><span class="p">,</span>
+                <span class="s2">&quot;freq_min&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+                <span class="s2">&quot;freq_max&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+                <span class="s2">&quot;percent&quot;</span><span class="p">:</span> <span class="mf">0.0</span>
             <span class="p">},</span>
-            <span class="s2">&quot;boot_time&quot;</span><span class="p">:</span> <span class="mf">1747205332.0</span><span class="p">,</span>
-            <span class="s2">&quot;uuid&quot;</span><span class="p">:</span> <span class="s2">&quot;11ec0800-4fb9-11ef-bd38-ad993f2e7700&quot;</span>
+            <span class="s2">&quot;memory&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;total&quot;</span><span class="p">:</span> <span class="mi">405987328</span><span class="p">,</span>
+                <span class="s2">&quot;available&quot;</span><span class="p">:</span> <span class="mi">103829504</span><span class="p">,</span>
+                <span class="s2">&quot;percent&quot;</span><span class="p">:</span> <span class="mf">74.4</span><span class="p">,</span>
+                <span class="s2">&quot;used&quot;</span><span class="p">:</span> <span class="mi">252207104</span><span class="p">,</span>
+                <span class="s2">&quot;free&quot;</span><span class="p">:</span> <span class="mi">20271104</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;load&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;1&quot;</span><span class="p">:</span> <span class="mf">0.4306640625</span><span class="p">,</span>
+                <span class="s2">&quot;5&quot;</span><span class="p">:</span> <span class="mf">0.16650390625</span><span class="p">,</span>
+                <span class="s2">&quot;15&quot;</span><span class="p">:</span> <span class="mf">0.0595703125</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;boot_time&quot;</span><span class="p">:</span> <span class="mf">1747205332.0</span><span class="p">,</span>
+        <span class="s2">&quot;uuid&quot;</span><span class="p">:</span> <span class="s2">&quot;11ec0800-4fb9-11ef-bd38-ad993f2e7700&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;storage&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;total&quot;</span><span class="p">:</span> <span class="mi">12345678</span><span class="p">,</span>
+            <span class="s2">&quot;used&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;free&quot;</span><span class="p">:</span> <span class="mi">12345678</span><span class="p">,</span>
+            <span class="s2">&quot;files&quot;</span><span class="p">:</span> <span class="mi">0</span>
         <span class="p">}</span>
     <span class="p">}</span>
 <span class="p">}</span>
@@ -756,12 +769,14 @@ prepared.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="psec.Api.start">
-<span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mqtt_client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#psec.MqttClient" title="psec._mqtt_client.MqttClient"><span class="pre">MqttClient</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">recording</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logfile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'/var/folders/ph/ckhh2rkx24dcxpb7mbs6002r0000gn/T/journal.log'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/psec/_api.html#Api.start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.Api.start" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mqtt_client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#psec.MqttClient" title="psec._mqtt_client.MqttClient"><span class="pre">MqttClient</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">domain_identifier</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'undefined'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recording</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logfile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'/var/folders/ph/ckhh2rkx24dcxpb7mbs6002r0000gn/T/psec.log'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/psec/_api.html#Api.start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.Api.start" title="Link to this definition">¶</a></dt>
 <dd><p>Starts the API by connecting to the MQTT broker and opening a log file if asked.</p>
+<p>When no mqtt_client argument is provided the API tries to create a DomU client with the identifier provided.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>mqtt_client</strong> (<a class="reference internal" href="#psec.MqttClient" title="psec.MqttClient"><em>MqttClient</em></a>) – The instance of the MqttClient class which handles the connexion to the MQTT broker.</p></li>
+<li><p><strong>domain_identifier</strong> (<em>str</em>) – The unique identifier (label) for the domain connection.</p></li>
 <li><p><strong>recording</strong> (<em>bool</em>) – If true, the events will be recorded in a log file.</p></li>
 <li><p><strong>logfile</strong> (<em>str</em>) – If recording is true, the location of the log file can provided with this parameter.</p></li>
 </ul>
@@ -1885,11 +1900,6 @@ metaclass because it is best suited for this purpose.</p>
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psec.</span></span><span class="sig-name descname"><span class="pre">SysUsbController</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mqtt_client</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#psec.MqttClient" title="psec._mqtt_client.MqttClient"><span class="pre">MqttClient</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/psec/_sys_usb_controller.html#SysUsbController"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.SysUsbController" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Cette classe traite les messages échangés par la sys-usb avec le Dom0 ou les autres domaines.</p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="psec.SysUsbController.nb_mqtt_conn">
-<span class="sig-name descname"><span class="pre">nb_mqtt_conn</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#psec.SysUsbController.nb_mqtt_conn" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="psec.SysUsbController.start">
 <span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/psec/_sys_usb_controller.html#SysUsbController.start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.SysUsbController.start" title="Link to this definition">¶</a></dt>
@@ -1900,17 +1910,28 @@ metaclass because it is best suited for this purpose.</p>
 <span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/psec/_sys_usb_controller.html#SysUsbController.stop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.SysUsbController.stop" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="psec.SysUsbController.task_runner">
-<span class="sig-name descname"><span class="pre">task_runner</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;psec._tasks_runner.TaskRunner</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#psec.SysUsbController.task_runner" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="psec.System">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psec.</span></span><span class="sig-name descname"><span class="pre">System</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/psec/_system.html#System"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.System" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="psec.System.compute_cpus_for_group">
+<span class="sig-name descname"><span class="pre">compute_cpus_for_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/psec/_system.html#System.compute_cpus_for_group"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.System.compute_cpus_for_group" title="Link to this definition">¶</a></dt>
+<dd><p>Computes the CPUs (or cores) which will be pinned to the Domains of the group.</p>
+<p>The first CPU is assigned to Dom0 and sys-usb Domain.
+If there are at least 4 CPUs the second CPU is also assigned to Dom0 and sys-usb.
+The other CPUs are assigned to sys-gui and the other groups by trying to avoid overlapping.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="psec.System.compute_vcpus_for_group">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">compute_vcpus_for_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">groups</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dict</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="reference internal" href="_modules/psec/_system.html#System.compute_vcpus_for_group"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.System.compute_vcpus_for_group" title="Link to this definition">¶</a></dt>
+<dd><p>Computes the number of vCPUs which will be pinned to each Domain of a group.</p>
+<p>The number of vCPUs depends on the value of the parameter vcpu.groups defined in the file topology.json.</p>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="psec.System.debug_activated">
 <em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">debug_activated</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/psec/_system.html#System.debug_activated"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.System.debug_activated" title="Link to this definition">¶</a></dt>
@@ -1919,6 +1940,11 @@ metaclass because it is best suited for this purpose.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="psec.System.domain_name">
 <em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">domain_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/psec/_system.html#System.domain_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.System.domain_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="psec.System.get_platform_cpu_count">
+<span class="sig-name descname"><span class="pre">get_platform_cpu_count</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/psec/_system.html#System.get_platform_cpu_count"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.System.get_platform_cpu_count" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1941,19 +1967,46 @@ metaclass because it is best suited for this purpose.</p>
 <span class="sig-name descname"><span class="pre">get_system_uuid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/psec/_system.html#System.get_system_uuid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.System.get_system_uuid" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="psec.System.height">
-<span class="sig-name descname"><span class="pre">height</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-1</span></em><a class="headerlink" href="#psec.System.height" title="Link to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="psec.System.get_topology">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_topology</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">override_topology_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/psec/_system.html#System.get_topology"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.System.get_topology" title="Link to this definition">¶</a></dt>
+<dd><p>Returns the topology of the current system</p>
+<p>The topology structure is different from the configuration file topology.json because the file will
+evolve from its original format and it must be dissociated from the internal structure to avoid
+future compatibility problems.</p>
+<p>The topology is defined in the file <cite>topology.json</cite>. This function returns a data structure
+representing the topology as a dict. Instead of returning the JSON data as the function
+<a class="reference internal" href="#psec.System.read_topology_file" title="psec.System.read_topology_file"><code class="xref py py-func docutils literal notranslate"><span class="pre">read_topology_file()</span></code></a> does, it returns a structure representing the objects:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="p">{</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="s2">&quot;domains&quot;</span><span class="p">:</span> <span class="p">[</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="s2">&quot;my-domain&quot;</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">&gt;&gt;&gt; </span>            <span class="s2">&quot;vcpu_group&quot;</span><span class="p">:</span> <span class="s2">&quot;group1&quot;</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>            <span class="s2">&quot;memory&quot;</span><span class="p">:</span> <span class="mi">4000</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>            <span class="s2">&quot;vcpus&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>            <span class="s2">&quot;cpus&quot;</span><span class="p">:</span> <span class="s2">&quot;3-4&quot;</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>            <span class="s2">&quot;package&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="p">],</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="s2">&quot;system&quot;</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="s2">&quot;use_usb&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="s2">&quot;use_gui&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="s2">&quot;screen_rotation&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="s2">&quot;gui_app_package&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>        <span class="s2">&quot;gui_memory&quot;</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span>
+<span class="gp">&gt;&gt;&gt; </span>    <span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="psec.System.get_topology_data">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_topology_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">override_topology_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="_modules/psec/_system.html#System.get_topology_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.System.get_topology_data" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
-<dl class="py attribute">
-<dt class="sig sig-object py" id="psec.System.rotation">
-<span class="sig-name descname"><span class="pre">rotation</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-1</span></em><a class="headerlink" href="#psec.System.rotation" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="psec.System.width">
-<span class="sig-name descname"><span class="pre">width</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">-1</span></em><a class="headerlink" href="#psec.System.width" title="Link to this definition">¶</a></dt>
+<dl class="py method">
+<dt class="sig sig-object py" id="psec.System.read_topology_file">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">read_topology_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">override_topology_file</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/psec/_system.html#System.read_topology_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.System.read_topology_file" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -1962,24 +2015,9 @@ metaclass because it is best suited for this purpose.</p>
 <dt class="sig sig-object py" id="psec.TaskRunner">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psec.</span></span><span class="sig-name descname"><span class="pre">TaskRunner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_tasks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/psec/_tasks_runner.html#TaskRunner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.TaskRunner" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="psec.TaskRunner.max_tasks_">
-<span class="sig-name descname"><span class="pre">max_tasks_</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">11</span></em><a class="headerlink" href="#psec.TaskRunner.max_tasks_" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="psec.TaskRunner.queue_">
-<span class="sig-name descname"><span class="pre">queue_</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;queue.Queue</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#psec.TaskRunner.queue_" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="psec.TaskRunner.run_task">
 <span class="sig-name descname"><span class="pre">run_task</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/psec/_tasks_runner.html#TaskRunner.run_task"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.TaskRunner.run_task" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="psec.TaskRunner.running_">
-<span class="sig-name descname"><span class="pre">running_</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#psec.TaskRunner.running_" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -1990,11 +2028,6 @@ metaclass because it is best suited for this purpose.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="psec.TaskRunner.stop">
 <span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/psec/_tasks_runner.html#TaskRunner.stop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.TaskRunner.stop" title="Link to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="psec.TaskRunner.threads_">
-<span class="sig-name descname"><span class="pre">threads_</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#psec.TaskRunner.threads_" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -2154,6 +2187,16 @@ metaclass because it is best suited for this purpose.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="psec.Topics.SYS_USB">
+<span class="sig-name descname"><span class="pre">SYS_USB</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'system/sys-usb'</span></em><a class="headerlink" href="#psec.Topics.SYS_USB" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="psec.Topics.SYS_USB_CLEAR_QUEUES">
+<span class="sig-name descname"><span class="pre">SYS_USB_CLEAR_QUEUES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'system/sys-usb/clear-queues'</span></em><a class="headerlink" href="#psec.Topics.SYS_USB_CLEAR_QUEUES" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="psec.Topics.WARNING">
 <span class="sig-name descname"><span class="pre">WARNING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'system/events/warning'</span></em><a class="headerlink" href="#psec.Topics.WARNING" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -2257,6 +2300,7 @@ metaclass because it is best suited for this purpose.</p>
 <li><a class="reference internal" href="#psec.Api.add_restart_callback"><code class="docutils literal notranslate"><span class="pre">Api.add_restart_callback()</span></code></a></li>
 <li><a class="reference internal" href="#psec.Api.add_shutdown_callback"><code class="docutils literal notranslate"><span class="pre">Api.add_shutdown_callback()</span></code></a></li>
 <li><a class="reference internal" href="#psec.Api.add_subscription_callback"><code class="docutils literal notranslate"><span class="pre">Api.add_subscription_callback()</span></code></a></li>
+<li><a class="reference internal" href="#psec.Api.clear_sys_usb_queues"><code class="docutils literal notranslate"><span class="pre">Api.clear_sys_usb_queues()</span></code></a></li>
 <li><a class="reference internal" href="#psec.Api.copy_file"><code class="docutils literal notranslate"><span class="pre">Api.copy_file()</span></code></a></li>
 <li><a class="reference internal" href="#psec.Api.create_file"><code class="docutils literal notranslate"><span class="pre">Api.create_file()</span></code></a></li>
 <li><a class="reference internal" href="#psec.Api.critical"><code class="docutils literal notranslate"><span class="pre">Api.critical()</span></code></a></li>
@@ -2523,32 +2567,29 @@ metaclass because it is best suited for this purpose.</p>
 </li>
 <li><a class="reference internal" href="#psec.SingletonMeta"><code class="docutils literal notranslate"><span class="pre">SingletonMeta</span></code></a></li>
 <li><a class="reference internal" href="#psec.SysUsbController"><code class="docutils literal notranslate"><span class="pre">SysUsbController</span></code></a><ul>
-<li><a class="reference internal" href="#psec.SysUsbController.nb_mqtt_conn"><code class="docutils literal notranslate"><span class="pre">SysUsbController.nb_mqtt_conn</span></code></a></li>
 <li><a class="reference internal" href="#psec.SysUsbController.start"><code class="docutils literal notranslate"><span class="pre">SysUsbController.start()</span></code></a></li>
 <li><a class="reference internal" href="#psec.SysUsbController.stop"><code class="docutils literal notranslate"><span class="pre">SysUsbController.stop()</span></code></a></li>
-<li><a class="reference internal" href="#psec.SysUsbController.task_runner"><code class="docutils literal notranslate"><span class="pre">SysUsbController.task_runner</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#psec.System"><code class="docutils literal notranslate"><span class="pre">System</span></code></a><ul>
+<li><a class="reference internal" href="#psec.System.compute_cpus_for_group"><code class="docutils literal notranslate"><span class="pre">System.compute_cpus_for_group()</span></code></a></li>
+<li><a class="reference internal" href="#psec.System.compute_vcpus_for_group"><code class="docutils literal notranslate"><span class="pre">System.compute_vcpus_for_group()</span></code></a></li>
 <li><a class="reference internal" href="#psec.System.debug_activated"><code class="docutils literal notranslate"><span class="pre">System.debug_activated()</span></code></a></li>
 <li><a class="reference internal" href="#psec.System.domain_name"><code class="docutils literal notranslate"><span class="pre">System.domain_name()</span></code></a></li>
+<li><a class="reference internal" href="#psec.System.get_platform_cpu_count"><code class="docutils literal notranslate"><span class="pre">System.get_platform_cpu_count()</span></code></a></li>
 <li><a class="reference internal" href="#psec.System.get_screen_height"><code class="docutils literal notranslate"><span class="pre">System.get_screen_height()</span></code></a></li>
 <li><a class="reference internal" href="#psec.System.get_screen_rotation"><code class="docutils literal notranslate"><span class="pre">System.get_screen_rotation()</span></code></a></li>
 <li><a class="reference internal" href="#psec.System.get_screen_width"><code class="docutils literal notranslate"><span class="pre">System.get_screen_width()</span></code></a></li>
 <li><a class="reference internal" href="#psec.System.get_system_uuid"><code class="docutils literal notranslate"><span class="pre">System.get_system_uuid()</span></code></a></li>
-<li><a class="reference internal" href="#psec.System.height"><code class="docutils literal notranslate"><span class="pre">System.height</span></code></a></li>
-<li><a class="reference internal" href="#psec.System.rotation"><code class="docutils literal notranslate"><span class="pre">System.rotation</span></code></a></li>
-<li><a class="reference internal" href="#psec.System.width"><code class="docutils literal notranslate"><span class="pre">System.width</span></code></a></li>
+<li><a class="reference internal" href="#psec.System.get_topology"><code class="docutils literal notranslate"><span class="pre">System.get_topology()</span></code></a></li>
+<li><a class="reference internal" href="#psec.System.get_topology_data"><code class="docutils literal notranslate"><span class="pre">System.get_topology_data()</span></code></a></li>
+<li><a class="reference internal" href="#psec.System.read_topology_file"><code class="docutils literal notranslate"><span class="pre">System.read_topology_file()</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#psec.TaskRunner"><code class="docutils literal notranslate"><span class="pre">TaskRunner</span></code></a><ul>
-<li><a class="reference internal" href="#psec.TaskRunner.max_tasks_"><code class="docutils literal notranslate"><span class="pre">TaskRunner.max_tasks_</span></code></a></li>
-<li><a class="reference internal" href="#psec.TaskRunner.queue_"><code class="docutils literal notranslate"><span class="pre">TaskRunner.queue_</span></code></a></li>
 <li><a class="reference internal" href="#psec.TaskRunner.run_task"><code class="docutils literal notranslate"><span class="pre">TaskRunner.run_task()</span></code></a></li>
-<li><a class="reference internal" href="#psec.TaskRunner.running_"><code class="docutils literal notranslate"><span class="pre">TaskRunner.running_</span></code></a></li>
 <li><a class="reference internal" href="#psec.TaskRunner.start"><code class="docutils literal notranslate"><span class="pre">TaskRunner.start()</span></code></a></li>
 <li><a class="reference internal" href="#psec.TaskRunner.stop"><code class="docutils literal notranslate"><span class="pre">TaskRunner.stop()</span></code></a></li>
-<li><a class="reference internal" href="#psec.TaskRunner.threads_"><code class="docutils literal notranslate"><span class="pre">TaskRunner.threads_</span></code></a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#psec.Topics"><code class="docutils literal notranslate"><span class="pre">Topics</span></code></a><ul>
@@ -2582,6 +2623,8 @@ metaclass because it is best suited for this purpose.</p>
 <li><a class="reference internal" href="#psec.Topics.SHUTDOWN"><code class="docutils literal notranslate"><span class="pre">Topics.SHUTDOWN</span></code></a></li>
 <li><a class="reference internal" href="#psec.Topics.SYSTEM"><code class="docutils literal notranslate"><span class="pre">Topics.SYSTEM</span></code></a></li>
 <li><a class="reference internal" href="#psec.Topics.SYSTEM_INFO"><code class="docutils literal notranslate"><span class="pre">Topics.SYSTEM_INFO</span></code></a></li>
+<li><a class="reference internal" href="#psec.Topics.SYS_USB"><code class="docutils literal notranslate"><span class="pre">Topics.SYS_USB</span></code></a></li>
+<li><a class="reference internal" href="#psec.Topics.SYS_USB_CLEAR_QUEUES"><code class="docutils literal notranslate"><span class="pre">Topics.SYS_USB_CLEAR_QUEUES</span></code></a></li>
 <li><a class="reference internal" href="#psec.Topics.WARNING"><code class="docutils literal notranslate"><span class="pre">Topics.WARNING</span></code></a></li>
 <li><a class="reference internal" href="#psec.Topics.WORKFLOW"><code class="docutils literal notranslate"><span class="pre">Topics.WORKFLOW</span></code></a></li>
 </ul>
