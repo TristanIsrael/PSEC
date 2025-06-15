@@ -41,11 +41,13 @@ In the case you want to add a module or make tests with or without some modules 
 
 *The -j option should be used in make to accelerate the build.*
 
+To compile only one module, execute `$ make drivers/the/module`. For exemple `$ make drivers/usb/serial/ftdi_sio.ko`.
+
 *[Package the module]*
 
 Then the ISO image should be built again with the command `$ ./mkimage.sh --profile virt --repository "$HOME"/packages/main --repository https://dl-cdn.alpinelinux.org/alpine/v$pkgver/main --arch x86_64 --outdir "$HOME"/iso`. 
 
 Another way to test is to copy the modules directly from the build system to the testing system:
-- Install the modules in a temporary folder : `$ make INSTALL_MOD_PATH=/tmp/modules install`
+- Install the modules in a temporary folder : `$ make INSTALL_MOD_PATH=/tmp/modules modules_install`
 - Module will be in `/tmp/lib/modules/6.x.x-virt` they can be copied to the target.
 - On the target system, execute `# depmod -a` before using the new modules.
