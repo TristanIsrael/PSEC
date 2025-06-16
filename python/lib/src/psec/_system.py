@@ -213,7 +213,7 @@ class System(metaclass=SingletonMeta):
             "vcpus": System.compute_vcpus_for_group("sys-gui", vcpu_groups),
             "cpus": System().compute_cpus_for_group("sys-gui", vcpu_groups),            
         }
-
+        
         for domain in business_domains:
             # Business domains
             domain_name = domain.get("name", "unknown")

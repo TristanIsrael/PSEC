@@ -28,7 +28,7 @@ class DomainsFactory:
             self.__create_domd_gui()
             self.__fetch_alpine_packages(package)
         
-        self.__provision_business_domains()
+        self.__create_business_domains()
             
 
     ###
@@ -43,6 +43,9 @@ class DomainsFactory:
             with open('/etc/psec/xen/sys-usb.conf', 'w') as f:
                 f.write(conf)
 
+        print(">>> Domain sys-usb created successfully")
+        print("")
+
 
     def __create_domd_gui(self):
         print("Create Driver Domain GUI")
@@ -52,11 +55,15 @@ class DomainsFactory:
         if conf is not None:
             with open('/etc/psec/xen/sys-gui.conf', 'w') as f:
                 f.write(conf)
+
+        print(">>> Domain sys-gui created successfully")
+        print("")
     
-    def __provision_business_domains(self):
+    def __create_business_domains(self):
         domains = self.__topology.get("domains", {})
-        if domains is not None:
-            for domain_name in domains:
+
+        if domains:
+            for domain_name in domains.keys():
                 config = domains[domain_name]
                 domain_type = config.get("type")
 
@@ -68,7 +75,7 @@ class DomainsFactory:
                 blacklist_conf = self.__create_blacklist_conf()
                 self.__provision_domain(domain_name, package, "virt", blacklist_conf)
                 conf = self.__create_xl_conf_domain(
-                    domain_name= domain_name,                    
+                    domain_name= domain_name,
                     boot_iso_location= f"bootiso-{domain_name}.iso",
                     share_packages= True,
                     share_storage= True,
@@ -79,6 +86,11 @@ class DomainsFactory:
                     f.write(conf)
 
                 self.__fetch_alpine_packages(package)
+
+                print(f">>> Domain {domain_name} created successfully")
+                print("")
+        else:
+            print("There are no business Domains to create")
 
     def __create_xl_conf_sys_usb(self) -> None:
         domains = self.__topology.get("domains", {})
@@ -239,7 +251,7 @@ vif=[]
 
     def __create_blacklist_conf(self, domain_name:str = "") -> str:
         print(f"Create blacklist.conf file for { domain_name if domain_name != "" else "standard Domain" }")
-        print("DISABLED")
+        print(">>> DISABLED")
 
         modules_multimedia = [ "simpledrm", "drm", "snd", "snd_hda_intel", "bluetooth", "btusb", "uvcvideo", "pcspkr", "videobuf2_v4l2", "joydev", "videodev", "videobuf2_common" ]
         modules_usb = [ "sd_mod", "usb_common", "usbcore", "usb_storage" ]
