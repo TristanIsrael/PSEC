@@ -46,13 +46,13 @@ class FichierHelper():
             chemin = Parametres().parametre(Cles.CHEMIN_DEPOT_DOM0)
         else:
             chemin_montage = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)
-            if chemin_montage == None:
-                print("Aucun point de montage défini. Abandon")
+            if chemin_montage is None:
+                print("No mount point defined. Aborting.")
                 return []
             
-            chemin = "{}/{}".format(chemin_montage, disk)
+            chemin = f"{chemin_montage}/{disk}"
 
-        print("Récupération de la liste des fichiers pour le point de montage {}".format(chemin))
+        print(f"Getting files list for mount point {chemin}")
         fichiers = []
         FichierHelper.get_folder_contents(chemin, fichiers, len(chemin), recursive, from_dir)
         return fichiers

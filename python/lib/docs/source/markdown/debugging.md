@@ -37,6 +37,12 @@ For example:
 $ mosquitto_sub --unix /var/run/mqtt_msg_local.sock -t '#' --pretty -v
 ```
 
+## Debug messages
+
+PSEC provides scripts for messages debugging:
+- `/usr/lib/psec/bin/show-messages.sh` connects to the MQTT broker and displays all the messages with their payload.
+- `/usr/lib/psec/bin/show-logs.sh` connects to the MQTT broker and displays all the logging messages (and only them).
+
 ## Log files
 
 When in debug mode the following log files are created:

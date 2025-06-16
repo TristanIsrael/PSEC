@@ -15,11 +15,13 @@ install="$pkgname.post-install"
 subpackages=""
 replaces=""
 options="!check"  # no tests provided
+source="https://gitlab.alpinelinux.org/alpine/aports/-/archive/v$pkgver.$pkgrel/aports-v$pkgver.$pkgrel.tar.bz2"
 
 prepare() {
     mkdir -p "$builddir"
     cd "$builddir"
     git clone https://gitlab.alpinelinux.org/alpine/aports.git aports
+    cd "$builddir"/aports
     git branch "v$pkgver.$pkgrel"
 }
 
@@ -62,12 +64,18 @@ package() {
     # Switch to virt for packaging
     cd "$builddir/aports/main/linux-lts"
     sed -i 's/_flavor=lts/_flavor=virt/g' APKBUILD
+    
+    # Remove unnecessary subpackages
+    sed -i "/^subpackages=\"${pkgname}-dev\"/d"
 
     abuild package
-    abuild rootpkg
-    abuild index
+    #abuild rootpkg
+    #abuild index
 
+    rm "$HOME"/iso/alpine-virt*.iso
+    cd "$builddir/aports/scripts"
     ./mkimage.sh --profile virt --repository "$HOME"/packages/main --repository https://dl-cdn.alpinelinux.org/alpine/v$pkgver/main --arch x86_64 --outdir "$HOME"/iso
 
+    mkdir -p "$pkgdir/var/lib/xen/images"    
     install -D -m644 "$HOME"/iso/alpine-virt*.iso "$pkgdir/var/lib/xen/images/alpine-virt-$pkgver.$pkgrel-$arch.iso"
 }

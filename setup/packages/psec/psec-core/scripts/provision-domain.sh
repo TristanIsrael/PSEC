@@ -100,7 +100,7 @@ cd $WORKDIR/apkovl
 tar czf $WORKDIR/iso/domu.apkovl.tar.gz .
 
 echo ... Create new ISO
-mkisofs -r -V "BOOT" -cache-inodes -J -l -b boot/syslinux/isolinux.bin -c boot/syslinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o /usr/lib/psec/tmp/$BOOTISO_FILENAME $WORKDIR/iso
+xorriso -as mkisofs -r -V "BOOT" -cache-inodes -J -l -b boot/syslinux/isolinux.bin -c boot/syslinux/boot.cat -no-emul-boot -boot-load-size 4 -boot-info-table -o /usr/lib/psec/tmp/$BOOTISO_FILENAME $WORKDIR/iso
 mv /usr/lib/psec/tmp/$BOOTISO_FILENAME /usr/lib/psec/system/
 
 echo ... Clean
