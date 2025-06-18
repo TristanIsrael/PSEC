@@ -1,5 +1,5 @@
 __author__ = "Tristan Israël (tristan.israel@alefbet.net)"
-__version__ = '1.1'
+__version__ = '1.1.2'
 
 from ._singleton import SingletonMeta
 from ._constantes import Constantes, Cles, BoutonSouris, TypeEntree, BenchmarkId, EtatComposant
