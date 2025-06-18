@@ -3,6 +3,6 @@
 # because by default it is 80.
 
 if [ "$TERM" = "vt100" ]; then 
-    stty cols 80
+    stty cols 200
     stty rows 50
 fi

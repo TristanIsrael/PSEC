@@ -2,7 +2,9 @@ import subprocess
 import platform
 import os
 import json
-from . import SingletonMeta
+import psutil
+import shutil
+from . import SingletonMeta, __version__, Constantes, Cles
 
 class System(metaclass=SingletonMeta):
 
@@ -106,7 +108,7 @@ class System(metaclass=SingletonMeta):
         
         return self.__system_uuid
 
-    def get_platform_cpu_count(self):
+    def get_platform_cpu_count(self) -> int:
         if self.__cpu_count is not None:
             return self.__cpu_count
         
@@ -118,14 +120,14 @@ class System(metaclass=SingletonMeta):
         except Exception:
             return 1
         
-        return self.__cpu_count
+        return 1 if self.__cpu_count is None else self.__cpu_count
 
 
     @staticmethod
     def debug_activated():
         try:
             fd = os.open("/proc/cmdline", os.O_RDONLY)
-            data = os.read(fd)
+            data = os.read(fd, 4096)
             return b'debug=on' in data.lower()
         except Exception:
             return False
@@ -253,7 +255,7 @@ class System(metaclass=SingletonMeta):
         except Exception as e:
             print("An error occured while decoding JSON file")
             print(e)
-            return None
+            return {}
         
 
     @staticmethod
@@ -294,7 +296,7 @@ class System(metaclass=SingletonMeta):
 
         return vcpus
 
-    def compute_cpus_for_group(self, group_name:str, groups:dict) -> int:
+    def compute_cpus_for_group(self, group_name:str, groups:dict) -> list[int]:
         """ Computes the CPUs (or cores) which will be pinned to the Domains of the group.
 
         The first CPU is assigned to Dom0 and sys-usb Domain. 
@@ -343,3 +345,80 @@ class System(metaclass=SingletonMeta):
 
         # Finally we return the value
         return cpu_assignments.get(group_name, [ 0 ])
+
+    @staticmethod
+    def get_system_information() -> dict:
+        sysinfo = {
+            "core": {
+                "version": __version__,
+                "debug_on": System.debug_activated()
+            },
+            "system": {
+                "os" : {
+                    "name": platform.system(),
+                    "release": platform.release(),
+                    "version": platform.version()
+                },
+                "machine": {
+                    "arch": platform.machine(),
+                    "processor": platform.processor(),
+                    "platform": platform.platform(),
+                    "cpu": {
+                        "count": System().get_platform_cpu_count(),
+                        "freq_current": psutil.cpu_freq().current,
+                        "freq_min": psutil.cpu_freq().min,
+                        "freq_max": psutil.cpu_freq().max,
+                        "percent": psutil.cpu_percent()
+                    },
+                    "memory": {
+                        "total": psutil.virtual_memory().total,
+                        "available": psutil.virtual_memory().available,
+                        "percent": psutil.virtual_memory().percent,
+                        "used": psutil.virtual_memory().used,
+                        "free": psutil.virtual_memory().free
+                    }
+                },
+                "storage": System.__get_storage_info(),
+                "boot_time": psutil.boot_time(),
+                "uuid": System().get_system_uuid()
+            }
+        }
+ 
+        # Special case for Windows
+        if hasattr(os, "getloadavg"):
+            sysinfo["system"]["machine"]["load"] = {
+                "1": os.getloadavg()[0],
+                "5": os.getloadavg()[1],
+                "15": os.getloadavg()[2]
+            }
+
+        return sysinfo
+    
+    @staticmethod
+    def __get_storage_info() -> dict:
+        info = {
+            "total": 0,
+            "used": 0,
+            "free": 0,
+            "files": 0
+        }
+        
+        storage_path = Constantes().constante(Cles.CHEMIN_DEPOT_DOM0)
+        print(f"Looking for storage information into {storage_path}")
+
+        # Get information about the disk
+        try:
+            if storage_path is not None:
+                usage = shutil.disk_usage(storage_path)
+                info["total"] = usage.total
+                info["used"] = usage.used
+                info["free"] = usage.free
+        except Exception as e:
+            print(f"Could not get storage information : {e}")
+
+        # Get information about the files
+        if storage_path is not None:
+            for _, _, files in os.walk(storage_path):
+                info["files"] += len(files)
+
+        return info

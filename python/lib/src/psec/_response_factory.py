@@ -6,14 +6,14 @@ class ResponseFactory():
     """
 
     @staticmethod
-    def create_response_disks_list(disks_list:list = list()) -> dict:
+    def create_response_disks_list(disks_list:list = []) -> dict:
         payload = {
             "disks": disks_list
         }        
         return payload
     
     @staticmethod
-    def create_response_list_files(disk:str, files:list = list()) -> dict:
+    def create_response_list_files(disk:str, files:list = []) -> dict:
         payload = {
             "disk": disk,
             "files": files
@@ -75,7 +75,7 @@ class ResponseFactory():
         return payload
 
     @staticmethod
-    def create_response_component_state(component_id:int, component_label:str, domain_name:str, state:EtatComposant, component_type = "core") -> dict:
+    def create_response_component_state(component_id:str, component_label:str, domain_name:str, state:EtatComposant, component_type = "core") -> dict:
         payload = {
             "components": [
                 {
@@ -83,7 +83,7 @@ class ResponseFactory():
                 "domain_name": domain_name,
                 "label": component_label,
                 "type": component_type,
-                "state": state
+                "state": state.value
                 }
             ]
         }

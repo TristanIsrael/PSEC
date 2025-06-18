@@ -2,8 +2,8 @@ __author__ = "Tristan Israël (tristan.israel@alefbet.net)"
 __version__ = '1.1'
 
 from ._singleton import SingletonMeta
-from ._system import System
 from ._constantes import Constantes, Cles, BoutonSouris, TypeEntree, BenchmarkId, EtatComposant
+from ._system import System
 try:
     from ._keymap_fr import KeymapFR
 except Exception as e:

@@ -19,15 +19,16 @@ source="https://gitlab.alpinelinux.org/alpine/aports/-/archive/v$pkgver.$pkgrel/
 
 prepare() {
     mkdir -p "$builddir"
-    cd "$builddir"
-    git clone https://gitlab.alpinelinux.org/alpine/aports.git aports
-    cd "$builddir"/aports
-    git branch "v$pkgver.$pkgrel"
+    echo "Uncompress Alpine source file"
+    tar xjf src/aports-v$pkgver.$pkgrel.tar.bz2 -C "$builddir"
+#    git clone https://gitlab.alpinelinux.org/alpine/aports.git aports
+#    cd "$builddir"/aports
+#    git branch "v$pkgver.$pkgrel"
 }
 
 build() {
     # First we build the kernel
-    cd "$builddir/aports/main/linux-lts"
+    cd "$builddir/aports-v$pkgver.$pkgrel/main/linux-lts"
     
     # We remove the configs we don't want 
     sed -i '/[[:space:]]*lts\..*\.config/d' APKBUILD

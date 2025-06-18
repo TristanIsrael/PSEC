@@ -11,9 +11,12 @@ class ComponentsHelper():
         for update in updates:
             if update["id"] in components_dict:
                 # Si l'id existe, mettre à jour uniquement le champ 'state'
-                components_dict[update["id"]]["state"] = update.get("state", EtatComposant.UNKNOWN)
+                state = update.get("state", EtatComposant.UNKNOWN)
+                components_dict[update["id"]]["state"] = EtatComposant(state)
             else:
                 # Si l'id n'existe pas, ajouter l'entrée
+                state = update.get("state", EtatComposant.UNKNOWN)
+                update["state"] = EtatComposant(state) # On traduit le str en énumération
                 self.__components.append(update)
 
     def get_by_id(self, id:str) -> dict:
@@ -29,7 +32,7 @@ class ComponentsHelper():
     def get_states(self) -> dict:
         return {comp["id"]: comp["state"] for comp in self.__components if "id" in comp and "state" in comp}
     
-    def get_state(self, id:str):
+    def get_state(self, id:str) -> EtatComposant:
         for comp in self.__components:
             if comp.get("id") == id:
                 return comp.get("state", EtatComposant.UNKNOWN)

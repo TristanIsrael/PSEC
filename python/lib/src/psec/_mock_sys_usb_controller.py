@@ -2,12 +2,13 @@ import os, shutil
 from psec import MqttClient, ConnectionType, Topics, ResponseFactory, FichierHelper, MqttHelper, NotificationFactory, Constantes
 from concurrent.futures import ThreadPoolExecutor
 import base64, zlib
-
+from threading import Event
 
 class MockSysUsbController():
 
-    def __init__(self):
+    def __init__(self, verrou:Event):
         self.__thread_pool = ThreadPoolExecutor(max_workers=1)
+        self.__verrou = verrou
 
 
     def start(self, source_disk_path:str, storage_path:str, destination_disk_path:str):
@@ -29,6 +30,7 @@ class MockSysUsbController():
         # Finally we announce our components
         self.__handle_discover_components()
 
+        self.__verrou.set()
         #threading.Timer(10.0, self.__connect_destination).start()
 
 

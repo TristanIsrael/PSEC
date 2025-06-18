@@ -37,7 +37,9 @@ rc-update add debug
 
 # Install new Grub file
 mv /etc/default/grub /etc/default/grub.orig
-mv /etc/default/grub.apk-new /etc/default/grub
+if [ -f /etc/default/grub.apk-new ]; then
+    mv /etc/default/grub.apk-new /etc/default/grub
+fi
 # update-grub is automatically called at the end
 
 # Re-enable colored prompt   

@@ -1,3 +1,4 @@
+from enum import Enum
 from . import SingletonMeta
 
 class Cles: 
@@ -31,23 +32,23 @@ class Cles:
     XEN_SOCKETS_PATH = "xen_sockets_path"
     STORAGE_PATH_DOMU = "storage_path_domu"
 
-class TypeEntree:
+class TypeEntree(Enum):
     INCONNU = 0
     CLAVIER = 1
     SOURIS = 2
     TOUCH = 3
 
-class BoutonSouris():
+class BoutonSouris(Enum):
     AUCUN = 0
     GAUCHE = 1
     MILIEU = 2
     DROIT = 3
 
-class BenchmarkId():
+class BenchmarkId(Enum):
     INPUTS = "inputs"
     FILES = "files"
 
-class EtatComposant():
+class EtatComposant(Enum):
     UNKNOWN = "unknown"
     STARTING = "starting"
     READY = "ready"
@@ -90,7 +91,7 @@ class Constantes(metaclass=SingletonMeta):
         Cles.STORAGE_PATH_DOMU: "/mnt/storage"
     }                
 
-    def constante(self, cle):
+    def constante(self, cle) -> str | int | None:
         valeur = self.constantes.get(cle)
         if valeur:
             return valeur

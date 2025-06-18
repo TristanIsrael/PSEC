@@ -182,49 +182,7 @@ class Dom0Controller():
 
 
     def __handle_system_info(self):
-        payload = {
-            "core": {
-                "version": __version__,
-                "debug_on": System.debug_activated()
-            },
-            "system": {
-                "os" : {
-                    "name": platform.system(),
-                    "release": platform.release(),
-                    "version": platform.version()
-                },
-                "machine": {
-                    "arch": platform.machine(),
-                    "processor": platform.processor(),
-                    "platform": platform.platform(),
-                    "cpu": {
-                        "count": System().get_platform_cpu_count(),
-                        "freq_current": psutil.cpu_freq().current,
-                        "freq_min": psutil.cpu_freq().min,
-                        "freq_max": psutil.cpu_freq().max,
-                        "percent": psutil.cpu_percent()
-                    },
-                    "memory": {
-                        "total": psutil.virtual_memory().total,
-                        "available": psutil.virtual_memory().available,
-                        "percent": psutil.virtual_memory().percent,
-                        "used": psutil.virtual_memory().used,
-                        "free": psutil.virtual_memory().free
-                    }
-                },
-                "storage": self.__get_storage_info(),
-                "boot_time": psutil.boot_time(),
-                "uuid": System().get_system_uuid()
-            }
-        }
- 
-        # Special case for Windows
-        if hasattr(os, "getloadavg"):
-            payload["system"]["machine"]["load"] = {
-                "1": os.getloadavg()[0],
-                "5": os.getloadavg()[1],
-                "15": os.getloadavg()[2]
-            }
+        payload = System.get_system_information()
  
         self.mqtt_client.publish(f"{Topics.SYSTEM_INFO}/response", payload)
 
@@ -266,28 +224,4 @@ class Dom0Controller():
 
         self.mqtt_client.publish(f"{Topics.PING}/response", payload)
 
-    def __get_storage_info(self) -> dict:
-        info = {
-            "total": 0,
-            "used": 0,
-            "free": 0,
-            "files": 0
-        }
-        
-        storage_path = Constantes().constante(Cles.CHEMIN_DEPOT_DOM0)
-        print(f"Looking for storage information into {storage_path}")
-
-        # Get information about the disk
-        try:
-            usage = shutil.disk_usage(storage_path)
-            info["total"] = usage.total
-            info["used"] = usage.used
-            info["free"] = usage.free
-        except Exception as e:
-            Logger().error(f"Could not get storage information : {e}")
-
-        # Get information about the files
-        for _, _, files in os.walk(storage_path):
-            info["files"] += len(files)
-
-        return info
+    
