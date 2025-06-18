@@ -32,19 +32,19 @@ class Cles:
     XEN_SOCKETS_PATH = "xen_sockets_path"
     STORAGE_PATH_DOMU = "storage_path_domu"
 
-class TypeEntree(Enum):
+class TypeEntree:
     INCONNU = 0
     CLAVIER = 1
     SOURIS = 2
     TOUCH = 3
 
-class BoutonSouris(Enum):
+class BoutonSouris:
     AUCUN = 0
     GAUCHE = 1
     MILIEU = 2
     DROIT = 3
 
-class BenchmarkId(Enum):
+class BenchmarkId:
     INPUTS = "inputs"
     FILES = "files"
 

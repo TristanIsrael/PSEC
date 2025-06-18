@@ -85,7 +85,7 @@ def start_events_listener(virtual_mouse, virtual_touch):
             print("Connection with inputs socket lost")
             return
         
-        buffer.extend(raw_data)        
+        buffer.extend(raw_data)
 
         while b'\n' in buffer:
             # Trouver la première occurrence du délimiteur '\n'
