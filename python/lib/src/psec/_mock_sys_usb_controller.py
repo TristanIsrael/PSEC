@@ -200,7 +200,7 @@ class MockSysUsbController():
         # On envoie la notification de succès
         footprint = FichierHelper.calculate_footprint(complete_filepath)
         response = ResponseFactory.create_response_create_file(complete_filepath, disk, footprint, True)
-        self.mqtt_client.publish("{}/response".format(topic), response)
+        self.mqtt_client.publish(f"{Topics.CREATE_FILE}/response", response)
 
 
     def __connect_destination(self):        
