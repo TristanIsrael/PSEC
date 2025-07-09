@@ -1,7 +1,7 @@
 # Contributor:
 # Maintainer: Tristan Israël <tristan.israel@alefbet.net>
 pkgname=psec-core
-pkgver=1.1
+pkgver=1.2
 pkgrel=0
 pkgdesc="PSEC - Core of the system"
 url="https://www.alefbet.net/"
