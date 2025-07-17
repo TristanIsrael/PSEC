@@ -26,5 +26,5 @@ build() {
 
 package() {
     cd "$builddir"/dist
-    python3 -m installer --destdir=$pkgdir paho_mqtt-2.1.0-py3-none-any.whl
+    python3 -m installer --destdir=$pkgdir "paho_mqtt-$pkgver-py3-none-any.whl"
 }
