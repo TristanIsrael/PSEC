@@ -41,6 +41,7 @@ from ._mqtt_factory import MqttFactory
 from ._api import Api
 from ._mock_sys_usb_controller import MockSysUsbController
 from ._debugging import Debugging
+from ._configuration_reader import Configuration, ConfigurationReader
 
 import logging
 from logging import NullHandler
@@ -48,6 +49,7 @@ from logging import NullHandler
 __all__ = [
     "__version__",
     "KeymapFR",
+    "Configuration", "ConfigurationReader",
     "TypeEntree", "BoutonSouris", "Constantes", "EtatComposant", "MouseMove",     
     "RequestFactory",
     #"Journal", "JournalProxy", "DemonProxyJournal",

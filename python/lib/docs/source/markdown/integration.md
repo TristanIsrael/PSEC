@@ -76,6 +76,8 @@ PSEC provides a versatile environment compatible with different hardware (PC, ta
 
 This section provides information on the integration process on a new hardware.
 
+If you want to know how to create configuration-specific profiles, see this [chapter](#create-a-configuration-specific-profile)
+
 ### Enumerate the components
 
 You need to gather the list of hardware components:
@@ -102,3 +104,130 @@ That PCI bus must be *blacklisted* in the `topology.json` file of the product th
 ```
 
 This section blacklists the PCI bus `0000:00:0d.0` which won't be captured by sys-usb nor the Dom0.
+
+## Create a configuration-specific profile
+
+When you product targets very different hardware configurations you may need to differenciate the behaviour and adapt to the real configuration. For example, when using a tablet, the screen layout can be rotated by 90 degrees.
+
+This sections helps you creating configuration-specific profiles.
+
+A profile is a set of parameters applied to a specific configuration. The configuration is defined by some hardware characteristics.
+
+Parameters which can be configured are:
+- GRUB bootloader configuration
+- Screen rotation
+- PCI blacklist
+
+Configurations are defined in the `topology.json` file in a specific section `configurations`.
+
+Default topology layout (without specific configuration):
+```
+{    
+    "usb": {
+        "use": 1
+    },
+    "pci": {
+        "blacklist": "00:0d.0"
+    },
+    "gui": {
+        "use": 1,
+        "memory": 2000,
+        "app-package": "saphir-gui",        
+        "screen": {
+            "rotation": 90
+        }
+    },
+    ...
+```
+
+Topology layout using specific configurations:
+```
+{
+    "gui": {
+        "use": 1,
+        "app-package": "saphir-gui"        
+    },
+    "configurations": [
+        {
+            "name": "ZBook laptop",
+            "identifier": "xxxxxx",
+            "settings": {
+                "usb": {
+                    "use": 1
+                },                
+                "gui": {                    
+                    "memory": 2000,                    
+                    "screen": {
+                        "rotation": 0
+                    }
+                },
+            }
+        },
+        {
+            "name": "Durabook R8",
+            "identifier": "xxxxxx",
+            "settings": {
+                "usb": {
+                    "use": 1
+                },
+                "pci": {
+                    "blacklist": "00:0d.0"
+                },
+                "gui": {
+                    "memory": 2500,
+                    "screen": {
+                        "rotation": 90
+                    }
+                }
+            }
+        }
+    ]
+}
+```
+
+The topology can mix global configuration and specific configuration settings. Specific settings will override global ones.
+
+The configurations are differenciated with their DMI information:
+```
+# dmidecode -t 1
+# dmidecode 3.6
+Getting SMBIOS data from sysfs.
+SMBIOS 2.7 present.
+
+Handle 0x000C, DMI type 1, 27 bytes
+System Information
+	Manufacturer: HP
+	Product Name: HP ZBook 15 G3
+	Version:
+	Serial Number: XXXXXXXXXX
+	UUID: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
+	Wake-up Type: Power Switch
+	SKU Number: 1JF54EP#ABF
+	Family: 103C_5336AN
+```
+
+The configuration identifier can be composed of any field of the DMI structure as found in the *sysfs* directory `/sys/class/dmi/id/`. For example, if the configuration target a specific model of laptops, the SKU field can be used alone. If any laptop of the ZBook 15 G3 family are targetted, the field Product Name of Family can be used.
+
+*Please notice that these information are encoded by each manufacturer, their representation can differ from a manufacturer to another*.
+
+The encoding of the identifier can be done in a JSON structure as key:value:
+```
+{
+    "gui": {
+        "use": 1,
+        "app-package": "saphir-gui"        
+    },
+    "configurations": [
+        {
+            "name": "ZBook laptop",
+            "identifier": {
+                "sys_vendor": "HP",
+                "product_sku": "1JF54EP#ABF"
+            },
+            "settings": {
+                ...
+            }
+        }
+    ]
+}
+```

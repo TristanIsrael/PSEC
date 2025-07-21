@@ -1,24 +1,27 @@
-import sys, json, subprocess
+import subprocess
+from psec import ConfigurationReader
 
 if __name__ == "__main__":    
     print("Write screen information into Xenstore")
 
     # Rotation is defined in topology.json
-    topology_file="/etc/psec/topology.json"
+    #topology_file="/etc/psec/topology.json"
+    #try:
+    #    with open(topology_file, 'r') as file:
+    #        json_data = json.load(file)
+    #except Exception as e:
+    #    print("An error occured while reading the topology file {}".format(topology_file))    
+    #    print(e)    
+    #    exit(1)    
 
-    try:
-        with open(topology_file, 'r') as file:
-            json_data = json.load(file)
-    except Exception as e:
-        print("An error occured while reading the topology file {}".format(topology_file))    
-        print(e)    
-        exit(1)    
+    config = ConfigurationReader.get_configuration_for_system()
 
-    #"gui": {
+    # Settings structure:
+    # "gui": {
     #    "use": 1,    
     #    "screen": {
     #        "rotation": 0
-    json_gui = json_data.get("gui")
+    json_gui = config.get("gui")
     if json_gui is None:
         print("No GUI in topology")
         exit(0)
@@ -41,6 +44,5 @@ if __name__ == "__main__":
     if rotation is None:
         rotation = 0
 
-    command = "xenstore-write /local/domain/system/screen_rotation {}".format(rotation)
-
+    command = f"xenstore-write /local/domain/system/screen_rotation {rotation}"
     subprocess.run(command, shell=True, check=True)

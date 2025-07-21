@@ -1,4 +1,4 @@
-from psec import MqttFactory, Logger, TypeEntree, Topics, MqttHelper, ResponseFactory
+from psec import MqttFactory, Logger, TypeEntree, ConfigurationReader
 import os
 import glob
 import subprocess
@@ -22,11 +22,11 @@ CREATE_DOMAINS=True
 
 def find_touchscreen() -> InputDevice:
     inputs = glob.glob("/dev/input/event*")
-    for input in inputs:
+    for inputdev in inputs:
         #print("Fichier {}".format(input))
         
-        try:          
-            dev = InputDevice(input)
+        try:
+            dev = InputDevice(inputdev)
             caps = dev.capabilities()
             #print(caps)
             
@@ -36,7 +36,7 @@ def find_touchscreen() -> InputDevice:
                     continue
                 
                 # We get all the capabilities
-                Logger().debug("Found a touchscreen: {}".format(dev.name))
+                Logger().debug(f"Found a touchscreen: {dev.name}")
                 return dev
         except Exception as e:
             print(e)
@@ -62,13 +62,13 @@ def create_virtual_mouse():
     }
 
     input = UInput(capabilities, name=MOUSE_NAME)
-    Logger().debug("Created virtual mouse {}".format(input.name))
+    Logger().debug(f"Created virtual mouse {input.name}")
     return input
 
 
 def create_virtual_touch(touch_device) -> InputDevice:
     virtual_touch = UInput.from_device(touch_device, name=TOUCH_NAME)
-    Logger().debug("Created virtual touchscreen {}".format(virtual_touch.name))
+    Logger().debug(f"Created virtual touchscreen {virtual_touch.name}")
     return virtual_touch
 
 
@@ -120,21 +120,24 @@ def start_events_listener(virtual_mouse, virtual_touch):
 
 
 def wait_for_file(filepath):
-    print("Wait for the file {} to be available".format(filepath))
+    print(f"Wait for the file {filepath} to be available")
 
     while not os.path.exists(filepath):
         time.sleep(0.5)
 
 
 def get_blacklisted_devices():
-    with open("/etc/psec/topology.json", 'r') as file:
-        data = json.load(file)
+    #with open("/etc/psec/topology.json", 'r') as file:
+    #    data = json.load(file)
+    #
+    #    pci = data.get("pci", {})
+    #    blacklist = pci.get("blacklist", "")
+    #    return blacklist.split(",")
+    config = ConfigurationReader.get_configuration_for_system()
 
-        pci = data.get("pci", {})
-        blacklist = pci.get("blacklist", "")
-        return blacklist.split(",")
-
-    return []
+    pci = config.get("pci", {})
+    blacklist = pci.get("blacklist", "")
+    return blacklist.split(",")
 
 
 def get_pci_usb_devices():
@@ -171,17 +174,17 @@ def expose_pci_devices():
     whitelist = []
     for dev in pci_usb_devs:
         if is_blacklisted(dev, blacklisted_devices):
-            Logger().debug("Device {} is ignored because it is blacklisted".format(dev))
+            Logger().debug(f"Device {dev} is ignored because it is blacklisted")
         else:            
-            Logger().debug("Expose device {}".format(dev))
+            Logger().debug(f"Expose device {dev}")
             cmd = ["xl", "pci-assignable-add", dev]
 
             res = subprocess.run(cmd)
             if res.returncode == 0:
-                Logger().debug("Device {} has been exposed to Xen".format(dev)) 
+                Logger().debug(f"Device {dev} has been exposed to Xen")
                 whitelist.append(dev)
             else:
-                Logger().error("There has been a error while exposing the device {} to Xen".format(dev))           
+                Logger().error(f"There has been a error while exposing the device {dev} to Xen")
     
     # Append devices to sys-usb.conf
     if len(whitelist) > 0:
@@ -203,11 +206,12 @@ def patch_sys_usb_conf(usb_devs:list):
 
 def start_business_domains():
     try:
-        with open('/etc/psec/topology.json', 'r') as f:
-            data = json.loads(f.read())
-            f.close()
+        #with open('/etc/psec/topology.json', 'r') as f:
+        #    data = json.loads(f.read())
+        #    f.close()
+        config = ConfigurationReader.get_configuration_for_system()
             
-        json_business = data.get("business", {})
+        json_business = config.get("business", {})
         json_domains = json_business.get("domains", [])
         for domain in json_domains:
             domain_name = domain.get("name", "")
@@ -218,9 +222,9 @@ def start_business_domains():
             res = subprocess.run(cmd)
 
             if res == 0:
-                Logger().info("Started Domain {}".format(domain_name))  
+                Logger().info(f"Started Domain {domain_name}")
             else:
-                Logger().critical("Domain {} did not start".format(domain_name))            
+                Logger().critical(f"Domain {domain_name} did not start")
 
     except Exception as e:
         print("An error occured while reading the file /etc/psec/topology.json")
