@@ -1,15 +1,25 @@
+''' @brief This file contains mechanims for creating new DomUs on a PSEC system
+'''
 import subprocess
-from psec import System
 import tempfile
 import os
+from psec import System
 
 class DomainsFactory:
+    ''' @brief This class is designed to orchestrate the Domains creation during the
+    setup process of a system based on PSEC.
+    
+    The Domains are defined in the file /etc/psec/topology.json.
+    '''
+
     __topology:dict = {}
 
     def __init__(self, topology:dict):
         self.__topology = topology
 
     def create_domains(self):
+        ''' @brief Creates all the Domains of a PSEC system '''
+
         print("Start creating domains from topology")
 
         system = self.__topology.get("system", {})

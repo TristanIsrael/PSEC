@@ -1,14 +1,14 @@
-from psec import MqttFactory, Logger, TypeEntree, Topics, MqttHelper, ResponseFactory
 import os
 import glob
 import subprocess
-import evdev
 import time
 import socket
-import msgpack
 import threading
 import json
+import msgpack
+import evdev
 from evdev import InputDevice, ecodes, UInput
+from psec import MqttFactory, Logger, TypeEntree, Topics, MqttHelper, ResponseFactory
 
 mqtt_lock = threading.Event()
 mqtt = MqttFactory.create_mqtt_client_dom0("Orchestrator")

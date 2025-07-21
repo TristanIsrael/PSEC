@@ -1,4 +1,8 @@
-import subprocess, os, time, threading, select, socket
+import subprocess
+import time
+import threading
+import select
+import socket
 from psec import Constantes, Cles, Logger
 
 broker_msg_socket = Constantes().constante(Cles.MQTT_MSG_BROKER_SOCKETS)
@@ -8,7 +12,8 @@ DEBUG = False
 DEBUG_HEX = True
 
 def hexdump(data, prefix=""):
-    """Print binary data in hexdump format."""
+    ''' @brief Print binary data in hexdump format.
+    '''
     for i in range(0, len(data), 16):
         chunk = data[i:i + 16]
         hex_bytes = " ".join(f"{byte:02x}" for byte in chunk)
@@ -18,6 +23,14 @@ def hexdump(data, prefix=""):
     Logger.print("EOF")
 
 class UnixSocketTunneler:
+    ''' @brief Creates a tunnel between two UNIX sockets 
+    
+        The tunnel reads data coming from both sides and writes them immediately
+        on the other side.
+
+        This tunneling facility has been designed in order to connect a UNIX serial socket 
+        created by Mosquitto and a UNIX serial socket created by QEMU for a DomU.
+    '''
 
     def __init__(self, client_socket_path, broker_socket_path, n_socket:int):
         self.client_socket_path = client_socket_path
@@ -25,10 +38,11 @@ class UnixSocketTunneler:
         self.n_socket = n_socket
 
     def tunnel(self, messaging_socket_path:str):
-        """
-        Set up connections and manage bidirectional tunneling.
-        We need to connect to the broken only when there is an incoming connection from a client
-        """
+        ''' @brief Setup connections and manage bidirectional tunneling.
+        
+        This function creates a new socket and waits for a connection on the local side. The
+        connection to the remote is made only when the local side is connected.
+        '''
         client_to_broker_buffer = b''
         broker_to_client_buffer = b''
 
@@ -133,6 +147,10 @@ class UnixSocketTunneler:
                 time.sleep(1)  # Wait before retrying
 
     def __create_client_socket_and_wait_for_connection(self) -> socket.socket:
+        ''' @brief Creates a UNIX socket and waits for a connection on it.
+        
+            This function is blocking until a connection is made on the new socket.
+        '''
         client_sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         client_sock.connect(self.client_socket_path)
 
@@ -144,6 +162,8 @@ class UnixSocketTunneler:
             return client_sock
         
     def __debug_data(self, data, emitter, receiver):
+        ''' @brief Writes debugging information about the sockets communication '''
+
         if DEBUG_HEX:
             hexdump(data, f"from {emitter} to {receiver}")
         else:
@@ -151,15 +171,18 @@ class UnixSocketTunneler:
 
 
 def create_msg_tunnel(client_socket:str, n_socket:int):
+    ''' @brief Creates a new tunnel between two messaging sockets
+    '''
     Logger.print(f"Creating new tunnel with client socket {client_socket} with ID {n_socket}.")
     tunneler = UnixSocketTunneler(client_socket, broker_msg_socket, n_socket)
     tunneler.tunnel(client_socket)
 
 
 def wait_for_broker_socket() -> bool:
+    ''' @brief Waits for the MQTT broker to create its sockets '''
     Logger.print("Waiting for MQTT Broker sockets...")
     
-    cmd = "find /var/run/ -name '{}'".format(broker_msg_socket)
+    cmd = f"find /var/run/ -name '{broker_msg_socket}'"
 
     while True:
         result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
@@ -173,6 +196,11 @@ def wait_for_broker_socket() -> bool:
 
 
 def watch_msg_sockets():
+    ''' @brief Monitors DomU sockets and starts a tunnel. 
+    
+        This functions looks for messaging sockets in the /var/run folder. When a new
+        socket appears, a tunnel is created with the next available socket for Mosquitto.
+    '''
     Logger.print("Looking for msg mqtt sockets")
 
     cmd = "find /var/run/ -name '*-msg.sock'"
