@@ -4,7 +4,7 @@ import os
 import json
 import psutil
 import shutil
-from . import SingletonMeta, __version__, Constantes, Cles
+from . import SingletonMeta, __version__, Constantes, Cles, ConfigurationReader
 
 class System(metaclass=SingletonMeta):
 
@@ -138,7 +138,7 @@ class System(metaclass=SingletonMeta):
     
 
     @staticmethod
-    def get_topology(override_topology_file:str = "") -> dict:
+    def get_topology() -> dict:
         """ Returns the topology of the current system
 
         The topology structure is different from the configuration file topology.json because the file will
@@ -167,11 +167,11 @@ class System(metaclass=SingletonMeta):
             >>>         "gui_memory": 1000,
             >>>     }
             >>> }
-        """        
+        """
 
         topo_struct = {}
-        topo_data = System.get_topology_data(override_topology_file)
-        if topo_data is None:
+        topo_data = System.get_topology_data()
+        if topo_data is None or len(topo_data) == 0:
             print("No topology data available. Aborting")
             return {}
 
@@ -234,28 +234,30 @@ class System(metaclass=SingletonMeta):
         return topo_struct
 
 
-    @staticmethod
-    def read_topology_file(override_topology_file:str = "") -> str:
-        try:
-            with open('/etc/psec/topology.json' if override_topology_file == "" else override_topology_file, 'r') as f:
-                topo = f.read()
-                f.close()
-                return topo
-        except Exception as e:
-            print("An error occured while reading the file /etc/psec/topology.json")
-            print(e)
-            return ""
+    #@staticmethod
+    #def read_topology_file() -> str:
+    #    try:
+    #        with open(file='/etc/psec/topology.json', mode='r', encoding="utf-8") as f:
+    #            topo = f.read()
+    #            f.close()
+    #            return topo
+    #    except Exception as e:
+    #        print("An error occured while reading the file /etc/psec/topology.json")
+    #        print(e)
+    #        return ""
 
     @staticmethod
-    def get_topology_data(override_topology_file:str = "") -> dict:
-        try:
-            topo_data = System.read_topology_file(override_topology_file)
-            data = json.loads(topo_data)
-            return data
-        except Exception as e:
-            print("An error occured while decoding JSON file")
-            print(e)
-            return {}
+    def get_topology_data() -> dict:
+        #try:
+        #    topo_data = System.read_topology_file()
+        #    data = json.loads(topo_data)
+        #    return data
+        #except Exception as e:
+        #    print("An error occured while decoding JSON file")
+        #    print(e)
+        #    return {}
+        config = ConfigurationReader.get_configuration_for_system()
+        return config
         
 
     @staticmethod
