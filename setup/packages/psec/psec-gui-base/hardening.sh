@@ -24,7 +24,9 @@ modprobe -r sd_mod
 # Disable module loading after this point
 sysctl -w kernel.modules_disabled=1
 
-if grep -q "DEBUG=ON" "/proc/cmdline"; then
+debug=$(xenstore-read /local/domain/system/debug_on)
+
+if [ "$debug" != "1" ]; then
     # Disable root connection
     truncate -s 0 /etc/securetty
     pwd=$(head /dev/urandom | tr -dc A-Za-z0-9 | head -c 256)
