@@ -1,8 +1,8 @@
 # Contributor:
 # Maintainer: Tristan Isra..l <tristan.israel@alefbet.net>
 pkgname=psec-lib
-pkgver=1.1
-pkgrel=2
+pkgver=1.2
+pkgrel=0
 pkgdesc="PSEC - Python library"
 url="https://www.alefbet.net/"
 arch="noarch"
@@ -15,8 +15,11 @@ install=""
 subpackages=""
 replaces=""
 options="!check"  # no tests provided
-giturl="https://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@github.com/TristanIsrael/psec"
-gitbranch=""
+gitbranch="main"
+source="
+$pkgname.zip::https://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@github.com/TristanIsrael/PSEC/archive/refs/heads/$gitbranch.zip
+start-gui.initd
+"
 
 PSEC_CONFDIR="$pkgdir/etc/psec"
 PSEC_ROOTDIR="$pkgdir/usr/lib/psec"
@@ -24,19 +27,12 @@ PSEC_BINDIR="$PSEC_ROOTDIR/bin"
 
 prepare() {
     mkdir -p "$builddir"
-    cd "$builddir"
-
-    if [ -z "$gitbranch" ]; then
-        echo Using main branch
-        git clone "$giturl" .    
-    else
-        echo Using branch "$gitbranch"
-        git clone --branch "$gitbranch" "$giturl" .
-    fi
+    echo "Uncompress source files"
+    unzip $pkgname.zip -d "$builddir"    
 }
 
 build() {
-    cd "$builddir/python/lib"
+    cd "$builddir/PSEC/python/lib"
     python3 -m build
 }
 

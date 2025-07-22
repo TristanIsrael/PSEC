@@ -15,34 +15,29 @@ install="$pkgname.post-install"
 subpackages=""
 replaces=""
 options="!check"  # no tests provided
-psec_branch="1.0"
-giturl="https://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@github.com/tibsys/psec"
-gitbranch=""
-source="start-gui.initd"
+gitbranch="main"
+source="
+$pkgname.zip::https://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@github.com/TristanIsrael/PSEC/archive/refs/heads/$gitbranch.zip
+start-gui.initd
+"
 
 prepare() {
     mkdir -p "$builddir"
-    cd "$builddir"
-    if [ -z "$gitbranch" ]; then
-        echo Using main branch
-        git clone "$giturl" .    
-    else
-        echo Using branch "$gitbranch"
-        git clone --branch "$gitbranch" "$giturl" .
-    fi
+    echo "Uncompress source files"
+    unzip $pkgname.zip -d "$builddir"    
 }
 
 build() {
-    cd "$builddir/python/demo"
+    cd "$builddir/PSEC/python/demo"
     python3 -m build
 }
 
 package() {
-    cd "$builddir/python/demo/dist"
+    cd "$builddir/PSEC/python/demo/dist"
     mkdir -p "$pkgdir/usr/lib/psec"
     tar xvzf *.tar.gz -C "$pkgdir/usr/lib/psec"
     cd "$pkgdir/usr/lib/psec"
-    ln -s "demo-$psec_branch" demo
+    ln -s "demo-$pkgver" demo
 
     install -D -m755 "$srcdir"/start-gui.initd "$pkgdir"/etc/init.d/start-gui
 }

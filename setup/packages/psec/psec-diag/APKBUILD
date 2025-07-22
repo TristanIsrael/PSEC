@@ -15,25 +15,20 @@ install="$pkgname.post-install"
 subpackages=""
 replaces=""
 options="!check"  # no tests provided
-psec_branch="1.0"
-giturl="https://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@github.com/tibsys/psec"
-gitbranch=""
-source="diag.initd"
+gitbranch="main"
+source="
+$pkgname.zip::https://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@github.com/TristanIsrael/PSEC/archive/refs/heads/$gitbranch.zip
+diag.initd
+"
 
 prepare() {
     mkdir -p "$builddir"
-    cd "$builddir"
-    if [ -z "$gitbranch" ]; then
-        echo Using main branch
-        git clone "$giturl" .    
-    else
-        echo Using branch "$gitbranch"
-        git clone --branch "$gitbranch" "$giturl" .
-    fi
+    echo "Uncompress source files"
+    unzip $pkgname.zip -d "$builddir"    
 }
 
 build() {
-    cd "$builddir/python/diag"
+    cd "$builddir/PSEC/python/diag"
     python3 -m build
 }
 
@@ -42,7 +37,7 @@ package() {
     mkdir -p "$pkgdir/usr/lib/psec"
     tar xvzf *.tar.gz -C "$pkgdir/usr/lib/psec"
     cd "$pkgdir/usr/lib/psec"
-    ln -s "diag-$psec_branch" diag    
+    ln -s "diag-$pkgver" diag    
 
     install -D -m755 "$srcdir"/diag.initd "$pkgdir/etc/init.d/diag"
 }
