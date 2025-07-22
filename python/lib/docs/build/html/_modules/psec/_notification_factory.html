@@ -208,17 +208,19 @@
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/capabilities.html">Capabilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/debugging.html">Debugging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/design-rules.html">Design rules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/development.html">Development of PSEC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/documentation.html">Documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/graphical-design.html">Graphical design</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/integration.html">Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/known-problems.html">Known problems</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/logging.html">Logging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/protocol.html">Protocol</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/provisioning.html">Provisioning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/python-api.html">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/roles.html">Roles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/sensors.html">Sensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/tested-hardware.html">Tested hardware</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../markdown/tested-hardware.html#dell-latitude-e5510">Dell Latitude E5510</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/topology.html">Topology</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/update-alpine-mirror.html">Create or Update the Alpine Mirror</a></li>
 </ul>
@@ -283,12 +285,12 @@
 <div class="viewcode-block" id="NotificationFactory.create_notification_new_file">
 <a class="viewcode-back" href="../../psec.html#psec.NotificationFactory.create_notification_new_file">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">create_notification_new_file</span><span class="p">(</span><span class="n">disk</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">source_footprint</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">dest_footprint</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_notification_new_file</span><span class="p">(</span><span class="n">disk</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">source_fingerprint</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">dest_fingerprint</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>            
             <span class="s2">&quot;disk&quot;</span><span class="p">:</span> <span class="n">disk</span><span class="p">,</span>
             <span class="s2">&quot;filepath&quot;</span><span class="p">:</span> <span class="n">filepath</span><span class="p">,</span>
-            <span class="s2">&quot;source_footprint&quot;</span><span class="p">:</span> <span class="n">source_footprint</span><span class="p">,</span>
-            <span class="s2">&quot;dest_footprint&quot;</span><span class="p">:</span> <span class="n">dest_footprint</span>
+            <span class="s2">&quot;source_fingerprint&quot;</span><span class="p">:</span> <span class="n">source_fingerprint</span><span class="p">,</span>
+            <span class="s2">&quot;dest_fingerprint&quot;</span><span class="p">:</span> <span class="n">dest_fingerprint</span>
         <span class="p">}</span>
         
         <span class="k">return</span> <span class="n">payload</span></div>

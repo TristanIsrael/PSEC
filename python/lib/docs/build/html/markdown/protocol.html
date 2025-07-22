@@ -375,7 +375,7 @@
 <section id="calculate-a-file-fingerprint">
 <h3>Calculate a file fingerprint<a class="headerlink" href="#calculate-a-file-fingerprint" title="Link to this heading">¶</a></h3>
 <p><em>Calculates the unique fingerprint of a file. The current algorihm is MD5.</em></p>
-<p>Request topic: <code class="docutils literal notranslate"><span class="pre">system/disks/file_footprint/request</span></code></p>
+<p>Request topic: <code class="docutils literal notranslate"><span class="pre">system/disks/file_fingerprint/request</span></code></p>
 <p>Request payload:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;disk&quot;</span><span class="p">:</span> <span class="s2">&quot;disk1&quot;</span><span class="p">,</span>
@@ -388,12 +388,12 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">disk</span></code> (str) : The disk the file belongs to.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">filepath</span></code> (str) : The complete path of the file.</p></li>
 </ul>
-<p>Response topic: <code class="docutils literal notranslate"><span class="pre">system/disks/file_footprint/response</span></code></p>
+<p>Response topic: <code class="docutils literal notranslate"><span class="pre">system/disks/file_fingerprint/response</span></code></p>
 <p>Response payload:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;disk&quot;</span><span class="p">:</span> <span class="s2">&quot;disk1&quot;</span><span class="p">,</span>
     <span class="s2">&quot;filepath&quot;</span><span class="p">:</span> <span class="s2">&quot;/my/folder/my_file.txt,    </span>
-    <span class="s2">&quot;footprint&quot;</span><span class="p">:</span> <span class="s2">&quot;12cfd565ff54caa12&quot;</span>
+    <span class="s2">&quot;fingerprint&quot;</span><span class="p">:</span> <span class="s2">&quot;12cfd565ff54caa12&quot;</span>
 <span class="p">}</span>  
 </pre></div>
 </div>
@@ -401,7 +401,7 @@
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">disk</span></code> (str) : The disk the file belongs to.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">filepath</span></code> (str) : The complete path of the file.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">footprint</span></code> (str) : The footprint of the file as an MD5 hash.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">fingerprint</span></code> (str) : The fingerprint of the file as an MD5 hash.</p></li>
 </ul>
 </section>
 <section id="create-a-new-file">
@@ -704,8 +704,8 @@ Response payload:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="s2">&quot;disk&quot;</span><span class="p">:</span> <span class="s2">&quot;disk1&quot;</span><span class="p">,</span>
     <span class="s2">&quot;filepath&quot;</span><span class="p">,</span> <span class="s2">&quot;/a/folder/my_file.txt&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;source_footprint&quot;</span><span class="p">:</span> <span class="s2">&quot;acd653c5a8b988cbdbabd65&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;dest_footprint&quot;</span><span class="p">:</span> <span class="s2">&quot;acd653c5a8b988cbdbabd65&quot;</span>
+    <span class="s2">&quot;source_fingerprint&quot;</span><span class="p">:</span> <span class="s2">&quot;acd653c5a8b988cbdbabd65&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dest_fingerprint&quot;</span><span class="p">:</span> <span class="s2">&quot;acd653c5a8b988cbdbabd65&quot;</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -713,8 +713,8 @@ Response payload:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">disk</span></code> (str): The disk on which the file hase been created.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">filepath</span></code> (str): The complete path of the file.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">source_footprint</span></code> (str): The fingerprint of the original source file.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">dest_footprint</span></code> (str): The fingerprint of the file after the copy. <em>It must match the source_footprint value</em>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">source_fingerprint</span></code> (str): The fingerprint of the original source file.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">dest_fingerprint</span></code> (str): The fingerprint of the file after the copy. <em>It must match the source_fingerprint value</em>.</p></li>
 </ul>
 </section>
 <section id="the-state-of-disk-changed">

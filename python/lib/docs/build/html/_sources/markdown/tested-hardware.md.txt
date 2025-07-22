@@ -24,6 +24,8 @@ This document describes tested hardware configurations.
 
 ## Durabook R8
 
+Resolution : 1280x800
+
 Quirks:
 - This tablet is known to work with the exclusion of the PCI bus `00:0d.0` which causes an hangout during the boot.
 - XEN kernel options: `no-real-mode edd=off`.
@@ -61,6 +63,8 @@ MENU SEPARATOR
 ```
 
 ## HP ZBook 15 G3
+
+Resolution: 1920x1080
 
 Disable Intel graphics : append `nomodeset modprobe.blacklist=i915` to the kernel command line.
 

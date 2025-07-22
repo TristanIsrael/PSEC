@@ -264,7 +264,9 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">platform</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingletonMeta</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">psutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shutil</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingletonMeta</span><span class="p">,</span> <span class="n">__version__</span><span class="p">,</span> <span class="n">Constantes</span><span class="p">,</span> <span class="n">Cles</span>
 
 <div class="viewcode-block" id="System">
 <a class="viewcode-back" href="../../psec.html#psec.System">[docs]</a>
@@ -384,7 +386,7 @@
 
 <div class="viewcode-block" id="System.get_platform_cpu_count">
 <a class="viewcode-back" href="../../psec.html#psec.System.get_platform_cpu_count">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_platform_cpu_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_platform_cpu_count</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cpu_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cpu_count</span>
         
@@ -396,7 +398,7 @@
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">1</span>
         
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cpu_count</span></div>
+        <span class="k">return</span> <span class="mi">1</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cpu_count</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cpu_count</span></div>
 
 
 
@@ -406,7 +408,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">debug_activated</span><span class="p">():</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">fd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;/proc/cmdline&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">O_RDONLY</span><span class="p">)</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="mi">4096</span><span class="p">)</span>
             <span class="k">return</span> <span class="sa">b</span><span class="s1">&#39;debug=on&#39;</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span></div>
@@ -500,7 +502,7 @@
             <span class="s2">&quot;vcpus&quot;</span><span class="p">:</span> <span class="n">System</span><span class="o">.</span><span class="n">compute_vcpus_for_group</span><span class="p">(</span><span class="s2">&quot;sys-gui&quot;</span><span class="p">,</span> <span class="n">vcpu_groups</span><span class="p">),</span>
             <span class="s2">&quot;cpus&quot;</span><span class="p">:</span> <span class="n">System</span><span class="p">()</span><span class="o">.</span><span class="n">compute_cpus_for_group</span><span class="p">(</span><span class="s2">&quot;sys-gui&quot;</span><span class="p">,</span> <span class="n">vcpu_groups</span><span class="p">),</span>            
         <span class="p">}</span>
-
+        
         <span class="k">for</span> <span class="n">domain</span> <span class="ow">in</span> <span class="n">business_domains</span><span class="p">:</span>
             <span class="c1"># Business domains</span>
             <span class="n">domain_name</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">)</span>
@@ -546,7 +548,7 @@
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;An error occured while decoding JSON file&quot;</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-            <span class="k">return</span> <span class="kc">None</span></div>
+            <span class="k">return</span> <span class="p">{}</span></div>
 
         
 
@@ -593,7 +595,7 @@
 
 <div class="viewcode-block" id="System.compute_cpus_for_group">
 <a class="viewcode-back" href="../../psec.html#psec.System.compute_cpus_for_group">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">compute_cpus_for_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">groups</span><span class="p">:</span><span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">compute_cpus_for_group</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group_name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">groups</span><span class="p">:</span><span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Computes the CPUs (or cores) which will be pinned to the Domains of the group.</span>
 
 <span class="sd">        The first CPU is assigned to Dom0 and sys-usb Domain. </span>
@@ -642,7 +644,87 @@
 
         <span class="c1"># Finally we return the value</span>
         <span class="k">return</span> <span class="n">cpu_assignments</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">group_name</span><span class="p">,</span> <span class="p">[</span> <span class="mi">0</span> <span class="p">])</span></div>
-</div>
+
+
+<div class="viewcode-block" id="System.get_system_information">
+<a class="viewcode-back" href="../../psec.html#psec.System.get_system_information">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_system_information</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">sysinfo</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;core&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="n">__version__</span><span class="p">,</span>
+                <span class="s2">&quot;debug_on&quot;</span><span class="p">:</span> <span class="n">System</span><span class="o">.</span><span class="n">debug_activated</span><span class="p">()</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;system&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;os&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">(),</span>
+                    <span class="s2">&quot;release&quot;</span><span class="p">:</span> <span class="n">platform</span><span class="o">.</span><span class="n">release</span><span class="p">(),</span>
+                    <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="n">platform</span><span class="o">.</span><span class="n">version</span><span class="p">()</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;machine&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;arch&quot;</span><span class="p">:</span> <span class="n">platform</span><span class="o">.</span><span class="n">machine</span><span class="p">(),</span>
+                    <span class="s2">&quot;processor&quot;</span><span class="p">:</span> <span class="n">platform</span><span class="o">.</span><span class="n">processor</span><span class="p">(),</span>
+                    <span class="s2">&quot;platform&quot;</span><span class="p">:</span> <span class="n">platform</span><span class="o">.</span><span class="n">platform</span><span class="p">(),</span>
+                    <span class="s2">&quot;cpu&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;count&quot;</span><span class="p">:</span> <span class="n">System</span><span class="p">()</span><span class="o">.</span><span class="n">get_platform_cpu_count</span><span class="p">(),</span>
+                        <span class="s2">&quot;freq_current&quot;</span><span class="p">:</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_freq</span><span class="p">()</span><span class="o">.</span><span class="n">current</span><span class="p">,</span>
+                        <span class="s2">&quot;freq_min&quot;</span><span class="p">:</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_freq</span><span class="p">()</span><span class="o">.</span><span class="n">min</span><span class="p">,</span>
+                        <span class="s2">&quot;freq_max&quot;</span><span class="p">:</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_freq</span><span class="p">()</span><span class="o">.</span><span class="n">max</span><span class="p">,</span>
+                        <span class="s2">&quot;percent&quot;</span><span class="p">:</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_percent</span><span class="p">()</span>
+                    <span class="p">},</span>
+                    <span class="s2">&quot;memory&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;total&quot;</span><span class="p">:</span> <span class="n">psutil</span><span class="o">.</span><span class="n">virtual_memory</span><span class="p">()</span><span class="o">.</span><span class="n">total</span><span class="p">,</span>
+                        <span class="s2">&quot;available&quot;</span><span class="p">:</span> <span class="n">psutil</span><span class="o">.</span><span class="n">virtual_memory</span><span class="p">()</span><span class="o">.</span><span class="n">available</span><span class="p">,</span>
+                        <span class="s2">&quot;percent&quot;</span><span class="p">:</span> <span class="n">psutil</span><span class="o">.</span><span class="n">virtual_memory</span><span class="p">()</span><span class="o">.</span><span class="n">percent</span><span class="p">,</span>
+                        <span class="s2">&quot;used&quot;</span><span class="p">:</span> <span class="n">psutil</span><span class="o">.</span><span class="n">virtual_memory</span><span class="p">()</span><span class="o">.</span><span class="n">used</span><span class="p">,</span>
+                        <span class="s2">&quot;free&quot;</span><span class="p">:</span> <span class="n">psutil</span><span class="o">.</span><span class="n">virtual_memory</span><span class="p">()</span><span class="o">.</span><span class="n">free</span>
+                    <span class="p">}</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;storage&quot;</span><span class="p">:</span> <span class="n">System</span><span class="o">.</span><span class="n">__get_storage_info</span><span class="p">(),</span>
+                <span class="s2">&quot;boot_time&quot;</span><span class="p">:</span> <span class="n">psutil</span><span class="o">.</span><span class="n">boot_time</span><span class="p">(),</span>
+                <span class="s2">&quot;uuid&quot;</span><span class="p">:</span> <span class="n">System</span><span class="p">()</span><span class="o">.</span><span class="n">get_system_uuid</span><span class="p">()</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+ 
+        <span class="c1"># Special case for Windows</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">os</span><span class="p">,</span> <span class="s2">&quot;getloadavg&quot;</span><span class="p">):</span>
+            <span class="n">sysinfo</span><span class="p">[</span><span class="s2">&quot;system&quot;</span><span class="p">][</span><span class="s2">&quot;machine&quot;</span><span class="p">][</span><span class="s2">&quot;load&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;1&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getloadavg</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="s2">&quot;5&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getloadavg</span><span class="p">()[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="s2">&quot;15&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">getloadavg</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">sysinfo</span></div>
+
+    
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__get_storage_info</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;total&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;used&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;free&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;files&quot;</span><span class="p">:</span> <span class="mi">0</span>
+        <span class="p">}</span>
+        
+        <span class="n">storage_path</span> <span class="o">=</span> <span class="n">Constantes</span><span class="p">()</span><span class="o">.</span><span class="n">constante</span><span class="p">(</span><span class="n">Cles</span><span class="o">.</span><span class="n">CHEMIN_DEPOT_DOM0</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Looking for storage information into </span><span class="si">{</span><span class="n">storage_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Get information about the disk</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">storage_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">usage</span> <span class="o">=</span> <span class="n">shutil</span><span class="o">.</span><span class="n">disk_usage</span><span class="p">(</span><span class="n">storage_path</span><span class="p">)</span>
+                <span class="n">info</span><span class="p">[</span><span class="s2">&quot;total&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">usage</span><span class="o">.</span><span class="n">total</span>
+                <span class="n">info</span><span class="p">[</span><span class="s2">&quot;used&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">usage</span><span class="o">.</span><span class="n">used</span>
+                <span class="n">info</span><span class="p">[</span><span class="s2">&quot;free&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">usage</span><span class="o">.</span><span class="n">free</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not get storage information : </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Get information about the files</span>
+        <span class="k">if</span> <span class="n">storage_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">storage_path</span><span class="p">):</span>
+                <span class="n">info</span><span class="p">[</span><span class="s2">&quot;files&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">info</span></div>
 
 </pre></div>
         </article>

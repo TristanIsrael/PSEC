@@ -208,17 +208,19 @@
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/capabilities.html">Capabilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/debugging.html">Debugging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/design-rules.html">Design rules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/development.html">Development of PSEC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/documentation.html">Documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/graphical-design.html">Graphical design</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/integration.html">Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/known-problems.html">Known problems</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/logging.html">Logging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/protocol.html">Protocol</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/provisioning.html">Provisioning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/python-api.html">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/roles.html">Roles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/sensors.html">Sensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/tested-hardware.html">Tested hardware</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../markdown/tested-hardware.html#dell-latitude-e5510">Dell Latitude E5510</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/topology.html">Topology</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/update-alpine-mirror.html">Create or Update the Alpine Mirror</a></li>
 </ul>
@@ -258,7 +260,8 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for psec._constantes</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingletonMeta</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">SingletonMeta</span>
 
 <div class="viewcode-block" id="Cles">
 <a class="viewcode-back" href="../../psec.html#psec.Cles">[docs]</a>
@@ -305,7 +308,7 @@
 
 <div class="viewcode-block" id="BoutonSouris">
 <a class="viewcode-back" href="../../psec.html#psec.BoutonSouris">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">BoutonSouris</span><span class="p">():</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BoutonSouris</span><span class="p">:</span>
     <span class="n">AUCUN</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">GAUCHE</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">MILIEU</span> <span class="o">=</span> <span class="mi">2</span>
@@ -314,14 +317,14 @@
 
 <div class="viewcode-block" id="BenchmarkId">
 <a class="viewcode-back" href="../../psec.html#psec.BenchmarkId">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">BenchmarkId</span><span class="p">():</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">BenchmarkId</span><span class="p">:</span>
     <span class="n">INPUTS</span> <span class="o">=</span> <span class="s2">&quot;inputs&quot;</span>
     <span class="n">FILES</span> <span class="o">=</span> <span class="s2">&quot;files&quot;</span></div>
 
 
 <div class="viewcode-block" id="EtatComposant">
 <a class="viewcode-back" href="../../psec.html#psec.EtatComposant">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">EtatComposant</span><span class="p">():</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">EtatComposant</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">UNKNOWN</span> <span class="o">=</span> <span class="s2">&quot;unknown&quot;</span>
     <span class="n">STARTING</span> <span class="o">=</span> <span class="s2">&quot;starting&quot;</span>
     <span class="n">READY</span> <span class="o">=</span> <span class="s2">&quot;ready&quot;</span>
@@ -369,7 +372,7 @@
 
 <div class="viewcode-block" id="Constantes.constante">
 <a class="viewcode-back" href="../../psec.html#psec.Constantes.constante">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">constante</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cle</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">constante</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cle</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">valeur</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">constantes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cle</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">valeur</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">valeur</span>
@@ -378,7 +381,7 @@
 
         
     <span class="n">REPOSITORY</span> <span class="o">=</span> <span class="s2">&quot;__repository__&quot;</span>
-    <span class="n">FOOTPRINT_METHOD</span> <span class="o">=</span> <span class="s2">&quot;md5&quot;</span>
+    <span class="n">FINGERPRINT_METHOD</span> <span class="o">=</span> <span class="s2">&quot;md5&quot;</span>
     <span class="n">PSEC_DISK_CONTROLLER</span> <span class="o">=</span> <span class="s2">&quot;psec_disk_controller&quot;</span>
     <span class="n">PSEC_INPUT_CONTROLLER</span> <span class="o">=</span> <span class="s2">&quot;psec_input_controller&quot;</span>
     <span class="n">PSEC_IO_BENCHMARK</span> <span class="o">=</span> <span class="s2">&quot;psec_io_benchmark&quot;</span>

@@ -7,6 +7,11 @@ This document explains how to debug a system running with PSEC.
 In order to activate the debugging facilities, the file `/etc/default/grub` must be modified.
 Add the sequence `DEBUG=ON` (with a space before if needed) at the end of the line `GRUB_CMDLINE_LINUX_DEFAULT`.
 
+## Disable splash screen
+
+Disabling the splash screen might be necessary to see boot messages. In this case add the option `nosplash` to the kernel command line in GRUB during the boot or in the
+file `/etc/default/grub` at the end of the line `GRUB_CMDLINE_LINUX_DEFAULT`.
+
 ## RS-232 Serial link
 
 The main debugging channel uses the RS-232 serial port of the system when it has one. Otherwise an USB-serial device can be used as long as its chipset is recognized by the kernel embedded in the `sys-usb` DomD.
@@ -31,6 +36,12 @@ For example:
 ```
 $ mosquitto_sub --unix /var/run/mqtt_msg_local.sock -t '#' --pretty -v
 ```
+
+## Debug messages
+
+PSEC provides scripts for messages debugging:
+- `/usr/lib/psec/bin/show-messages.sh` connects to the MQTT broker and displays all the messages with their payload.
+- `/usr/lib/psec/bin/show-logs.sh` connects to the MQTT broker and displays all the logging messages (and only them).
 
 ## Log files
 

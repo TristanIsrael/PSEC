@@ -315,13 +315,13 @@
             <span class="n">chemin</span> <span class="o">=</span> <span class="n">Parametres</span><span class="p">()</span><span class="o">.</span><span class="n">parametre</span><span class="p">(</span><span class="n">Cles</span><span class="o">.</span><span class="n">CHEMIN_DEPOT_DOM0</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">chemin_montage</span> <span class="o">=</span> <span class="n">Parametres</span><span class="p">()</span><span class="o">.</span><span class="n">parametre</span><span class="p">(</span><span class="n">Cles</span><span class="o">.</span><span class="n">CHEMIN_MONTAGE_USB</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">chemin_montage</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Aucun point de montage défini. Abandon&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">chemin_montage</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No mount point defined. Aborting.&quot;</span><span class="p">)</span>
                 <span class="k">return</span> <span class="p">[]</span>
             
-            <span class="n">chemin</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chemin_montage</span><span class="p">,</span> <span class="n">disk</span><span class="p">)</span>
+            <span class="n">chemin</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">chemin_montage</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">disk</span><span class="si">}</span><span class="s2">&quot;</span>
 
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Récupération de la liste des fichiers pour le point de montage </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">chemin</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Getting files list for mount point </span><span class="si">{</span><span class="n">chemin</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">fichiers</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">FichierHelper</span><span class="o">.</span><span class="n">get_folder_contents</span><span class="p">(</span><span class="n">chemin</span><span class="p">,</span> <span class="n">fichiers</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">chemin</span><span class="p">),</span> <span class="n">recursive</span><span class="p">,</span> <span class="n">from_dir</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">fichiers</span></div>
@@ -383,16 +383,16 @@
         <span class="k">return</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;&quot;</span> <span class="k">if</span> <span class="n">disk_name</span> <span class="o">==</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">disk_name</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="FichierHelper.calculate_footprint">
-<a class="viewcode-back" href="../../psec.html#psec.FichierHelper.calculate_footprint">[docs]</a>
+<div class="viewcode-block" id="FichierHelper.calculate_fingerprint">
+<a class="viewcode-back" href="../../psec.html#psec.FichierHelper.calculate_fingerprint">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_footprint</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_fingerprint</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">h</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">file_digest</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">Constantes</span><span class="o">.</span><span class="n">FOOTPRINT_METHOD</span><span class="p">)</span>
+                <span class="n">h</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">file_digest</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">Constantes</span><span class="o">.</span><span class="n">FINGERPRINT_METHOD</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">h</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;An error occured while calculating the footprint of the file </span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;An error occured while calculating the fingerprint of the file </span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
@@ -401,7 +401,7 @@
 <div class="viewcode-block" id="FichierHelper.copy_file">
 <a class="viewcode-back" href="../../psec.html#psec.FichierHelper.copy_file">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">copy_file</span><span class="p">(</span><span class="n">source_location</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">destination_folder</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">source_footprint</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">copy_file</span><span class="p">(</span><span class="n">source_location</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">destination_folder</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">source_fingerprint</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&#39;&#39;&#39; Copie le fichier source_filepath dans le répertoire destination_folder</span>
 
 <span class="sd">        Le répertoire de destination doit exister.</span>
@@ -422,14 +422,14 @@
             <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The file </span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2"> could not be copied to </span><span class="si">{</span><span class="n">destination_folder</span><span class="si">}</span><span class="s2">. Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="s2">&quot;&quot;</span>
 
-        <span class="c1"># Calculate the new file&#39;s footprint</span>
+        <span class="c1"># Calculate the new file&#39;s fingerprint</span>
         <span class="n">destination_file</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">destination_folder</span><span class="si">}{</span><span class="n">filepath</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="n">dest_footprint</span> <span class="o">=</span> <span class="n">FichierHelper</span><span class="o">.</span><span class="n">calculate_footprint</span><span class="p">(</span><span class="n">destination_file</span><span class="p">)</span>
+        <span class="n">dest_fingerprint</span> <span class="o">=</span> <span class="n">FichierHelper</span><span class="o">.</span><span class="n">calculate_fingerprint</span><span class="p">(</span><span class="n">destination_file</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">source_footprint</span> <span class="o">==</span> <span class="n">dest_footprint</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">dest_footprint</span>
+        <span class="k">if</span> <span class="n">source_fingerprint</span> <span class="o">==</span> <span class="n">dest_fingerprint</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">dest_fingerprint</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The file </span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2"> has been copied to </span><span class="si">{</span><span class="n">destination_folder</span><span class="si">}</span><span class="s2"> but the footprints differ&quot;</span><span class="p">)</span>
+            <span class="n">Logger</span><span class="p">()</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The file </span><span class="si">{</span><span class="n">filepath</span><span class="si">}</span><span class="s2"> has been copied to </span><span class="si">{</span><span class="n">destination_folder</span><span class="si">}</span><span class="s2"> but the fingerprints differ&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
 
 
@@ -437,9 +437,9 @@
 <div class="viewcode-block" id="FichierHelper.copy_file_to_repository">
 <a class="viewcode-back" href="../../psec.html#psec.FichierHelper.copy_file_to_repository">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">copy_file_to_repository</span><span class="p">(</span><span class="n">source_location</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">footprint</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">copy_file_to_repository</span><span class="p">(</span><span class="n">source_location</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">fingerprint</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
         <span class="n">repository_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Parametres</span><span class="p">()</span><span class="o">.</span><span class="n">parametre</span><span class="p">(</span><span class="n">Cles</span><span class="o">.</span><span class="n">STORAGE_PATH_DOMU</span><span class="p">))</span>
-        <span class="n">FichierHelper</span><span class="o">.</span><span class="n">copy_file</span><span class="p">(</span><span class="n">source_location</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">repository_path</span><span class="p">,</span> <span class="n">footprint</span><span class="p">)</span></div>
+        <span class="n">FichierHelper</span><span class="o">.</span><span class="n">copy_file</span><span class="p">(</span><span class="n">source_location</span><span class="p">,</span> <span class="n">filepath</span><span class="p">,</span> <span class="n">repository_path</span><span class="p">,</span> <span class="n">fingerprint</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="FichierHelper.create_file">

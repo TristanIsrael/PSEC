@@ -710,20 +710,20 @@
 
 
 
-<div class="viewcode-block" id="Api.get_file_footprint">
-<a class="viewcode-back" href="../../psec.html#psec.Api.get_file_footprint">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_file_footprint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">disk</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="Api.get_file_fingerprint">
+<a class="viewcode-back" href="../../psec.html#psec.Api.get_file_fingerprint">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_file_fingerprint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">disk</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the fingerprint of a file.</span>
 
-<span class="sd">        The response is provided on the topic :attr:`Topic.FILE_FOOTPRINT`.</span>
+<span class="sd">        The response is provided on the topic :attr:`Topic.FILE_FINGERPRINT`.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            filepath(str): The full path of the file.</span>
 <span class="sd">            disk(str): The disk on which the file is located.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">payload</span> <span class="o">=</span> <span class="n">RequestFactory</span><span class="o">.</span><span class="n">create_request_get_file_footprint</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">disk</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/request&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">FILE_FOOTPRINT</span><span class="p">),</span> <span class="n">payload</span><span class="p">)</span></div>
+        <span class="n">payload</span> <span class="o">=</span> <span class="n">RequestFactory</span><span class="o">.</span><span class="n">create_request_get_file_fingerprint</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">disk</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/request&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">FILE_FINGERPRINT</span><span class="p">),</span> <span class="n">payload</span><span class="p">)</span></div>
 
 
 

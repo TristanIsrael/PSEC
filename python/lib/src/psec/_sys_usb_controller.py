@@ -61,7 +61,7 @@ class SysUsbController():
         self.mqtt_client.subscribe(f"{Topics.READ_FILE}/request")
         self.mqtt_client.subscribe(f"{Topics.DELETE_FILE}/request")
         #self.mqtt_client.subscribe(f"{Topics.BENCHMARK}/request")
-        self.mqtt_client.subscribe(f"{Topics.FILE_FOOTPRINT}/request")
+        self.mqtt_client.subscribe(f"{Topics.FILE_FINGERPRINT}/request")
         self.mqtt_client.subscribe(f"{Topics.CREATE_FILE}/request")
         self.mqtt_client.subscribe(f"{Topics.DISCOVER_COMPONENTS}/request")
         self.mqtt_client.subscribe(f"{Topics.PING}/request")
@@ -132,8 +132,8 @@ class SysUsbController():
             self.__handle_remove_file(topic, payload)
         elif topic == Topics.BENCHMARK:
             self.__handle_benchmark(topic, payload)
-        elif topic == Topics.FILE_FOOTPRINT:
-            self.__handle_file_footprint(topic, payload)
+        elif topic == Topics.FILE_FINGERPRINT:
+            self.__handle_file_fingerprint(topic, payload)
         elif topic == Topics.CREATE_FILE:
             self.__handle_create_file(topic, payload)
         elif topic == Topics.DISCOVER_COMPONENTS:
@@ -196,7 +196,7 @@ class SysUsbController():
         repository_path:str = Parametres().parametre(Cles.STORAGE_PATH_DOMU)
     
         source_location = f"{Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)}/{source_disk}"
-        source_footprint = FichierHelper.calculate_footprint(f"{source_location}/{filepath}")
+        source_fingerprint = FichierHelper.calculate_fingerprint(f"{source_location}/{filepath}")
 
         dest_parent_path = Path(f"{repository_path}/{filepath}").parent
         if not dest_parent_path.exists():
@@ -209,10 +209,10 @@ class SysUsbController():
                 "source_disk": source_disk, 
                 "filepath": filepath, 
                 "repository_path": repository_path, 
-                "source_footprint": source_footprint
+                "source_fingerprint": source_fingerprint
             }
         )
-            #self.task_runner.run_task(self.__do_read_file, args=(source_location, source_disk, filepath, repository_path, source_footprint,))    
+            #self.task_runner.run_task(self.__do_read_file, args=(source_location, source_disk, filepath, repository_path, source_fingerprint,))    
 
     def __handle_remove_file(self, topic:str, payload: dict):
         #Logger().error("The command remove file is not implemented")
@@ -239,7 +239,6 @@ class SysUsbController():
                     "filepath": filepath, 
                     "target_disk": target_disk, 
                     "destination_location": destination_location
-                    #"source_footprint": source_footprint
                 }
             )
             #self.task_runner.run_task(self.__do_copy_file, args=(source_location, filepath, target_disk, destination_location,))
@@ -256,7 +255,7 @@ class SysUsbController():
             Logger().error(f"Argument missing: module. Topic is {topic}")
             return
 
-    def __handle_file_footprint(self, topic:str, payload:dict):
+    def __handle_file_fingerprint(self, topic:str, payload:dict):
         disk = payload.get("disk")
         filepath = payload.get("filepath")
         
@@ -272,14 +271,14 @@ class SysUsbController():
             Logger().error(f"Argument missing: filepath. Topic is {topic}")
             return
         
-        Logger().debug(f"Calculate footprint of the file {filepath} on the disk {disk}")
+        Logger().debug(f"Calculate fingerprint of the file {filepath} on the disk {disk}")
 
         mount_point = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)
-        footprint = FichierHelper.calculate_footprint(f"{mount_point}/{disk}/{filepath}")
+        fingerprint = FichierHelper.calculate_fingerprint(f"{mount_point}/{disk}/{filepath}")
 
-        Logger().info(f"The footprint of the file {disk} on the disk {filepath} is {footprint}")
+        Logger().info(f"The fingerprint of the file {disk} on the disk {filepath} is {fingerprint}")
 
-        response = ResponseFactory.create_response_file_footprint(filepath, disk, footprint)
+        response = ResponseFactory.create_response_file_fingerprint(filepath, disk, fingerprint)
         self.mqtt_client.publish(f"{topic}/response", response)
 
 
@@ -323,8 +322,8 @@ class SysUsbController():
             return
 
         # On envoie la notification de succès
-        footprint = FichierHelper.calculate_footprint(complete_filepath)
-        response = ResponseFactory.create_response_create_file(complete_filepath, disk, footprint, True)
+        fingerprint = FichierHelper.calculate_fingerprint(complete_filepath)
+        response = ResponseFactory.create_response_create_file(complete_filepath, disk, fingerprint, True)
         self.mqtt_client.publish(f"{topic}/response", response)
 
     def __handle_discover_components(self, topic:str, payload:dict) -> None:
@@ -375,8 +374,8 @@ class SysUsbController():
                 source_disk = next_file.get("source_disk", "")
                 filepath = next_file.get("filepath", "")
                 repository_path = next_file.get("repository_path", "")
-                source_footprint = next_file.get("source_footprint", "")
-                self.__do_read_file(source_location, source_disk, filepath, repository_path, source_footprint)
+                source_fingerprint = next_file.get("source_fingerprint", "")
+                self.__do_read_file(source_location, source_disk, filepath, repository_path, source_fingerprint)
             
             time.sleep(0.1)
 
@@ -392,12 +391,12 @@ class SysUsbController():
             
             time.sleep(0.1)
 
-    def __do_read_file(self, source_location:str, source_disk:str, filepath:str, repository_path:str, source_footprint:str):
+    def __do_read_file(self, source_location:str, source_disk:str, filepath:str, repository_path:str, source_fingerprint:str):
         #self.__debug_threads()
 
-        dest_footprint = FichierHelper.copy_file(source_location, filepath, repository_path, source_footprint)
-        if dest_footprint != "":
-            notif = NotificationFactory.create_notification_new_file(Constantes.REPOSITORY, filepath, source_footprint, dest_footprint)
+        dest_fingerprint = FichierHelper.copy_file(source_location, filepath, repository_path, source_fingerprint)
+        if dest_fingerprint != "":
+            notif = NotificationFactory.create_notification_new_file(Constantes.REPOSITORY, filepath, source_fingerprint, dest_fingerprint)
             self.mqtt_client.publish(Topics.NEW_FILE, notif)
         else:
             notif = NotificationFactory.create_notification_error(source_disk, filepath, "The file could not be copied")
@@ -405,7 +404,7 @@ class SysUsbController():
 
     def __do_copy_file(self, source_location:str, filepath:str, target_disk: str, target_location:str):        
         #source_filepath = "{}/{}/{}".format(Parametres().parametre(Cles.CHEMIN_MONTAGE_USB), source_disk, filepath)        
-        source_footprint = FichierHelper.calculate_footprint("{}/{}".format(source_location, filepath))
+        source_fingerprint = FichierHelper.calculate_fingerprint("{}/{}".format(source_location, filepath))
         
         # Création du répertoire de destination si nécessaire
         parent_path = Path(filepath).parent
@@ -413,17 +412,17 @@ class SysUsbController():
             print(f"Création du répertoire {parent_path} dans le dépôt")
             os.makedirs(f"{target_location}/{parent_path}", exist_ok= True)
 
-        dest_footprint = FichierHelper.copy_file(source_location, filepath, target_location, source_footprint)
-        if dest_footprint != "":
-            Logger().debug(f"The file {filepath} has been copied to {target_location}. The footprint is {source_footprint}")
+        dest_fingerprint = FichierHelper.copy_file(source_location, filepath, target_location, source_fingerprint)
+        if dest_fingerprint != "":
+            Logger().debug(f"The file {filepath} has been copied to {target_location}. The fingerprint is {source_fingerprint}")
 
             # Envoi d'une notification pour informer de la présence d'un nouveau fichier
-            notif = NotificationFactory.create_notification_new_file(disk= target_disk, filepath= filepath, source_footprint= source_footprint, dest_footprint= dest_footprint)
+            notif = NotificationFactory.create_notification_new_file(disk= target_disk, filepath= filepath, source_fingerprint= source_fingerprint, dest_fingerprint= dest_fingerprint)
             self.mqtt_client.publish(f"{Topics.NEW_FILE}/notification", notif)
 
-            response = ResponseFactory.create_response_copy_file(filepath, target_disk, True, dest_footprint)            
+            response = ResponseFactory.create_response_copy_file(filepath, target_disk, True, dest_fingerprint)            
         else:
-            response = ResponseFactory.create_response_copy_file(filepath, target_disk, False, dest_footprint)
+            response = ResponseFactory.create_response_copy_file(filepath, target_disk, False, dest_fingerprint)
             Logger().error(f"La copie du fichier {filepath} dans le dépôt a échoué.")
 
         self.mqtt_client.publish(f"{Topics.COPY_FILE}/response", response)

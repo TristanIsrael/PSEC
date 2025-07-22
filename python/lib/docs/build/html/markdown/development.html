@@ -286,11 +286,36 @@
 <li><p>Run <code class="docutils literal notranslate"><span class="pre">abuild</span> <span class="pre">checksum</span> <span class="pre">&amp;&amp;</span> <span class="pre">abuild</span> <span class="pre">-r</span></code>.</p></li>
 </ul>
 <p>The packages will be available in the folder <code class="docutils literal notranslate"><span class="pre">~/packages/psec/&lt;arch&gt;</span></code>.</p>
+</section>
 <section id="psec-alpine-iso">
-<h3>psec-alpine-iso<a class="headerlink" href="#psec-alpine-iso" title="Link to this heading">¶</a></h3>
+<h2>psec-alpine-iso<a class="headerlink" href="#psec-alpine-iso" title="Link to this heading">¶</a></h2>
 <p>This package creates a modified ISO for the HVM DomU in a system running PSEC. It is a dependency for <code class="docutils literal notranslate"><span class="pre">psec-core</span></code>.</p>
 <p>It compiles the Linux kernel and adds modules needed in <code class="docutils literal notranslate"><span class="pre">sys-usb</span></code> and <code class="docutils literal notranslate"><span class="pre">sys-gui</span></code>, then it creates the ISO image used when booting the DomU.</p>
 <p><em>The compilation of the kernel is a very long process (multiple hours)</em>.</p>
+<section id="incremental-build-of-the-kernel">
+<h3>Incremental build of the kernel<a class="headerlink" href="#incremental-build-of-the-kernel" title="Link to this heading">¶</a></h3>
+<p>In the case you want to add a module or make tests with or without some modules you have to:</p>
+<ul class="simple">
+<li><p>Make a first complete build and keep all the data (<code class="docutils literal notranslate"><span class="pre">abuild</span> <span class="pre">-K</span></code>)</p></li>
+<li><p>Enter in the <code class="docutils literal notranslate"><span class="pre">src/psec-alpine-virt-x.xx/aports/main/linux-lts</span></code></p></li>
+<li><p>Edit the file <code class="docutils literal notranslate"><span class="pre">virt.x86_64.config</span></code> file</p></li>
+<li><p>Enter in the directory <code class="docutils literal notranslate"><span class="pre">src/linux-x.xx</span></code></p></li>
+<li><p>Execute <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">cp</span> <span class="pre">../virt.x86-64.config</span> <span class="pre">.config</span></code></p></li>
+<li><p>Execute <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">make</span> <span class="pre">olddefconfig</span></code></p></li>
+<li><p>Execute <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">make</span> <span class="pre">prepare</span></code></p></li>
+<li><p>Execute <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">make</span> <span class="pre">modules_prepare</span></code></p></li>
+<li><p>Execute <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">make</span> <span class="pre">modules</span></code></p></li>
+</ul>
+<p><em>The -j option should be used in make to accelerate the build.</em></p>
+<p>To compile only one module, execute <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">make</span> <span class="pre">drivers/the/module</span></code>. For exemple <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">make</span> <span class="pre">drivers/usb/serial/ftdi_sio.ko</span></code>.</p>
+<p><em>[Package the module]</em></p>
+<p>Then the ISO image should be built again with the command <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">./mkimage.sh</span> <span class="pre">--profile</span> <span class="pre">virt</span> <span class="pre">--repository</span> <span class="pre">&quot;$HOME&quot;/packages/main</span> <span class="pre">--repository</span> <span class="pre">https://dl-cdn.alpinelinux.org/alpine/v$pkgver/main</span> <span class="pre">--arch</span> <span class="pre">x86_64</span> <span class="pre">--outdir</span> <span class="pre">&quot;$HOME&quot;/iso</span></code>.</p>
+<p>Another way to test is to copy the modules directly from the build system to the testing system:</p>
+<ul class="simple">
+<li><p>Install the modules in a temporary folder : <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">make</span> <span class="pre">INSTALL_MOD_PATH=/tmp/modules</span> <span class="pre">modules_install</span></code></p></li>
+<li><p>Module will be in <code class="docutils literal notranslate"><span class="pre">/tmp/lib/modules/6.x.x-virt</span></code> they can be copied to the target.</p></li>
+<li><p>On the target system, execute <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">depmod</span> <span class="pre">-a</span></code> before using the new modules.</p></li>
+</ul>
 </section>
 </section>
 </section>
@@ -352,8 +377,9 @@
             <ul>
 <li><a class="reference internal" href="#">Development of PSEC</a><ul>
 <li><a class="reference internal" href="#requirements">Requirements</a></li>
-<li><a class="reference internal" href="#build-the-packages">Build the packages</a><ul>
-<li><a class="reference internal" href="#psec-alpine-iso">psec-alpine-iso</a></li>
+<li><a class="reference internal" href="#build-the-packages">Build the packages</a></li>
+<li><a class="reference internal" href="#psec-alpine-iso">psec-alpine-iso</a><ul>
+<li><a class="reference internal" href="#incremental-build-of-the-kernel">Incremental build of the kernel</a></li>
 </ul>
 </li>
 </ul>

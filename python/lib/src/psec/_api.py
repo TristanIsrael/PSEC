@@ -386,18 +386,18 @@ class Api(metaclass=SingletonMeta):
         self.__mqtt_client.publish("{}/request".format(Topics.DELETE_FILE), payload)
 
 
-    def get_file_footprint(self, filepath:str, disk:str):
+    def get_file_fingerprint(self, filepath:str, disk:str):
         """
         Compute the fingerprint of a file.
 
-        The response is provided on the topic :attr:`Topic.FILE_FOOTPRINT`.
+        The response is provided on the topic :attr:`Topic.FILE_FINGERPRINT`.
 
         Args:
             filepath(str): The full path of the file.
             disk(str): The disk on which the file is located.
         """
-        payload = RequestFactory.create_request_get_file_footprint(filepath, disk)
-        self.__mqtt_client.publish("{}/request".format(Topics.FILE_FOOTPRINT), payload)
+        payload = RequestFactory.create_request_get_file_fingerprint(filepath, disk)
+        self.__mqtt_client.publish("{}/request".format(Topics.FILE_FINGERPRINT), payload)
 
 
     def create_file(self, filepath:str, disk:str, contents:bytes, binary=False):

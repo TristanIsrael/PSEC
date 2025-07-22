@@ -208,17 +208,19 @@
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/capabilities.html">Capabilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/debugging.html">Debugging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/design-rules.html">Design rules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/development.html">Development of PSEC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/documentation.html">Documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/graphical-design.html">Graphical design</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/integration.html">Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/known-problems.html">Known problems</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/logging.html">Logging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/protocol.html">Protocol</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/provisioning.html">Provisioning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/python-api.html">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/roles.html">Roles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/sensors.html">Sensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/tested-hardware.html">Tested hardware</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../markdown/tested-hardware.html#dell-latitude-e5510">Dell Latitude E5510</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/topology.html">Topology</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/update-alpine-mirror.html">Create or Update the Alpine Mirror</a></li>
 </ul>
@@ -258,8 +260,8 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for psec._api</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">Constantes</span><span class="p">,</span> <span class="n">RequestFactory</span><span class="p">,</span> <span class="n">Topics</span><span class="p">,</span> <span class="n">NotificationFactory</span><span class="p">,</span> <span class="n">ResponseFactory</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">Logger</span><span class="p">,</span> <span class="n">MqttClient</span><span class="p">,</span> <span class="n">System</span><span class="p">,</span> <span class="n">SingletonMeta</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">RequestFactory</span><span class="p">,</span> <span class="n">Topics</span><span class="p">,</span> <span class="n">NotificationFactory</span><span class="p">,</span> <span class="n">ResponseFactory</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">Logger</span><span class="p">,</span> <span class="n">MqttClient</span><span class="p">,</span> <span class="n">System</span><span class="p">,</span> <span class="n">SingletonMeta</span><span class="p">,</span> <span class="n">MqttFactory</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">paho.mqtt.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">MQTTErrorCode</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
@@ -267,7 +269,6 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">base64</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">atexit</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">signal</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
 
 <div class="viewcode-block" id="Api">
@@ -322,8 +323,7 @@
 <span class="sd">        subscriptions = []</span>
 
 <span class="sd">        def start():</span>
-<span class="sd">            client=MqttFactory.create_mqtt_network_dev(&quot;my_app&quot;)</span>
-<span class="sd">            Api().start(client)</span>
+<span class="sd">            Api().start(domain_identifier=&quot;my-domain&quot;)</span>
 <span class="sd">            Api().add_ready_callback(on_connected)</span>
 <span class="sd">            event.wait()</span>
 
@@ -343,29 +343,37 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">__ready_callbacks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-    <span class="n">__message_callbacks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-    <span class="n">__subscriptions</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-    <span class="n">__shutdown_callbacks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-    <span class="n">__restart_callbacks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>    
-    <span class="n">__subscription_callbacks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="n">__ready_callbacks</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">__message_callbacks</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">__subscriptions</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">__shutdown_callbacks</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">__restart_callbacks</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">__subscription_callbacks</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">__recording</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">__mqtt_client</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">__ping_id</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">__logfile</span> <span class="o">=</span> <span class="s2">&quot;/var/log/psec.log&quot;</span>
 
 
 <div class="viewcode-block" id="Api.start">
 <a class="viewcode-back" href="../../psec.html#psec.Api.start">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mqtt_client</span><span class="p">:</span><span class="n">MqttClient</span><span class="p">,</span> <span class="n">recording</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">logfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">(),</span> <span class="s2">&quot;journal.log&quot;</span><span class="p">)):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mqtt_client</span><span class="p">:</span><span class="n">MqttClient</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">domain_identifier</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;undefined&quot;</span><span class="p">,</span> <span class="n">recording</span><span class="p">:</span><span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">logfile</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">(),</span> <span class="s2">&quot;psec.log&quot;</span><span class="p">)):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Starts the API by connecting to the MQTT broker and opening a log file if asked.</span>
 
+<span class="sd">        When no mqtt_client argument is provided the API tries to create a DomU client with the identifier provided.</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            mqtt_client (MqttClient): The instance of the MqttClient class which handles the connexion to the MQTT broker.</span>
+<span class="sd">            domain_identifier (str): The unique identifier (label) for the domain connection.</span>
 <span class="sd">            recording (bool): If true, the events will be recorded in a log file.</span>
 <span class="sd">            logfile (str): If recording is true, the location of the log file can provided with this parameter.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span> <span class="o">=</span> <span class="n">mqtt_client</span>
+        <span class="k">if</span> <span class="n">mqtt_client</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span> <span class="o">=</span> <span class="n">MqttFactory</span><span class="o">.</span><span class="n">create_mqtt_client_domu</span><span class="p">(</span><span class="n">domain_identifier</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span> <span class="o">=</span> <span class="n">mqtt_client</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">__recording</span> <span class="o">=</span> <span class="n">recording</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__logfile</span> <span class="o">=</span> <span class="n">logfile</span>
 
@@ -702,9 +710,9 @@
 
 
 
-<div class="viewcode-block" id="Api.get_file_footprint">
-<a class="viewcode-back" href="../../psec.html#psec.Api.get_file_footprint">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_file_footprint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">disk</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="Api.get_file_fingerprint">
+<a class="viewcode-back" href="../../psec.html#psec.Api.get_file_fingerprint">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_file_fingerprint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">disk</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the fingerprint of a file.</span>
 
@@ -714,8 +722,8 @@
 <span class="sd">            filepath(str): The full path of the file.</span>
 <span class="sd">            disk(str): The disk on which the file is located.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">payload</span> <span class="o">=</span> <span class="n">RequestFactory</span><span class="o">.</span><span class="n">create_request_get_file_footprint</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">disk</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/request&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">FILE_FOOTPRINT</span><span class="p">),</span> <span class="n">payload</span><span class="p">)</span></div>
+        <span class="n">payload</span> <span class="o">=</span> <span class="n">RequestFactory</span><span class="o">.</span><span class="n">create_request_get_file_fingerprint</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">disk</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/request&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">FILE_FINGERPRINT</span><span class="p">),</span> <span class="n">payload</span><span class="p">)</span></div>
 
 
 
@@ -819,40 +827,55 @@
 <span class="sd">                    &quot;os&quot;: {</span>
 <span class="sd">                        &quot;name&quot;: &quot;Linux&quot;, </span>
 <span class="sd">                        &quot;release&quot;: &quot;6.12.20-0-lts&quot;, </span>
-<span class="sd">                        &quot;version&quot;: &quot;#1-Alpine SMP PREEMPT_DYNAMIC 2025-03-24 08:09:11&quot;}, </span>
-<span class="sd">                        &quot;machine&quot;: {</span>
-<span class="sd">                            &quot;arch&quot;: &quot;x86_64&quot;, </span>
-<span class="sd">                            &quot;processor&quot;: &quot;&quot;, </span>
-<span class="sd">                            &quot;platform&quot;: &quot;Linux-6.12.20-0-lts-x86_64-with&quot;, </span>
-<span class="sd">                            &quot;cpu&quot;: {</span>
-<span class="sd">                                &quot;count&quot;: 12, </span>
-<span class="sd">                                &quot;freq_current&quot;: 1689.5970000000004, </span>
-<span class="sd">                                &quot;freq_min&quot;: 0.0, </span>
-<span class="sd">                                &quot;freq_max&quot;: 0.0, </span>
-<span class="sd">                                &quot;percent&quot;: 0.0</span>
-<span class="sd">                            }, </span>
-<span class="sd">                            &quot;memory&quot;: {</span>
-<span class="sd">                                &quot;total&quot;: 405987328, </span>
-<span class="sd">                                &quot;available&quot;: 103829504, </span>
-<span class="sd">                                &quot;percent&quot;: 74.4, </span>
-<span class="sd">                                &quot;used&quot;: 252207104, </span>
-<span class="sd">                                &quot;free&quot;: 20271104</span>
-<span class="sd">                            }, </span>
-<span class="sd">                            &quot;load&quot;: {</span>
-<span class="sd">                                &quot;1&quot;: 0.4306640625, </span>
-<span class="sd">                                &quot;5&quot;: 0.16650390625, </span>
-<span class="sd">                                &quot;15&quot;: 0.0595703125</span>
-<span class="sd">                            }</span>
+<span class="sd">                        &quot;version&quot;: &quot;#1-Alpine SMP PREEMPT_DYNAMIC 2025-03-24 08:09:11&quot;</span>
+<span class="sd">                    }, </span>
+<span class="sd">                    &quot;machine&quot;: {</span>
+<span class="sd">                        &quot;arch&quot;: &quot;x86_64&quot;, </span>
+<span class="sd">                        &quot;processor&quot;: &quot;&quot;, </span>
+<span class="sd">                        &quot;platform&quot;: &quot;Linux-6.12.20-0-lts-x86_64-with&quot;, </span>
+<span class="sd">                        &quot;cpu&quot;: {</span>
+<span class="sd">                            &quot;count&quot;: 12, </span>
+<span class="sd">                            &quot;freq_current&quot;: 1689.5970000000004, </span>
+<span class="sd">                            &quot;freq_min&quot;: 0.0, </span>
+<span class="sd">                            &quot;freq_max&quot;: 0.0, </span>
+<span class="sd">                            &quot;percent&quot;: 0.0</span>
 <span class="sd">                        }, </span>
-<span class="sd">                        &quot;boot_time&quot;: 1747205332.0, </span>
-<span class="sd">                        &quot;uuid&quot;: &quot;11ec0800-4fb9-11ef-bd38-ad993f2e7700&quot;</span>
+<span class="sd">                        &quot;memory&quot;: {</span>
+<span class="sd">                            &quot;total&quot;: 405987328, </span>
+<span class="sd">                            &quot;available&quot;: 103829504, </span>
+<span class="sd">                            &quot;percent&quot;: 74.4, </span>
+<span class="sd">                            &quot;used&quot;: 252207104, </span>
+<span class="sd">                            &quot;free&quot;: 20271104</span>
+<span class="sd">                        }, </span>
+<span class="sd">                        &quot;load&quot;: {</span>
+<span class="sd">                            &quot;1&quot;: 0.4306640625, </span>
+<span class="sd">                            &quot;5&quot;: 0.16650390625, </span>
+<span class="sd">                            &quot;15&quot;: 0.0595703125</span>
+<span class="sd">                        }</span>
+<span class="sd">                    }, </span>
+<span class="sd">                    &quot;boot_time&quot;: 1747205332.0, </span>
+<span class="sd">                    &quot;uuid&quot;: &quot;11ec0800-4fb9-11ef-bd38-ad993f2e7700&quot;,</span>
+<span class="sd">                    &quot;storage&quot;: {</span>
+<span class="sd">                        &quot;total&quot;: 12345678,</span>
+<span class="sd">                        &quot;used&quot;: 0,</span>
+<span class="sd">                        &quot;free&quot;: 12345678,</span>
+<span class="sd">                        &quot;files&quot;: 0</span>
 <span class="sd">                    }</span>
 <span class="sd">                }</span>
-<span class="sd">            }</span>
+<span class="sd">            }        </span>
 
 <span class="sd">        The response is provided on the topic :attr:`Topic.SYSTEM_INFO`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">/request&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">Topics</span><span class="o">.</span><span class="n">SYSTEM_INFO</span><span class="p">),</span> <span class="p">{})</span></div>
+
+
+
+<div class="viewcode-block" id="Api.clear_sys_usb_queues">
+<a class="viewcode-back" href="../../psec.html#psec.Api.clear_sys_usb_queues">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_sys_usb_queues</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Queries sys-usb to clear its queues.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">Api</span><span class="p">()</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">SYS_USB_CLEAR_QUEUES</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">,</span> <span class="p">{})</span></div>
 
 
 
@@ -941,6 +964,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">payload</span> <span class="o">=</span> <span class="n">RequestFactory</span><span class="o">.</span><span class="n">create_request_restart_domain</span><span class="p">(</span><span class="n">domain_name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__mqtt_client</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Topics</span><span class="o">.</span><span class="n">RESTART_DOMAIN</span><span class="si">}</span><span class="s2">/request&quot;</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span></div>
+
 
 
 

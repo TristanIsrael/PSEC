@@ -105,19 +105,19 @@ class FichierHelper():
         return "{}:{}".format("" if disk_name == None else disk_name, file_name)
 
     @staticmethod
-    def calculate_footprint(filepath:str) -> str:
+    def calculate_fingerprint(filepath:str) -> str:
         try:
             with open(filepath, "rb") as f:
-                h = hashlib.file_digest(f, Constantes.FOOTPRINT_METHOD)
+                h = hashlib.file_digest(f, Constantes.FINGERPRINT_METHOD)
                 return h.hexdigest()
         except Exception as e:
-            print(f"An error occured while calculating the footprint of the file {filepath}")
+            print(f"An error occured while calculating the fingerprint of the file {filepath}")
             print(e)
 
         return ""
         
     @staticmethod
-    def copy_file(source_location:str, filepath:str, destination_folder:str, source_footprint:str) -> str:
+    def copy_file(source_location:str, filepath:str, destination_folder:str, source_fingerprint:str) -> str:
         ''' Copie le fichier source_filepath dans le répertoire destination_folder
 
         Le répertoire de destination doit exister.
@@ -138,21 +138,21 @@ class FichierHelper():
             Logger().debug(f"The file {filepath} could not be copied to {destination_folder}. Error: {e}")
             return ""
 
-        # Calculate the new file's footprint
+        # Calculate the new file's fingerprint
         destination_file = f"{destination_folder}{filepath}"
-        dest_footprint = FichierHelper.calculate_footprint(destination_file)
+        dest_fingerprint = FichierHelper.calculate_fingerprint(destination_file)
 
-        if source_footprint == dest_footprint:
-            return dest_footprint
+        if source_fingerprint == dest_fingerprint:
+            return dest_fingerprint
         else:
-            Logger().debug(f"The file {filepath} has been copied to {destination_folder} but the footprints differ")
+            Logger().debug(f"The file {filepath} has been copied to {destination_folder} but the fingerprints differ")
             return ""
 
 
     @staticmethod
-    def copy_file_to_repository(source_location:str, filepath:str, footprint:str):
+    def copy_file_to_repository(source_location:str, filepath:str, fingerprint:str):
         repository_path = str(Parametres().parametre(Cles.STORAGE_PATH_DOMU))
-        FichierHelper.copy_file(source_location, filepath, repository_path, footprint)
+        FichierHelper.copy_file(source_location, filepath, repository_path, fingerprint)
 
     @staticmethod
     def create_file(filepath:str, size_ko:int):

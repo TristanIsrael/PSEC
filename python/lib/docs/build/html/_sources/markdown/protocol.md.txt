@@ -116,7 +116,7 @@ Request fields:
  
 *Calculates the unique fingerprint of a file. The current algorihm is MD5.*
  
-Request topic: `system/disks/file_footprint/request`
+Request topic: `system/disks/file_fingerprint/request`
  
 Request payload:
 ```
@@ -130,21 +130,21 @@ Request fields:
 - `disk` (str) : The disk the file belongs to.
 - `filepath` (str) : The complete path of the file.
  
-Response topic: `system/disks/file_footprint/response`
+Response topic: `system/disks/file_fingerprint/response`
  
 Response payload:
 ```
 {
     "disk": "disk1",
     "filepath": "/my/folder/my_file.txt,    
-    "footprint": "12cfd565ff54caa12"
+    "fingerprint": "12cfd565ff54caa12"
 }  
 ```
  
 Response fields:
 - `disk` (str) : The disk the file belongs to.
 - `filepath` (str) : The complete path of the file.
-- `footprint` (str) : The footprint of the file as an MD5 hash.
+- `fingerprint` (str) : The fingerprint of the file as an MD5 hash.
  
 ### Create a new file
  
@@ -473,16 +473,16 @@ Payload:
 {
     "disk": "disk1",
     "filepath", "/a/folder/my_file.txt",
-    "source_footprint": "acd653c5a8b988cbdbabd65",
-    "dest_footprint": "acd653c5a8b988cbdbabd65"
+    "source_fingerprint": "acd653c5a8b988cbdbabd65",
+    "dest_fingerprint": "acd653c5a8b988cbdbabd65"
 }
 ```
 
 Fields:
 - `disk` (str): The disk on which the file hase been created.
 - `filepath` (str): The complete path of the file.
-- `source_footprint` (str): The fingerprint of the original source file.
-- `dest_footprint` (str): The fingerprint of the file after the copy. *It must match the source_footprint value*.
+- `source_fingerprint` (str): The fingerprint of the original source file.
+- `dest_fingerprint` (str): The fingerprint of the file after the copy. *It must match the source_fingerprint value*.
  
 ### The state of disk changed
  

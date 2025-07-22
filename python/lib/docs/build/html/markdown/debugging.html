@@ -209,17 +209,19 @@
 <li class="toctree-l2"><a class="reference internal" href="capabilities.html">Capabilities</a></li>
 <li class="toctree-l2 current current-page"><a class="current reference internal" href="#">Debugging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="design-rules.html">Design rules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="development.html">Development of PSEC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="documentation.html">Documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="graphical-design.html">Graphical design</a></li>
 <li class="toctree-l2"><a class="reference internal" href="integration.html">Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="known-problems.html">Known problems</a></li>
 <li class="toctree-l2"><a class="reference internal" href="logging.html">Logging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="protocol.html">Protocol</a></li>
 <li class="toctree-l2"><a class="reference internal" href="provisioning.html">Provisioning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="python-api.html">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="roles.html">Roles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sensors.html">Sensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tested-hardware.html">Tested hardware</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tested-hardware.html#dell-latitude-e5510">Dell Latitude E5510</a></li>
 <li class="toctree-l2"><a class="reference internal" href="topology.html">Topology</a></li>
 <li class="toctree-l2"><a class="reference internal" href="update-alpine-mirror.html">Create or Update the Alpine Mirror</a></li>
 </ul>
@@ -272,6 +274,11 @@
 <p>In order to activate the debugging facilities, the file <code class="docutils literal notranslate"><span class="pre">/etc/default/grub</span></code> must be modified.
 Add the sequence <code class="docutils literal notranslate"><span class="pre">DEBUG=ON</span></code> (with a space before if needed) at the end of the line <code class="docutils literal notranslate"><span class="pre">GRUB_CMDLINE_LINUX_DEFAULT</span></code>.</p>
 </section>
+<section id="disable-splash-screen">
+<h2>Disable splash screen<a class="headerlink" href="#disable-splash-screen" title="Link to this heading">¶</a></h2>
+<p>Disabling the splash screen might be necessary to see boot messages. In this case add the option <code class="docutils literal notranslate"><span class="pre">nosplash</span></code> to the kernel command line in GRUB during the boot or in the
+file <code class="docutils literal notranslate"><span class="pre">/etc/default/grub</span></code> at the end of the line <code class="docutils literal notranslate"><span class="pre">GRUB_CMDLINE_LINUX_DEFAULT</span></code>.</p>
+</section>
 <section id="rs-232-serial-link">
 <h2>RS-232 Serial link<a class="headerlink" href="#rs-232-serial-link" title="Link to this heading">¶</a></h2>
 <p>The main debugging channel uses the RS-232 serial port of the system when it has one. Otherwise an USB-serial device can be used as long as its chipset is recognized by the kernel embedded in the <code class="docutils literal notranslate"><span class="pre">sys-usb</span></code> DomD.</p>
@@ -295,6 +302,14 @@ Add the sequence <code class="docutils literal notranslate"><span class="pre">DE
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ mosquitto_sub --unix /var/run/mqtt_msg_local.sock -t &#39;#&#39; --pretty -v
 </pre></div>
 </div>
+</section>
+<section id="debug-messages">
+<h2>Debug messages<a class="headerlink" href="#debug-messages" title="Link to this heading">¶</a></h2>
+<p>PSEC provides scripts for messages debugging:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">/usr/lib/psec/bin/show-messages.sh</span></code> connects to the MQTT broker and displays all the messages with their payload.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">/usr/lib/psec/bin/show-logs.sh</span></code> connects to the MQTT broker and displays all the logging messages (and only them).</p></li>
+</ul>
 </section>
 <section id="log-files">
 <h2>Log files<a class="headerlink" href="#log-files" title="Link to this heading">¶</a></h2>
@@ -389,9 +404,11 @@ Add the sequence <code class="docutils literal notranslate"><span class="pre">DE
             <ul>
 <li><a class="reference internal" href="#">Debugging</a><ul>
 <li><a class="reference internal" href="#activate-debugging">Activate debugging</a></li>
+<li><a class="reference internal" href="#disable-splash-screen">Disable splash screen</a></li>
 <li><a class="reference internal" href="#rs-232-serial-link">RS-232 Serial link</a></li>
 <li><a class="reference internal" href="#pty-terminal">PTY terminal</a></li>
 <li><a class="reference internal" href="#mqtt-console">MQTT console</a></li>
+<li><a class="reference internal" href="#debug-messages">Debug messages</a></li>
 <li><a class="reference internal" href="#log-files">Log files</a></li>
 <li><a class="reference internal" href="#verify-whether-debug-is-activated">Verify whether debug is activated</a></li>
 </ul>

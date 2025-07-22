@@ -208,17 +208,19 @@
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/capabilities.html">Capabilities</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/debugging.html">Debugging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/design-rules.html">Design rules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/development.html">Development of PSEC</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/documentation.html">Documentation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/graphical-design.html">Graphical design</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/integration.html">Integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/known-problems.html">Known problems</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/logging.html">Logging</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/protocol.html">Protocol</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/provisioning.html">Provisioning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/python-api.html">Python API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../markdown/roles.html">Roles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/sensors.html">Sensors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/support-infrastructure.html">Creating the Deployment Infrastructure</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/tested-hardware.html">Tested hardware</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../markdown/tested-hardware.html#dell-latitude-e5510">Dell Latitude E5510</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/topology.html">Topology</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../markdown/update-alpine-mirror.html">Create or Update the Alpine Mirror</a></li>
 </ul>
@@ -275,9 +277,12 @@
         <span class="k">for</span> <span class="n">update</span> <span class="ow">in</span> <span class="n">updates</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">update</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">components_dict</span><span class="p">:</span>
                 <span class="c1"># Si l&#39;id existe, mettre à jour uniquement le champ &#39;state&#39;</span>
-                <span class="n">components_dict</span><span class="p">[</span><span class="n">update</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]][</span><span class="s2">&quot;state&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">update</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">EtatComposant</span><span class="o">.</span><span class="n">UNKNOWN</span><span class="p">)</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="n">update</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">EtatComposant</span><span class="o">.</span><span class="n">UNKNOWN</span><span class="p">)</span>
+                <span class="n">components_dict</span><span class="p">[</span><span class="n">update</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]][</span><span class="s2">&quot;state&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">EtatComposant</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># Si l&#39;id n&#39;existe pas, ajouter l&#39;entrée</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="n">update</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">EtatComposant</span><span class="o">.</span><span class="n">UNKNOWN</span><span class="p">)</span>
+                <span class="n">update</span><span class="p">[</span><span class="s2">&quot;state&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">EtatComposant</span><span class="p">(</span><span class="n">state</span><span class="p">)</span> <span class="c1"># On traduit le str en énumération</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__components</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">update</span><span class="p">)</span></div>
 
 
@@ -305,7 +310,7 @@
     
 <div class="viewcode-block" id="ComponentsHelper.get_state">
 <a class="viewcode-back" href="../../psec.html#psec.ComponentsHelper.get_state">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EtatComposant</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__components</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">comp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="nb">id</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">comp</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">,</span> <span class="n">EtatComposant</span><span class="o">.</span><span class="n">UNKNOWN</span><span class="p">)</span>
