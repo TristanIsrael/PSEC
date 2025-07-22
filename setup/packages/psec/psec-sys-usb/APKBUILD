@@ -23,7 +23,8 @@ mdev-usb-storage.sh
 99-usbdisks.rules
 psec-sys-usb-controller.py
 create-tty-tunnel.sh
-tty-tunnel.initd"
+tty-tunnel.initd
+hardening.sh"
 
 PSEC_CONFDIR="/etc/psec"
 PSEC_ROOTDIR="/usr/lib/psec"
@@ -39,4 +40,6 @@ package() {
     install -D -m644 "$srcdir"/psec-sys-usb-controller.py "$pkgdir/$PSEC_BINDIR/psec-sys-usb-controller.py"
     install -D -m755 "$srcdir"/tty-tunnel.initd "$pkgdir"/etc/init.d/tty-tunnel
     install -D -m755 "$srcdir"/create-tty-tunnel.sh "$pkgdir/$PSEC_BINDIR/create-tty-tunnel.sh"
+
+    install -D -m755 "$srcdir"/hardening.sh "$pkgdir"/usr/lib/psec/bin/hardening.sh
 }
