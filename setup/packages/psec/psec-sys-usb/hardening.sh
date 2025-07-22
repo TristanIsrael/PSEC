@@ -2,7 +2,7 @@
 #!/bin/bash
 
 # This file contains kernel parameters and shell instructions to harden 
-# the GUI domain
+# the sys-usb domain
 
 echo "Apply hardening"
 
