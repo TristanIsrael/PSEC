@@ -45,4 +45,7 @@ fi
 # Re-enable colored prompt   
 #mv "/etc/profile.d/color_prompt.sh.disabled" "/etc/profile.d/color_prompt.sh"
 
+echo Setup system integrity
+/usr/lib/psec/bin/integrity-setup.sh
+
 exit 0
