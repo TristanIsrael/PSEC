@@ -1,6 +1,6 @@
 from psec import SingletonMeta, Logger, RequestFactory, BenchmarkId, Parametres, Cles
 try:
-    from psec import DemonInputs
+    from psec import InputsDaemon
 except:
     print("DemonInputs not available")
 from psec import Mouse, MouseButton, ResponseFactory, FichierHelper, MqttClient, Topics
@@ -41,7 +41,7 @@ class ControleurBenchmark(metaclass=SingletonMeta):
             mouse.x = random.randrange(0, 1024, 1)
             mouse.y = random.randrange(0, 768, 1)
             mouse.buttons = random.choice([MouseButton.UNKNOWN, MouseButton.LEFT, MouseButton.MIDDLE, MouseButton.RIGHT])
-            DemonInputs().genere_evenement_souris(mouse)
+            InputsDaemon().genere_evenement_souris(mouse)
 
         end_ms = time.time()*1000
         duration = int(end_ms-start_ms)

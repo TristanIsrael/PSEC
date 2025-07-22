@@ -168,7 +168,8 @@ device_model_args = [
      '-device', 'virtio-gpu-pci',
      '-display', 'gtk,full-screen=on,zoom-to-fit=on,gl=on',
      '-device', 'virtio-input-host,id=virtio-mouse,evdev=/dev/input/virtual_mouse',
-     '-device', 'virtio-input-host,id=virtio-touch,evdev=/dev/input/virtual_touch'
+     '-device', 'virtio-input-host,id=virtio-keyboard,evdev=/dev/input/virtual_keyboard'
+     '-device', 'virtio-input-host,id=virtio-touch,evdev=/dev/input/virtual_touch',     
 ]
 usb=0
 vnc=0

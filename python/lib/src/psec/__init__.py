@@ -2,7 +2,7 @@ __author__ = "Tristan Israël (tristan.israel@alefbet.net)"
 __version__ = '1.2.0'
 
 from ._singleton import SingletonMeta
-from ._constantes import Constantes, Cles, BoutonSouris, TypeEntree, BenchmarkId, EtatComposant
+from ._constantes import Constantes, Cles, BoutonSouris, InputType, BenchmarkId, EtatComposant
 from ._system import System
 try:
     from ._keymap_fr import KeymapFR
@@ -26,7 +26,7 @@ except Exception as e:
 from ._mouse import Mouse, MouseButton, MouseWheel, MouseMove
 from ._tasks_runner import TaskRunner
 try:
-    from ._demon_inputs import DemonInputs
+    from ._demon_inputs import InputsDaemon
 except Exception as e:
     print("The classes DemonInputs, ControleurVmSysUsb et ControleurBenchmark won't be available due to missing dependancy")
     print(e)
@@ -48,7 +48,7 @@ from logging import NullHandler
 __all__ = [
     "__version__",
     "KeymapFR",
-    "TypeEntree", "BoutonSouris", "Constantes", "EtatComposant", "MouseMove",     
+    "InputType", "BoutonSouris", "Constantes", "EtatComposant", "MouseMove",     
     "RequestFactory",
     #"Journal", "JournalProxy", "DemonProxyJournal",
     "Logger",
@@ -57,7 +57,7 @@ __all__ = [
     "DiskMonitor",
     "FichierHelper",    
     "SingletonMeta",
-    "DemonInputs",
+    "InputsDaemon",
     "Mouse", "MouseButton", "MouseWheel", #"InputsProxy",
     #"ControleurBenchmark", 
     "BenchmarkId",

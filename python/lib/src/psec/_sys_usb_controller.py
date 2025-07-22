@@ -9,7 +9,7 @@ from . import Constantes, Parametres, MqttClient, Topics, MqttHelper
 from . import FichierHelper, ResponseFactory, EtatComposant
 from . import Logger, Cles, DiskMonitor, NotificationFactory
 try:
-    from . import DemonInputs
+    from . import InputsDaemon
     NO_INPUTS_MONITORING = False
 except:
     NO_INPUTS_MONITORING = True
@@ -48,7 +48,7 @@ class SysUsbController():
         
     def stop(self):
         self.__can_run = False
-        DemonInputs().stop()
+        InputsDaemon().stop()
 
 
     def __on_mqtt_connected(self):
@@ -69,7 +69,7 @@ class SysUsbController():
 
         # Démarrage de la surveillance des entrées
         if not NO_INPUTS_MONITORING:
-            DemonInputs().start(self.mqtt_client)
+            InputsDaemon().start(self.mqtt_client)
 
         #ControleurBenchmark().setup(self.mqtt_client)
         # Start threads
