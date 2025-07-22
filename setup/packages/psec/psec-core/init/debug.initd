@@ -19,6 +19,9 @@ start() {
         ebegin "Log MQTT messages"
         start-stop-daemon --start --make-pidfile --exec /usr/lib/psec/bin/start-mqtt-logger.sh --pidfile /var/run/$name-mqtt.pid --background
         eend $?
+
+        # Store the information into Xenstore
+        xenstore-write /local/domain/system/debug_on 1
     else 
         echo "Debugging disabled"
         eend 1
