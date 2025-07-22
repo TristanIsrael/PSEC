@@ -118,8 +118,7 @@ disk = [
 ]
 p9 = [
 'tag=packages, path=/usr/lib/psec/packages, backend=0, security_model=none',
-'tag=storage, path=/usr/lib/psec/storage, backend=0, security_model=none',
-'tag=system, path=/usr/lib/psec/system, backend=0, security_model=none'
+'tag=storage, path=/usr/lib/psec/storage, backend=0, security_model=none'
 ]
 channel = [
 #'name=console, connection=pty',
@@ -153,8 +152,7 @@ disk = [
 ]
 p9 = [
     'tag=packages, path=/usr/lib/psec/packages, backend=0, security_model=none',
-    'tag=storage, path=/usr/lib/psec/storage, backend=0, security_model=none',
-    'tag=system, path=/usr/lib/psec/system, backend=0, security_model=none'
+    'tag=storage, path=/usr/lib/psec/storage, backend=0, security_model=none'
 ]
 channel = [
 #'name=console, connection=pty',
