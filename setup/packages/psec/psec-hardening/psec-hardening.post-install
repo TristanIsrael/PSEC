@@ -1,0 +1,5 @@
+#!/bin/sh
+
+/usr/lib/psec/bin/hardening.sh
+
+exit 0
