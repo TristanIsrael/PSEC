@@ -1,6 +1,7 @@
 #!/sbin/openrc-run
 
 name="psec-sys-usb-controller"
+user="svc-sys-usb-controller"
 
 depend() {
     before udev
@@ -9,7 +10,7 @@ depend() {
 start() {
     ebegin "Starting PSEC sys-usb controller"
 
-    start-stop-daemon --start --make-pidfile --exec /usr/bin/python3 --pidfile /var/run/$name.pid --background -- /usr/lib/psec/bin/psec-sys-usb-controller.py
+    start-stop-daemon --start --make-pidfile --exec /usr/bin/python3 --pidfile /var/run/$name.pid --background --user "$user" -- /usr/lib/psec/bin/psec-sys-usb-controller.py
 
     eend $?
 }

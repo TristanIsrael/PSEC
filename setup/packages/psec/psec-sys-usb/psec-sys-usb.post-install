@@ -9,6 +9,11 @@ modprobe vfat
 modprobe ntfs3
 modprobe ext4
 
+echo "**** Creating service accounts"
+addgroup psec
+adduser -H -D -s /sbin/nologin -G psec svc-sys-usb-controller
+adduser -H -D -s /sbin/nologin -G psec svc-tty-tunnel
+
 rc-update add psec-sys-usb-controller
 rc-service psec-sys-usb-controller start
 
