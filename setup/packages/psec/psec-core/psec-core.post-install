@@ -19,6 +19,20 @@ echo "**** Resizing shared memory"
 # Note : non-persistent setting
 mount -o remount,size=16M /dev/shm
 
+echo "**** Creating service accounts"
+addgroup psec
+adduser -H -D -s /sbin/nologin -G psec svc-mqtt-tunnels
+adduser -H -D -s /sbin/nologin -G psec svc-tty-tunnels
+adduser -H -D -s /sbin/nologin -G psec svc-tty-terminal
+adduser -H -D -s /sbin/nologin -G psec svc-mqtt-logger
+adduser -H -D -s /sbin/nologin -G psec svc-orchestrator
+adduser -H -D -s /sbin/nologin -G psec svc-psec-controller
+
+echo "**** Settings permissions on files"
+mkdir -p /var/log/psec
+chown -R nobody:psec /var/log/psec
+chown -R nobody:psec /usr/lib/psec
+
 rc-update add splash boot
 rc-service splash start
 

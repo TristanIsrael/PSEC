@@ -101,7 +101,7 @@ check() {
 
 package() {
     # Alpine overlay for DomUs
-    install -D -m644 "$builddir"/domu.apkovl.tar.gz "$pkgdir"/usr/lib/psec/system/domu.apkovl.tar.gz    
+    install -D -m640 "$builddir"/domu.apkovl.tar.gz "$pkgdir"/usr/lib/psec/system/domu.apkovl.tar.gz    
 
     # Openrc
     install -D -m755 "$srcdir"/splash.initd "$pkgdir"/etc/init.d/splash
@@ -110,13 +110,13 @@ package() {
     install -D -m755 "$srcdir"/orchestrator.initd "$pkgdir"/etc/init.d/orchestrator
     
     # Configuration
-    install -D -m644 "$srcdir"/topology.json "$pkgdir/$PSEC_CONFDIR"/topology.json
+    install -D -m640 "$srcdir"/topology.json "$pkgdir/$PSEC_CONFDIR"/topology.json
     install -D -m644 "$srcdir"/psec.conf "$pkgdir"/etc/modules-load.d/psec.conf
     install -D -m644 "$srcdir"/10-energy-saving.conf "$pkgdir"/etc/X11/xorg.conf.d/10-energy-saving.conf
     install -D -m644 "$srcdir"/grub.default "$pkgdir"/etc/default/grub
     #install -D -m644 "$srcdir"/grub.cfg-durabook-r8 "$pkgdir"/boot/grub/grub.cfg
     install -D -m644 "$srcdir"/rc.conf "$pkgdir/etc/rc.conf"
-    install -D -m644 "$srcdir"/constants.sh "$pkgdir/$PSEC_CONFDIR"/constants.sh
+    install -D -m640 "$srcdir"/constants.sh "$pkgdir/$PSEC_CONFDIR"/constants.sh
     install -D -m644 "$srcdir"/10-stty.sh "$pkgdir"/etc/profile.d/10-stty.sh
     install -D -m644 "$srcdir"/color_prompt.sh "$pkgdir"/etc/profile.d/color_prompt.sh
     install -D -m644 "$srcdir"/inittab "$pkgdir"/etc/inittab
@@ -125,34 +125,34 @@ package() {
     #install -D -m644 "$srcdir"/sys-usb.conf "$pkgdir/$PSEC_CONFDIR/xen/sys-usb.conf"
 
     # Shell scripts
-    install -D -m755 "$srcdir"/post-install.sh "$pkgdir/$PSEC_BINDIR"/post-install.sh
-    install -D -m755 "$srcdir"/get-sys-gui-domid.sh "$pkgdir/$PSEC_BINDIR"/get-sys-gui-domid.sh    
-    install -D -m755 "$srcdir"/show-logs.sh "$pkgdir/$PSEC_BINDIR"/show-logs.sh
-    install -D -m755 "$srcdir"/show-messages.sh "$pkgdir/$PSEC_BINDIR"/show-messages.sh
-    install -D -m755 "$srcdir"/start-sys-usb.sh "$pkgdir/$PSEC_BINDIR"/start-sys-usb.sh
-    install -D -m755 "$srcdir"/start-sys-gui.sh "$pkgdir/$PSEC_BINDIR"/start-sys-gui.sh
-    install -D -m755 "$srcdir"/start-business-domain.sh "$pkgdir/$PSEC_BINDIR"/start-business-domain.sh
-    install -D -m755 "$srcdir"/provision-domain.sh "$pkgdir/$PSEC_BINDIR"/provision-domain.sh
-    install -D -m755 "$srcdir"/create-local-alpine-repository.sh "$pkgdir/$PSEC_BINDIR"/create-local-alpine-repository.sh
-    install -D -m755 "$srcdir"/generate-pgp-keys.sh "$pkgdir/$PSEC_BINDIR"/generate-pgp-keys.sh    
-    install -D -m755 "$srcdir"/reindex-and-sign-repository.sh "$pkgdir/$PSEC_BINDIR"/reindex-and-sign-repository.sh
-    install -D -m755 "$srcdir"/setup-alpine-repositories.sh "$pkgdir/$PSEC_BINDIR"/setup-alpine-repositories.sh        
+    install -D -m750 "$srcdir"/post-install.sh "$pkgdir/$PSEC_BINDIR"/post-install.sh
+    install -D -m750 "$srcdir"/get-sys-gui-domid.sh "$pkgdir/$PSEC_BINDIR"/get-sys-gui-domid.sh    
+    install -D -m750 "$srcdir"/show-logs.sh "$pkgdir/$PSEC_BINDIR"/show-logs.sh
+    install -D -m750 "$srcdir"/show-messages.sh "$pkgdir/$PSEC_BINDIR"/show-messages.sh
+    install -D -m750 "$srcdir"/start-sys-usb.sh "$pkgdir/$PSEC_BINDIR"/start-sys-usb.sh
+    install -D -m750 "$srcdir"/start-sys-gui.sh "$pkgdir/$PSEC_BINDIR"/start-sys-gui.sh
+    install -D -m750 "$srcdir"/start-business-domain.sh "$pkgdir/$PSEC_BINDIR"/start-business-domain.sh
+    install -D -m750 "$srcdir"/provision-domain.sh "$pkgdir/$PSEC_BINDIR"/provision-domain.sh
+    install -D -m750 "$srcdir"/create-local-alpine-repository.sh "$pkgdir/$PSEC_BINDIR"/create-local-alpine-repository.sh
+    install -D -m750 "$srcdir"/generate-pgp-keys.sh "$pkgdir/$PSEC_BINDIR"/generate-pgp-keys.sh    
+    install -D -m750 "$srcdir"/reindex-and-sign-repository.sh "$pkgdir/$PSEC_BINDIR"/reindex-and-sign-repository.sh
+    install -D -m750 "$srcdir"/setup-alpine-repositories.sh "$pkgdir/$PSEC_BINDIR"/setup-alpine-repositories.sh        
     #install -D -m755 "$srcdir"/setup-pci-usb-controllers.sh "$pkgdir/$PSEC_BINDIR"/setup-pci-usb-controllers.sh 
     #install -D -m755 "$srcdir"/setup-pci-vga-controller.sh "$pkgdir/$PSEC_BINDIR"/setup-pci-vga-controller.sh
-    install -D -m755 "$srcdir"/setup-xen-environment.sh "$pkgdir/$PSEC_BINDIR"/setup-xen-environment.sh
-    install -D -m755 "$srcdir"/finish-core-init.sh "$pkgdir/$PSEC_BINDIR"/finish-core-init.sh
-    install -D -m755 "$srcdir"/set-xenstore-permissions.sh "$pkgdir/$PSEC_BINDIR"/set-xenstore-permissions.sh
+    install -D -m750 "$srcdir"/setup-xen-environment.sh "$pkgdir/$PSEC_BINDIR"/setup-xen-environment.sh
+    install -D -m750 "$srcdir"/finish-core-init.sh "$pkgdir/$PSEC_BINDIR"/finish-core-init.sh
+    install -D -m750 "$srcdir"/set-xenstore-permissions.sh "$pkgdir/$PSEC_BINDIR"/set-xenstore-permissions.sh
 
 
     # Python scripts
-    install -D -m644 "$srcdir"/write-screen-information-to-xenstore.py "$pkgdir/$PSEC_BINDIR"/write-screen-information-to-xenstore.py
-    install -D -m644 "$srcdir"/get-total-memory.py "$pkgdir/$PSEC_BINDIR"/get-total-memory.py    
-    install -D -m644 "$srcdir"/orchestrator.py "$pkgdir/$PSEC_BINDIR"/orchestrator.py
-    install -D -m644 "$srcdir"/rotate-screen.py "$pkgdir/$PSEC_BINDIR"/rotate-screen.py
-    install -D -m644 "$srcdir"/generate-x-config.py "$pkgdir/$PSEC_BINDIR"/generate-x-config.py
-    install -D -m644 "$srcdir"/create-domains.py "$pkgdir/$PSEC_BINDIR"/create-domains.py
-    install -D -m755 "$srcdir"/start-psec-core-controller.py "$pkgdir/$PSEC_BINDIR"/start-psec-core-controller.py 
-    install -D -m755 "$srcdir"/create-mqtt-tunnels.py "$pkgdir/$PSEC_BINDIR"/create-mqtt-tunnels.py 
+    install -D -m640 "$srcdir"/write-screen-information-to-xenstore.py "$pkgdir/$PSEC_BINDIR"/write-screen-information-to-xenstore.py
+    install -D -m640 "$srcdir"/get-total-memory.py "$pkgdir/$PSEC_BINDIR"/get-total-memory.py    
+    install -D -m640 "$srcdir"/orchestrator.py "$pkgdir/$PSEC_BINDIR"/orchestrator.py
+    install -D -m640 "$srcdir"/rotate-screen.py "$pkgdir/$PSEC_BINDIR"/rotate-screen.py
+    install -D -m640 "$srcdir"/generate-x-config.py "$pkgdir/$PSEC_BINDIR"/generate-x-config.py
+    install -D -m640 "$srcdir"/create-domains.py "$pkgdir/$PSEC_BINDIR"/create-domains.py
+    install -D -m750 "$srcdir"/start-psec-core-controller.py "$pkgdir/$PSEC_BINDIR"/start-psec-core-controller.py 
+    install -D -m750 "$srcdir"/create-mqtt-tunnels.py "$pkgdir/$PSEC_BINDIR"/create-mqtt-tunnels.py 
 
     # Misc
     install -D -m644 "$srcdir"/Splash_800_1280.ppm "$pkgdir"/boot/Splash_800_1280.ppm
@@ -167,9 +167,9 @@ package() {
 
     # Debugging
     install -D -m755 "$srcdir"/debug.initd "$pkgdir"/etc/init.d/debug
-    install -D -m755 "$srcdir"/create-tty-tunnel.sh "$pkgdir/$PSEC_BINDIR"/create-tty-tunnel.sh
-    install -D -m755 "$srcdir"/create-tty-terminal.sh "$pkgdir/$PSEC_BINDIR"/create-tty-terminal.sh
-    install -D -m755 "$srcdir"/start-mqtt-logger.sh "$pkgdir/$PSEC_BINDIR"/start-mqtt-logger.sh
+    install -D -m750 "$srcdir"/create-tty-tunnel.sh "$pkgdir/$PSEC_BINDIR"/create-tty-tunnel.sh
+    install -D -m750 "$srcdir"/create-tty-terminal.sh "$pkgdir/$PSEC_BINDIR"/create-tty-terminal.sh
+    install -D -m750 "$srcdir"/start-mqtt-logger.sh "$pkgdir/$PSEC_BINDIR"/start-mqtt-logger.sh
     install -D -m755 "$srcdir"/motd "$pkgdir/etc/motd"
 
     # Security

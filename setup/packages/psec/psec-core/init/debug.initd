@@ -9,15 +9,15 @@ depend() {
 start() {
     if grep -q "DEBUG=ON" "/proc/cmdline"; then            
         ebegin "Create TTY tunnel"
-        start-stop-daemon --start --make-pidfile --exec /usr/lib/psec/bin/create-tty-tunnel.sh --pidfile /var/run/$name-tty-tunnel.pid --background
+        start-stop-daemon --start --make-pidfile --exec /usr/lib/psec/bin/create-tty-tunnel.sh --pidfile /var/run/$name-tty-tunnel.pid --background --user "svc-tty-tunnels"
         eend $?
 
         ebegin "Create TTY terminal"
-        start-stop-daemon --start --make-pidfile --exec /usr/lib/psec/bin/create-tty-terminal.sh --pidfile /var/run/$name-tty-terminal.pid --background
+        start-stop-daemon --start --make-pidfile --exec /usr/lib/psec/bin/create-tty-terminal.sh --pidfile /var/run/$name-tty-terminal.pid --background --user "svc-tty-terminal"
         eend $?
 
         ebegin "Log MQTT messages"
-        start-stop-daemon --start --make-pidfile --exec /usr/lib/psec/bin/start-mqtt-logger.sh --pidfile /var/run/$name-mqtt.pid --background
+        start-stop-daemon --start --make-pidfile --exec /usr/lib/psec/bin/start-mqtt-logger.sh --pidfile /var/run/$name-mqtt.pid --background --user "svc-mqtt-logger"
         eend $?
     else 
         echo "Debugging disabled"
