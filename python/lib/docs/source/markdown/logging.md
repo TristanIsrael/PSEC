@@ -39,3 +39,14 @@ The platform automatically saves all events at or above the level defined by the
 ## Retrieving the Log
 
 The command to retrieve the log is `system/events/save_log`.
+
+## Syslog
+
+The package `psec-syslog` can be installed in a Domain in order to provide `syslog` facility.
+
+When this package is installed, all `syslog` logs with the tag `PSEC` are redirected to the PSEC logger. This gives you an opportunity to use standard logging services and libraries for logging, including for services you install in the Domains.
+
+Additionally, the commande `logger` can be used in the shell to send log to PSEC, for example:
+```
+$ logger -t PSEC My message log
+```
