@@ -4,7 +4,7 @@ import os
 import json
 import psutil
 import shutil
-from . import SingletonMeta, __version__, Constantes, Cles
+from . import SingletonMeta, __version__, Constantes, Cles, LibvirtHelper 
 
 class System(metaclass=SingletonMeta):
 
@@ -112,15 +112,16 @@ class System(metaclass=SingletonMeta):
         if self.__cpu_count is not None:
             return self.__cpu_count
         
-        try:
-            output = subprocess.check_output(['xl', 'info'], encoding='utf-8')
-            for line in output.splitlines():
-                if line.startswith('nr_cpus'):
-                    self.__cpu_count = int(line.split(':')[1].strip())
-        except Exception:
-            return 1
-        
-        return 1 if self.__cpu_count is None else self.__cpu_count
+        self.__cpu_count = LibvirtHelper.get_cpu_count()
+
+        #try:            
+        #    output = subprocess.check_output(['xl', 'info'], encoding='utf-8')
+        #    for line in output.splitlines():
+        #        if line.startswith('nr_cpus'):
+        #            self.__cpu_count = int(line.split(':')[1].strip())
+        #except Exception:
+        #    return 1        
+        #return 1 if self.__cpu_count is None else self.__cpu_count
 
 
     @staticmethod
@@ -380,7 +381,8 @@ class System(metaclass=SingletonMeta):
                 },
                 "storage": System.__get_storage_info(),
                 "boot_time": psutil.boot_time(),
-                "uuid": System().get_system_uuid()
+                "uuid": System().get_system_uuid(),
+                "cpu_allocation": System().get_cpu_allocation()
             }
         }
  
@@ -422,3 +424,9 @@ class System(metaclass=SingletonMeta):
                 info["files"] += len(files)
 
         return info
+    
+    def get_cpu_allocation(self) -> dict:
+        """ @brief Provides information about CPU allocation for all the Domains """
+
+        # First get the list of domains
+        subprocess.run("")

@@ -1,19 +1,16 @@
-import platform
 import threading
 import subprocess
 import time
 import psutil
-import os
-import shutil
 from . import Constantes, __version__
 from . import Logger, FichierHelper, Parametres, Cles
 from . import ResponseFactory
 from . import MqttClient, Topics, MqttHelper, NotificationFactory
 from . import System, EtatComposant
+from . import LibvirtHelper
 
 class Dom0Controller():
-    """ Cette classe traite les commandes envoyées par les Domaines et qui concernent le dépôt local et le 
-    système en général (supervision, configuration, etc).
+    """ @brief The Dom0 controller listens to messages coming from other controllers or Domains and provides responses.    
 
     """    
 
@@ -31,6 +28,8 @@ class Dom0Controller():
 
 
     def start(self):
+        """ @brief Starts the controller by connecting to the messaging.
+        """
         self.mqtt_client.start()
         self.__mqtt_lock.wait()
     
@@ -160,10 +159,7 @@ class Dom0Controller():
 
 
     def __reboot_domain(self, domain_name:str):
-        cmd = ["xl", "reboot", domain_name]
-        res = subprocess.run(cmd)
-
-        if res.returncode == 0:
+        if LibvirtHelper.reboot_domain(domain_name):
             Logger().info(f"Rebooting domain {domain_name}")
             response = ResponseFactory.create_response_restart_domain(domain_name, True)
             self.mqtt_client.publish(f"{Topics.RESTART_DOMAIN}/response", response)
@@ -171,6 +167,18 @@ class Dom0Controller():
             Logger().error(f"The domain {domain_name} won't reboot")
             response = ResponseFactory.create_response_restart_domain(domain_name, False)
             self.mqtt_client.publish(f"{Topics.RESTART_DOMAIN}/response", response)
+
+        #cmd = ["xl", "reboot", domain_name]
+        #res = subprocess.run(cmd)
+
+        #if res.returncode == 0:
+        #    Logger().info(f"Rebooting domain {domain_name}")
+        #    response = ResponseFactory.create_response_restart_domain(domain_name, True)
+        #    self.mqtt_client.publish(f"{Topics.RESTART_DOMAIN}/response", response)
+        #else:
+        #    Logger().error(f"The domain {domain_name} won't reboot")
+        #    response = ResponseFactory.create_response_restart_domain(domain_name, False)
+        #    self.mqtt_client.publish(f"{Topics.RESTART_DOMAIN}/response", response)
 
 
     def __handle_energy_state(self):

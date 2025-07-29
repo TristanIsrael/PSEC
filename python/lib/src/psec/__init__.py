@@ -3,6 +3,7 @@ __version__ = '1.2.0'
 
 from ._singleton import SingletonMeta
 from ._constantes import Constantes, Cles, BoutonSouris, TypeEntree, BenchmarkId, EtatComposant
+from ._libvirt_helper import LibvirtHelper
 from ._system import System
 try:
     from ._keymap_fr import KeymapFR
@@ -50,6 +51,7 @@ __all__ = [
     "KeymapFR",
     "TypeEntree", "BoutonSouris", "Constantes", "EtatComposant", "MouseMove",     
     "RequestFactory",
+    "LibvirtHelper",
     #"Journal", "JournalProxy", "DemonProxyJournal",
     "Logger",
     "NotificationFactory", "BoutonSouris",
