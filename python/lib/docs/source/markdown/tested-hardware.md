@@ -16,7 +16,7 @@ This document describes tested hardware configurations.
 | Desktop | HP | Compaq 6300 Pro MT | Intel Core i5-3470 (4) | Intel HD Graphics 2500 | Yes | Yes | Yes | | ★★★★★ (3) |
 | Tablet | GETAC | T800 G2 | Atom x7-Z8750 (4) | Intel HD Graphics | Yes | Yes | Yes | UEFI | ★★★★★ (3) |
 | Tablet | GETAC | UX10 G2 | Core i5-10210U vPro (12) | Intel UHD Graphics | Yes | Yes | Yes | UEFI | ☆☆☆☆☆ |
-| Phone | Fairphone | Fairphone 5 | 
+| Phone | Fairphone | Fairphone 5 | Qualcomm QCM6490 (8) | Adreno 543L | No | No | No | Android | ☆☆☆☆☆ |
 
 - (1) Specific configuration is needed.
 - (2) Without IOMMU the isolation between components is reduced.
