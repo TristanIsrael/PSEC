@@ -16,6 +16,7 @@ This document describes tested hardware configurations.
 | Desktop | HP | Compaq 6300 Pro MT | Intel Core i5-3470 (4) | Intel HD Graphics 2500 | Yes | Yes | Yes | | ★★★★★ (3) |
 | Tablet | GETAC | T800 G2 | Atom x7-Z8750 (4) | Intel HD Graphics | Yes | Yes | Yes | UEFI | ★★★★★ (3) |
 | Tablet | GETAC | UX10 G2 | Core i5-10210U vPro (12) | Intel UHD Graphics | Yes | Yes | Yes | UEFI | ☆☆☆☆☆ |
+| Phone | Fairphone | Fairphone 5 | 
 
 - (1) Specific configuration is needed.
 - (2) Without IOMMU the isolation between components is reduced.
@@ -75,3 +76,156 @@ Enable Intel graphics requires to disable IOMMU for graphics: append `intel_iomm
 Disable Intel graphics : append `nomodeset modprobe.blacklist=i915` to the kernel command line.
 
 Enable Intel graphics requires to disable IOMMU for graphics: append `intel_iommu=on iommu=no-igfx` to both XEN and Linux kernel command lines.
+
+## Fairphone 5
+
+In progress...
+
+[PostmarketOS documentation](https://wiki.postmarketos.org/wiki/Fairphone_5_(fairphone-fp5))
+
+### Hardware capabilities
+
+```
+Architecture:                aarch64
+  CPU op-mode(s):            32-bit, 64-bit
+  Byte Order:                Little Endian
+CPU(s):                      8
+  On-line CPU(s) list:       0-7
+Vendor ID:                   ARM
+  Model name:                Cortex-A55
+    Model:                   0
+    Thread(s) per core:      1
+    Core(s) per socket:      4
+    Socket(s):               1
+    Stepping:                r2p0
+    Frequency boost:         disabled
+    CPU(s) scaling MHz:      73%
+    CPU max MHz:             1958.4000
+    CPU min MHz:             300.0000
+    BogoMIPS:                38.40
+    Flags:                   fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+  Model name:                Cortex-A78
+    Model:                   1
+    Thread(s) per core:      1
+    Core(s) per socket:      4
+    Socket(s):               1
+    Stepping:                r1p1
+    CPU(s) scaling MHz:      58%
+    CPU max MHz:             2707.2000
+    CPU min MHz:             691.2000
+    BogoMIPS:                38.40
+    Flags:                   fp asimd evtstrm aes pmull sha1 sha2 crc32 atomics fphp asimdhp cpuid asimdrdm lrcpc dcpop asimddp
+NUMA:
+  NUMA node(s):              1
+  NUMA node0 CPU(s):         0-7
+Vulnerabilities:
+  Gather data sampling:      Not affected
+  Ghostwrite:                Not affected
+  Indirect target selection: Not affected
+  Itlb multihit:             Not affected
+  L1tf:                      Not affected
+  Mds:                       Not affected
+  Meltdown:                  Not affected
+  Mmio stale data:           Not affected
+  Old microcode:             Not affected
+  Reg file data sampling:    Not affected
+  Retbleed:                  Not affected
+  Spec rstack overflow:      Not affected
+  Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl
+  Spectre v1:                Mitigation; __user pointer sanitization
+  Spectre v2:                Mitigation; CSV2, BHB
+  Srbds:                     Not affected
+  Tsa:                       Not affected
+  Tsx async abort:           Not affected
+  Vmscape:                   Not affected
+```
+
+### Phone preparation
+
+Prerequisites:
+- The battery must be at least 50%
+- The WiFi must be connected
+- Android platform tools installed on a computer
+- The phone must be connected to the computer
+
+Procedure:
+- Enable developper mode
+- Disable OEM 
+  - Go to https://www.fairphone.com/en/bootloader-unlocking-code-for-fairphone/ 
+  - Enter the IMEI, Phone serial number
+    - To obtain the serial number, on the computer enter `$ adb shell getprop ro.serialno`
+  - Get the unlock code    
+  - Activate Settings > OEM Unlock 
+  - Enter the unlock code
+- Enable USB debugging
+- Reboot to bootloader `$ adb reboot bootloader`
+- Unlock the bootloader `$ fastboot flashing unlock`
+- Recommander la procédure et terminer par `$ fastboot flashing unlock_critical`
+
+After restart the phone is ready to flash.
+
+### Create PostmarketOS flash images
+
+Prerequisites:
+- A computer running GNU/Linux
+- git command line tools
+
+Procedure:
+- Clone postmarketOS `$ git clone https://wiki.postmarketos.org/wiki/Fairphone_5_(fairphone-fp5)`
+- Initialize `$ ./pmbootstrap init`
+  - Choose the channel `edge`
+  - Define a username
+  - Choose default options for WiFi
+  - Choose `developer` for USB mode
+  - Choose `console` for User interface
+  - Don't install `systemd`
+  - Choose default for the remaining settings.
+  - Define the additionnal packages: `iw dhcpcd`
+  - Run `$ pmbootstrap install`
+
+Images are in:
+- rootfs: ./chroot_native/home/pmos/rootfs/fairphone-fp5.img
+- kernel + initramfs: ./chroot_rootfs_fairphone-fp5/boot
+
+### Flash the device
+
+Prerequisites:
+- The phone must be in developer mode with USB debugging enabled
+
+Procedure:
+- Flash rootfs `$ pmbootstrap flasher flash_rootfs`
+- Flash kernel and initramfs `$ pmbootstrap flasher flash_kernel`
+- Erase DTBO and reboot `$ fastboot erase dtbo reboot`
+
+## Install PSEC 
+
+*Before booting, connect a USB OTG adapter and a keyboard*
+
+- Login with the user defined in the phone preparation step. The password is identical to the login.
+- Change the font `$ sudo setfont /usr/share/consolefonts/ter-g32n.psf.gz`
+- Set the WiFi connection:
+  - Edit the configuration file `$ sudo vi /etc/wpa_supplicant/wpa_supplicant.conf`
+```
+ctrl_interface=/var/run/wpa_supplicant
+update_config=1
+
+network={
+    ssid="NETWORK NAME"
+    psk="NETWORK KEY"
+}
+```
+  - Connect to the WiFi `$ sudo wpa_supplicant -B -i wlan0 -c /etc/wpa_supplicant/wpa_supplicant.conf`
+  - Define an IP address `$ sudo ip addr add AN_IP_ADDRESS/24 wlan0`
+  - Define the gateway `$ sudo ip route add default via 192.168.1.1`
+  - Define the name server in `$ sudo vi /etc/resolv.conf`
+  - Setup openssh `$ sudo setup-sshd`
+  - Setup network configuration file `/etc/network/interfaces`:
+```
+auto wlan0
+iface wlan0 inet static
+	address 192.168.1.244
+	netmask 255.255.255.0
+	gateway 192.168.1.1
+	dns-nameservers 192.168.1.1
+	wpa-conf /etc/wpa_supplicant/wpa_supplicant.conf
+```

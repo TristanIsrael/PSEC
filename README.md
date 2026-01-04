@@ -11,7 +11,7 @@ You are **not allowed to fork, copy, modify, or reuse** this code in any form, i
 
 Newcomers should begin with the [architecture documentation](python/lib/docs/source/markdown/architecture.md).
 
-API is documented in the [protocol documentation](python/lib/docs/source/markdown/protocol.md) for the Messages and in the [API documentation (HTML)](python/lib/docs/build/html/api.html) for the *python API*.
+API is documented in the [protocol documentation](python/lib/docs/source/markdown/protocol.md) for the Messages and in the [API documentation (HTML)](python/lib/docs/build/html/psec.html#psec.Api) for the *python API*.
 
 All python classes documentation (*docstrings*) is provided as HTML pages in the folder `python/lib/docs/build/html`.
 
