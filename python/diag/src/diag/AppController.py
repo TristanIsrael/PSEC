@@ -6,6 +6,9 @@ from PySide6.QtCore import QObject, Property, Slot
 
 class AppController(QObject):
 
+    def __init__(self, parent:QObject):
+        super().__init__(parent)
+
     def __get_system_info(self) -> dict:
         cpu = cpuinfo.get_cpu_info()
         return cpu

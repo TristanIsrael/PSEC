@@ -45,6 +45,8 @@ def main():
     #engine.load(qml_file.as_uri())
     if os.getenv("DEVMODE") is None:
         view.showFullScreen()
+    else:
+        view.show()
 
     #if not engine.rootObjects():
     #    sys.exit(-1)

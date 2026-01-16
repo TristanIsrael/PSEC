@@ -1,0 +1,17 @@
+<RCC>
+    <qresource>
+        <file>components/qmldir</file>
+        <file>content/Bindings.qml</file>
+        <file>content/Energy.qml</file>
+        <file>content/MainScreen.qml</file>
+        <file>content/MainScreenUi.ui.qml</file>
+        <file>content/MessagesPanel.qml</file>
+        <file>content/PanelResults.qml</file>
+        <file>content/ProgressListEntry.qml</file>
+        <file>content/TestsList.qml</file>
+        <file>content/TopBar.qml</file>
+        <file>content/TopBarUi.ui.qml</file>
+        <file>qtquickcontrols2.conf</file>
+        <file>Tests.qmlproject</file>
+    </qresource>
+</RCC>
