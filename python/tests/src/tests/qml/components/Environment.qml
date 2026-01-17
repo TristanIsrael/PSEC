@@ -37,7 +37,7 @@ QtObject {
 
     readonly property color colorSuccess: "#4CAF50"
     readonly property color colorFailure: "#F44330"
-    readonly property color colorRunning: "#99dfdfdf"
+    readonly property color colorRunning: "#66656dfd"
 
     readonly property color colorSelected: "#66656dfd"
 

@@ -1,8 +1,8 @@
 from lib import AbstractTest
 
-class TestGetRepositoryContent(AbstractTest):
+class TestGetFile(AbstractTest):
 
-    name = "Get repository content"
+    name = "Get file"
     description = ""
     parallelizable = True
 

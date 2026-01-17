@@ -1,8 +1,8 @@
 from lib import AbstractTest
 
-class TestGetRepositoryContent(AbstractTest):
+class TestMouse(AbstractTest):
 
-    name = "Get repository content"
+    name = "Mouse"
     description = ""
     parallelizable = True
 

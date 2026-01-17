@@ -1,8 +1,8 @@
 from lib import AbstractTest
 
-class TestGetRepositoryContent(AbstractTest):
+class TestKeyboard(AbstractTest):
 
-    name = "Get repository content"
+    name = "Keyboard"
     description = ""
     parallelizable = True
 

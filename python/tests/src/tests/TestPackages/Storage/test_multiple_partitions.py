@@ -1,8 +1,8 @@
 from lib import AbstractTest
 
-class TestGetRepositoryContent(AbstractTest):
+class TestMultiplePartitions(AbstractTest):
 
-    name = "Get repository content"
+    name = "Multiple partitions"
     description = ""
     parallelizable = True
 

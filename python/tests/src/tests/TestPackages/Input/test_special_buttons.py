@@ -1,8 +1,8 @@
 from lib import AbstractTest
 
-class TestGetRepositoryContent(AbstractTest):
+class TestSpecialButtons(AbstractTest):
 
-    name = "Get repository content"
+    name = "Special buttons"
     description = ""
     parallelizable = True
 

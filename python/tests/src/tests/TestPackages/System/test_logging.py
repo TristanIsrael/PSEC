@@ -1,8 +1,8 @@
 from lib import AbstractTest
 
-class TestGetRepositoryContent(AbstractTest):
+class TestLogging(AbstractTest):
 
-    name = "Get repository content"
+    name = "Logging"
     description = ""
     parallelizable = True
 

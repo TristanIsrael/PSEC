@@ -1,8 +1,8 @@
 from lib import AbstractTest
 
-class TestGetRepositoryContent(AbstractTest):
+class TestSerialPort(AbstractTest):
 
-    name = "Get repository content"
+    name = "Serial port"
     description = ""
     parallelizable = True
 

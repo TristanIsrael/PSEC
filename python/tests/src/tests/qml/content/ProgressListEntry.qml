@@ -12,7 +12,7 @@ Item {
 
     width: implicitWidth
     height: implicitHeight
-    implicitHeight: 50
+    implicitHeight: 30
     implicitWidth: 400
 
     Rectangle {
@@ -33,12 +33,15 @@ Item {
         id: lbl
         anchors {
             fill: parent
-            margins: parent.height * 0.2
+            leftMargin: root.isPackage ? 10 : 20
+            rightMargin: parent.height * 0.2
+            topMargin: parent.height * 0.2
+            bottomMargin: parent.height * 0.2
         }
         horizontalAlignment: Qt.AlignLeft
         verticalAlignment: Qt.AlignVCenter
         fontSizeMode: Text.HorizontalFit
-        font.pixelSize: height * (root.isPackage ? 1 : 0.7)
+        font.pixelSize: height * (root.isPackage ? 1 : 0.8)
         text: qsTr("Progress component")
         color: Environment.colorText
     }
