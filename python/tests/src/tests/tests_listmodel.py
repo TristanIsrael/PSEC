@@ -2,12 +2,12 @@ import pkgutil
 import importlib
 import inspect
 from pathlib import Path
-from PySide6.QtCore import QObject, QAbstractListModel
+from PySide6.QtCore import QObject, QAbstractListModel, QModelIndex
 from enums import Roles
 
 class TestsListModel(QAbstractListModel):
-    
-    __cache = []
+
+    __cache = [] # List of dicts
 
     def __init__(self, parent:QObject):
         super().__init__(parent)
@@ -25,28 +25,77 @@ class TestsListModel(QAbstractListModel):
 
             #package_path = packages_path / package_name
             package = importlib.import_module(f"TestPackages.{package_name}")
+            #package_tests:list = self.__cache.setdefault(package_name, [])
 
-            tests = []
-            for _, module_name, _ in pkgutil.iter_modules(package.__path__):
+            if not any(d.get("name") == package_name for d in self.__cache):
+                self.__cache.append({
+                    "name": package_name,
+                    "progress": 0,
+                    "success": False,
+                    "is_test": False
+                })
+
+            for _, module_name, _ in pkgutil.walk_packages(package.__path__, package.__name__ + "."):
                 print(f"Test file {module_name} discovered")
-                #module = importlib.import_module(module_name)
-                for nom, class_ in inspect.getmembers(module_name, inspect.isclass):
-                    print(nom, type(nom).__name__)
+                
+                module = importlib.import_module(module_name)                
+
+                for _, cls in inspect.getmembers(module, inspect.isclass):
+                    if cls.__module__ == module_name:
+                        print(f"Test class {module_name} discovered")
+
+                        '''if module_name not in package_tests:
+                            package_tests.append( {
+                                "name": cls.__name__,
+                                "progress": 0,
+                                "success": False
+                            })'''
+                        self.__cache.append({
+                            "name": cls.name,
+                            "progress": 0,
+                            "success": False,
+                            "is_test": True
+                        })
+
+        print(self.__cache)
             
 
-    def rowCount(self, /, parent = ...):
-        return super().rowCount(parent)
+    def rowCount(self, parent=QModelIndex()):
+        #return len(self.__cache.keys()) + len(self.__cache.values())
+        return len(self.__cache)
     
-    def columnCount(self, parent):
-        return super().columnCount(parent)
+    def data(self, index, role):
+        if not index.isValid():
+            return None
+        
+        if len(self.__cache) <= index.row():
+            return
+
+        item = self.__cache[index.row()]
+
+        if role == Roles.RoleLabel:
+            return item.get("name")
+        elif role == Roles.RoleSection:
+            return not item.get("is_test")
+        elif role == Roles.RoleProgress:
+            return item.get("progress")
+        elif role == Roles.RoleSuccess:
+            return item.get("success")
+        elif role == Roles.RoleIsPackage:
+            return not item.get("is_test")
+        
+    def get_nb_capacities_total(self) -> int:
+        return sum(1 for d in self.__cache if d.get("is_test") is False)
     
-    def data(self, index, /, role = ...):
-        return super().data(index, role)
-    
+    def get_nb_tests_total(self) -> int:
+        return sum(1 for d in self.__cache if d.get("is_test"))
+
     def roleNames(self) -> dict:
         roles = {
             Roles.RoleProgress: b'progress',
-            Roles.RolePackage: b'package',
-            Roles.RoleTest: b'test'
+            Roles.RoleIsPackage: b'isPackage', 
+            Roles.RoleLabel: b'label',
+            Roles.RoleSuccess: b'success'
         }
+
         return roles

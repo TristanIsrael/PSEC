@@ -27,16 +27,16 @@ def main():
 
     signal.signal(signal.SIGINT, lambda *_: app.quit())
     
-    # Expose les Types QML
+    # Expose QML Types
     qmlRegisterSingletonInstance(AppController, "PSEC", 1, 0, 'AppController', AppController(app))
 
     # Install font
     #font = QFont("Roboto", 18)
     #app.setFont(font)
-
+            
     app_root_path = Path(__file__).parent
     view = MyView()
-
+    
     view.engine().quit.connect(app.quit)
     view.engine().addImportPath(app_root_path / 'qml')
     qml_file = app_root_path / 'qml/content/MainScreen.qml'
@@ -45,8 +45,6 @@ def main():
         view.showFullScreen()
     else:
         view.show()
-
-    app_controller = AppController(app)
 
     return app.exec()
 

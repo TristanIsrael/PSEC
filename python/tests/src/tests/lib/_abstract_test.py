@@ -1,4 +1,3 @@
-from abc import ABC, abstractmethod
 from PySide6.QtCore import QObject, Signal
 from enums import MessageLevel
 
@@ -12,7 +11,7 @@ class Message():
         self.message = message
         self.level = level
 
-class AbstractTest(QObject, ABC):
+class AbstractTest(QObject):
     """ Abstract class for developping tests """
 
     #### Public properties ####
@@ -28,21 +27,18 @@ class AbstractTest(QObject, ABC):
     #################
     #### Methods ####
     #################
-
-    @abstractmethod
+ 
     def start(self) -> None:
         """ Called when the test is started """
-        pass
+        raise NotImplementedError
 
-    @abstractmethod
     def stop(self) -> None:
         """ Called when the test must be stopped """
-        pass
+        raise NotImplementedError
 
-    @abstractmethod
     def is_success(self) -> bool:
         """ Called to know the test result """
-        pass
+        raise NotImplementedError
 
     def _send_message(self, message:str, level:MessageLevel):
         self.messages.append(Message(message, level))

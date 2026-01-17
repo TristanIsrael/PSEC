@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Components
+import PSEC
 
 GridLayout {
     id: lytResults

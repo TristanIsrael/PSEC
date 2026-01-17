@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Components
+import PSEC
 
 Item {
     width: implicitWidth
@@ -23,13 +24,19 @@ Item {
             delegate: ProgressListEntry {
                 implicitWidth: parent.width
 
-                label: display
-                progress: RoleProgress
+                label: model.label
+                progress: model.progress
+                success: model.success
+                isPackage: model.isPackage
             }
         }
     }
 
     Bindings {
         id: bindings
+    }
+
+    Component.onCompleted: {
+        console.debug(bindings, bindings.testsListModel)
     }
 }

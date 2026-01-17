@@ -1,8 +1,8 @@
 import QtQuick
-import Components
 import PSEC
+import Components
 
-Item {
+QtObject {
     id: root
 
     /* Bindings */
@@ -14,15 +14,15 @@ Item {
     property bool ambientLightSensorReady: false
     property int ambientLight: 0 // 0 (dark) - 100 (sunny)
     property int systemState: 0
-    property int nbTestsTotal: 857
-    property int nbTestsFailed: 123
-    property int nbTestsSucceeded: 543
-    property int nbCapacitiesTotal: 12
+    property int nbTestsTotal: AppController.nbTestsTotal
+    property int nbTestsFailed: 0
+    property int nbTestsSucceeded: 0
+    property int nbCapacitiesTotal: AppController.nbCapacitiesTotal
     property int nbCapacitiesFailed: 0
-    property int nbCapacitiesSucceeded: 11
+    property int nbCapacitiesSucceeded: 0
 
     /* Models */
-    property var testsListModel: modelTest
+    property var testsListModel: AppController.testsListModel
 
     /* System states */
     readonly property color systemStateColor: {
@@ -45,12 +45,9 @@ Item {
     /**
         For development only
     */
-    ListModel {
-        id: debugMessages
-    }
+    property var debugMessages: ListModel { }
 
-    ListModel {
-            id: modelTest
+    property var modelTest: ListModel {
             ListElement {
                 display: "Capacité 1"
                 RoleProgress: 20
@@ -68,6 +65,5 @@ Item {
                 RoleProgress: 96
             }
         }
-
 
 }

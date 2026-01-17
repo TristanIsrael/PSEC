@@ -8,6 +8,7 @@ Item {
     property int progress: 0 // 0-100
     property alias label: lbl.text
     property bool success: true
+    property bool isPackage: false
 
     width: implicitWidth
     height: implicitHeight
@@ -37,7 +38,7 @@ Item {
         horizontalAlignment: Qt.AlignLeft
         verticalAlignment: Qt.AlignVCenter
         fontSizeMode: Text.HorizontalFit
-        font.pixelSize: height
+        font.pixelSize: height * (root.isPackage ? 1 : 0.7)
         text: qsTr("Progress component")
         color: Environment.colorText
     }

@@ -12,7 +12,6 @@ Item {
     width: implicitWidth
     implicitWidth: icnPlugged.width + icnBattery.width + height*0.25
 
-
     Text {
         id: icnPlugged
         anchors {
