@@ -40,8 +40,8 @@ jobs:
           chmod 600 /home/builder/.abuild/psec.rsa
           chown -R builder:builder /home/builder/.abuild
           echo "PACKAGER_PRIVKEY=/home/builder/.abuild/psec.rsa" >> /etc/abuild.conf
-          echo "PACKAGER_NAME=Tristan Israël" >> /etc/abuild.conf
-          echo "PACKAGER_EMAIL=tristan.israel@alefbet.net" >> /etc/abuild.conf
+          echo "PACKAGER_NAME=\"Tristan Israël\" >> /etc/abuild.conf
+          echo "PACKAGER_EMAIL=\"tristan.israel@alefbet.net\"" >> /etc/abuild.conf
           echo "PACKAGER_SIGN=1" >> /etc/abuild.conf
 
       - name: Build APK
