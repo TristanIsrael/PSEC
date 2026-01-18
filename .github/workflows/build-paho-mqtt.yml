@@ -45,6 +45,7 @@ jobs:
           echo "PACKAGER_NAME=\"Tristan Israël\"" >> /etc/abuild.conf
           echo "PACKAGER_EMAIL=\"tristan.israel@alefbet.net\"" >> /etc/abuild.conf
           echo "PACKAGER_SIGN=1" >> /etc/abuild.conf
+          abuild -i -a
 
       - name: Copy abuild public key 
         run: |
