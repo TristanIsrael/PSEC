@@ -1,4 +1,4 @@
-name: Build paho mqtt library
+name: Build paho-mqtt library
 
 on:
   push:
