@@ -56,3 +56,9 @@ jobs:
         run: |
           sudo -u builder abuild checksum
           sudo -u builder abuild -r
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: py3-paho-mqtt
+          path: /home/builder/packages/*.apk
