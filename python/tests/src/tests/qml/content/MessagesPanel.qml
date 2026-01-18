@@ -1,5 +1,6 @@
 import QtQuick
 import Components
+import PSEC
 
 PanelBase {
     id: root
@@ -19,22 +20,31 @@ PanelBase {
 
             anchors {
                 fill: parent
-                margins: parent.height * 0.1
+                margins: parent.height * 0.05
             }
 
-            model: bindings.messages
+            model: bindings.messagesModel
 
             onCountChanged: {
                 const txt = itemAtIndex(count -1)
-                if(txt !== null && txt.y > height) {
-                    contentY = txt.y - height + txt.height
-                }
+                listView.positionViewAtIndex(count-1, ListView.Contain)
+                /*console.debug(txt.y, listView.height, txt.text, count)
+                if(txt !== null && txt.y > listView.height) {
+                    listView.contentY = txt.y - listView.height + txt.height
+                }*/
             }
 
             delegate: Text {
-                text: display
-                color: Environment.colorText
-                font.pixelSize: wrapper.height/(wrapper.lines+1)
+                text: datetime +" - " +label
+                font.pixelSize: 18
+                color: {
+                    switch(criticity) {
+                        case Enums.MessageLevel.Warning: return Environment.colorWarning
+                        case Enums.MessageLevel.Error: return Environment.colorError
+                        case Enums.MessageLevel.User: return Environment.colorUserMessage
+                        default: Environment.colorText
+                    }
+                }                
             }
 
             Behavior on contentY {

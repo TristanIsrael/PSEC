@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Effects
 import Components
+import PSEC
 
 Item {
     id: mainWindow
@@ -10,6 +11,7 @@ Item {
     property alias back: back
     property alias backFilter: backFilter
     property alias pnlMessages: pnlMessages
+    property alias btnStartStop: btnStartStop
 
     /* Private properties */
     implicitWidth: 1344
@@ -85,7 +87,7 @@ Item {
             id: pnlResults
 
             radius: 10
-            width: (parent.width - lytMain.spacing) / 2
+            width: (parent.width - lytMain.spacing) / 3
             height: results.implicitHeight + results.anchors.margins * 2
 
             PanelResults {
@@ -102,7 +104,7 @@ Item {
 
             radius: 10
             y: pnlResults.height + lytMain.spacing
-            width: (parent.width - lytMain.spacing) / 2
+            width: (parent.width - lytMain.spacing) / 3
             height: parent.height - pnlResults.height - lytMain.spacing
 
             TestsList {
@@ -113,14 +115,12 @@ Item {
             }
         }
 
-        Item {}
-
         MessagesPanel {
             id: pnlMessages
 
-            x: (parent.width + lytMain.spacing) / 2
+            x: (parent.width + lytMain.spacing) / 3 + 20
             height: parent.height
-            width: (parent.width - lytMain.spacing) / 2
+            width: (parent.width - lytMain.spacing) * 2/3 - 20
             radius: 10
         }
     }

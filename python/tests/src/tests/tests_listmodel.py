@@ -2,46 +2,47 @@ import pkgutil
 import importlib
 import inspect
 from pathlib import Path
-from PySide6.QtCore import QObject, QAbstractListModel, QModelIndex
-from enums import Roles
+from PySide6.QtCore import QObject, QAbstractListModel, QModelIndex, Signal
+from enums import Roles, MessageLevel
 
 class TestsListModel(QAbstractListModel):
 
     __cache = [] # List of dicts
 
+    addMessage = Signal(str, MessageLevel)
+
     def __init__(self, parent:QObject):
-        super().__init__(parent)
+        super().__init__(parent)        
 
-        self.__update_cache()
-
-    def __update_cache(self):
+    def update_cache(self):
         """ The cache contains all tests automatically discovered """
         app_root_path = Path(__file__).parent
         packages_path = app_root_path / "TestPackages"
-        print(f"Look for test packages into {packages_path}")
+        # print(f"Look for test packages into {packages_path}")
+
+        self.addMessage.emit(self.tr("Looking into test packages"), MessageLevel.Information)
 
         for _, package_name, _ in pkgutil.iter_modules([packages_path]):
-            print(f"Module {package_name} discovered")
+            # print(f"Module {package_name} discovered")
 
-            #package_path = packages_path / package_name
             package = importlib.import_module(f"TestPackages.{package_name}")
-            #package_tests:list = self.__cache.setdefault(package_name, [])
 
             if not any(d.get("name") == package_name for d in self.__cache):
+                self.addMessage.emit(self.tr(f"Found package {package_name}"), MessageLevel.Information)
+
                 self.__cache.append({
                     "name": package_name,
                     "success": False,
                     "is_test": False
                 })
 
-            for _, module_name, _ in pkgutil.walk_packages(package.__path__, package.__name__ + "."):
-                print(f"Test file {module_name} discovered")
-                
+            for _, module_name, _ in pkgutil.walk_packages(package.__path__, package.__name__ + "."):                                
                 module = importlib.import_module(module_name)
 
                 for _, cls in inspect.getmembers(module, inspect.isclass):
                     if cls.__module__ == module_name:
-                        print(f"Test class {module_name} discovered")
+                        self.addMessage.emit(self.tr(f"Found test {cls.name}"), MessageLevel.Information)
+                        # print(f"Test class {module_name} discovered")
 
                         self.__cache.append({
                             "name": cls.name,
@@ -51,7 +52,7 @@ class TestsListModel(QAbstractListModel):
                             "is_test": True
                         })
 
-        print(self.__cache)
+        self.addMessage.emit(self.tr("Test discovery finished\n"), MessageLevel.Information)
             
 
     def rowCount(self, parent=QModelIndex()):

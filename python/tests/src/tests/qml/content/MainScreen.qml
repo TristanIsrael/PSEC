@@ -1,5 +1,6 @@
 import QtQuick
 import Components
+import PSEC
 
 Item {
     id: root
@@ -17,6 +18,12 @@ Item {
         backFilter.colorizationColor: bindings.systemStateColor
 
         /* Slots */
+        Connections {
+            target: window.btnStartStop
+            function onClicked() {
+                AppController.start_stop();
+            }
+        }
     }
 
     Bindings {

@@ -6,7 +6,7 @@ QML_IMPORT_NAME = "PSEC"
 QML_IMPORT_MAJOR_VERSION = 1
 
 class MessageLevel(Enum):
-    Information, Warning, Error = range(3)
+    User, Information, Warning, Error = range(4)
 
 class Roles():    
     RoleProgress = Qt.UserRole +1    
@@ -14,6 +14,8 @@ class Roles():
     RoleSection = Qt.UserRole +3
     RoleLabel = Qt.UserRole +4
     RoleSuccess = Qt.UserRole +5
+    RoleCriticity = Qt.UserRole + 6
+    RoleDateTime = Qt.UserRole + 7
 
 @QmlElement
 class Enums(QObject):

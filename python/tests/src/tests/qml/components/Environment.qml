@@ -36,8 +36,12 @@ QtObject {
     readonly property color colorFilterInfected: "#ff0000"
 
     readonly property color colorSuccess: "#4CAF50"
-    readonly property color colorFailure: "#F44330"
+    readonly property color colorFailure: "#F44330"    
     readonly property color colorRunning: "#66656dfd"
+
+    readonly property color colorUserMessage: "#4CAF50"
+    readonly property color colorWarning: "#ffa500"
+    readonly property color colorError: "#F44330"
 
     readonly property color colorSelected: "#66656dfd"
 

@@ -23,6 +23,7 @@ QtObject {
 
     /* Models */
     property var testsListModel: AppController.testsListModel
+    property var messagesModel: AppController.messagesModel
 
     /* System states */
     readonly property color systemStateColor: {
