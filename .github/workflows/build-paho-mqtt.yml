@@ -61,4 +61,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: py3-paho-mqtt
-          path: /home/builder/packages/*.apk
+          path: /home/builder/packages/psec/{{ runner.arch }}/*.apk
