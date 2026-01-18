@@ -31,7 +31,7 @@ jobs:
 
       - name: Set ownership of repo
         run: |
-          chown -R builder:builder setup/packages/psec/psec-lib
+          chown -R builder:builder setup/packages/psec/py3-paho-mqtt2
 
       - name: Restore abuild private key
         run: |
