@@ -44,6 +44,10 @@ jobs:
           echo "PACKAGER_EMAIL=\"tristan.israel@alefbet.net\"" >> /etc/abuild.conf
           echo "PACKAGER_SIGN=1" >> /etc/abuild.conf
 
+      - name: Copy abuild public key 
+        run: |
+          cp certs/psec.rsa.pub /home/builder/.abuild
+
       - name: Build APK
         working-directory: setup/packages/psec/psec-lib
         run: |
