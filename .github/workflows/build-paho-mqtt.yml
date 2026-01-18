@@ -49,6 +49,7 @@ jobs:
       - name: Copy abuild public key 
         run: |
           cp certs/psec.rsa.pub /etc/apk/keys
+          cp certs/psec.rsa.pub /home/builder/.abuild
 
       - name: Build APK
         working-directory: setup/packages/psec/py3-paho-mqtt2
