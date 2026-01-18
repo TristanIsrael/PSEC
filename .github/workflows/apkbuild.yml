@@ -1,0 +1,44 @@
+name: Build PSEC library
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    container:
+      image: alpine:3.21
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Install build tools
+        run: |
+          apk update
+          apk add alpine-sdk build-base sudo git
+
+      - name: Create abuild user
+        run: |
+          adduser -D builder
+          addgroup builder abuild
+          echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+      - name: Restore abuild private key
+        run: |
+          mkdir -p /home/builder/.abuild
+          echo "${{ secrets.ABUILD_PRIVATE_KEY }}" | base64 -d \
+            > /home/builder/.abuild/psec.rsa
+          chmod 600 /home/builder/.abuild/psec.rsa
+          chown -R builder:builder /home/builder/.abuild
+
+      - name: Build APK
+        working-directory: setup/packages/psec/psec-lib
+        run: |
+          sudo -u builder abuild-keygen -a -n
+          sudo -u builder abuild checksum
+          sudo -u builder abuild -r
