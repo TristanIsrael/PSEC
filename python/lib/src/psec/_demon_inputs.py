@@ -1,97 +1,97 @@
-import sys, glob, threading, serial, time, struct, msgpack
-from typing import Optional
+import glob
+import threading
+import serial
+import time
+import struct
+import msgpack
 from evdev import InputDevice, ecodes, InputEvent
-from . import Logger, Mouse, MouseButton, MouseWheel, MouseMove, Parametres, Cles, SingletonMeta
-from . import MqttClient, Topics
-
-class TypeEntree:
-    INCONNU = 0
-    CLAVIER = 1
-    SOURIS = 2
-    TOUCH = 3
+from . import Logger, Mouse, Parametres, Cles, SingletonMeta, InputType
+from . import MqttClient
 
 INPUT_EVENT_FORMAT = "HHI"  # HH = type, code, I = value (unsigned int)
 INPUT_EVENT_SIZE = struct.calcsize(INPUT_EVENT_FORMAT)
 
-class DemonInputs(metaclass=SingletonMeta):
-    """! Cette classe surveille les entrées des souris et clavier et transfère les informations au travers du XenBus 
+class InputsDaemon(metaclass=SingletonMeta):
+    """! This class monitors mouse, touch and keyboard inputs and serialize filtered information thru the XenBus
     
-    Le canal de communication *inputs* est utilisé pour transmettre les informations sur les périphériques d'entrée.
-
-    Souris
+    *inputs* communication channel is used between sys-usb and the Dom0.
+    
+    Mouse
     ------
-    Les informations sur la souris sont transmises entièrement à chaque événement. Cela signifie que les informations 
-    envoyées au travers du canal sont une représentation de la situation de la souris (position x et y, état de
-    chaque bouton).
+    Information on mouse position and buttons are all transmitted each time an event occurs. It means that the 
+    information are sent as a data structure containing x and y position and the buttons state.    
     
     """    
 
-    mouse = Mouse()    
-    chemin_socket_xenbus = None
-    interface_xenbus_prete = False
-    socket_xenbus = None
-    monitored_inputs = []
-    mouse_max_x = 1
-    mouse_max_y = 1
-    last_x = 0
-    last_y = 0
-    can_run = True
-
+    __mouse = Mouse()
+    __xenbus_socket_path = None
+    __xenbus_iface_ready = False
+    __xenbus_socket = None
+    __monitored_inputs = []
+    __mouse_max_x = 1
+    __mouse_max_y = 1
+    __last_x = 0
+    __last_y = 0
+    __can_run = True
+    __mqtt_client = None
 
     def start(self, mqtt_client: MqttClient):
-        self.mqtt_client = mqtt_client                
-        #Logger().setup("Input daemon", mqtt_client)
-        Logger().info("Starting input daemon", "Input daemon")
-        self.can_run = True
+        """ @brief Starts the inputs daemon """
 
-        # On démarre la messagerie si elle ne l'est pas déjà
-        self.chemin_socket_xenbus = Parametres().parametre(Cles.CHEMIN_SOCKET_INPUT_DOMU)
-        if not self.__connecte_interface_xenbus():
+        self.__mqtt_client = mqtt_client
+        Logger().info("Starting input daemon", "Input daemon")
+        self.__can_run = True
+
+        # Start XenBus messaging
+        self.__xenbus_socket_path = Parametres().parametre(Cles.CHEMIN_SOCKET_INPUT_DOMU)
+        if not self.__connect_xenbus():
             return
 
-        # On connecte le listener pour la souris
-        threading.Thread(target=self.__recherche_souris).start()
-        threading.Thread(target=self.__recherche_tactile).start()
-        #threading.Thread(target=self.__recherche_claviers).start()
+        # Start inputs listeners
+        threading.Thread(target=self.__find_mouse).start()
+        threading.Thread(target=self.__find_touchscreen).start()
+        threading.Thread(target=self.__find_keyboard).start()
 
     def stop(self):
-        self.can_run = False
-        self.__deconnecte_interface_xenbus()
+        """ @brief Stops the inputs daemon """
 
-    def __recherche_souris(self):
+        self.__can_run = False
+        self.__disconnect_xenbus()
+
+    def __find_mouse(self):
         # This function is ran in a specific thread
         Logger().info("Looking for a mouse...", "Input daemon")
 
         while True:
             inputs = glob.glob("/dev/input/event*")
-            for input in inputs:
+            for input_ in inputs:
                 #Logger().debug("Fichier {}".format(input))
                 try:
-                    dev = InputDevice(input)
-                    type_input = self.__type_entree(dev)
-                    if type_input == TypeEntree.SOURIS and input not in self.monitored_inputs:
-                        threading.Thread(target= self.__surveille_souris, args=(dev,)).start()
-                        self.monitored_inputs.append(input)
+                    dev = InputDevice(input_)
+                    type_input = self.__input_type(dev)
+                    if type_input == InputType.MOUSE and input_ not in self.__monitored_inputs:
+                        threading.Thread(target= self.__monitor_mouse, args=(dev,)).start()
+                        self.__monitored_inputs.append(input_)
                 except Exception:
                     pass # Ignore all errors silently
             
             # Wait a little and start over
             time.sleep(0.5)
 
-    def __recherche_tactile(self):
+    def __find_touchscreen(self):
         Logger().info("Looking for a touchscreen...", "Input daemon")
 
-        while self.can_run:
+        while self.__can_run:
             inputs = glob.glob("/dev/input/event*")
 
-            for input in inputs:
+            for input_ in inputs:
                 #Logger().debug("Fichier {}".format(input))
                 
                 try:          
-                    dev = InputDevice(input)
-                    type_input = self.__type_entree(dev)
+                    dev = InputDevice(input_)
+                    type_input = self.__input_type(dev)
 
-                    if type_input == TypeEntree.TOUCH and input not in self.monitored_inputs:
+                    if type_input == InputType.TOUCH and input_ not in self.__monitored_inputs:
                         # On récupère les valeurs max x et y pour connaître la résolution
                         caps = dev.capabilities()
 
@@ -99,13 +99,13 @@ class DemonInputs(metaclass=SingletonMeta):
                         if not any(t[0] == ecodes.ABS_MT_POSITION_X for t in caps[ecodes.EV_ABS]):
                             continue
 
-                        self.mouse_max_x = caps[ecodes.EV_ABS][ecodes.ABS_X][1].max
-                        self.mouse_max_y = caps[ecodes.EV_ABS][ecodes.ABS_Y][1].max
+                        self.__mouse_max_x = caps[ecodes.EV_ABS][ecodes.ABS_X][1].max
+                        self.__mouse_max_y = caps[ecodes.EV_ABS][ecodes.ABS_Y][1].max
 
                         #print("max_x={}, max_y={}".format(self.mouse.max_x, self.mouse.max_y))
 
-                        threading.Thread(target= self.__surveille_tactile, args=(dev,)).start()
-                        self.monitored_inputs.append(input)
+                        threading.Thread(target= self.__monitor_touchscreen, args=(dev,)).start()
+                        self.__monitored_inputs.append(input_)
                 except:
                     pass # Ignore all errors silently
 
@@ -113,38 +113,33 @@ class DemonInputs(metaclass=SingletonMeta):
             time.sleep(0.5)
 
     def __serialize_event(self, type_input, event):
-        """Sérialise un événement pour transmission."""
-        #data = [event.type, event.code, event.value]
-        #payload = self.__packer.pack(data)
-        #payload = struct.pack(INPUT_EVENT_FORMAT, event.type, event.code, event.value)
+        """ Serializes an event as packed bytes in order to transmit. """        
         # event.type : unsigned 16bit
         # event.code : unsigned 16bit
         # event.value : signed 32bit
-        #payload = struct.pack('<BHHi', type_input, event.type, event.code, event.value)
-        #print("Event : Type={}, Code={}, Value={}".format(ecodes.EV[event.type], ecodes.bytype[event.type][event.code], event.value))
         payload = msgpack.packb([type_input, event.type, event.code, event.value])
         return payload +b'\n'
 
-    def __surveille_souris(self, input):
-        Logger().info("Monitor the mouse {}".format(input.name), "Input daemon")
+    def __monitor_mouse(self, mouse):
+        Logger().info(f"Monitor the mouse {mouse.name}", "Input daemon")
 
         try:
-            for event in input.read_loop():  
+            for event in mouse.read_loop():  
                 if event.type in [ecodes.EV_KEY, ecodes.EV_REL, ecodes.EV_ABS, ecodes.EV_SYN]:
-                    serialized = self.__serialize_event(TypeEntree.SOURIS, event)
-                    self.socket_xenbus.write(serialized)
+                    serialized = self.__serialize_event(InputType.MOUSE, event)
+                    self.__xenbus_socket.write(serialized)
                     #print(f"Sent: {serialized.strip()}")
 
-                if not self.can_run:
+                if not self.__can_run:
                     return
-        except:
-            Logger().debug("The mouse {} is not available anymore".format(input.name), "Input daemon")
-            self.monitored_inputs.remove(input.path)
+        except Exception:
+            Logger().debug(f"The mouse {mouse.name} is not available anymore", "Input daemon")
+            self.__monitored_inputs.remove(mouse.path)
 
-    def __surveille_tactile(self, input):
-        Logger().info("Monitor the touchscreen {}".format(input.name), "Input daemon")
+    def __monitor_touchscreen(self, touch):
+        Logger().info(f"Monitor the touchscreen {touch.name}", "Input daemon")
 
-        '''filtered_events = [
+        """ filtered_events = [
             ecodes.EV_KEY,
             ecodes.EV_MSC,
             ecodes.EV_ABS,
@@ -153,74 +148,85 @@ class DemonInputs(metaclass=SingletonMeta):
             ecodes.ABS_MT_POSITION_X,
             ecodes.ABS_MT_POSITION_Y,
             ecodes.ABS_MT_TRACKING_ID
-        ]'''
+        ] """
 
         try:
-            for event in input.read_loop():
-                #if event.type in filtered_events:
-                serialized = self.__serialize_event(TypeEntree.TOUCH, event)
-                self.socket_xenbus.write(serialized)
+            for event in touch.read_loop():
+                serialized = self.__serialize_event(InputType.TOUCH, event)
+                self.__xenbus_socket.write(serialized)
                 #print(f"Sent: {serialized.strip()}")
 
-                if not self.can_run:
+                if not self.__can_run:
                     return
-        except:
-            Logger().debug("The touchscreen {} is not available anymore".format(input.name), "Input daemon")
-            self.monitored_inputs.remove(input.path)
+        except Exception:
+            Logger().debug(f"The touchscreen {touch.name} is not available anymore", "Input daemon")
+            self.__monitored_inputs.remove(touch.path)
 
-    #def __recherche_claviers(self):
-    #    Logger().info("Recherche d'un clavier")
-    #    inputs = glob.glob("/dev/input/event*")
-    #    for input in inputs:
-    #        Logger().debug("Fichier {}".format(input))            
-    #        dev = InputDevice(input)
-    #        type_input = self.__type_entree(dev)
-    #        if type_input == TypeEntree.CLAVIER:
-    #            threading.Thread(target= self.__surveille_clavier, args=(dev,)).start()
+    def __find_keyboard(self):
+        # This function is ran in a specific thread
+        Logger().info("Looking for a keyboard...", "Input daemon")
+
+        while True:
+            inputs = glob.glob("/dev/input/event*")
+            for input_ in inputs:
+                #Logger().debug("Fichier {}".format(input))
+                try:
+                    dev = InputDevice(input_)
+                    type_input = self.__input_type(dev)
+                    if type_input == InputType.KEYBOARD and input_ not in self.__monitored_inputs:
+                        threading.Thread(target= self.__monitor_keyboard, args=(dev,)).start()
+                        self.__monitored_inputs.append(input_)
+                except Exception:
+                    pass # Ignore all errors silently
+            
+            # Wait a little and start over
+            time.sleep(0.5)
     
-    #def __surveille_clavier(self, input):
-    #    Logger().info("Surveille le clavier {}".format(input.name))
-    #
-    #    for event in input.read_loop():
-    #        if event.type == ecodes.EV_KEY and event.value == 0: # Key_UP
-    #            self.__on_keypress(event.code)
+    def __monitor_keyboard(self, keyboard):
+        Logger().info(f"Monitor the keyboard {keyboard.name}")
 
-    def __type_entree(self, entree : InputDevice):
-        caps = entree.capabilities()
+        for event in keyboard.read_loop():
+            if (event.type == ecodes.EV_KEY and event.code in [ ecodes.KEY_ESC, ecodes.KEY_1, ecodes.KEY_2, ecodes.KEY_3, ecodes.KEY_4, ecodes.KEY_5, ecodes.KEY_6, ecodes.KEY_7, ecodes.KEY_8, ecodes.KEY_9, ecodes.KEY_0, ecodes.KEY_MINUS, ecodes.KEY_EQUAL, ecodes.KEY_BACKSPACE, ecodes.KEY_TAB, ecodes.KEY_Q, ecodes.KEY_W, ecodes.KEY_E, ecodes.KEY_R, ecodes.KEY_T, ecodes.KEY_Y, ecodes.KEY_U, ecodes.KEY_I, ecodes.KEY_O, ecodes.KEY_P, ecodes.KEY_LEFTBRACE, ecodes.KEY_RIGHTBRACE, ecodes.KEY_ENTER, ecodes.KEY_LEFTCTRL, ecodes.KEY_A, ecodes.KEY_S, ecodes.KEY_D, ecodes.KEY_F, ecodes.KEY_G, ecodes.KEY_H, ecodes.KEY_J, ecodes.KEY_K, ecodes.KEY_L, ecodes.KEY_SEMICOLON, ecodes.KEY_APOSTROPHE, ecodes.KEY_GRAVE, ecodes.KEY_LEFTSHIFT, ecodes.KEY_BACKSLASH, ecodes.KEY_Z, ecodes.KEY_X, ecodes.KEY_C, ecodes.KEY_V, ecodes.KEY_B, ecodes.KEY_N, ecodes.KEY_M, ecodes.KEY_COMMA, ecodes.KEY_DOT, ecodes.KEY_SLASH, ecodes.KEY_RIGHTSHIFT, ecodes.KEY_KPASTERISK, ecodes.KEY_LEFTALT, ecodes.KEY_SPACE, ecodes.KEY_CAPSLOCK, ecodes.KEY_F1, ecodes.KEY_F2, ecodes.KEY_F3, ecodes.KEY_F4, ecodes.KEY_F5, ecodes.KEY_F6, ecodes.KEY_F7, ecodes.KEY_F8, ecodes.KEY_F9, ecodes.KEY_F10, ecodes.KEY_NUMLOCK, ecodes.KEY_SCROLLLOCK, ecodes.KEY_KP7, ecodes.KEY_KP8, ecodes.KEY_KP9, ecodes.KEY_KPMINUS, ecodes.KEY_KP4, ecodes.KEY_KP5, ecodes.KEY_KP6, ecodes.KEY_KPPLUS, ecodes.KEY_KP1, ecodes.KEY_KP2, ecodes.KEY_KP3, ecodes.KEY_KP0, ecodes.KEY_KPDOT, ecodes.KEY_ZENKAKUHANKAKU, ecodes.KEY_102ND, ecodes.KEY_F11, ecodes.KEY_F12, ecodes.KEY_RO, ecodes.KEY_KATAKANA, ecodes.KEY_HIRAGANA, ecodes.KEY_HENKAN, ecodes.KEY_KATAKANAHIRAGANA, ecodes.KEY_MUHENKAN, ecodes.KEY_KPJPCOMMA, ecodes.KEY_KPENTER, ecodes.KEY_RIGHTCTRL, ecodes.KEY_KPSLASH, ecodes.KEY_SYSRQ, ecodes.KEY_RIGHTALT, ecodes.KEY_HOME, ecodes.KEY_UP, ecodes.KEY_PAGEUP, ecodes.KEY_LEFT, ecodes.KEY_RIGHT, ecodes.KEY_END, ecodes.KEY_DOWN, ecodes.KEY_PAGEDOWN, ecodes.KEY_INSERT, ecodes.KEY_DELETE, ecodes.KEY_MUTE, ecodes.KEY_VOLUMEDOWN, ecodes.KEY_VOLUMEUP, ecodes.KEY_POWER, ecodes.KEY_KPEQUAL, ecodes.KEY_PAUSE, ecodes.KEY_KPCOMMA, ecodes.KEY_HANGUEL, ecodes.KEY_HANJA, ecodes.KEY_YEN, ecodes.KEY_LEFTMETA, ecodes.KEY_RIGHTMETA, ecodes.KEY_COMPOSE, ecodes.KEY_STOP, ecodes.KEY_AGAIN, ecodes.KEY_PROPS, ecodes.KEY_UNDO, ecodes.KEY_FRONT, ecodes.KEY_COPY, ecodes.KEY_OPEN, ecodes.KEY_PASTE, ecodes.KEY_FIND, ecodes.KEY_CUT, ecodes.KEY_HELP, ecodes.KEY_CALC, ecodes.KEY_SLEEP, ecodes.KEY_WWW, ecodes.KEY_SCREENLOCK, ecodes.KEY_BACK, ecodes.KEY_FORWARD, ecodes.KEY_EJECTCD, ecodes.KEY_NEXTSONG, ecodes.KEY_PLAYPAUSE, ecodes.KEY_PREVIOUSSONG, ecodes.KEY_STOPCD, ecodes.KEY_REFRESH, ecodes.KEY_EDIT, ecodes.KEY_SCROLLUP, ecodes.KEY_SCROLLDOWN, ecodes.KEY_KPLEFTPAREN, ecodes.KEY_KPRIGHTPAREN, ecodes.KEY_F13, ecodes.KEY_F14, ecodes.KEY_F15, ecodes.KEY_F16, ecodes.KEY_F17, ecodes.KEY_F18, ecodes.KEY_F19, ecodes.KEY_F20, ecodes.KEY_F21, ecodes.KEY_F22, ecodes.KEY_F23, ecodes.KEY_F24 ]
+                or (event.type == ecodes.EV_MSC and event.code == ecodes.MSC_SCAN)
+            ):
+                serialized = self.__serialize_event(InputType.KEYBOARD, event)
+                self.__xenbus_socket.write(serialized)
+                #print(f"Sent: {serialized.strip()}")
+
+            if not self.__can_run:
+                return
+
+    def __input_type(self, input_:InputDevice):
+        caps = input_.capabilities()
         keys = caps.get(ecodes.EV_KEY)
 
         if keys is None:
-            return TypeEntree.INCONNU
+            return InputType.UNKNOWN
         
         if ecodes.KEY_ESC in keys:
-            return TypeEntree.CLAVIER
+            return InputType.KEYBOARD
         elif ecodes.BTN_LEFT in keys:
-            return TypeEntree.SOURIS
+            return InputType.MOUSE
         elif ecodes.BTN_TOUCH in keys:
-            return TypeEntree.TOUCH
+            return InputType.TOUCH
     
-    def __connecte_interface_xenbus(self) -> bool:
+    def __connect_xenbus(self) -> bool:
         #Ouvre le flux avec la socket
-        Logger().debug("Open Xenbus I/O channel {}".format(self.chemin_socket_xenbus), "Input daemon")
+        Logger().debug(f"Open Xenbus I/O channel {self.__xenbus_socket_path}", "Input daemon")
 
         try:
-            self.socket_xenbus = serial.Serial(port= self.chemin_socket_xenbus)
-            self.interface_xenbus_prete = True            
+            self.__xenbus_socket = serial.Serial(port= self.__xenbus_socket_path)
+            self.__xenbus_iface_ready = True
             Logger().info("I/O channel is open", "Input daemon")
-            return True          
+            return True
         except serial.SerialException as e:
-            self.socket_xenbus = None            
-            Logger().error("Impossible to open the serial port {}".format(self.chemin_socket_xenbus), "Input daemon")
+            self.__xenbus_socket = None            
+            Logger().error(f"Impossible to open the serial port {self.__xenbus_socket_path}", "Input daemon")
             Logger().error(str(e), "Input daemon")
             return False
         
-    def __deconnecte_interface_xenbus(self):
-        if self.socket_xenbus is not None:
+    def __disconnect_xenbus(self):
+        if self.__xenbus_socket is not None:
             Logger().debug("Close Xenbus I/O socket", "Input daemon")
-            self.socket_xenbus.close()
+            self.__xenbus_socket.close()
         
-    '''def __envoie_evenement_souris(self, mouse: Optional[Mouse] = None):
-        data = mouse.serialize() if mouse is not None else self.mouse.serialize()
-        #Logger().debug(data)
-        self.socket_xenbus.write(data +b'\n')
-    '''

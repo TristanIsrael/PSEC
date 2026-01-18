@@ -32,10 +32,10 @@ class Cles:
     XEN_SOCKETS_PATH = "xen_sockets_path"
     STORAGE_PATH_DOMU = "storage_path_domu"
 
-class TypeEntree:
-    INCONNU = 0
-    CLAVIER = 1
-    SOURIS = 2
+class InputType:
+    UNKNOWN = 0
+    KEYBOARD = 1
+    MOUSE = 2
     TOUCH = 3
 
 class BoutonSouris:
