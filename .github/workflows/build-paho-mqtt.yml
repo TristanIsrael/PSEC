@@ -50,7 +50,7 @@ jobs:
           cp certs/psec.rsa.pub /home/builder/.abuild
 
       - name: Build APK
-        working-directory: setup/packages/psec/psec-lib
+        working-directory: setup/packages/psec/py3-paho-mqtt2
         run: |
           sudo -u builder abuild checksum
           sudo -u builder abuild -r
