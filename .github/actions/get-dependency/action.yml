@@ -16,21 +16,29 @@ runs:
         name: ${{ github.event.inputs.name }}
         run-id: ${{ github.event.workflow_run.id }}
 
+    - name: Add local repository if needed
+      shell: sh
+      run: |
+        LINE="/home/builder/packages/psec"
+        FILE="/etc/apk/repositories"
+        grep -qxF "$LINE" "$FILE" || echo "$LINE" >> "$FILE"
+        mkdir -p /home/builder/packages/psec/x86_64
+        apk update
+
     - name: Uncompress and copy packages 
       shell: sh
       env:
         FILENAME: ${{ inputs.name }}
       run: |
         cd $GITHUB_WORKSPACE/downloads
-        ls -lR
         if [ -d "$FILENAME" ]; then
           cd "$FILENAME"
-        fi
-        mkdir -p /home/builder/packages/psec/x86_64
-        cp *.apk /home/builder/packages/psec/x86_64
+        fi        
+        cp *.apk /home/builder/packages/psec/x86_64    
 
     - name: Rebuild and sign the APK index
       shell: sh
       run: |
         apk index -o /home/builder/packages/psec/x86_64/APKINDEX.tar.gz /home/builder/packages/psec/x86_64/*.apk
         abuild-sign /home/builder/packages/psec/x86_64/APKINDEX.tar.gz
+        apk update
