@@ -29,7 +29,7 @@ runs:
       run: |
         echo "Restore abuild private key"
         mkdir -p /home/builder/.abuild
-        echo "${{ env.abuild-key }}" | base64 -d \
+        echo "${{ inputs.abuild-key }}" | base64 -d \
           > /home/builder/.abuild/psec.rsa
         chmod 600 /home/builder/.abuild/psec.rsa
         chown -R builder:builder /home/builder/.abuild
