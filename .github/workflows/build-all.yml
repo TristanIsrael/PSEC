@@ -186,7 +186,7 @@ jobs:
           path: /home/builder/packages/psec/x86_64/*.apk
           
   build-psec-lib:
-    needs: [ prepare, py3-paho-mqtt2 ]
+    needs: [ prepare, build-py3-paho-mqtt2 ]
     if: needs.prepare.outputs.check-psec-lib == 'true'
     runs-on: ubuntu-latest
  
