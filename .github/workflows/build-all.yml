@@ -130,6 +130,8 @@ jobs:
  
       - name: Prepare build environment
         uses: ./.github/actions/prepare-build-env
+        with:
+          abuild-key: ${{ secrets.ABUILD_PRIVATE_KEY }}
  
       - name: Build APK
         working-directory: setup/packages/psec/py3-paho-mqtt2

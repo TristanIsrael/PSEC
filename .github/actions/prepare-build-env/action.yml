@@ -2,6 +2,11 @@ name: Prepare Alpine build environment
 
 runs:
   using: composite
+  inputs:
+    abuild-key:
+      description: Base64 encoded private key
+      required: true
+
   steps:
     - shell: sh
       run: |
@@ -23,9 +28,8 @@ runs:
       run: |
         echo "Restore abuild private key"
         mkdir -p /home/builder/.abuild
-        echo "${{ secrets.ABUILD_PRIVATE_KEY }}" | base64 -d \
+        echo "${{ inputs.abuild-key }}" | base64 -d \
           > /home/builder/.abuild/psec.rsa
-        cat /home/builder/.abuild/psec.rsa
         chmod 600 /home/builder/.abuild/psec.rsa
         chown -R builder:builder /home/builder/.abuild
         echo "PACKAGER_PRIVKEY=/home/builder/.abuild/psec.rsa" >> /etc/abuild.conf
