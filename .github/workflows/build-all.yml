@@ -142,7 +142,7 @@ jobs:
  
       - name: Prepare build environment
         uses: ./.github/actions/prepare-build-env
-        env:
+        with:
           abuild-key: ${{ secrets.ABUILD_PRIVATE_KEY }}
  
       - name: Build APK
