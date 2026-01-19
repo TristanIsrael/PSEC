@@ -202,12 +202,10 @@ jobs:
         with:
           abuild-key: ${{ secrets.ABUILD_PRIVATE_KEY }}
  
-      - name: Download py3-paho-mqtt2 dependecy
-        uses: actions/download-artifact@v4
+      - name: Get py3-paho-mqtt2 dependency
+        uses: ./.github/actions/get-dependency
         with:
           name: py3-paho-mqtt2
-          path: /home/builder/packages/psec/x86_64
-          run-id: ${{ github.event.workflow_run.id }}
  
       - name: Build APK
         working-directory: setup/packages/psec/psec-lib
@@ -218,5 +216,44 @@ jobs:
       - name: Upload packages
         uses: actions/upload-artifact@v4
         with:
+          name: psec-lib
+          path: /home/builder/packages/psec/x86_64/*.apk
+
+  build-psec-core:
+    needs: [ prepare, build-psec-lib ]
+    if: needs.prepare.outputs.check-psec-core == 'true'
+    runs-on: ubuntu-latest
+ 
+    container:
+      image: alpine:3.21
+ 
+    steps:      
+      - name: Checkout sources
+        uses: actions/checkout@v4
+ 
+      - name: Prepare build environment
+        uses: ./.github/actions/prepare-build-env
+        with:
+          abuild-key: ${{ secrets.ABUILD_PRIVATE_KEY }}
+ 
+      - name: Get py3-paho-mqtt2 dependency
+        uses: ./.github/actions/get-dependency
+        with:
           name: py3-paho-mqtt2
+
+      - name: Get psec-lib dependency
+        uses: ./.github/actions/get-dependency
+        with:
+          name: psec-lib      
+ 
+      - name: Build APK
+        working-directory: setup/packages/psec/psec-core
+        run: |
+          sudo -u builder abuild checksum
+          sudo -u builder abuild -r
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: psec-core
           path: /home/builder/packages/psec/x86_64/*.apk

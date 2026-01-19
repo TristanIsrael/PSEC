@@ -1,0 +1,22 @@
+name: Get dependency
+
+inputs:
+  name:
+    description: The name of the dependency
+    required: true
+
+runs:
+  using: composite  
+
+  steps:
+    - name: Download py3-paho-mqtt2 dependecy
+      uses: actions/download-artifact@v4
+      with:
+        name: ${{ github.event.inputs.name }}
+        path: /home/builder/packages/psec/x86_64
+        run-id: ${{ github.event.workflow_run.id }}
+
+    - name: Rebuild and sign the APK index
+      run: |
+        apk-index -o /home/builder/packages/psec/x86_64/APKINDEX.tar.gz /home/builder/packages/psec/x86_64/*.apk
+        abuild-sign /home/builder/packages/psec/x86_64/APKINDEX.tar.gz
