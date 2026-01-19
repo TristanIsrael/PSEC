@@ -42,3 +42,4 @@ runs:
         apk index -o /home/builder/packages/psec/x86_64/APKINDEX.tar.gz /home/builder/packages/psec/x86_64/*.apk
         abuild-sign /home/builder/packages/psec/x86_64/APKINDEX.tar.gz
         apk update
+        ls -lR /home/builder/packages/psec/x86_64/
