@@ -1,0 +1,97 @@
+name: Build PSEC
+ 
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "**"
+    paths:
+      - "setup/packages/psec/**"
+      - "python/**"
+ 
+jobs:
+  detect-changes:
+    name: Detect changed packages
+    runs-on: ubuntu-latest
+    outputs:
+      pkg-py3-paho-mqtt: ${{ steps.detect.outputs.py3-paho-mqtt2 }}
+      pkg-psec-alpine-iso: ${{ steps.detect.outputs.psec-alpine-iso }}
+      pkg-psec-alpine-virt: ${{ steps.detect.outputs.psec-alpine-virt }}
+      pkg-psec-container-debian: ${{ steps.detect.outputs.psec-container-debian }}
+      pkg-psec-core: ${{ steps.detect.outputs.psec-core }}
+      pkg-psec-demo: ${{ steps.detect.outputs.psec-demo }}
+      pkg-psec-demo-gui: ${{ steps.detect.outputs.psec-demo-gui }}
+      pkg-psec-diag: ${{ steps.detect.outputs.psec-diag }}
+      pkg-psec-gui-base: ${{ steps.detect.outputs.psec-gui-base }}
+      pkg-psec-lib: ${{ steps.detect.outputs.psec-lib }}
+      pkg-psec-sys-gui: ${{ steps.detect.outputs.psec-sys-gui }}
+      pkg-psec-sys-usb: ${{ steps.detect.outputs.psec-sys-usb }}
+      app-demo: ${{ steps.detect.outputs.app-demo }}
+      app-demo2: ${{ steps.detect.outputs.app-demo2 }}
+      app-diag: ${{ steps.detect.outputs.app-diag }}
+      app-lib: ${{ steps.detect.outputs.app-lib }}
+      app-tests: ${{ steps.detect.outputs.app-tests }}
+            
+    steps:
+      - uses: actions/checkout@v4
+      - name: Detect changed components
+        id: detect
+        run: |
+          echo "Detecting changes..."
+          declare -A paths=(
+            [pkg-py3-paho-mqtt]="setup/packages/psec/py3-paho-mqtt2/"
+            [pkg-psec-alpine-iso]="setup/packages/psec/py3-paho-mqtt2/"
+            [pkg-psec-alpine-virt]="setup/packages/psec/py3-paho-mqtt2/"
+            [pkg-psec-container-debian]="setup/packages/psec/py3-paho-mqtt2/"
+            [pkg-psec-core]="setup/packages/psec/psec-core/"
+            [pkg-psec-demo]="setup/packages/psec/psec-demo/"
+            [pkg-psec-demo-gui]="setup/packages/psec/psec-demo-gui/"
+            [pkg-psec-diag]="setup/packages/psec/psec-diag/"
+            [pkg-psec-gui-base]="setup/packages/psec/psec-gui-base/"
+            [pkg-psec-lib]="setup/packages/psec/psec-lib/"
+            [pkg-psec-sys-gui]="setup/packages/psec/psec-sys-gui/"
+            [pkg-psec-sys-usb]="setup/packages/psec/psec-sys-usb/"
+            [app-diag]="python/diag/"
+            [app-demo]="python/demo/"
+            [app-demo2]="python/demo2/"
+            [app-lib]="python/lib/"
+            [app-tests]="python/tests/"
+          )
+
+          for key in "${!paths[@]}"; do
+            if git diff --name-only ${{ github.event.before }} ${{ github.sha }} \
+              | grep "^${paths[$key]}"; then
+              echo "$key=true" >> $GITHUB_OUTPUT
+            else
+              echo "$key=false" >> $GITHUB_OUTPUT
+            fi
+          done
+
+  build-py3-paho-mqtt2:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.pkg-py3-paho-mqtt == 'true'
+    runs-on: ubuntu-latest
+ 
+    container:
+      image: alpine:3.21
+ 
+    steps:      
+      - name: Checkout sources
+        uses: actions/checkout@v4
+ 
+      - name: Prepare build environment
+        uses: ./.github/actions/prepare-build-env
+ 
+      - name: Download py3-paho-mqtt dependecy
+        uses: actions/download-artifact@v4
+        with:
+          name: py3-paho-mqtt
+          path: /home/builder/packages/psec/x86_64
+          run-id: ${{ github.event.workflow_run.id }}
+ 
+      - name: Build APK
+        working-directory: setup/packages/psec/py3-paho-mqtt2
+        run: |
+          sudo -u builder abuild checksum
+          sudo -u builder abuild -r
+          
