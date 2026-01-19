@@ -17,6 +17,7 @@ runs:
         run-id: ${{ github.event.workflow_run.id }}
 
     - name: Rebuild and sign the APK index
+      shell: sh
       run: |
         apk-index -o /home/builder/packages/psec/x86_64/APKINDEX.tar.gz /home/builder/packages/psec/x86_64/*.apk
         abuild-sign /home/builder/packages/psec/x86_64/APKINDEX.tar.gz
