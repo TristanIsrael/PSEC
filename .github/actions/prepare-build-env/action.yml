@@ -1,11 +1,12 @@
-name: Prepare Alpine build environment
-        run: |
-          apk update
-          apk add alpine-sdk build-base sudo git
+name: Prepare Alpine build environment  
 
 runs:
   using: composite
   steps:
+    - shell: sh
+      run: |
+        apk update
+        apk add alpine-sdk build-base sudo git
     - shell: sh
       run: |
         echo "Create abuild user"
