@@ -16,16 +16,6 @@ runs:
         name: ${{ github.event.inputs.name }}
         run-id: ${{ github.event.workflow_run.id }}
 
-    - name: Add local repository if needed
-      shell: sh
-      run: |
-        LINE="/home/builder/packages/psec"
-        FILE="/etc/apk/repositories"
-        grep "^$LINE\$" "$FILE" > /dev/null 2>&1 || echo "$LINE" >> "$FILE"
-        mkdir -p /home/builder/packages/psec/x86_64
-        cat /etc/apk/repositories
-        apk update
-
     - name: Uncompress and copy packages 
       shell: sh
       env:
@@ -35,12 +25,21 @@ runs:
         if [ -d "$FILENAME" ]; then
           cd "$FILENAME"
         fi        
+        mkdir -p /home/builder/packages/psec/x86_64
         cp *.apk /home/builder/packages/psec/x86_64
 
     - name: Rebuild and sign the APK index
       shell: sh
       run: |
+        LINE="/home/builder/packages/psec"
+        FILE="/etc/apk/repositories"
+        if grep -q "^$LINE\$" "$FILE"; then
+          echo "Local repository is already set"
+        else
+          echo "Adding local repository"
+          echo "$LINE" | sudo tee $FILE
+        fi
+        cat /etc/apk/repositories
         apk index -o /home/builder/packages/psec/x86_64/APKINDEX.tar.gz /home/builder/packages/psec/x86_64/*.apk
         abuild-sign /home/builder/packages/psec/x86_64/APKINDEX.tar.gz
-        apk update
-        ls -lR /home/builder/packages/psec/x86_64/
+        apk update        
