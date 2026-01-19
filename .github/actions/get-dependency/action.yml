@@ -20,7 +20,9 @@ runs:
       env:
         FILENAME: ${{ inputs.name }}
       run: |
+        ls
         cd $GITHUB_WORKSPACE
+        ls 
         if [ -f "$FILENAME.zip" ]; then
           unzip -o "$FILENAME.zip" -d /home/builder/packages/psec/x86_64
         else 
