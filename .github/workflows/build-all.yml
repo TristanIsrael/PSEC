@@ -140,16 +140,17 @@ jobs:
           PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-py3-paho-mqtt2 }}
           FORCE: ${{ github.event.inputs.force-py3-paho-mqtt2 }}
         run: |          
-          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true'; then 
+          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' ]]; then 
             echo "check-py3-paho-mqtt2=true" >> $GITHUB_OUTPUT
           else 
             echo "check-py3-paho-mqtt2=false" >> $GITHUB_OUTPUT
           fi
       - id: check-psec-lib
-        run: |
-          PKG_CHANGED="${{ needs.detect-changes.outputs.pkg-psec-lib }}"
-          FORCE="${{ github.event.inputs.force-psec-lib }}"
-          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true'; then 
+        env:
+          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-lib }}
+          FORCE: ${{ github.event.inputs.force-psec-lib }}
+        run: |          
+          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' ]]; then 
             echo "check-psec-lib=true" >> $GITHUB_OUTPUT
           else 
             echo "check-psec-lib=false" >> $GITHUB_OUTPUT
