@@ -13,8 +13,20 @@ runs:
       uses: actions/download-artifact@v4
       with:
         name: ${{ github.event.inputs.name }}
-        path: /home/builder/packages/psec/x86_64
+        path: $RUNNER_TEMP
         run-id: ${{ github.event.workflow_run.id }}
+
+    - name: Uncompress and copy packages 
+      shell: sh
+      var:
+        FILENAME: ${{ github.events.inputs.name }}
+      run: |
+        cd $RUNNER_TEMP
+        if [ -f "$FILENAME.zip" ]; then
+          unzip -o "$FILENAME.zip" -d /home/builder/packages/psec/x86_64
+        else 
+          cp *.apk /home/builder/packages/psec/x86_64
+        fi
 
     - name: Rebuild and sign the APK index
       shell: sh
