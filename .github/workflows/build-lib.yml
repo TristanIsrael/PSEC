@@ -59,7 +59,6 @@ jobs:
           name: py3-paho-mqtt
           path: /home/builder/packages/psec/x86_64
           run-id: ${{ github.event.workflow_run.id }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
  
       - name: Build APK
         working-directory: setup/packages/psec/psec-lib
