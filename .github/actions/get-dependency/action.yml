@@ -47,8 +47,3 @@ runs:
           echo "$LINE" | sudo tee -a $FILE
         fi
         apk update
-
-    - name: Install the package
-      shell: sh
-      run: |
-        apk add ${{ inputs.name }}
