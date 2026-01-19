@@ -157,8 +157,8 @@ jobs:
           fi
 
   build-py3-paho-mqtt2:
-    needs: detect-changes
-    if: needs.prepare.outputs.check-py3-paho-mqtt2 == 'true' || needs.prepare.outputs.check-psec-lib == 'true'
+    needs: prepare
+    if: needs.prepare.outputs.check-py3-paho-mqtt2 == 'true'
     runs-on: ubuntu-latest
  
     container:
@@ -186,7 +186,7 @@ jobs:
           path: /home/builder/packages/psec/x86_64/*.apk
           
   build-psec-lib:
-    needs: [ detect-changes, build-py3-paho-mqtt2 ]
+    needs: prepare
     if: needs.prepare.outputs.check-psec-lib == 'true'
     runs-on: ubuntu-latest
  
