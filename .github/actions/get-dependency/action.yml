@@ -12,6 +12,7 @@ runs:
     - name: Download py3-paho-mqtt2 dependecy
       uses: actions/download-artifact@v4
       with:
+        path: downloads
         name: ${{ github.event.inputs.name }}
         run-id: ${{ github.event.workflow_run.id }}
 
@@ -20,14 +21,12 @@ runs:
       env:
         FILENAME: ${{ inputs.name }}
       run: |
-        ls
-        cd $GITHUB_WORKSPACE
-        ls 
-        if [ -f "$FILENAME.zip" ]; then
-          unzip -o "$FILENAME.zip" -d /home/builder/packages/psec/x86_64
-        else 
-          cp *.apk /home/builder/packages/psec/x86_64
+        cd $GITHUB_WORKSPACE/downloads
+        ls -lR
+        if [ -d "$FILENAME" ]; then
+          cd "$FILENAME"          
         fi
+        cp *.apk /home/builder/packages/psec/x86_64
 
     - name: Rebuild and sign the APK index
       shell: sh
