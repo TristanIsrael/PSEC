@@ -1,6 +1,9 @@
 name: Build PSEC library
  
 on:
+  workflow_run:
+    workflows: [ "Build paho-mqtt library" ]
+    types: [ completed ]
   workflow_dispatch:
   push:
     branches:
@@ -55,6 +58,8 @@ jobs:
         with:
           name: py3-paho-mqtt
           path: /home/builder/packages/psec/x86_64
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
  
       - name: Build APK
         working-directory: setup/packages/psec/psec-lib
