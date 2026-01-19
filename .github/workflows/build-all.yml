@@ -158,7 +158,7 @@ jobs:
           path: /home/builder/packages/psec/x86_64/*.apk
           
   build-psec-lib:
-    needs: detect-changes
+    needs: [ detect-changes, build-py3-paho-mqtt ]
     if: needs.detect-changes.outputs.pkg-psec-lib == 'true' || github.event.inputs.force-psec-lib == 'true'
     runs-on: ubuntu-latest
  
