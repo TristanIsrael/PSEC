@@ -34,7 +34,7 @@ runs:
         apk index -d PSEC -o /home/builder/packages/psec/x86_64/APKINDEX.tar.gz /home/builder/packages/psec/x86_64/*.apk
         abuild-sign -k /home/builder/.abuild/psec.rsa -p /etc/apk/keys/psec.rsa.pub /home/builder/packages/psec/x86_64/APKINDEX.tar.gz            
 
-    - name: Update repository
+    - name: Update repository configuration
       shell: sh
       run: |
         LINE="/home/builder/packages/psec"
@@ -47,8 +47,7 @@ runs:
         fi
         apk update
 
-    - name: Upload index
-      uses: actions/upload-artifact@v4
-      with:
-        name: APKINDEX
-        path: /home/builder/packages/psec/x86_64/APKINDEX.tar.gz
+    - name: Install the package
+      shell: sh
+      run: |
+        apk add ${{ inputs.name }}

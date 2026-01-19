@@ -1,5 +1,4 @@
-# Contributor: Tristan Israël <tristan.israel@alefbet.net>
-# Maintainer: Fabian Affolter <tristan.israel@alefbet.net>
+# Maintainer: Tristan Israël <tristan.israel@alefbet.net>
 pkgname=py3-paho-mqtt2
 pkgver=2.1.0
 pkgrel=3
