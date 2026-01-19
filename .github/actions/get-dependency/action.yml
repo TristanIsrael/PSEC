@@ -21,8 +21,9 @@ runs:
       run: |
         LINE="/home/builder/packages/psec"
         FILE="/etc/apk/repositories"
-        grep -qxF "$LINE" "$FILE" || echo "$LINE" >> "$FILE"
+        grep "^$LINE\$" "$FILE" > /dev/null 2>&1 || echo "$LINE" >> "$FILE"
         mkdir -p /home/builder/packages/psec/x86_64
+        echo /etc/apk/repositories
         apk update
 
     - name: Uncompress and copy packages 
