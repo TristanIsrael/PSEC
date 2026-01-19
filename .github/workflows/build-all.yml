@@ -131,6 +131,33 @@ jobs:
       - name: Prepare build environment
         uses: ./.github/actions/prepare-build-env
  
+      - name: Build APK
+        working-directory: setup/packages/psec/py3-paho-mqtt2
+        run: |
+          sudo -u builder abuild checksum
+          sudo -u builder abuild -r   
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: py3-paho-mqtt2
+          path: /home/builder/packages/psec/x86_64/*.apk
+          
+  build-psec-lib:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.pkg-psec-lib == 'true' || github.event.inputs.force-psec-lib == 'true'
+    runs-on: ubuntu-latest
+ 
+    container:
+      image: alpine:3.21
+ 
+    steps:      
+      - name: Checkout sources
+        uses: actions/checkout@v4
+ 
+      - name: Prepare build environment
+        uses: ./.github/actions/prepare-build-env
+ 
       - name: Download py3-paho-mqtt dependecy
         uses: actions/download-artifact@v4
         with:
@@ -143,4 +170,9 @@ jobs:
         run: |
           sudo -u builder abuild checksum
           sudo -u builder abuild -r
-          
+
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: py3-paho-mqtt2
+          path: /home/builder/packages/psec/x86_64/*.apk
