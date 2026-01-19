@@ -24,8 +24,9 @@ runs:
         cd $GITHUB_WORKSPACE/downloads
         ls -lR
         if [ -d "$FILENAME" ]; then
-          cd "$FILENAME"          
+          cd "$FILENAME"
         fi
+        mkdir -p /home/builder/packages/psec/x86_64
         cp *.apk /home/builder/packages/psec/x86_64
 
     - name: Rebuild and sign the APK index
