@@ -31,8 +31,9 @@ runs:
     - name: Rebuild and sign the APK index
       shell: sh
       run: |        
-        apk index -d PSEC -o /home/builder/packages/psec/x86_64/APKINDEX.tar.gz /home/builder/packages/psec/x86_64/*.apk
-        abuild-sign -k /home/builder/.abuild/psec.rsa -p /etc/apk/keys/psec.rsa.pub /home/builder/packages/psec/x86_64/APKINDEX.tar.gz            
+        cd /home/builder/packages/psec/x86_64/
+        apk index -d PSEC -o APKINDEX.tar.gz *.apk
+        abuild-sign -k /home/builder/.abuild/psec.rsa -p /etc/apk/keys/psec.rsa.pub APKINDEX.tar.gz            
 
     - name: Update repository configuration
       shell: sh
