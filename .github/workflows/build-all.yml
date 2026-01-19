@@ -6,50 +6,62 @@ on:
       force-py3-paho-mqtt2:
         description: "Build py3-paho-mqtt2"
         required: false
+        type: 'boolean'
         default: 'false'
       force-psec-alpine-iso:
         description: "Build psec-alpine-iso"
         required: false
+        type: 'boolean'
         default: 'false'
       force-psec-alpine-virt:
         description: "Build psec-alpine-virt"
         required: false
+        type: 'boolean'
         default: 'false'
       force-psec-container-debian:
         description: "Build psec-container-debian"
         required: false
+        type: 'boolean'
         default: 'false'
       force-psec-core:
         description: "Build psec-core"
         required: false
+        type: 'boolean'
         default: 'false'
       force-psec-demo:
         description: "Build psec-demo"
         required: false
+        type: 'boolean'
         default: 'false'
       force-psec-demo-gui:
         description: "Build psec-demo-gui"
         required: false
+        type: 'boolean'
         default: 'false'
       force-psec-diag:
         description: "Build psec-diag"
         required: false
+        type: 'boolean'
         default: 'false'
       force-psec-gui-base:
         description: "Build psec-gui-base"
         required: false
+        type: 'boolean'
         default: 'false'
       force-psec-lib:
         description: "Build psec-lib"
         required: false
+        type: 'boolean'
         default: 'false'
       force-psec-sys-gui:
         description: "Build psec-sys-gui"
         required: false
+        type: 'boolean'
         default: 'false'
       force-psec-sys-usb:
         description: "Build psec-sys-usb"
         required: false
+        type: 'boolean'
         default: 'false'      
   push:
     branches:
@@ -159,6 +171,8 @@ jobs:
  
       - name: Prepare build environment
         uses: ./.github/actions/prepare-build-env
+        with:
+          abuild-key: ${{ secrets.ABUILD_PRIVATE_KEY }}
  
       - name: Download py3-paho-mqtt dependecy
         uses: actions/download-artifact@v4

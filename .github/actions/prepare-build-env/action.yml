@@ -1,11 +1,10 @@
 name: Prepare Alpine build environment  
 
-runs:
-  using: composite
-  inputs:
-    abuild-key:
-      description: Base64 encoded private key
-      required: true
+on:
+  workflow_call:
+    secrets:
+      abuild-key:
+        required: true
 
   steps:
     - shell: sh
