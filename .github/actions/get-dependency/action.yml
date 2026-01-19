@@ -48,27 +48,3 @@ runs:
         fi
 
         sudo apk update
-
-        # Vérification
-        echo "=== Contenu du dépôt ==="
-        ls -la /home/builder/packages/psec/x86_64/
-        echo "=== Recherche du paquet ==="
-        apk search -e ${{ inputs.name }} || echo "Paquet non trouvé !"
-
-    - name: Debug repository
-      shell: sh
-      run: |
-        echo "=== Structure du dépôt ==="
-        find /home/builder/packages/psec -type f
-        
-        echo "=== Contenu de l'index ==="
-        tar -tzf /home/builder/packages/psec/x86_64/APKINDEX.tar.gz
-        
-        echo "=== Paquets dans l'index ==="
-        tar -xzOf /home/builder/packages/psec/x86_64/APKINDEX.tar.gz APKINDEX | grep "^P:" | head -5
-        
-        echo "=== Repositories configurés ==="
-        cat /etc/apk/repositories
-        
-        echo "=== Cache APK ==="
-        sudo apk cache info

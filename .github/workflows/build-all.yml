@@ -209,11 +209,10 @@ jobs:
  
       - name: Build APK
         working-directory: setup/packages/psec/psec-lib
-        run: |
-          export ABUILD_REPO="/home/builder/packages/psec"
+        run: |          
           apk update
           sudo -u builder abuild checksum
-          sudo -u builder abuild -r
+          sudo -u builder abuild -r --repository /home/builder/packages/psec
 
       - name: Upload packages
         uses: actions/upload-artifact@v4
