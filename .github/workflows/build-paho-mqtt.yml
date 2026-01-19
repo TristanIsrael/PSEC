@@ -8,9 +8,6 @@ on:
     paths:
       - "setup/packages/psec/py3-paho-mqtt2"
 
-permissions:
-  contents: write
-
 jobs:
   build-apk:
     runs-on: ubuntu-latest
@@ -65,10 +62,3 @@ jobs:
         with:
           name: py3-paho-mqtt
           path: /home/builder/packages/psec/x86_64/*.apk
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: /home/builder/packages/psec/x86_64/*.apk
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
