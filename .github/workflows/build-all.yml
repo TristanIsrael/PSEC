@@ -73,6 +73,7 @@ on:
 jobs:
   prepare:
     runs-on: ubuntu-latest
+    needs: detect-changes
     outputs:
       check-py3-paho-mqtt2: ${{ steps.check-py3-paho-mqtt2 }}
       check-psec-lib: ${{ steps.check-psec-lib }}
