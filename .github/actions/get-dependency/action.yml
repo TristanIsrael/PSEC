@@ -19,7 +19,7 @@ runs:
     - name: Uncompress and copy packages 
       shell: sh
       env:
-        FILENAME: ${{ github.events.inputs.name }}
+        FILENAME: ${{ github.event.inputs.name }}
       run: |
         cd $RUNNER_TEMP
         if [ -f "$FILENAME.zip" ]; then
