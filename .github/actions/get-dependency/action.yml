@@ -37,7 +37,7 @@ runs:
           echo "Local repository is already set"
         else
           echo "Adding local repository"
-          echo "$LINE" | sudo tee $FILE
+          echo "$LINE" | sudo tee -a $FILE
         fi
         cat /etc/apk/repositories
         apk index -o /home/builder/packages/psec/x86_64/APKINDEX.tar.gz /home/builder/packages/psec/x86_64/*.apk
