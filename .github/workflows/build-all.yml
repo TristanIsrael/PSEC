@@ -210,7 +210,7 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
  
       - name: Build APK
-        working-directory: setup/packages/psec/py3-paho-mqtt2
+        working-directory: setup/packages/psec/psec-lib
         run: |
           sudo -u builder abuild checksum
           sudo -u builder abuild -r

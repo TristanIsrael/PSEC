@@ -1,0 +1,13 @@
+#!/bin/sh
+
+rc-service udev start
+rc-service udev-trigger start
+rc-service xenstored start
+rc-update add udev
+rc-update add udev-trigger
+rc-update add xenstored 
+
+rc-update add diag
+rc-service diag start
+
+exit 0
