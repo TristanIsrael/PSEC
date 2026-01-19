@@ -13,7 +13,6 @@ runs:
       uses: actions/download-artifact@v4
       with:
         name: ${{ github.event.inputs.name }}
-        path: $RUNNER_TEMP
         run-id: ${{ github.event.workflow_run.id }}
 
     - name: Uncompress and copy packages 
@@ -21,7 +20,7 @@ runs:
       env:
         FILENAME: ${{ inputs.name }}
       run: |
-        cd $RUNNER_TEMP
+        cd $GITHUB_WORKSPACE
         if [ -f "$FILENAME.zip" ]; then
           unzip -o "$FILENAME.zip" -d /home/builder/packages/psec/x86_64
         else 
