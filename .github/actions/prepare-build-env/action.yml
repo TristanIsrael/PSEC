@@ -1,10 +1,11 @@
 name: Prepare Alpine build environment  
 
-on:
-  workflow_call:
-    secrets:
-      abuild-key:
-        required: true
+runs:
+  using: composite
+  env:
+    abuild-key:
+      description: Base64 encoded private key
+      required: true
 
   steps:
     - shell: sh
@@ -27,7 +28,7 @@ on:
       run: |
         echo "Restore abuild private key"
         mkdir -p /home/builder/.abuild
-        echo "${{ inputs.abuild-key }}" | base64 -d \
+        echo "${{ env.abuild-key }}" | base64 -d \
           > /home/builder/.abuild/psec.rsa
         chmod 600 /home/builder/.abuild/psec.rsa
         chown -R builder:builder /home/builder/.abuild
