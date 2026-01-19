@@ -132,8 +132,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: detect-changes
     outputs:
-      check-py3-paho-mqtt2: ${{ steps.check-py3-paho-mqtt2 }}
-      check-psec-lib: ${{ steps.check-psec-lib }}
+      check-py3-paho-mqtt2: ${{ steps.check-py3-paho-mqtt2.outputs.do_build }}
+      check-psec-lib: ${{ steps.check-psec-lib.outputs.do_build }}
     steps:
       - id: check-py3-paho-mqtt2      
         env:
@@ -141,9 +141,9 @@ jobs:
           FORCE: ${{ github.event.inputs.force-py3-paho-mqtt2 }}
         run: |          
           if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' ]]; then 
-            echo "check-py3-paho-mqtt2=true" >> $GITHUB_OUTPUT
+            echo "do_build=true" >> $GITHUB_OUTPUT
           else 
-            echo "check-py3-paho-mqtt2=false" >> $GITHUB_OUTPUT
+            echo "do_build=false" >> $GITHUB_OUTPUT
           fi
       - id: check-psec-lib
         env:
@@ -151,9 +151,9 @@ jobs:
           FORCE: ${{ github.event.inputs.force-psec-lib }}
         run: |          
           if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' ]]; then 
-            echo "check-psec-lib=true" >> $GITHUB_OUTPUT
+            echo "do_build=true" >> $GITHUB_OUTPUT
           else 
-            echo "check-psec-lib=false" >> $GITHUB_OUTPUT
+            echo "do_build=false" >> $GITHUB_OUTPUT
           fi
 
   build-py3-paho-mqtt2:
