@@ -2,6 +2,55 @@ name: Build PSEC
  
 on:
   workflow_dispatch:
+    inputs:
+      force-py3-paho-mqtt2:
+        description: "Build py3-paho-mqtt2"
+        required: false
+        default: 'false'
+      force-psec-alpine-iso:
+        description: "Build psec-alpine-iso"
+        required: false
+        default: 'false'
+      force-psec-alpine-virt:
+        description: "Build psec-alpine-virt"
+        required: false
+        default: 'false'
+      force-psec-container-debian:
+        description: "Build psec-container-debian"
+        required: false
+        default: 'false'
+      force-psec-core:
+        description: "Build psec-core"
+        required: false
+        default: 'false'
+      force-psec-demo:
+        description: "Build psec-demo"
+        required: false
+        default: 'false'
+      force-psec-demo-gui:
+        description: "Build psec-demo-gui"
+        required: false
+        default: 'false'
+      force-psec-diag:
+        description: "Build psec-diag"
+        required: false
+        default: 'false'
+      force-psec-gui-base:
+        description: "Build psec-gui-base"
+        required: false
+        default: 'false'
+      force-psec-lib:
+        description: "Build psec-lib"
+        required: false
+        default: 'false'
+      force-psec-sys-gui:
+        description: "Build psec-sys-gui"
+        required: false
+        default: 'false'
+      force-psec-sys-usb:
+        description: "Build psec-sys-usb"
+        required: false
+        default: 'false'      
   push:
     branches:
       - "**"
@@ -14,7 +63,7 @@ jobs:
     name: Detect changed packages
     runs-on: ubuntu-latest
     outputs:
-      pkg-py3-paho-mqtt: ${{ steps.detect.outputs.py3-paho-mqtt2 }}
+      pkg-py3-paho-mqtt2: ${{ steps.detect.outputs.py3-paho-mqtt2 }}
       pkg-psec-alpine-iso: ${{ steps.detect.outputs.psec-alpine-iso }}
       pkg-psec-alpine-virt: ${{ steps.detect.outputs.psec-alpine-virt }}
       pkg-psec-container-debian: ${{ steps.detect.outputs.psec-container-debian }}
@@ -39,7 +88,7 @@ jobs:
         run: |
           echo "Detecting changes..."
           declare -A paths=(
-            [pkg-py3-paho-mqtt]="setup/packages/psec/py3-paho-mqtt2/"
+            [pkg-py3-paho-mqtt2]="setup/packages/psec/py3-paho-mqtt2/"
             [pkg-psec-alpine-iso]="setup/packages/psec/py3-paho-mqtt2/"
             [pkg-psec-alpine-virt]="setup/packages/psec/py3-paho-mqtt2/"
             [pkg-psec-container-debian]="setup/packages/psec/py3-paho-mqtt2/"
@@ -69,7 +118,7 @@ jobs:
 
   build-py3-paho-mqtt2:
     needs: detect-changes
-    if: needs.detect-changes.outputs.pkg-py3-paho-mqtt == 'true'
+    if: needs.detect-changes.outputs.pkg-py3-paho-mqtt2 == 'true' || github.event.inputs.force-py3-paho-mqtt2 == 'true'
     runs-on: ubuntu-latest
  
     container:
