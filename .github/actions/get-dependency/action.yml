@@ -46,3 +46,9 @@ runs:
           echo "$LINE" | sudo tee -a $FILE
         fi
         apk update
+
+    - name: Upload index
+      uses: actions/upload-artifact@v4
+      with:
+        name: APKINDEX
+        path: /home/builder/packages/psec/x86_64/APKINDEX.tar.gz

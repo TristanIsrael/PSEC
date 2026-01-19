@@ -211,7 +211,6 @@ jobs:
         working-directory: setup/packages/psec/psec-lib
         run: |
           apk update
-          ls -lR /home/builder/packages/psec/x86_64
           sudo -u builder abuild checksum
           sudo -u builder abuild -r
 
