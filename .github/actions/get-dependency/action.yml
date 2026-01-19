@@ -23,7 +23,7 @@ runs:
         FILE="/etc/apk/repositories"
         grep "^$LINE\$" "$FILE" > /dev/null 2>&1 || echo "$LINE" >> "$FILE"
         mkdir -p /home/builder/packages/psec/x86_64
-        echo /etc/apk/repositories
+        cat /etc/apk/repositories
         apk update
 
     - name: Uncompress and copy packages 
@@ -35,7 +35,7 @@ runs:
         if [ -d "$FILENAME" ]; then
           cd "$FILENAME"
         fi        
-        cp *.apk /home/builder/packages/psec/x86_64    
+        cp *.apk /home/builder/packages/psec/x86_64
 
     - name: Rebuild and sign the APK index
       shell: sh
