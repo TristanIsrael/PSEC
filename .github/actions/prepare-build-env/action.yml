@@ -17,7 +17,7 @@ runs:
     - shell: sh
       run: |
         echo "Set ownership of repo"
-        chown -R builder:builder setup/packages/psec/psec-lib
+        chown -R builder:builder .
 
     - shell: sh
       run: |
