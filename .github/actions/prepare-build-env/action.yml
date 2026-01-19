@@ -36,3 +36,4 @@ runs:
       run: |
         echo "Copy abuild public key"
         cp certs/psec.rsa.pub /home/builder/.abuild
+        cp certs/psec.rsa.pub /etc/apk/keys
