@@ -158,8 +158,8 @@ jobs:
           else 
             echo "do_build=false" >> $GITHUB_OUTPUT
           fi
-      - id: check-alpine-virt
-        name: check-alpine-virt
+      - id: check-psec-alpine-virt
+        name: check-psec-alpine-virt
         env:
           PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-alpine-virt }}
           FORCE: ${{ github.event.inputs.force-psec-alpine-virt }}
