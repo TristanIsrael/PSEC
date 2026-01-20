@@ -209,7 +209,8 @@ jobs:
  
       - name: Build APK
         working-directory: setup/packages/psec/psec-lib
-        run: |          
+        run: |
+          echo "REPODIR=$GITHUB_WORKSPACE" >> $GITHUB_ENV
           apk update
           sudo -u builder abuild checksum
           sudo -u builder abuild -r 
@@ -249,8 +250,7 @@ jobs:
  
       - name: Build APK
         working-directory: setup/packages/psec/psec-core        
-        run: |
-          echo "REPODIR=$GITHUB_WORKSPACE" >> $GITHUB_ENV          
+        run: |                    
           sudo -u builder abuild checksum
           sudo -u builder abuild -r
 
