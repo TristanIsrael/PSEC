@@ -14,6 +14,7 @@ runs:
   steps:
     - name: Build APK
       working-directory: ${{ github.event.inputs.working-dir }}
+      shell: sh
       run: |          
         apk update          
         sudo -u builder gitbranch="$GITHUB_REF_NAME" gitrepo="${{ github.event.repository.name }}" abuild checksum
