@@ -70,6 +70,9 @@ on:
       - "setup/packages/psec/**"
       - "python/**"
  
+env:
+  alpine-version: "3.21"
+
 jobs:  
   detect-changes:
     name: Detect changed packages
@@ -179,7 +182,7 @@ jobs:
     runs-on: ubuntu-latest
  
     container:
-      image: alpine:3.21
+      image: alpine:${{ env.alpine-version }}
  
     steps:      
       - name: Checkout sources
@@ -210,7 +213,7 @@ jobs:
     runs-on: ubuntu-latest
  
     container:
-      image: alpine:3.21
+      image: alpine:${{ env.alpine-version }}
  
     steps:      
       - name: Checkout sources
@@ -238,7 +241,7 @@ jobs:
     runs-on: ubuntu-latest
  
     container:
-      image: alpine:3.21
+      image: alpine:${{ env.alpine-version }}
  
     steps:      
       - name: Checkout sources
