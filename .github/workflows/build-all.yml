@@ -195,12 +195,6 @@ jobs:
         with:
           working-dir: setup/packages/psec/py3-paho-mqtt2
           artifact-name: py3-paho-mqtt2
-
-      - name: Upload packages
-        uses: actions/upload-artifact@v4
-        with:
-          name: py3-paho-mqtt2
-          path: /home/builder/packages/psec/x86_64/*.apk
           
   build-psec-lib:
     needs: [ prepare, build-py3-paho-mqtt2 ]
