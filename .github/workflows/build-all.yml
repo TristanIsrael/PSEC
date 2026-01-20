@@ -158,6 +158,17 @@ jobs:
           else 
             echo "do_build=false" >> $GITHUB_OUTPUT
           fi
+      - id: check-alpine-virt
+        name: check-alpine-virt
+        env:
+          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-alpine-virt }}
+          FORCE: ${{ github.event.inputs.force-psec-alpine-virt }}
+        run: |          
+          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' ]]; then 
+            echo "do_build=true" >> $GITHUB_OUTPUT
+          else 
+            echo "do_build=false" >> $GITHUB_OUTPUT
+          fi
       - id: check-psec-core
         name: check-psec-core
         env:
@@ -226,8 +237,33 @@ jobs:
           working-dir: setup/packages/psec/psec-lib
           artifact-name: psec-lib
 
+  build-alpine-virt:
+    needs: [ prepare ]
+    if: | 
+      needs.prepare.outputs.check-psec-alpine-virt == 'true' |
+      needs.prepare.outputs.check-psec-core == 'true'
+    runs-on: ubuntu-latest
+ 
+    container:
+      image: alpine:3.21
+ 
+    steps:      
+      - name: Checkout sources
+        uses: actions/checkout@v4
+ 
+      - name: Prepare build environment
+        uses: ./.github/actions/prepare-build-env
+        with:
+          abuild-key: ${{ secrets.ABUILD_PRIVATE_KEY }}
+ 
+      - name: Build APK
+        uses: ./.github/actions/build-apk
+        with:
+          working-dir: setup/packages/psec/psec-alpine-virt
+          artifact-name: psec-alpine-virt
+
   build-psec-core:
-    needs: [ prepare, build-psec-lib ]
+    needs: [ prepare, build-psec-lib, psec-alpine-virt ]
     if: needs.prepare.outputs.check-psec-core == 'true'
     runs-on: ubuntu-latest
  
