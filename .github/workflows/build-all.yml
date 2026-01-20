@@ -212,7 +212,7 @@ jobs:
         run: |          
           apk update
           sudo -u builder abuild checksum
-          sudo -u builder abuild -r --repository /home/builder/packages/psec
+          sudo -u builder abuild -r 
 
       - name: Upload packages
         uses: actions/upload-artifact@v4
