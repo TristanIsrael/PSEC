@@ -16,7 +16,6 @@ subpackages=""
 replaces=""
 options="!check"  # no tests provided
 source=""
-repodir="$REPODIR"
 
 PSEC_CONFDIR="$pkgdir/etc/psec"
 PSEC_ROOTDIR="$pkgdir/usr/lib/psec"
