@@ -191,10 +191,10 @@ jobs:
           abuild-key: ${{ secrets.ABUILD_PRIVATE_KEY }}
  
       - name: Build APK
-        working-dir: setup/packages/psec/py3-paho-mqtt2
-        run: |
-          sudo -u builder abuild checksum
-          sudo -u builder abuild -r   
+        uses: ./.github/actions/build-apk
+        with:
+          working-dir: setup/packages/psec/py3-paho-mqtt2
+          artifact-name: py3-paho-mqtt2
 
       - name: Upload packages
         uses: actions/upload-artifact@v4
