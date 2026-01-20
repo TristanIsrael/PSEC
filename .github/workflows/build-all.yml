@@ -191,7 +191,7 @@ jobs:
           abuild-key: ${{ secrets.ABUILD_PRIVATE_KEY }}
  
       - name: Build APK
-        working-directory: setup/packages/psec/py3-paho-mqtt2
+        working-dir: setup/packages/psec/py3-paho-mqtt2
         run: |
           sudo -u builder abuild checksum
           sudo -u builder abuild -r   
@@ -229,7 +229,7 @@ jobs:
       - name: Build APK
         uses: ./.github/actions/build-apk
         with:
-          working-directory: setup/packages/psec/psec-lib
+          working-dir: setup/packages/psec/psec-lib
           artifact-name: psec-lib
 
   build-psec-core:
@@ -257,5 +257,5 @@ jobs:
       - name: Build APK
         uses: ./.github/actions/build-apk
         with:
-          working-directory: setup/packages/psec/psec-core
+          working-dir: setup/packages/psec/psec-core
           artifact-name: psec-core
