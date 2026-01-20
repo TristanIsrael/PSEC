@@ -210,8 +210,7 @@ jobs:
       - name: Build APK
         working-directory: setup/packages/psec/psec-lib        
         run: |          
-          apk update
-          mkdir -p /home/builder/packages/psec/x86_64/
+          apk update          
           sudo -u builder gitbranch="$GITHUB_REF_NAME" gitrepo="${{ github.event.repository.name }}" abuild checksum
           sudo -u builder gitbranch="$GITHUB_REF_NAME" gitrepo="${{ github.event.repository.name }}" abuild -r 
 

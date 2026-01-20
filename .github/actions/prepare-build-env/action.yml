@@ -22,8 +22,10 @@ runs:
 
     - shell: sh
       run: |
-        echo "Set ownership of repo"
+        echo "Prepare directories"
         chown -R builder:builder .
+        mkdir -p /home/builder/packages/psec/x86_64
+        chown builder:builder /home/builder/packages/psec/x86_64
 
     - shell: sh
       run: |
