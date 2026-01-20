@@ -49,4 +49,4 @@ runs:
 
         cd /home/builder/packages/psec
         ln -s x86_64 noarch
-        sudo abuild-apk update
+        sudo apk update

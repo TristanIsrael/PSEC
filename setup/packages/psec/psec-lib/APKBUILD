@@ -26,13 +26,15 @@ PSEC_BINDIR="$PSEC_ROOTDIR/bin"
 
 prepare() {
     mkdir -p "$builddir"
-    echo "Uncompress source files"
-    unzip $pkgname.zip -d "$builddir"    
+    ls -lR
+    #echo "Uncompress source files"
+    #unzip $pkgname.zip -d "$builddir"    
 }
 
 build() {
-    cd "$builddir/PSEC/python/lib"
+    cd "$srcdir/python/lib"
     python3 -m build
+    ls -lR
 }
 
 package() {
