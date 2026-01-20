@@ -15,29 +15,29 @@ install=""
 subpackages=""
 replaces=""
 options="!check"  # no tests provided
-gitbranch="main"
-gitrepo="PSEC"
-source="
-$pkgname.zip::https://github.com/TristanIsrael/PSEC/archive/refs/heads/$gitbranch.zip
-"
+source=""
 
 PSEC_CONFDIR="$pkgdir/etc/psec"
 PSEC_ROOTDIR="$pkgdir/usr/lib/psec"
 PSEC_BINDIR="$PSEC_ROOTDIR/bin"
 
-prepare() {
-    mkdir -p "$builddir"
+prepare() {    
+    #mkdir -p "$builddir"
     ls -l
     #echo "Uncompress source files"
     #unzip $pkgname.zip -d "$builddir"    
 }
 
 build() {
-    cd "$srcdir/$gitrepo-$gitbranch/python/lib"
+    ls -lR 
+    cd "$srcdir/python/lib"
     python3 -m build
+    ls -l
 }
 
 package() {
-    cd "$srcdir/$gitrepo-$gitbranch/python/lib"
+    ls -lR
+    cd "$srcdir/python/lib/dist"
+    ls -l
     python3 -m installer --destdir=$pkgdir psec-*-py3-none-any.whl
 }
