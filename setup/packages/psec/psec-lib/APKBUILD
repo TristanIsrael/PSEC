@@ -16,6 +16,7 @@ subpackages=""
 replaces=""
 options="!check"  # no tests provided
 gitbranch="main"
+gitrepo="PSEC"
 source="
 $pkgname.zip::https://github.com/TristanIsrael/PSEC/archive/refs/heads/$gitbranch.zip
 "
@@ -34,8 +35,9 @@ prepare() {
 build() {
     echo "$srcdir"
     echo "$builddir"
-    ls "$srcdir"
-    cd "python/lib"
+    ls -l "$srcdir"
+    set
+    cd "$srcdir/$gitrepo-$gitbranch/python/lib"
     python3 -m build
     ls -l
 }
