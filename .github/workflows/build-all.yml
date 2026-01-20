@@ -210,8 +210,10 @@ jobs:
       - name: Build APK
         working-directory: setup/packages/psec/psec-lib
         env:
-          repodir: ${{ github.workspace }}
-        run: |          
+          REPODIR: ${{ github.workspace }}
+        run: |
+          export repodir=$REPODIR
+          set
           apk update
           sudo -u builder abuild checksum
           sudo -u builder abuild -r 
