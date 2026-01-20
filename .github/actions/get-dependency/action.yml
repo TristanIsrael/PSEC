@@ -47,4 +47,4 @@ runs:
           echo "$LINE" | sudo tee -a $FILE
         fi
 
-        sudo apk update
+        sudo abuild-apk update
