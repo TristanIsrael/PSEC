@@ -31,15 +31,15 @@ prepare() {
 }
 
 build() {
-    ls -lR 
-    cd "$gitrepo-$gitbranch/python/lib"
+    cd "src/$gitrepo-$gitbranch/python/lib"
     python3 -m build
     ls -l
 }
 
 package() {
-    ls -lR
-    cd "$gitrepo-$gitbranch/python/lib/dist"
+    ls -l src
+    ls -lR src/$gitrepo-$gitbranch
+    cd "src/$gitrepo-$gitbranch/python/lib/dist"
     ls -l
     python3 -m installer --destdir=$pkgdir psec-*-py3-none-any.whl
 }
