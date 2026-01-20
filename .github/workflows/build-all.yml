@@ -240,7 +240,7 @@ jobs:
   build-alpine-virt:
     needs: [ prepare ]
     if: | 
-      needs.prepare.outputs.check-psec-alpine-virt == 'true' |
+      needs.prepare.outputs.check-psec-alpine-virt == 'true' ||
       needs.prepare.outputs.check-psec-core == 'true'
     runs-on: ubuntu-latest
  
