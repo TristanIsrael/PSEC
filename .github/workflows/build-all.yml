@@ -208,15 +208,11 @@ jobs:
           name: py3-paho-mqtt2
  
       - name: Build APK
-        working-directory: setup/packages/psec/psec-lib
-        env:
-          REPODIR: ${{ github.workspace }}
-        run: |
-          export repodir=$REPODIR
-          set
+        working-directory: setup/packages/psec/psec-lib        
+        run: |          
           apk update
           sudo -u builder abuild checksum
-          sudo -u builder abuild -r 
+          sudo -u builder repodir=${{ github.workspace }} abuild -r 
 
       - name: Upload packages
         uses: actions/upload-artifact@v4
