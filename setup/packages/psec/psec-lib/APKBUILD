@@ -16,7 +16,7 @@ subpackages=""
 replaces=""
 options="!check"  # no tests provided
 source="
-$pkgname.zip::https://@github.com/TristanIsrael/PSEC/archive/refs/heads/$gitbranch.zip
+$pkgname.zip::https://github.com/TristanIsrael/PSEC/archive/refs/heads/$gitbranch.zip
 "
 
 PSEC_CONFDIR="$pkgdir/etc/psec"
