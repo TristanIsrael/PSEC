@@ -71,7 +71,7 @@ on:
       - "python/**"
  
 env:
-  alpine-version: "3.21"
+  alpine_version: "3.21"
 
 jobs:  
   detect-changes:
@@ -182,7 +182,7 @@ jobs:
     runs-on: ubuntu-latest
  
     container:
-      image: alpine:${{ env.alpine-version }}
+      image: alpine:${{ env.alpine_version }}
  
     steps:      
       - name: Checkout sources
@@ -213,7 +213,7 @@ jobs:
     runs-on: ubuntu-latest
  
     container:
-      image: alpine:${{ env.alpine-version }}
+      image: alpine:${{ env.alpine_version }}
  
     steps:      
       - name: Checkout sources
@@ -241,7 +241,7 @@ jobs:
     runs-on: ubuntu-latest
  
     container:
-      image: alpine:${{ env.alpine-version }}
+      image: alpine:${{ env.alpine_version }}
  
     steps:      
       - name: Checkout sources
