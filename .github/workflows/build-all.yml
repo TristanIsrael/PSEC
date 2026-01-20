@@ -155,10 +155,22 @@ jobs:
           else 
             echo "do_build=false" >> $GITHUB_OUTPUT
           fi
+      - id: check-psec-core
+        env:
+          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-core }}
+          FORCE: ${{ github.event.inputs.force-psec-core }}
+        run: |          
+          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' ]]; then 
+            echo "do_build=true" >> $GITHUB_OUTPUT
+          else 
+            echo "do_build=false" >> $GITHUB_OUTPUT
+          fi
 
   build-py3-paho-mqtt2:
     needs: [ prepare ]
-    if: needs.prepare.outputs.check-py3-paho-mqtt2 == 'true' || needs.prepare.outputs.check-psec-lib == 'true'
+    if: |
+      needs.prepare.outputs.check-py3-paho-mqtt2 == 'true' || 
+      needs.prepare.outputs.check-psec-lib == 'true'
     runs-on: ubuntu-latest
  
     container:
@@ -187,7 +199,9 @@ jobs:
           
   build-psec-lib:
     needs: [ prepare, build-py3-paho-mqtt2 ]
-    if: needs.prepare.outputs.check-psec-lib == 'true'
+    if: | 
+      needs.prepare.outputs.check-psec-lib == 'true' ||
+      needs.prepare.outputs.check-psec-core == 'true'
     runs-on: ubuntu-latest
  
     container:
