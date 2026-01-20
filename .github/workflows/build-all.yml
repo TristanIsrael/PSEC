@@ -134,8 +134,10 @@ jobs:
     outputs:
       check-py3-paho-mqtt2: ${{ steps.check-py3-paho-mqtt2.outputs.do_build }}
       check-psec-lib: ${{ steps.check-psec-lib.outputs.do_build }}
+      check-psec-core: ${{ steps.check-psec-core.outputs.do_build }}
     steps:
-      - id: check-py3-paho-mqtt2      
+      - id: check-py3-paho-mqtt2 
+        name: check-py3-paho-mqtt2 
         env:
           PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-py3-paho-mqtt2 }}
           FORCE: ${{ github.event.inputs.force-py3-paho-mqtt2 }}
@@ -146,6 +148,7 @@ jobs:
             echo "do_build=false" >> $GITHUB_OUTPUT
           fi
       - id: check-psec-lib
+        name: check-psec-lib
         env:
           PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-lib }}
           FORCE: ${{ github.event.inputs.force-psec-lib }}
@@ -156,6 +159,7 @@ jobs:
             echo "do_build=false" >> $GITHUB_OUTPUT
           fi
       - id: check-psec-core
+        name: check-psec-core
         env:
           PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-core }}
           FORCE: ${{ github.event.inputs.force-psec-core }}
