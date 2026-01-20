@@ -134,6 +134,7 @@ jobs:
     outputs:
       check-py3-paho-mqtt2: ${{ steps.check-py3-paho-mqtt2.outputs.do_build }}
       check-psec-lib: ${{ steps.check-psec-lib.outputs.do_build }}
+      check-psec-alpine-virt: ${{ steps.check-psec-alpine-virt.outputs.do_build }}
       check-psec-core: ${{ steps.check-psec-core.outputs.do_build }}
     steps:
       - id: check-py3-paho-mqtt2 
