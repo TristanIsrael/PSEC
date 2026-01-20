@@ -212,7 +212,7 @@ jobs:
         run: |          
           apk update
           sudo -u builder abuild checksum
-          sudo -u builder repodir=${{ github.workspace }} abuild -r 
+          sudo -u builder gitbranch="${{ github.ref_name }}" abuild -r 
 
       - name: Upload packages
         uses: actions/upload-artifact@v4
