@@ -16,6 +16,7 @@ subpackages=""
 replaces=""
 options="!check"  # no tests provided
 source=""
+repodir="$REPODIR"
 
 PSEC_CONFDIR="$pkgdir/etc/psec"
 PSEC_ROOTDIR="$pkgdir/usr/lib/psec"
@@ -30,6 +31,7 @@ prepare() {
 }
 
 build() {
+    set
     ls -lR 
     cd "$srcdir/python/lib"
     python3 -m build

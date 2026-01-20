@@ -248,8 +248,9 @@ jobs:
           name: psec-lib      
  
       - name: Build APK
-        working-directory: setup/packages/psec/psec-core
+        working-directory: setup/packages/psec/psec-core        
         run: |
+          echo "repodir=$GITHUB_WORKSPACE" >> $GITHUB_ENV
           sudo -u builder abuild checksum
           sudo -u builder abuild -r
 
