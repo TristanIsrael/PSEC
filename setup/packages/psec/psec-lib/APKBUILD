@@ -24,7 +24,7 @@ PSEC_ROOTDIR="$pkgdir/usr/lib/psec"
 PSEC_BINDIR="$PSEC_ROOTDIR/bin"
 
 prepare() {
-    default_prepare()
+    default_prepare
     #mkdir -p "$builddir"
     #echo "Uncompress source files"
     #unzip $pkgname.zip -d "$builddir"    
