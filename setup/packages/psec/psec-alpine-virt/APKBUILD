@@ -27,9 +27,8 @@ prepare() {
 
 build() {
     # First we build the kernel
-    #cd "$builddir/aports-v$pkgver.$pkgrel/main/linux-lts"
-    ls -l    
-    cd "$gitrepo-$gitbranch/aports-v$pkgver.$pkgrel/main/linux-lts"
+    #cd "$builddir/aports-v$pkgver.$pkgrel/main/linux-lts"    
+    cd "aports-v$pkgver.$pkgrel/main/linux-lts"
     
     # We remove the configs we don't want 
     sed -i '/[[:space:]]*lts\..*\.config/d' APKBUILD
@@ -64,7 +63,7 @@ CONFIG_USB_ACM=m
 
 package() {
     # Switch to virt for packaging
-    cd "$gitrepo-$gitbranch/aports/main/linux-lts"
+    cd "aports-v$pkgver.$pkgrel/main/linux-lts"
     sed -i 's/_flavor=lts/_flavor=virt/g' APKBUILD
     
     # Remove unnecessary subpackages
@@ -75,7 +74,8 @@ package() {
     #abuild index
 
     rm "$HOME"/iso/alpine-virt*.iso
-    cd "$gitrepo-$gitbranch/aports/scripts"
+    cd -
+    cd "aports-v$pkgver.$pkgrel/scripts"
     ./mkimage.sh --profile virt --repository "$HOME"/packages/main --repository https://dl-cdn.alpinelinux.org/alpine/v$pkgver/main --arch x86_64 --outdir "$HOME"/iso
 
     mkdir -p "$pkgdir/var/lib/xen/images"    
