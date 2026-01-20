@@ -70,7 +70,7 @@ on:
       - "setup/packages/psec/**"
       - "python/**"
  
-env:
+vars:
   alpine_version: "3.21"
 
 jobs:  
@@ -182,7 +182,7 @@ jobs:
     runs-on: ubuntu-latest
  
     container:
-      image: alpine:${{ env.alpine_version }}
+      image: alpine:${{ vars.alpine_version }}
  
     steps:      
       - name: Checkout sources
@@ -213,7 +213,7 @@ jobs:
     runs-on: ubuntu-latest
  
     container:
-      image: alpine:${{ env.alpine_version }}
+      image: alpine:${{ vars.alpine_version }}
  
     steps:      
       - name: Checkout sources
@@ -241,7 +241,7 @@ jobs:
     runs-on: ubuntu-latest
  
     container:
-      image: alpine:${{ env.alpine_version }}
+      image: alpine:${{ vars.alpine_version }}
  
     steps:      
       - name: Checkout sources
