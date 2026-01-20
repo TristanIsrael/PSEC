@@ -69,9 +69,6 @@ on:
     paths:
       - "setup/packages/psec/**"
       - "python/**"
- 
-vars:
-  alpine_version: "3.21"
 
 jobs:  
   detect-changes:
@@ -182,7 +179,7 @@ jobs:
     runs-on: ubuntu-latest
  
     container:
-      image: alpine:${{ vars.alpine_version }}
+      image: alpine:3.21
  
     steps:      
       - name: Checkout sources
@@ -213,7 +210,7 @@ jobs:
     runs-on: ubuntu-latest
  
     container:
-      image: alpine:${{ vars.alpine_version }}
+      image: alpine:3.21
  
     steps:      
       - name: Checkout sources
@@ -241,7 +238,7 @@ jobs:
     runs-on: ubuntu-latest
  
     container:
-      image: alpine:${{ vars.alpine_version }}
+      image: alpine:3.21
  
     steps:      
       - name: Checkout sources
