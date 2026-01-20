@@ -24,14 +24,13 @@ PSEC_ROOTDIR="$pkgdir/usr/lib/psec"
 PSEC_BINDIR="$PSEC_ROOTDIR/bin"
 
 prepare() {    
-    ls -lR
     #mkdir -p "$builddir"
     #echo "Uncompress source files"
     #unzip $pkgname.zip -d "$builddir"    
 }
 
 build() {
-    cd "src/$gitrepo-$gitbranch/python/lib"
+    cd "$gitrepo-$gitbranch/python/lib"
     python3 -m build
     ls -l
 }
