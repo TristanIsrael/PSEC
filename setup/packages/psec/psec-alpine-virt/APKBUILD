@@ -28,9 +28,7 @@ prepare() {
 build() {
     # First we build the kernel
     #cd "$builddir/aports-v$pkgver.$pkgrel/main/linux-lts"
-    echo "PWD=$PWD"
-    ls -l "$gitrepo-$gitbranch"
-    ls -l "$gitrepo-$gitbranch/aports*"
+    ls -l    
     cd "$gitrepo-$gitbranch/aports-v$pkgver.$pkgrel/main/linux-lts"
     
     # We remove the configs we don't want 
