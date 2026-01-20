@@ -211,7 +211,7 @@ jobs:
         working-directory: setup/packages/psec/psec-lib        
         run: |          
           apk update
-          sudo -u builder abuild checksum
+          sudo -u builder gitbranch="$GITHUB_REF_NAME" abuild checksum
           sudo -u builder gitbranch="$GITHUB_REF_NAME" abuild -r 
 
       - name: Upload packages
