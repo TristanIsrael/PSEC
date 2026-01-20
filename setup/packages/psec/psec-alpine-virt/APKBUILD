@@ -16,11 +16,10 @@ subpackages=""
 replaces=""
 options="!check"  # no tests provided
 source="https://gitlab.alpinelinux.org/alpine/aports/-/archive/v$pkgver.$pkgrel/aports-v$pkgver.$pkgrel.tar.bz2"
+homedir="/home/builder/"
 
 prepare() {
-    mkdir -p "$builddir"
-    echo "Uncompress Alpine source file"
-    tar xjf src/aports-v$pkgver.$pkgrel.tar.bz2 -C "$builddir"
+    default_prepare    
 #    git clone https://gitlab.alpinelinux.org/alpine/aports.git aports
 #    cd "$builddir"/aports
 #    git branch "v$pkgver.$pkgrel"
@@ -28,7 +27,8 @@ prepare() {
 
 build() {
     # First we build the kernel
-    cd "$builddir/aports-v$pkgver.$pkgrel/main/linux-lts"
+    #cd "$builddir/aports-v$pkgver.$pkgrel/main/linux-lts"
+    cd "$gitrepo-$gitbranch/aports-v$pkgver.$pkgrel/main/linux-lts"
     
     # We remove the configs we don't want 
     sed -i '/[[:space:]]*lts\..*\.config/d' APKBUILD
@@ -63,7 +63,7 @@ CONFIG_USB_ACM=m
 
 package() {
     # Switch to virt for packaging
-    cd "$builddir/aports/main/linux-lts"
+    cd "$gitrepo-$gitbranch/aports/main/linux-lts"
     sed -i 's/_flavor=lts/_flavor=virt/g' APKBUILD
     
     # Remove unnecessary subpackages
@@ -74,7 +74,7 @@ package() {
     #abuild index
 
     rm "$HOME"/iso/alpine-virt*.iso
-    cd "$builddir/aports/scripts"
+    cd "$gitrepo-$gitbranch/aports/scripts"
     ./mkimage.sh --profile virt --repository "$HOME"/packages/main --repository https://dl-cdn.alpinelinux.org/alpine/v$pkgver/main --arch x86_64 --outdir "$HOME"/iso
 
     mkdir -p "$pkgdir/var/lib/xen/images"    
