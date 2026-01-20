@@ -33,17 +33,11 @@ prepare() {
 }
 
 build() {
-    echo "$srcdir"
-    echo "$builddir"
-    ls -l "$srcdir"
-    set
     cd "$srcdir/$gitrepo-$gitbranch/python/lib"
     python3 -m build
-    ls -l
 }
 
 package() {
-    cd "$builddir/python/lib/dist"
+    cd "$srcdir/$gitrepo-$gitbranch/python/lib"
     python3 -m installer --destdir=$pkgdir psec-*-py3-none-any.whl
 }
-
