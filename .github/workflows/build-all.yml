@@ -310,6 +310,12 @@ jobs:
         with:
           working-dir: setup/packages/psec/py3-paho-mqtt2
           artifact-name: py3-paho-mqtt2
+
+      - name: Publish package
+        uses: ./.github/actions/publish
+        with:
+          privkey: ${{ secrets.DEPLOY_KEY }}
+          filepath: /home/builder/packages/psec/x86_64/
           
   build-psec-lib:
     needs: [ prepare, build-py3-paho-mqtt2 ]
@@ -343,6 +349,12 @@ jobs:
           working-dir: setup/packages/psec/psec-lib
           artifact-name: psec-lib
 
+      - name: Publish package
+        uses: ./.github/actions/publish
+        with:
+          privkey: ${{ secrets.DEPLOY_KEY }}
+          filepath: /home/builder/packages/psec/x86_64/
+
   build-alpine-virt:
     needs: [ prepare ]
     if: | 
@@ -369,6 +381,12 @@ jobs:
           working-dir: setup/packages/psec/psec-alpine-virt
           artifact-name: psec-alpine-virt
 
+      - name: Publish package
+        uses: ./.github/actions/publish
+        with:
+          privkey: ${{ secrets.DEPLOY_KEY }}
+          filepath: /home/builder/packages/psec/x86_64/
+
   build-alpine-iso:
     needs: [ prepare ]
     if: | 
@@ -393,6 +411,12 @@ jobs:
           working-dir: setup/packages/psec/psec-alpine-iso
           artifact-name: psec-alpine-iso
 
+      - name: Publish package
+        uses: ./.github/actions/publish
+        with:
+          privkey: ${{ secrets.DEPLOY_KEY }}
+          filepath: /home/builder/packages/psec/x86_64/
+
   build-container-debian:
     needs: [ prepare ]
     if: | 
@@ -416,6 +440,12 @@ jobs:
         with:
           working-dir: setup/packages/psec/psec-container-debian
           artifact-name: psec-alpine-iso
+
+      - name: Publish package
+        uses: ./.github/actions/publish
+        with:
+          privkey: ${{ secrets.DEPLOY_KEY }}
+          filepath: /home/builder/packages/psec/x86_64/
 
   build-psec-core:
     needs: [ prepare, build-psec-lib ]
@@ -445,6 +475,12 @@ jobs:
           working-dir: setup/packages/psec/psec-core
           artifact-name: psec-core
 
+      - name: Publish package
+        uses: ./.github/actions/publish
+        with:
+          privkey: ${{ secrets.DEPLOY_KEY }}
+          filepath: /home/builder/packages/psec/x86_64/
+
   build-psec-sys-gui:
     needs: [ prepare, build-psec-lib ]
     if: needs.prepare.outputs.check-psec-sys-gui == 'true'
@@ -472,6 +508,12 @@ jobs:
         with:
           working-dir: setup/packages/psec/psec-sys-gui
           artifact-name: psec-sys-gui
+
+      - name: Publish package
+        uses: ./.github/actions/publish
+        with:
+          privkey: ${{ secrets.DEPLOY_KEY }}
+          filepath: /home/builder/packages/psec/x86_64/
 
   build-psec-sys-usb:
     needs: [ prepare, build-psec-lib ]
@@ -501,6 +543,12 @@ jobs:
           working-dir: setup/packages/psec/psec-sys-usb
           artifact-name: psec-sys-usb
 
+      - name: Publish package
+        uses: ./.github/actions/publish
+        with:
+          privkey: ${{ secrets.DEPLOY_KEY }}
+          filepath: /home/builder/packages/psec/x86_64/
+
   build-psec-gui-base:
     needs: [ prepare, build-psec-lib ]
     if: needs.prepare.outputs.check-psec-gui-base == 'true'
@@ -523,6 +571,12 @@ jobs:
         with:
           working-dir: setup/packages/psec/psec-gui-base
           artifact-name: psec-gui-base
+
+      - name: Publish package
+        uses: ./.github/actions/publish
+        with:
+          privkey: ${{ secrets.DEPLOY_KEY }}
+          filepath: /home/builder/packages/psec/x86_64/
 
   build-app-tests:
     needs: [ prepare, build-psec-lib, build-psec-core, build-psec-sys-gui ]
@@ -562,6 +616,12 @@ jobs:
         with:
           working-dir: setup/packages/psec/psec-tests
           artifact-name: psec-tests
+
+      - name: Publish package
+        uses: ./.github/actions/publish
+        with:
+          privkey: ${{ secrets.DEPLOY_KEY }}
+          filepath: /home/builder/packages/psec/x86_64/
 
   build-app-diag:
     needs: [ prepare ]
@@ -630,3 +690,9 @@ jobs:
         with:
           working-dir: setup/packages/psec/psec-demo
           artifact-name: psec-demo
+
+      - name: Publish package
+        uses: ./.github/actions/publish
+        with:
+          privkey: ${{ secrets.DEPLOY_KEY }}
+          filepath: /home/builder/packages/psec/x86_64/
