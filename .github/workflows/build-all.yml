@@ -241,8 +241,7 @@ jobs:
   build-alpine-virt:
     needs: [ prepare ]
     if: | 
-      needs.prepare.outputs.check-psec-alpine-virt == 'true' ||
-      needs.prepare.outputs.check-psec-core == 'true'
+      needs.prepare.outputs.check-psec-alpine-virt == 'true'
     runs-on: ubuntu-latest
  
     container:
@@ -264,7 +263,7 @@ jobs:
           artifact-name: psec-alpine-virt
 
   build-psec-core:
-    needs: [ prepare, build-psec-lib, build-alpine-virt ]
+    needs: [ prepare, build-psec-lib ]
     if: needs.prepare.outputs.check-psec-core == 'true'
     runs-on: ubuntu-latest
  

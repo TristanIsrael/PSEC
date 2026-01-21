@@ -58,12 +58,15 @@ CONFIG_USB_ACM=m
 " >> virt.x86_64.config
 
     # Then we build the kernel with the only flavour virt and arch x86_64
-    abuild build    
+    #abuild build    
 }
 
 package() {
     # Switch to virt for packaging
-    cd "aports-v$pkgver.$pkgrel/main/linux-lts"
+    ls -l "$srcdir"
+    ls -l "$builddir"
+    ls -l "$pkgdir"
+    cd "$srcdir/aports-v$pkgver.$pkgrel/main/linux-lts"
     sed -i 's/_flavor=lts/_flavor=virt/g' APKBUILD
     
     # Remove unnecessary subpackages
