@@ -9,62 +9,62 @@ on:
         type: 'boolean'
         default: 'false'
       force-psec-alpine-iso:
-        description: "Build psec-alpine-iso"
+        description: "Build alpine-iso"
         required: false
         type: 'boolean'
         default: 'false'
       force-psec-alpine-virt:
-        description: "Build psec-alpine-virt"
+        description: "Build alpine-virt"
         required: false
         type: 'boolean'
         default: 'false'
       force-psec-container-debian:
-        description: "Build psec-container-debian"
+        description: "Build container-debian"
         required: false
         type: 'boolean'
         default: 'false'
       force-psec-core:
-        description: "Build psec-core"
+        description: "Build core"
         required: false
         type: 'boolean'
         default: 'false'
       force-psec-demo:
-        description: "Build psec-demo"
+        description: "Build demo"
         required: false
         type: 'boolean'
         default: 'false'
       force-psec-demo-gui:
-        description: "Build psec-demo-gui"
+        description: "Build demo-gui"
         required: false
         type: 'boolean'
         default: 'false'
       force-psec-diag:
-        description: "Build psec-diag"
+        description: "Build diag"
         required: false
         type: 'boolean'
         default: 'false'
       force-psec-tests:
-        description: "Build psec-tests"
+        description: "Build tests"
         required: false
         type: 'boolean'
         default: 'false'
       force-psec-gui-base:
-        description: "Build psec-gui-base"
+        description: "Build gui-base"
         required: false
         type: 'boolean'
         default: 'false'
       force-psec-lib:
-        description: "Build psec-lib"
+        description: "Build lib"
         required: false
         type: 'boolean'
         default: 'false'
       force-psec-sys-gui:
-        description: "Build psec-sys-gui"
+        description: "Build sys-gui"
         required: false
         type: 'boolean'
         default: 'false'
       force-psec-sys-usb:
-        description: "Build psec-sys-usb"
+        description: "Build sys-usb"
         required: false
         type: 'boolean'
         default: 'false'      
