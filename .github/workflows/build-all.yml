@@ -253,7 +253,7 @@ jobs:
         name: check-app-tests
         env:
           PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-app-tests }}
-          FORCE: ${{ github.event.inputs.force-app-tests }}
+          FORCE: ${{ github.event.inputs.force-psec-tests }}
         run: |          
           if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' ]]; then 
             echo "do_build=true" >> $GITHUB_OUTPUT
@@ -264,7 +264,7 @@ jobs:
         name: check-app-diag
         env:
           PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-app-diag }}
-          FORCE: ${{ github.event.inputs.force-app-diag }}
+          FORCE: ${{ github.event.inputs.force-psec-diag }}
         run: |          
           if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' ]]; then 
             echo "do_build=true" >> $GITHUB_OUTPUT
@@ -275,7 +275,7 @@ jobs:
         name: check-app-demo
         env:
           PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-app-demo }}
-          FORCE: ${{ github.event.inputs.force-app-demo }}
+          FORCE: ${{ github.event.inputs.force-psec-demo }}
         run: |          
           if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' ]]; then 
             echo "do_build=true" >> $GITHUB_OUTPUT
