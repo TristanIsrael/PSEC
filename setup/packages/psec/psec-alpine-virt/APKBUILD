@@ -19,15 +19,11 @@ source="https://gitlab.alpinelinux.org/alpine/aports/-/archive/v$pkgver.$pkgrel/
 homedir="/home/builder/"
 
 prepare() {
-    default_prepare    
-#    git clone https://gitlab.alpinelinux.org/alpine/aports.git aports
-#    cd "$builddir"/aports
-#    git branch "v$pkgver.$pkgrel"
+    default_prepare
 }
 
 build() {
     # First we build the kernel
-    #cd "$builddir/aports-v$pkgver.$pkgrel/main/linux-lts"    
     cd "aports-v$pkgver.$pkgrel/main/linux-lts"
     
     # We remove the configs we don't want 
@@ -73,7 +69,7 @@ package() {
     #abuild rootpkg
     #abuild index
 
-    rm "$HOME"/iso/alpine-virt*.iso
+    rm -f "$HOME"/iso/alpine-virt*.iso
     cd "$srcdir/aports-v$pkgver.$pkgrel/scripts"
     ./mkimage.sh --profile virt --repository "$HOME"/packages/main --repository https://dl-cdn.alpinelinux.org/alpine/v$pkgver/main --arch x86_64 --outdir "$HOME"/iso
 

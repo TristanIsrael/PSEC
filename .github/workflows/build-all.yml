@@ -43,6 +43,11 @@ on:
         required: false
         type: 'boolean'
         default: 'false'
+      force-psec-tests:
+        description: "Build psec-tests"
+        required: false
+        type: 'boolean'
+        default: 'false'
       force-psec-gui-base:
         description: "Build psec-gui-base"
         required: false
@@ -135,7 +140,13 @@ jobs:
       check-py3-paho-mqtt2: ${{ steps.check-py3-paho-mqtt2.outputs.do_build }}
       check-psec-lib: ${{ steps.check-psec-lib.outputs.do_build }}
       check-psec-alpine-virt: ${{ steps.check-psec-alpine-virt.outputs.do_build }}
+      check-psec-alpine-iso: ${{ steps.check-psec-alpine-iso.outputs.do_build }}
+      check-psec-container-debian: ${{ steps.check-psec-container-debian.outputs.do_build }}
       check-psec-core: ${{ steps.check-psec-core.outputs.do_build }}
+      check-psec-sys-gui: ${{ steps.check-psec-sys-gui.outputs.do_build }}
+      check-psec-sys-usb: ${{ steps.check-psec-sys-usb.outputs.do_build }}
+      check-psec-gui-base: ${{ steps.check-psec-gui-base.outputs.do_build }}
+      check-app-tests: ${{ steps.check-app-tests.outputs.do_build }}
     steps:
       - id: check-py3-paho-mqtt2 
         name: check-py3-paho-mqtt2 
@@ -170,11 +181,77 @@ jobs:
           else 
             echo "do_build=false" >> $GITHUB_OUTPUT
           fi
+      - id: check-psec-alpine-iso
+        name: check-psec-alpine-iso
+        env:
+          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-alpine-iso }}
+          FORCE: ${{ github.event.inputs.force-psec-alpine-iso }}
+        run: |          
+          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' ]]; then 
+            echo "do_build=true" >> $GITHUB_OUTPUT
+          else 
+            echo "do_build=false" >> $GITHUB_OUTPUT
+          fi
+      - id: check-psec-container-debian
+        name: check-psec-container-debian
+        env:
+          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-container-debian }}
+          FORCE: ${{ github.event.inputs.force-psec-container-debian }}
+        run: |          
+          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' ]]; then 
+            echo "do_build=true" >> $GITHUB_OUTPUT
+          else 
+            echo "do_build=false" >> $GITHUB_OUTPUT
+          fi
       - id: check-psec-core
         name: check-psec-core
         env:
           PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-core }}
           FORCE: ${{ github.event.inputs.force-psec-core }}
+        run: |          
+          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' ]]; then 
+            echo "do_build=true" >> $GITHUB_OUTPUT
+          else 
+            echo "do_build=false" >> $GITHUB_OUTPUT
+          fi
+      - id: check-psec-sys-gui
+        name: check-psec-sys-gui
+        env:
+          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-sys-gui }}
+          FORCE: ${{ github.event.inputs.force-psec-sys-gui }}
+        run: |          
+          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' ]]; then 
+            echo "do_build=true" >> $GITHUB_OUTPUT
+          else 
+            echo "do_build=false" >> $GITHUB_OUTPUT
+          fi
+      - id: check-psec-sys-usb
+        name: check-psec-sys-usb
+        env:
+          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-sys-usb }}
+          FORCE: ${{ github.event.inputs.force-psec-sys-usb }}
+        run: |          
+          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' ]]; then 
+            echo "do_build=true" >> $GITHUB_OUTPUT
+          else 
+            echo "do_build=false" >> $GITHUB_OUTPUT
+          fi
+      - id: check-psec-gui-base
+        name: check-psec-gui-base
+        env:
+          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-gui-base }}
+          FORCE: ${{ github.event.inputs.force-psec-gui-base }}
+        run: |          
+          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' ]]; then 
+            echo "do_build=true" >> $GITHUB_OUTPUT
+          else 
+            echo "do_build=false" >> $GITHUB_OUTPUT
+          fi
+      - id: check-app-tests
+        name: check-app-tests
+        env:
+          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-app-tests }}
+          FORCE: ${{ github.event.inputs.force-app-tests }}
         run: |          
           if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' ]]; then 
             echo "do_build=true" >> $GITHUB_OUTPUT
@@ -187,7 +264,9 @@ jobs:
     if: |
       needs.prepare.outputs.check-py3-paho-mqtt2 == 'true' || 
       needs.prepare.outputs.check-psec-lib == 'true' ||
-      needs.prepare.outputs.check-psec-core == 'true'
+      needs.prepare.outputs.check-psec-core == 'true' ||
+      needs.prepare.outputs.check-psec-sys-gui == 'true' ||
+      needs.prepare.outputs.check-psec-sys-usb == 'true'
     runs-on: ubuntu-latest
  
     container:
@@ -212,7 +291,9 @@ jobs:
     needs: [ prepare, build-py3-paho-mqtt2 ]
     if: | 
       needs.prepare.outputs.check-psec-lib == 'true' ||
-      needs.prepare.outputs.check-psec-core == 'true'      
+      needs.prepare.outputs.check-psec-core == 'true' ||
+      needs.prepare.outputs.check-psec-sys-gui == 'true' ||
+      needs.prepare.outputs.check-psec-sys-usb == 'true'
     runs-on: ubuntu-latest
  
     container:
@@ -241,7 +322,9 @@ jobs:
   build-alpine-virt:
     needs: [ prepare ]
     if: | 
-      needs.prepare.outputs.check-psec-alpine-virt == 'true'
+      needs.prepare.outputs.check-psec-alpine-virt == 'true' ||
+      needs.prepare.outputs.check-psec-sys-gui == 'true' ||
+      needs.prepare.outputs.check-psec-sys-usb == 'true'
     runs-on: ubuntu-latest
  
     container:
@@ -261,6 +344,54 @@ jobs:
         with:
           working-dir: setup/packages/psec/psec-alpine-virt
           artifact-name: psec-alpine-virt
+
+  build-alpine-iso:
+    needs: [ prepare ]
+    if: | 
+      needs.prepare.outputs.check-psec-alpine-iso == 'true'
+    runs-on: ubuntu-latest
+ 
+    container:
+      image: alpine:3.21
+ 
+    steps:      
+      - name: Checkout sources
+        uses: actions/checkout@v4
+ 
+      - name: Prepare build environment
+        uses: ./.github/actions/prepare-build-env
+        with:
+          abuild-key: ${{ secrets.ABUILD_PRIVATE_KEY }}
+ 
+      - name: Build APK
+        uses: ./.github/actions/build-apk
+        with:
+          working-dir: setup/packages/psec/psec-alpine-iso
+          artifact-name: psec-alpine-iso
+
+  build-container-debian:
+    needs: [ prepare ]
+    if: | 
+      needs.prepare.outputs.check-psec-container-debian == 'true'
+    runs-on: ubuntu-latest
+ 
+    container:
+      image: alpine:3.21
+ 
+    steps:      
+      - name: Checkout sources
+        uses: actions/checkout@v4
+ 
+      - name: Prepare build environment
+        uses: ./.github/actions/prepare-build-env
+        with:
+          abuild-key: ${{ secrets.ABUILD_PRIVATE_KEY }}
+ 
+      - name: Build APK
+        uses: ./.github/actions/build-apk
+        with:
+          working-dir: setup/packages/psec/psec-container-debian
+          artifact-name: psec-alpine-iso
 
   build-psec-core:
     needs: [ prepare, build-psec-lib ]
@@ -289,3 +420,122 @@ jobs:
         with:
           working-dir: setup/packages/psec/psec-core
           artifact-name: psec-core
+
+  build-psec-sys-gui:
+    needs: [ prepare, build-psec-lib ]
+    if: needs.prepare.outputs.check-psec-sys-gui == 'true'
+    runs-on: ubuntu-latest
+ 
+    container:
+      image: alpine:3.21
+ 
+    steps:      
+      - name: Checkout sources
+        uses: actions/checkout@v4
+ 
+      - name: Prepare build environment
+        uses: ./.github/actions/prepare-build-env
+        with:
+          abuild-key: ${{ secrets.ABUILD_PRIVATE_KEY }}
+ 
+      - name: Get psec-lib dependency
+        uses: ./.github/actions/get-dependency
+        with:
+          name: psec-lib         
+ 
+      - name: Build APK
+        uses: ./.github/actions/build-apk
+        with:
+          working-dir: setup/packages/psec/psec-sys-gui
+          artifact-name: psec-sys-gui
+
+  build-psec-sys-usb:
+    needs: [ prepare, build-psec-lib ]
+    if: needs.prepare.outputs.check-psec-sys-usb == 'true'
+    runs-on: ubuntu-latest
+ 
+    container:
+      image: alpine:3.21
+ 
+    steps:      
+      - name: Checkout sources
+        uses: actions/checkout@v4
+ 
+      - name: Prepare build environment
+        uses: ./.github/actions/prepare-build-env
+        with:
+          abuild-key: ${{ secrets.ABUILD_PRIVATE_KEY }}
+ 
+      - name: Get psec-lib dependency
+        uses: ./.github/actions/get-dependency
+        with:
+          name: psec-lib         
+ 
+      - name: Build APK
+        uses: ./.github/actions/build-apk
+        with:
+          working-dir: setup/packages/psec/psec-sys-usb
+          artifact-name: psec-sys-usb
+
+  build-psec-gui-base:
+    needs: [ prepare, build-psec-lib ]
+    if: needs.prepare.outputs.check-psec-gui-base == 'true'
+    runs-on: ubuntu-latest
+ 
+    container:
+      image: alpine:3.21
+ 
+    steps:      
+      - name: Checkout sources
+        uses: actions/checkout@v4
+ 
+      - name: Prepare build environment
+        uses: ./.github/actions/prepare-build-env
+        with:
+          abuild-key: ${{ secrets.ABUILD_PRIVATE_KEY }}     
+ 
+      - name: Build APK
+        uses: ./.github/actions/build-apk
+        with:
+          working-dir: setup/packages/psec/psec-gui-base
+          artifact-name: psec-gui-base
+
+  build-app-tests:
+    needs: [ prepare, build-psec-lib, build-psec-core, build-psec-sys-gui ]
+    if: needs.prepare.outputs.check-app-tests == 'true'
+    runs-on: ubuntu-latest
+ 
+    container:
+      image: alpine:3.21
+ 
+    steps:      
+      - name: Checkout sources
+        uses: actions/checkout@v4
+ 
+      - name: Prepare build environment
+        uses: ./.github/actions/prepare-build-env
+        with:
+          abuild-key: ${{ secrets.ABUILD_PRIVATE_KEY }}     
+ 
+      - name: Get psec-lib dependency
+        uses: ./.github/actions/get-dependency
+        with:
+          name: psec-lib
+
+      - name: Get psec-core dependency
+        uses: ./.github/actions/get-dependency
+        with:
+          name: psec-core
+
+      - name: Build APK
+        uses: ./.github/actions/build-apk
+        with:
+          working-dir: setup/packages/psec/psec-tests-gui
+          artifact-name: psec-tests-gui
+
+      - name: Build APK
+        uses: ./.github/actions/build-apk
+        with:
+          working-dir: setup/packages/psec/psec-tests
+          artifact-name: psec-tests
+      
