@@ -16,7 +16,7 @@ runs:
       shell: sh
       run: |
         apk update
-        apk add rsync openssh-client-common
+        apk add rsync openssh-client-common openssh-client
 
     - name: Restore SSH key
       shell: sh
