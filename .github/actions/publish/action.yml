@@ -29,7 +29,7 @@ runs:
     - name: Add server to known_hosts
       shell: sh
       run: |
-        ssh-keyscan -H alefbet.net >> ~/.ssh/known_hosts
+        ssh-keyscan -4 -p 222 alefbet.net >> ~/.ssh/known_hosts
 
     - name: Copy files to server
       shell: sh
