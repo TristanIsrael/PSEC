@@ -17,7 +17,7 @@ replaces=""
 options="!check"  # no tests provided
 gitbranch="main"
 source="
-$pkgname.zip::https://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@github.com/TristanIsrael/PSEC/archive/refs/heads/$gitbranch.zip
+$pkgname.zip::https://github.com/TristanIsrael/PSEC/archive/refs/heads/$gitbranch.zip
 diag.initd
 "
 
