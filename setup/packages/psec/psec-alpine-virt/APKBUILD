@@ -64,7 +64,9 @@ CONFIG_USB_ACM=m
 package() {
     # Switch to virt for packaging
     ls -l "$srcdir"
-    ls -l "$builddir"
+    ls -l "$srcdir/aports-v$pkgver.$pkgrel"
+    ls -l "$srcdir/aports-v$pkgver.$pkgrel/main/"
+    ls -l "$srcdir/aports-v$pkgver.$pkgrel/main/linux-lts"
     ls -l "$pkgdir"
     cd "$srcdir/aports-v$pkgver.$pkgrel/main/linux-lts"
     sed -i 's/_flavor=lts/_flavor=virt/g' APKBUILD
