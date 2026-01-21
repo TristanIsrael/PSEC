@@ -13,15 +13,18 @@ runs:
 
   steps:    
     - name: Restore SSH key
+      shell: sh
       run: |
         mkdir -p ~/.ssh
         echo "${{ secrets.DEPLOY_KEY }}" | base64 -d > ~/.ssh/id_ed25519
         chmod 600 ~/.ssh/id_ed25519
 
     - name: Add server to known_hosts
+      shell: sh
       run: |
-        ssh-keyscan -H www.alefbet.net >> ~/.ssh/known_hosts
+        ssh-keyscan -H alefbet.net >> ~/.ssh/known_hosts
 
     - name: Copy files to server
+      shell: sh
       run: |
         rsync -avz ${{ inputs.filepath }} github-psec@alefbet.net:/var/www/github/psec
