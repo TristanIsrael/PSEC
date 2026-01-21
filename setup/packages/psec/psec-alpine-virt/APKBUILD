@@ -67,7 +67,7 @@ package() {
     sed -i 's/_flavor=lts/_flavor=virt/g' APKBUILD
     
     # Remove unnecessary subpackages
-    sed -i "/^subpackages=\"${pkgname}-dev\"/d"
+    sed -i "/^subpackages=\"${pkgname}-dev\"/d" APKBUILD
 
     abuild package
     #abuild rootpkg
