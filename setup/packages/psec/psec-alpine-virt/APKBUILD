@@ -63,11 +63,6 @@ CONFIG_USB_ACM=m
 
 package() {
     # Switch to virt for packaging
-    ls -l "$srcdir"
-    ls -l "$srcdir/aports-v$pkgver.$pkgrel"
-    ls -l "$srcdir/aports-v$pkgver.$pkgrel/main/"
-    ls -l "$srcdir/aports-v$pkgver.$pkgrel/main/linux-lts"
-    ls -l "$pkgdir"
     cd "$srcdir/aports-v$pkgver.$pkgrel/main/linux-lts"
     sed -i 's/_flavor=lts/_flavor=virt/g' APKBUILD
     
@@ -79,8 +74,7 @@ package() {
     #abuild index
 
     rm "$HOME"/iso/alpine-virt*.iso
-    cd -
-    cd "aports-v$pkgver.$pkgrel/scripts"
+    cd "$srcdir/aports-v$pkgver.$pkgrel/scripts"
     ./mkimage.sh --profile virt --repository "$HOME"/packages/main --repository https://dl-cdn.alpinelinux.org/alpine/v$pkgver/main --arch x86_64 --outdir "$HOME"/iso
 
     mkdir -p "$pkgdir/var/lib/xen/images"    
