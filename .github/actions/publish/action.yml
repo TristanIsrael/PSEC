@@ -22,7 +22,8 @@ runs:
       shell: sh
       run: |
         mkdir -p ~/.ssh
-        echo "${{ secrets.DEPLOY_KEY }}" | base64 -d > ~/.ssh/id_ed25519
+        chmod 700 ~/.ssh
+        echo "${{ inputs.privkey }}" | base64 -d > ~/.ssh/id_ed25519
         chmod 600 ~/.ssh/id_ed25519
 
     - name: Add server to known_hosts
