@@ -25,7 +25,8 @@ runs:
         echo "Prepare directories"
         chown -R builder:builder .
         mkdir -p /home/builder/packages/psec/x86_64
-        chown builder:builder /home/builder/packages/psec/x86_64
+        chown -R builder:builder /home/builder/packages
+        chmod -R 770 /home/builder/packages
 
     - shell: sh
       run: |
