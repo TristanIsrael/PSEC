@@ -12,6 +12,11 @@ runs:
   using: composite  
 
   steps:    
+    - name: Install missing packages
+      shell: sh
+      run: |
+        apt install -y rsync openssh-client
+
     - name: Restore SSH key
       shell: sh
       run: |
