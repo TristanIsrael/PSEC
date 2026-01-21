@@ -69,6 +69,8 @@ package() {
     #abuild rootpkg
     #abuild index
 
+    mkdir -p /home/builder/packages/main
+
     rm -f "$HOME"/iso/alpine-virt*.iso
     cd "$srcdir/aports-v$pkgver.$pkgrel/scripts"
     ./mkimage.sh --profile virt --repository "$HOME"/packages/main --repository https://dl-cdn.alpinelinux.org/alpine/v$pkgver/main --arch x86_64 --outdir "$HOME"/iso
