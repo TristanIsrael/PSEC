@@ -1,0 +1,27 @@
+name: Publish to official repository
+
+inputs:
+  privkey:
+    description: Base64 encoded private key
+    required: true
+  filepath:
+    description: The full path of the file to upload
+    required: true
+
+runs:
+  using: composite  
+
+  steps:    
+    - name: Restore SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.DEPLOY_KEY }}" | base64 -d > ~/.ssh/id_ed25519
+        chmod 600 ~/.ssh/id_ed25519
+
+    - name: Add server to known_hosts
+      run: |
+        ssh-keyscan -H www.alefbet.net >> ~/.ssh/known_hosts
+
+    - name: Copy files to server
+      run: |
+        rsync -avz ${{ inputs.filepath }} github-psec@alefbet.net:/var/www/github/psec

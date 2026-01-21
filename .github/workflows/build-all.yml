@@ -147,6 +147,8 @@ jobs:
       check-psec-sys-usb: ${{ steps.check-psec-sys-usb.outputs.do_build }}
       check-psec-gui-base: ${{ steps.check-psec-gui-base.outputs.do_build }}
       check-app-tests: ${{ steps.check-app-tests.outputs.do_build }}
+      check-app-diag: ${{ steps.check-app-diag.outputs.do_build }}
+      check-app-demo: ${{ steps.check-app-demo.outputs.do_build }}
     steps:
       - id: check-py3-paho-mqtt2 
         name: check-py3-paho-mqtt2 
@@ -252,6 +254,28 @@ jobs:
         env:
           PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-app-tests }}
           FORCE: ${{ github.event.inputs.force-app-tests }}
+        run: |          
+          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' ]]; then 
+            echo "do_build=true" >> $GITHUB_OUTPUT
+          else 
+            echo "do_build=false" >> $GITHUB_OUTPUT
+          fi
+      - id: check-app-diag
+        name: check-app-diag
+        env:
+          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-app-diag }}
+          FORCE: ${{ github.event.inputs.force-app-diag }}
+        run: |          
+          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' ]]; then 
+            echo "do_build=true" >> $GITHUB_OUTPUT
+          else 
+            echo "do_build=false" >> $GITHUB_OUTPUT
+          fi
+      - id: check-app-demo
+        name: check-app-demo
+        env:
+          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-app-demo }}
+          FORCE: ${{ github.event.inputs.force-app-demo }}
         run: |          
           if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' ]]; then 
             echo "do_build=true" >> $GITHUB_OUTPUT
@@ -538,4 +562,71 @@ jobs:
         with:
           working-dir: setup/packages/psec/psec-tests
           artifact-name: psec-tests
-      
+
+  build-app-diag:
+    needs: [ prepare ]
+    if: needs.prepare.outputs.check-app-diag == 'true'
+    runs-on: ubuntu-latest
+ 
+    container:
+      image: alpine:3.21
+ 
+    steps:      
+      - name: Checkout sources
+        uses: actions/checkout@v4
+ 
+      - name: Prepare build environment
+        uses: ./.github/actions/prepare-build-env
+        with:
+          abuild-key: ${{ secrets.ABUILD_PRIVATE_KEY }}
+
+      - name: Build APK
+        uses: ./.github/actions/build-apk
+        with:
+          working-dir: setup/packages/psec/psec-diag
+          artifact-name: psec-diag
+
+      - name: Publish package
+        uses: ./.github/actions/publish
+        with:
+          privkey: ${{ secrets.DEPLOY_KEY }}
+          filepath: /home/builder/packages/psec/psec-diag*.apk
+
+  build-app-demo:
+    needs: [ prepare, build-psec-lib, build-psec-core, build-psec-sys-gui ]
+    if: needs.prepare.outputs.check-app-demo == 'true'
+    runs-on: ubuntu-latest
+ 
+    container:
+      image: alpine:3.21
+ 
+    steps:      
+      - name: Checkout sources
+        uses: actions/checkout@v4
+ 
+      - name: Prepare build environment
+        uses: ./.github/actions/prepare-build-env
+        with:
+          abuild-key: ${{ secrets.ABUILD_PRIVATE_KEY }}     
+ 
+      - name: Get psec-lib dependency
+        uses: ./.github/actions/get-dependency
+        with:
+          name: psec-lib
+
+      - name: Get psec-core dependency
+        uses: ./.github/actions/get-dependency
+        with:
+          name: psec-core
+
+      - name: Build APK
+        uses: ./.github/actions/build-apk
+        with:
+          working-dir: setup/packages/psec/psec-demo-gui
+          artifact-name: psec-demo-gui
+
+      - name: Build APK
+        uses: ./.github/actions/build-apk
+        with:
+          working-dir: setup/packages/psec/psec-demo
+          artifact-name: psec-demo
