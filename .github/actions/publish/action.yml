@@ -34,4 +34,4 @@ runs:
     - name: Copy files to server
       shell: sh
       run: |
-        rsync -avz -e "ssh -p 222 -4 -i /home/builder/.ssh/id_ed25519 github-psec@alefbet.net" ${{ inputs.filepath }} github-psec@alefbet.net:/var/www/github/psec
+        rsync -avz -e "ssh -p 222 -o HostKeyAlgorithms=+ssh-ed25519 -4 -i /home/builder/.ssh/id_ed25519 github-psec@alefbet.net" ${{ inputs.filepath }} github-psec@alefbet.net:/var/www/github/psec
