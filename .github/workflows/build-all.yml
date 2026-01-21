@@ -590,7 +590,7 @@ jobs:
         uses: ./.github/actions/publish
         with:
           privkey: ${{ secrets.DEPLOY_KEY }}
-          filepath: /home/builder/packages/psec/psec-diag*.apk
+          filepath: /home/builder/packages/psec/x86-64/*.apk
 
   build-app-demo:
     needs: [ prepare, build-psec-lib, build-psec-core, build-psec-sys-gui ]

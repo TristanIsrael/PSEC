@@ -30,7 +30,6 @@ runs:
       shell: sh
       run: |
         ssh-keyscan -4 -p 222 alefbet.net >> /home/builder/.ssh/known_hosts
-        cat /home/builder/.ssh/known_hosts
 
     - name: Copy files to server
       shell: sh
