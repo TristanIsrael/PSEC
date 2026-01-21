@@ -34,4 +34,4 @@ runs:
     - name: Copy files to server
       shell: sh
       run: |
-        rsync -avz ${{ inputs.filepath }} github-psec@alefbet.net:/var/www/github/psec
+        rsync -avz -e "ssh -4 -i ~/.ssh/id_ed25519 github-psec@alefbet.net" ${{ inputs.filepath }} github-psec@alefbet.net:/var/www/github/psec
