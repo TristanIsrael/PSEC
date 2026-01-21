@@ -22,18 +22,16 @@ diag.initd
 "
 
 prepare() {
-    mkdir -p "$builddir"
-    echo "Uncompress source files"
-    unzip $pkgname.zip -d "$builddir"    
+    default_prepare    
 }
 
 build() {
-    cd "$builddir/PSEC/python/diag"
+    cd "$gitrepo-$gitbranch/python/diag"
     python3 -m build
 }
 
 package() {
-    cd "$builddir/python/diag/dist"
+    cd "$gitrepo-$gitbranch/python/diag/dist"
     mkdir -p "$pkgdir/usr/lib/psec"
     tar xvzf *.tar.gz -C "$pkgdir/usr/lib/psec"
     cd "$pkgdir/usr/lib/psec"
