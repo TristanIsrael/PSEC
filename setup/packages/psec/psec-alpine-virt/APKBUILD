@@ -58,7 +58,7 @@ CONFIG_USB_ACM=m
 " >> virt.x86_64.config
 
     # Then we build the kernel with the only flavour virt and arch x86_64
-    #abuild build    
+    abuild build    
 }
 
 package() {
