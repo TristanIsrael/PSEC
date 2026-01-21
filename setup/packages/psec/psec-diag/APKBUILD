@@ -31,8 +31,10 @@ build() {
 }
 
 package() {
-    cd "$gitrepo-$gitbranch/python/diag/dist"
+    echo "srcdir=$srcdir"
+    ls $srcdir
     mkdir -p "$pkgdir/usr/lib/psec"
+    cd "$srcdir/$gitrepo-$gitbranch/python/diag/dist"    
     tar xvzf *.tar.gz -C "$pkgdir/usr/lib/psec"
     cd "$pkgdir/usr/lib/psec"
     ln -s "diag-$pkgver" diag    
