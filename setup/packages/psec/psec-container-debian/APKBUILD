@@ -18,7 +18,7 @@ options="!check"  # no tests provided
 #_distro="debian"
 #_release="buster"
 #_arch="amd64"
-sources="
+source="
 https://www.alefbet.net/github/psec/x86_64/lxc-container-debian.tar.bz2!
 "
 
