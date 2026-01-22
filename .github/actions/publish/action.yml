@@ -20,14 +20,14 @@ runs:
       if: ${{ inputs.container == 'true' }}
       shell: sh
       run: |
-        apk update
+        apk update || true
         apk add rsync openssh-client-common openssh-client
 
     - name: Install missing packages (Ubuntu)
       if: ${{ inputs.container == 'false' }}
       shell: sh
       run: |
-        sudo apt update || true
+        sudo apt update 
         sudo apt install rsync openssh-client
 
     - name: Restore SSH key
