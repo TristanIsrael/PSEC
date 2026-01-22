@@ -33,6 +33,9 @@ runs:
     - name: Restore SSH key
       shell: sh
       run: |
+        echo "HOME=$HOME"
+        echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
+        echo "USER=$USER"
         mkdir -p $HOME/.ssh
         chmod 700 $HOME/.ssh
         echo "${{ inputs.privkey }}" | base64 -d > $HOME/.ssh/id_rsa

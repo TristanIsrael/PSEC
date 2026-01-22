@@ -41,6 +41,7 @@ package() {
     mkdir -p "$pkgdir"/var/lib/lxc/
 
     # Tar container
+    echo Create the package
     sudo tar czf "$pkgdir"/var/lib/lxc/"$pkgname".tar.bz2 -C "$srcdir" .
     #sudo chown $USER "$pkgdir"/var/lib/lxc/"$pkgname".tar
 
