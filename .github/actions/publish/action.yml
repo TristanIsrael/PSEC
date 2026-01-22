@@ -17,7 +17,7 @@ runs:
 
   steps:    
     - name: Install missing packages (Alpine)
-      if: ${{ inputs.container }}
+      if: ${{ inputs.container == 'true' }}
       shell: sh
       run: |
         apk update
