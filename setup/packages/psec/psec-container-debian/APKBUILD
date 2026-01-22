@@ -15,9 +15,12 @@ install="$pkgname.post-install $pkgname.pre-deinstall"
 subpackages=""
 replaces=""
 options="!check"  # no tests provided
-_distro="debian"
-_release="buster"
-_arch="amd64"
+#_distro="debian"
+#_release="buster"
+#_arch="amd64"
+sources="
+https://www.alefbet.net/github/psec/x86_64/lcx-container-debian.tar.bz2!
+"
 
 clean() {
     sudo rm -rf "$srcdir" 
@@ -25,7 +28,7 @@ clean() {
     sudo rm -rf "$builddir"
 }
 
-build() {     
+#build() {     
     # The container has been previously created
     # Create a new container
     # sudo lxc-create -n "$pkgname" -t download -P "$srcdir" -- --dist $_distro --release $_release --arch $_arch
@@ -34,17 +37,20 @@ build() {
     # sudo sed -i 's/^lxc\.net/#&/' "$srcdir/$pkgname"/config
 
     # sudo lxc-stop "$pkgname"
-}
+#}
 
 package() {
     mkdir -p "$pkgdir"/var/lib/lxc/
 
     # Tar container
-    sudo tar cf "$pkgdir"/var/lib/lxc/"$pkgname".tar -C "$srcdir" .
-    sudo chown $USER "$pkgdir"/var/lib/lxc/"$pkgname".tar
+    #sudo tar cf "$pkgdir"/var/lib/lxc/"$pkgname".tar -C "$srcdir" .
+    #sudo chown $USER "$pkgdir"/var/lib/lxc/"$pkgname".tar
 
     # Compress archive
-    bzip2 "$pkgdir"/var/lib/lxc/"$pkgname".tar
+    #bzip2 "$pkgdir"/var/lib/lxc/"$pkgname".tar
+
+    # Copy the archive into the package
+    mv $srcdir/lcx-container-debian.tar.bz2 $pkgdir/var/lib/lxc
 
     # Clean the environment because abuild won't be able
     sudo rm -rf "$srcdir/$pkgname"
