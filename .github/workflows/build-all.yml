@@ -483,7 +483,7 @@ jobs:
         run: |
           sudo apt update
           sudo apt install lxc lxc-templates liblxc-common iptables
-          
+
       - name: Create generic Debian container 
         env:
           pkgname: lxc-container-debian
@@ -504,10 +504,12 @@ jobs:
           # sudo lxc-stop "$pkgname"
 
           # Create an archive
-          sudo tar cf "$pkgname".tar -C "$srcdir" .
+          echo Compressing the image...
+          sudo tar cjf "$pkgname".tar.bz2 -C "$srcdir" .
+          echo Compression finished
 
           # Compress archive
-          sudo bzip2 "$pkgname".tar
+          # sudo bzip2 "$pkgname".tar
 
       - name: Publish archive
         uses: ./.github/actions/publish
