@@ -27,7 +27,7 @@ runs:
       if: ${{ inputs.container == 'false' }}
       shell: sh
       run: |
-        sudo apt update
+        sudo apt update || true
         sudo apt install rsync openssh-client
 
     - name: Restore SSH key
