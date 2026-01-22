@@ -53,7 +53,7 @@ runs:
       run: |
         ssh -p 222 -4 -i ssh/id_rsa -o StrictHostKeyChecking=no github-psec@alefbet.net <<'EOF'
           set -e
-          docker run --rm   -v /var/www/www.alefbet.net/github/psec/x86_64:/mnt/apk   -v /home/github-psec:/mnt/keys   alpine:3.20 sh -c "
+          docker run --rm -u $(id -u):$(id -g)  -v /var/www/www.alefbet.net/github/psec/x86_64:/mnt/apk   -v /home/github-psec:/mnt/keys   alpine:3.20 sh -c "
             apk add --no-cache alpine-sdk
             cp /mnt/keys/psec.rsa.pub /etc/apk/keys
             cd /mnt/apk
@@ -61,9 +61,5 @@ runs:
             apk index -d PSEC -o APKINDEX.tar.gz *.apk
             echo 'Signing APK index...'
             abuild-sign -k /mnt/keys/psec.rsa -p /mnt/keys/psec.rsa.pub APKINDEX.tar.gz            
-          "
-          cd /var/www/www.alefbet.net/github/psec/x86_64/
-          chown github-psec:www-data APKINDEX.tar.gz
-          chgrp www-data *
-          chmod 644 *
+          "          
         EOF
