@@ -61,8 +61,8 @@ runs:
             apk index -d PSEC -o APKINDEX.tar.gz *.apk
             echo 'Signing APK index...'
             abuild-sign -k /mnt/keys/psec.rsa -p /mnt/keys/psec.rsa.pub APKINDEX.tar.gz 
-            cd /var/www/www.alefbet.net/github/psec/x86_64
+            cd /mnt/apk
             chown $(id -u):$(id -g) *
-            chmod 644
+            chmod 644 *
           "          
         EOF
