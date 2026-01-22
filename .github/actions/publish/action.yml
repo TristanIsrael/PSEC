@@ -47,3 +47,16 @@ runs:
       shell: sh
       run: |
         rsync -av -e 'ssh -p 222 -4 -i ssh/id_rsa -o StrictHostKeyChecking=no' ${{ inputs.filepath }} github-psec@alefbet.net:/var/www/www.alefbet.net/github/psec/x86_64/
+
+    - name: Recreate and sign APK index 
+      shell: sh
+      run: |
+      ssh user@host <<'EOF'
+        set -e
+        ssh -p 222 -4 -i ssh/id_rsa -o StrictHostKeyChecking=no  <<'EOF'
+        cd /var/www/www.alefbet.net/github/psec/x86_64
+        echo Building...
+        apk index -d PSEC -o APKINDEX.tar.gz *.apk
+        echo Signing...
+        abuild-sign -k $HOME/psec.rsa -p $HOME/psec.rsa.pub APKINDEX.tar.gz
+        EOF
