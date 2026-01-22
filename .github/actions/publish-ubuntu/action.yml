@@ -1,0 +1,49 @@
+name: Publish to official repository
+
+inputs:
+  privkey:
+    description: Base64 encoded private key
+    required: true
+  filepath:
+    description: The full path of the file to upload
+    required: true
+  container:
+    description: Is this action running into an Alpine container
+    required: false
+    default: true
+
+runs:
+  using: composite  
+
+  steps:    
+    - name: Install missing packages (Alpine)
+      if: ${{ inputs.container }}
+      shell: sh
+      run: |
+        apk update
+        apk add rsync openssh-client-common openssh-client
+
+    - name: Install missing packages (Ubuntu)
+      if: ${{ inputs.container == 'false' }}
+      shell: sh
+      run: |
+        sudo apt update
+        sudo apt install rsync openssh-client
+
+    - name: Restore SSH key
+      shell: sh
+      run: |
+        mkdir -p /home/builder/.ssh
+        chmod 700 /home/builder/.ssh
+        echo "${{ inputs.privkey }}" | base64 -d > /home/builder/.ssh/id_rsa
+        chmod 600 /home/builder/.ssh/id_rsa
+
+    - name: Add server to known_hosts
+      shell: sh
+      run: |
+        ssh-keyscan -4 -p 222 alefbet.net >> /home/builder/.ssh/known_hosts
+
+    - name: Copy files to server
+      shell: sh
+      run: |
+        rsync -av -e 'ssh -p 222 -4 -i /home/builder/.ssh/id_rsa -o StrictHostKeyChecking=no' ${{ inputs.filepath }} github-psec@alefbet.net:/var/www/www.alefbet.net/github/psec/x86_64/
