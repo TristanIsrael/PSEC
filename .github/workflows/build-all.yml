@@ -487,10 +487,11 @@ jobs:
           distro: debian
           release: buster
           arch: amd64
-        shell: sh 
+          variant: cloud
+        shell: sh         
         run: |
           # Create the container 
-          sudo lxc-create -n "$pkgname" -t download -P "$srcdir" -- --dist $distro --release $release --arch $arch
+          sudo lxc-create -n "$pkgname" -t download -P "$srcdir" -- --dist $distro --release $release --arch $arch --variant $variant
           
           # Remove network configuration
           sudo sed -i 's/^lxc\.net/#&/' "$srcdir/$pkgname"/config
