@@ -471,7 +471,6 @@ jobs:
   build-lxc-container-debian:
     needs: [ prepare ]
     if: | 
-      false &&
       needs.prepare.outputs.check-psec-container-debian == 'true'
     runs-on: ubuntu-latest
  
@@ -550,8 +549,8 @@ jobs:
           filepath: /home/builder/packages/psec/x86_64/
 
   build-psec-core:
-    needs: [ prepare, build-psec-lib, build-alpine-virt ]
-    if: needs.prepare.outputs.check-psec-core == 'true'
+    needs: [ prepare, build-psec-lib ]
+    if: needs.prepare.outputs.check-psec-core == 'true'        
     runs-on: ubuntu-latest
  
     container:
