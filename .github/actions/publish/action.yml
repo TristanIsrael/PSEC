@@ -60,9 +60,10 @@ runs:
             echo 'Building APK index...'
             apk index -d PSEC -o APKINDEX.tar.gz *.apk
             echo 'Signing APK index...'
-            abuild-sign -k /mnt/keys/psec.rsa -p /mnt/keys/psec.rsa.pub APKINDEX.tar.gz
-            chown github-psec:www-data APKINDEX.tar.gz
-            chgrp www-data *
-            chmod 644 *
+            abuild-sign -k /mnt/keys/psec.rsa -p /mnt/keys/psec.rsa.pub APKINDEX.tar.gz            
           "
+          cd /var/www/www.alefbet.net/github/psec/x86_64/
+          chown github-psec:www-data APKINDEX.tar.gz
+          chgrp www-data *
+          chmod 644 *
         EOF
