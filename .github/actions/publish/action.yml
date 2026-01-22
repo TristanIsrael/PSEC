@@ -33,20 +33,17 @@ runs:
     - name: Restore SSH key
       shell: sh
       run: |
-        echo "HOME=$HOME"
-        echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE"
-        echo "USER=$USER"
-        mkdir -p $HOME/.ssh
-        chmod 700 $HOME/.ssh
-        echo "${{ inputs.privkey }}" | base64 -d > $HOME/.ssh/id_rsa
-        chmod 600 $HOME/.ssh/id_rsa
+        mkdir -p ssh
+        chmod 700 ssh
+        echo "${{ inputs.privkey }}" | base64 -d > ssh/id_rsa
+        chmod 600 ssh/id_rsa
 
     - name: Add server to known_hosts
       shell: sh
       run: |
-        ssh-keyscan -4 -p 222 alefbet.net >> $HOME/.ssh/known_hosts
+        ssh-keyscan -4 -p 222 alefbet.net >> ssh/known_hosts
 
     - name: Copy files to server
       shell: sh
       run: |
-        rsync -av -e 'ssh -p 222 -4 -i $HOME/.ssh/id_rsa -o StrictHostKeyChecking=no' ${{ inputs.filepath }} github-psec@alefbet.net:/var/www/www.alefbet.net/github/psec/x86_64/
+        rsync -av -e 'ssh -p 222 -4 -i ssh/id_rsa -o StrictHostKeyChecking=no' ${{ inputs.filepath }} github-psec@alefbet.net:/var/www/www.alefbet.net/github/psec/x86_64/
