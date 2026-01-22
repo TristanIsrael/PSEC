@@ -34,4 +34,4 @@ runs:
     - name: Copy files to server
       shell: sh
       run: |
-        rsync -av -e 'ssh -p 222 -4 -i /home/builder/.ssh/id_rsa -o StrictHostKeyChecking=no' ${{ inputs.filepath }} github-psec@alefbet.net:/var/www/github/psec/x86_64/
+        rsync -av -e 'ssh -p 222 -4 -i /home/builder/.ssh/id_rsa -o StrictHostKeyChecking=no' ${{ inputs.filepath }} github-psec@alefbet.net:/var/www/www.alefbet.net/github/psec/x86_64/

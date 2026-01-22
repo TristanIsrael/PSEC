@@ -26,21 +26,14 @@ clean() {
 }
 
 build() {     
+    # The container has been previously created
     # Create a new container
-    sudo lxc-create -n "$pkgname" -t download -P "$srcdir" -- --dist $_distro --release $_release --arch $_arch
-
-    # Inject python into the container
-    #sudo service dnsmasq.lxcbr0 start
-    #sudo lxc-start -P "$srcdir" -n "$pkgname"
-    #sudo lxc-attach -P "$srcdir" -n "$pkgname" -- apt update && apt upgrade
-        
-    # Stop the container
-    #sudo lxc-stop -P "$srcdir" -n "$pkgname"
+    # sudo lxc-create -n "$pkgname" -t download -P "$srcdir" -- --dist $_distro --release $_release --arch $_arch
 
     # Disable networking in the container
-    sudo sed -i 's/^lxc\.net/#&/' "$srcdir/$pkgname"/config
+    # sudo sed -i 's/^lxc\.net/#&/' "$srcdir/$pkgname"/config
 
-    sudo lxc-stop "$pkgname"
+    # sudo lxc-stop "$pkgname"
 }
 
 package() {

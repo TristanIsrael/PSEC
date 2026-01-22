@@ -8,6 +8,16 @@ on:
         required: false
         type: 'boolean'
         default: 'false'
+      force-apps:
+        description: "Build all apps"
+        required: false
+        type: 'boolean'
+        default: 'false'
+      force-libs:
+        description: "Build all libs"
+        required: false
+        type: 'boolean'
+        default: 'false'
       force-py3-paho-mqtt2:
         description: "Build py3-paho-mqtt2"
         required: false
@@ -161,8 +171,10 @@ jobs:
           PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-py3-paho-mqtt2 }}
           FORCE: ${{ github.event.inputs.force-py3-paho-mqtt2 }}
           FORCE_ALL: ${{ github.event.inputs.force-all }}
+          FORCE_APPS: ${{ github.event.inputs.force-apps }}
+          FORCE_LIBS: ${{ github.event.inputs.force-libs }}
         run: |          
-          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' || $FORCE_ALL == 'true' ]]; then 
+          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' || $FORCE_ALL == 'true' || $FORCE_APPS == 'true' || $FORCE_LIBS == 'true' ]]; then 
             echo "do_build=true" >> $GITHUB_OUTPUT
           else 
             echo "do_build=false" >> $GITHUB_OUTPUT
@@ -173,8 +185,10 @@ jobs:
           PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-lib }}
           FORCE: ${{ github.event.inputs.force-psec-lib }}
           FORCE_ALL: ${{ github.event.inputs.force-all }}
+          FORCE_APPS: ${{ github.event.inputs.force-apps }}
+          FORCE_LIBS: ${{ github.event.inputs.force-libs }}
         run: |          
-          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' || $FORCE_ALL == 'true' ]]; then 
+          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' || $FORCE_ALL == 'true' || $FORCE_APPS == 'true' || $FORCE_LIBS == 'true' ]]; then 
             echo "do_build=true" >> $GITHUB_OUTPUT
           else 
             echo "do_build=false" >> $GITHUB_OUTPUT
@@ -185,6 +199,8 @@ jobs:
           PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-alpine-virt }}
           FORCE: ${{ github.event.inputs.force-psec-alpine-virt }}
           FORCE_ALL: ${{ github.event.inputs.force-all }}
+          FORCE_APPS: ${{ github.event.inputs.force-apps }}
+          FORCE_LIBS: ${{ github.event.inputs.force-libs }}
         run: |          
           if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' || $FORCE_ALL == 'true' ]]; then 
             echo "do_build=true" >> $GITHUB_OUTPUT
@@ -197,6 +213,8 @@ jobs:
           PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-alpine-iso }}
           FORCE: ${{ github.event.inputs.force-psec-alpine-iso }}
           FORCE_ALL: ${{ github.event.inputs.force-all }}
+          FORCE_APPS: ${{ github.event.inputs.force-apps }}
+          FORCE_LIBS: ${{ github.event.inputs.force-libs }}
         run: |          
           if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' || $FORCE_ALL == 'true' ]]; then 
             echo "do_build=true" >> $GITHUB_OUTPUT
@@ -209,6 +227,8 @@ jobs:
           PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-container-debian }}
           FORCE: ${{ github.event.inputs.force-psec-container-debian }}
           FORCE_ALL: ${{ github.event.inputs.force-all }}
+          FORCE_APPS: ${{ github.event.inputs.force-apps }}
+          FORCE_LIBS: ${{ github.event.inputs.force-libs }}
         run: |          
           if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' || $FORCE_ALL == 'true' ]]; then 
             echo "do_build=true" >> $GITHUB_OUTPUT
@@ -221,8 +241,10 @@ jobs:
           PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-core }}
           FORCE: ${{ github.event.inputs.force-psec-core }}
           FORCE_ALL: ${{ github.event.inputs.force-all }}
+          FORCE_APPS: ${{ github.event.inputs.force-apps }}
+          FORCE_LIBS: ${{ github.event.inputs.force-libs }}
         run: |          
-          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' || $FORCE_ALL == 'true' ]]; then 
+          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' || $FORCE_ALL == 'true' || $FORCE_APPS == 'true' ]]; then 
             echo "do_build=true" >> $GITHUB_OUTPUT
           else 
             echo "do_build=false" >> $GITHUB_OUTPUT
@@ -233,8 +255,10 @@ jobs:
           PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-sys-gui }}
           FORCE: ${{ github.event.inputs.force-psec-sys-gui }}
           FORCE_ALL: ${{ github.event.inputs.force-all }}
+          FORCE_APPS: ${{ github.event.inputs.force-apps }}
+          FORCE_LIBS: ${{ github.event.inputs.force-libs }}
         run: |          
-          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' || $FORCE_ALL == 'true' ]]; then 
+          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' || $FORCE_ALL == 'true' || $FORCE_APPS == 'true' ]]; then 
             echo "do_build=true" >> $GITHUB_OUTPUT
           else 
             echo "do_build=false" >> $GITHUB_OUTPUT
@@ -245,8 +269,10 @@ jobs:
           PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-sys-usb }}
           FORCE: ${{ github.event.inputs.force-psec-sys-usb }}
           FORCE_ALL: ${{ github.event.inputs.force-all }}
+          FORCE_APPS: ${{ github.event.inputs.force-apps }}
+          FORCE_LIBS: ${{ github.event.inputs.force-libs }}
         run: |          
-          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' || $FORCE_ALL == 'true' ]]; then 
+          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' || $FORCE_ALL == 'true' || $FORCE_APPS == 'true' ]]; then 
             echo "do_build=true" >> $GITHUB_OUTPUT
           else 
             echo "do_build=false" >> $GITHUB_OUTPUT
@@ -256,8 +282,11 @@ jobs:
         env:
           PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-gui-base }}
           FORCE: ${{ github.event.inputs.force-psec-gui-base }}
+          FORCE_ALL: ${{ github.event.inputs.force-all }}
+          FORCE_APPS: ${{ github.event.inputs.force-apps }}
+          FORCE_LIBS: ${{ github.event.inputs.force-libs }}
         run: |          
-          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' ]]; then 
+          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' || $FORCE_ALL == 'true' || $FORCE_APPS == 'true' ]]; then 
             echo "do_build=true" >> $GITHUB_OUTPUT
           else 
             echo "do_build=false" >> $GITHUB_OUTPUT
@@ -267,8 +296,11 @@ jobs:
         env:
           PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-app-tests }}
           FORCE: ${{ github.event.inputs.force-psec-tests }}
+          FORCE_ALL: ${{ github.event.inputs.force-all }}
+          FORCE_APPS: ${{ github.event.inputs.force-apps }}
+          FORCE_LIBS: ${{ github.event.inputs.force-libs }}
         run: |          
-          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' ]]; then 
+          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' || $FORCE_ALL == 'true' || $FORCE_APPS == 'true' ]]; then 
             echo "do_build=true" >> $GITHUB_OUTPUT
           else 
             echo "do_build=false" >> $GITHUB_OUTPUT
@@ -279,8 +311,10 @@ jobs:
           PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-app-diag }}
           FORCE: ${{ github.event.inputs.force-psec-diag }}
           FORCE_ALL: ${{ github.event.inputs.force-all }}
+          FORCE_APPS: ${{ github.event.inputs.force-apps }}
+          FORCE_LIBS: ${{ github.event.inputs.force-libs }}
         run: |          
-          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' || $FORCE_ALL == 'true' ]]; then 
+          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' || $FORCE_ALL == 'true' || $FORCE_APPS == 'true' ]]; then 
             echo "do_build=true" >> $GITHUB_OUTPUT
           else 
             echo "do_build=false" >> $GITHUB_OUTPUT
@@ -291,8 +325,10 @@ jobs:
           PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-app-demo }}
           FORCE: ${{ github.event.inputs.force-psec-demo }}
           FORCE_ALL: ${{ github.event.inputs.force-all }}
+          FORCE_APPS: ${{ github.event.inputs.force-apps }}
+          FORCE_LIBS: ${{ github.event.inputs.force-libs }}
         run: |          
-          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' || $FORCE_ALL == 'true' ]]; then 
+          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' || $FORCE_ALL == 'true' || $FORCE_APPS == 'true' ]]; then 
             echo "do_build=true" >> $GITHUB_OUTPUT
           else 
             echo "do_build=false" >> $GITHUB_OUTPUT
@@ -430,10 +466,51 @@ jobs:
         uses: ./.github/actions/publish
         with:
           privkey: ${{ secrets.DEPLOY_KEY }}
-          filepath: /home/builder/packages/psec/x86_64/
+          filepath: /home/builder/packages/psec/x86_64/  
+
+  build-lxc-container-debian:
+    needs: [ prepare ]
+    if: | 
+      needs.prepare.outputs.check-psec-container-debian == 'true'
+    runs-on: ubuntu-latest
+ 
+    steps:      
+      - name: Install dependencies
+        shell: sh
+        run: |
+          apt install lxc lxc-templates liblxc-common iptables
+      - name: Create generic Debian container 
+        env:
+          pkgname: lxc-container-debian
+          srcdir: ${{ GITHUB_WORKSPACE }}/src
+          distro: debian
+          release: buster
+          arch: amd64
+        shell: sh 
+        run: |
+          # Create the container 
+          lxc-create -n "$pkgname" -t download -P "$srcdir" -- --dist $distro --release $release --arch $arch
+          
+          # Remove network configuration
+          sed -i 's/^lxc\.net/#&/' "$srcdir/$pkgname"/config
+          
+          # Stop the container
+          lxc-stop "$pkgname"
+
+          # Create an archive
+          sudo tar cf "$pkgname".tar -C "$srcdir" .
+
+          # Compress archive
+          bzip2 "$pkgname".tar
+
+      - name: Publish archive
+        uses: ./.github/actions/publish
+        with:
+          privkey: ${{ secrets.DEPLOY_KEY }}
+          filepath: /home/builder/lxc-container-debian.tar.bz2
 
   build-container-debian:
-    needs: [ prepare ]
+    needs: [ prepare, build-container-debian ]
     if: | 
       needs.prepare.outputs.check-psec-container-debian == 'true'
     runs-on: ubuntu-latest
@@ -454,7 +531,7 @@ jobs:
         uses: ./.github/actions/build-apk
         with:
           working-dir: setup/packages/psec/psec-container-debian
-          artifact-name: psec-alpine-iso
+          artifact-name: psec-container-debian
 
       - name: Publish package
         uses: ./.github/actions/publish
@@ -463,7 +540,7 @@ jobs:
           filepath: /home/builder/packages/psec/x86_64/
 
   build-psec-core:
-    needs: [ prepare, build-psec-lib ]
+    needs: [ prepare, build-psec-lib, build-alpine-virt ]
     if: needs.prepare.outputs.check-psec-core == 'true'
     runs-on: ubuntu-latest
  
