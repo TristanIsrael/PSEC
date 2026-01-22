@@ -19,14 +19,8 @@ options="!check"  # no tests provided
 #_release="buster"
 #_arch="amd64"
 sources="
-https://www.alefbet.net/github/psec/x86_64/lcx-container-debian.tar.bz2!
+https://www.alefbet.net/github/psec/x86_64/lxc-container-debian.tar.bz2!
 "
-
-clean() {
-    sudo rm -rf "$srcdir" 
-    sudo rm -rf "$pkgdir"
-    sudo rm -rf "$builddir"
-}
 
 #build() {     
     # The container has been previously created
