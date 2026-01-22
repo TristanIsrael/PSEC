@@ -42,17 +42,7 @@ on:
         description: "Build core"
         required: false
         type: 'boolean'
-        default: 'false'
-      force-psec-demo:
-        description: "Build demo"
-        required: false
-        type: 'boolean'
-        default: 'false'
-      force-psec-demo-gui:
-        description: "Build demo-gui"
-        required: false
-        type: 'boolean'
-        default: 'false'
+        default: 'false'      
       force-psec-diag:
         description: "Build diag"
         required: false
@@ -100,15 +90,11 @@ jobs:
       pkg-psec-alpine-virt: ${{ steps.detect.outputs.psec-alpine-virt }}
       pkg-psec-container-debian: ${{ steps.detect.outputs.psec-container-debian }}
       pkg-psec-core: ${{ steps.detect.outputs.psec-core }}
-      pkg-psec-demo: ${{ steps.detect.outputs.psec-demo }}
-      pkg-psec-demo-gui: ${{ steps.detect.outputs.psec-demo-gui }}
       pkg-psec-diag: ${{ steps.detect.outputs.psec-diag }}
       pkg-psec-gui-base: ${{ steps.detect.outputs.psec-gui-base }}
       pkg-psec-lib: ${{ steps.detect.outputs.psec-lib }}
       pkg-psec-sys-gui: ${{ steps.detect.outputs.psec-sys-gui }}
       pkg-psec-sys-usb: ${{ steps.detect.outputs.psec-sys-usb }}
-      app-demo: ${{ steps.detect.outputs.app-demo }}
-      app-demo2: ${{ steps.detect.outputs.app-demo2 }}
       app-diag: ${{ steps.detect.outputs.app-diag }}
       app-lib: ${{ steps.detect.outputs.app-lib }}
       app-tests: ${{ steps.detect.outputs.app-tests }}
@@ -125,16 +111,12 @@ jobs:
             [psec-alpine-virt]="setup/packages/psec/py3-paho-mqtt2/"
             [psec-container-debian]="setup/packages/psec/py3-paho-mqtt2/"
             [psec-core]="setup/packages/psec/psec-core/"
-            [psec-demo]="setup/packages/psec/psec-demo/"
-            [psec-demo-gui]="setup/packages/psec/psec-demo-gui/"
             [psec-diag]="setup/packages/psec/psec-diag/"
             [psec-gui-base]="setup/packages/psec/psec-gui-base/"
             [psec-lib]="setup/packages/psec/psec-lib/"
             [psec-sys-gui]="setup/packages/psec/psec-sys-gui/"
             [psec-sys-usb]="setup/packages/psec/psec-sys-usb/"
             [app-diag]="python/diag/"
-            [app-demo]="python/demo/"
-            [app-demo2]="python/demo2/"
             [app-lib]="python/lib/"
             [app-tests]="python/tests/"
           )
@@ -162,8 +144,7 @@ jobs:
       check-psec-sys-usb: ${{ steps.check-psec-sys-usb.outputs.do_build }}
       check-psec-gui-base: ${{ steps.check-psec-gui-base.outputs.do_build }}
       check-app-tests: ${{ steps.check-app-tests.outputs.do_build }}
-      check-app-diag: ${{ steps.check-app-diag.outputs.do_build }}
-      check-app-demo: ${{ steps.check-app-demo.outputs.do_build }}      
+      check-app-diag: ${{ steps.check-app-diag.outputs.do_build }}      
     steps:
       - id: check-py3-paho-mqtt2 
         name: check-py3-paho-mqtt2 
@@ -318,21 +299,7 @@ jobs:
             echo "do_build=true" >> $GITHUB_OUTPUT
           else 
             echo "do_build=false" >> $GITHUB_OUTPUT
-          fi
-      - id: check-app-demo
-        name: check-app-demo
-        env:
-          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-app-demo }}
-          FORCE: ${{ github.event.inputs.force-psec-demo }}
-          FORCE_ALL: ${{ github.event.inputs.force-all }}
-          FORCE_APPS: ${{ github.event.inputs.force-apps }}
-          FORCE_LIBS: ${{ github.event.inputs.force-libs }}
-        run: |          
-          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' || $FORCE_ALL == 'true' || $FORCE_APPS == 'true' ]]; then 
-            echo "do_build=true" >> $GITHUB_OUTPUT
-          else 
-            echo "do_build=false" >> $GITHUB_OUTPUT
-          fi
+          fi      
 
   build-py3-paho-mqtt2:
     needs: [ prepare ]
@@ -714,41 +681,6 @@ jobs:
         with:
           working-dir: setup/packages/psec/psec-diag
           artifact-name: psec-diag
-
-      - name: Publish package
-        uses: ./.github/actions/publish
-        with:
-          privkey: ${{ secrets.DEPLOY_KEY }}
-          filepath: /home/builder/packages/psec/x86_64/
-
-  build-app-demo:
-    needs: [ prepare, build-psec-lib, build-psec-core, build-psec-sys-gui ]
-    if: needs.prepare.outputs.check-app-demo == 'true'
-    runs-on: ubuntu-latest
- 
-    container:
-      image: alpine:3.21
- 
-    steps:      
-      - name: Checkout sources
-        uses: actions/checkout@v4
- 
-      - name: Prepare build environment
-        uses: ./.github/actions/prepare-build-env
-        with:
-          abuild-key: ${{ secrets.ABUILD_PRIVATE_KEY }}     
- 
-      - name: Build APK
-        uses: ./.github/actions/build-apk
-        with:
-          working-dir: setup/packages/psec/psec-demo-gui
-          artifact-name: psec-demo-gui
-
-      - name: Build APK
-        uses: ./.github/actions/build-apk
-        with:
-          working-dir: setup/packages/psec/psec-demo
-          artifact-name: psec-demo
 
       - name: Publish package
         uses: ./.github/actions/publish
