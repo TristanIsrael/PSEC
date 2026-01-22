@@ -55,6 +55,7 @@ runs:
           set -e
           docker run --rm   -v /var/www/www.alefbet.net/github/psec/x86_64:/mnt/apk   -v /home/github-psec:/mnt/keys   alpine:3.20 sh -c "
             apk add --no-cache alpine-sdk
+            cp /mnt/keys/psec.rsa.pub /etc/apk/keys
             cd /mnt/apk
             echo 'Building APK index...'
             apk index -d PSEC -o APKINDEX.tar.gz *.apk
