@@ -478,7 +478,7 @@ jobs:
       - name: Install dependencies
         shell: sh
         run: |
-          apt install lxc lxc-templates liblxc-common iptables
+          sudo apt install lxc lxc-templates liblxc-common iptables
       - name: Create generic Debian container 
         env:
           pkgname: lxc-container-debian
@@ -489,19 +489,19 @@ jobs:
         shell: sh 
         run: |
           # Create the container 
-          lxc-create -n "$pkgname" -t download -P "$srcdir" -- --dist $distro --release $release --arch $arch
+          sudo lxc-create -n "$pkgname" -t download -P "$srcdir" -- --dist $distro --release $release --arch $arch
           
           # Remove network configuration
-          sed -i 's/^lxc\.net/#&/' "$srcdir/$pkgname"/config
+          sudo sed -i 's/^lxc\.net/#&/' "$srcdir/$pkgname"/config
           
           # Stop the container
-          lxc-stop "$pkgname"
+          sudo lxc-stop "$pkgname"
 
           # Create an archive
           sudo tar cf "$pkgname".tar -C "$srcdir" .
 
           # Compress archive
-          bzip2 "$pkgname".tar
+          sudo bzip2 "$pkgname".tar
 
       - name: Publish archive
         uses: ./.github/actions/publish
