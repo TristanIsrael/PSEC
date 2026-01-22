@@ -389,11 +389,6 @@ jobs:
         with:
           abuild-key: ${{ secrets.ABUILD_PRIVATE_KEY }}
  
-      - name: Get py3-paho-mqtt2 dependency
-        uses: ./.github/actions/get-dependency
-        with:
-          name: py3-paho-mqtt2
- 
       - name: Build APK
         uses: ./.github/actions/build-apk
         with:
@@ -565,11 +560,6 @@ jobs:
         with:
           abuild-key: ${{ secrets.ABUILD_PRIVATE_KEY }}
  
-      - name: Get psec-lib dependency
-        uses: ./.github/actions/get-dependency
-        with:
-          name: psec-lib         
- 
       - name: Build APK
         uses: ./.github/actions/build-apk
         with:
@@ -599,11 +589,6 @@ jobs:
         with:
           abuild-key: ${{ secrets.ABUILD_PRIVATE_KEY }}
  
-      - name: Get psec-lib dependency
-        uses: ./.github/actions/get-dependency
-        with:
-          name: psec-lib         
- 
       - name: Build APK
         uses: ./.github/actions/build-apk
         with:
@@ -631,12 +616,7 @@ jobs:
       - name: Prepare build environment
         uses: ./.github/actions/prepare-build-env
         with:
-          abuild-key: ${{ secrets.ABUILD_PRIVATE_KEY }}
- 
-      - name: Get psec-lib dependency
-        uses: ./.github/actions/get-dependency
-        with:
-          name: psec-lib         
+          abuild-key: ${{ secrets.ABUILD_PRIVATE_KEY }}      
  
       - name: Build APK
         uses: ./.github/actions/build-apk
@@ -696,16 +676,6 @@ jobs:
         with:
           abuild-key: ${{ secrets.ABUILD_PRIVATE_KEY }}     
  
-      - name: Get psec-lib dependency
-        uses: ./.github/actions/get-dependency
-        with:
-          name: psec-lib
-
-      - name: Get psec-core dependency
-        uses: ./.github/actions/get-dependency
-        with:
-          name: psec-core
-
       - name: Build APK
         uses: ./.github/actions/build-apk
         with:
@@ -770,16 +740,6 @@ jobs:
         with:
           abuild-key: ${{ secrets.ABUILD_PRIVATE_KEY }}     
  
-      - name: Get psec-lib dependency
-        uses: ./.github/actions/get-dependency
-        with:
-          name: psec-lib
-
-      - name: Get psec-core dependency
-        uses: ./.github/actions/get-dependency
-        with:
-          name: psec-core
-
       - name: Build APK
         uses: ./.github/actions/build-apk
         with:

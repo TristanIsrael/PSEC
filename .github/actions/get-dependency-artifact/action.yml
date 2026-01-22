@@ -1,4 +1,4 @@
-name: Get dependency
+name: Get dependency from the workflow artifacts
 
 inputs:
   name:
@@ -24,7 +24,7 @@ runs:
         cd $GITHUB_WORKSPACE/downloads
         if [ -d "$FILENAME" ]; then
           cd "$FILENAME"
-        fi        
+        fi
         mkdir -p /home/builder/packages/psec/x86_64
         cp *.apk /home/builder/packages/psec/x86_64
 

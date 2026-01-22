@@ -43,6 +43,11 @@ runs:
 
     - shell: sh
       run: |
+        echo "Register the official repository"
+        sudo echo "https://www.alefbet.net/github/psec" >> /etc/apk/repositories
+
+    - shell: sh
+      run: |
         echo "Copy abuild public key"
         cp certs/psec.rsa.pub /home/builder/.abuild
         cp certs/psec.rsa.pub /etc/apk/keys
