@@ -510,7 +510,7 @@ jobs:
           filepath: /home/builder/lxc-container-debian.tar.bz2
 
   build-container-debian:
-    needs: [ prepare, build-container-debian ]
+    needs: [ prepare, build-lxc-container-debian ]
     if: | 
       needs.prepare.outputs.check-psec-container-debian == 'true'
     runs-on: ubuntu-latest
