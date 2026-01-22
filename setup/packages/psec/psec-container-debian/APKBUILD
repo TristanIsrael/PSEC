@@ -33,6 +33,10 @@ https://www.alefbet.net/github/psec/x86_64/lxc-container-debian.tar.bz2!
     # sudo lxc-stop "$pkgname"
 #}
 
+prepare() {
+    default_prepare
+}
+
 package() {
     mkdir -p "$pkgdir"/var/lib/lxc/
 
