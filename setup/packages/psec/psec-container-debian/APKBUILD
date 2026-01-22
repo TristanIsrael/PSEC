@@ -44,7 +44,7 @@ package() {
     #bzip2 "$pkgdir"/var/lib/lxc/"$pkgname".tar
 
     # Copy the archive into the package
-    mv $srcdir/lcx-container-debian.tar.bz2 $pkgdir/var/lib/lxc
+    mv $srcdir/lxc-container-debian.tar.bz2 $pkgdir/var/lib/lxc
 
     # Clean the environment because abuild won't be able
     sudo rm -rf "$srcdir/$pkgname"
