@@ -19,7 +19,7 @@ options="!check"  # no tests provided
 #_release="buster"
 #_arch="amd64"
 source="
-https://www.alefbet.net/github/psec/x86_64/lxc-container-debian.tar.bz2!
+https://www.alefbet.net/github/psec/x86_64/lxc-container-debian.tar.bz2
 "
 
 #build() {     
@@ -41,15 +41,12 @@ package() {
     mkdir -p "$pkgdir"/var/lib/lxc/
 
     # Tar container
-    #sudo tar cf "$pkgdir"/var/lib/lxc/"$pkgname".tar -C "$srcdir" .
+    sudo tar czf "$pkgdir"/var/lib/lxc/"$pkgname".tar.bz2 -C "$srcdir" .
     #sudo chown $USER "$pkgdir"/var/lib/lxc/"$pkgname".tar
 
     # Compress archive
     #bzip2 "$pkgdir"/var/lib/lxc/"$pkgname".tar
 
-    # Copy the archive into the package
-    mv $srcdir/lxc-container-debian.tar.bz2 $pkgdir/var/lib/lxc
-
     # Clean the environment because abuild won't be able
-    sudo rm -rf "$srcdir/$pkgname"
+    #sudo rm -rf "$srcdir/$pkgname"
 }
