@@ -474,12 +474,16 @@ jobs:
       needs.prepare.outputs.check-psec-container-debian == 'true'
     runs-on: ubuntu-latest
  
-    steps:      
+    steps:
+      - name: Checkout sources 
+        uses: actions/checkout@v4
+
       - name: Install dependencies
         shell: sh
         run: |
           sudo apt update
           sudo apt install lxc lxc-templates liblxc-common iptables
+          
       - name: Create generic Debian container 
         env:
           pkgname: lxc-container-debian
