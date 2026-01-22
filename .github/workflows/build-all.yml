@@ -485,7 +485,7 @@ jobs:
           pkgname: lxc-container-debian
           srcdir: ${{ github.workspace }}/src
           distro: debian
-          release: buster
+          release: bookworm
           arch: amd64
           variant: cloud
         shell: sh         
