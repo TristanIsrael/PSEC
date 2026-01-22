@@ -515,7 +515,7 @@ jobs:
         uses: ./.github/actions/publish
         with:
           privkey: ${{ secrets.DEPLOY_KEY }}
-          filepath: /home/builder/lxc-container-debian.tar.bz2
+          filepath: lxc-container-debian.tar.bz2
           container: false
 
   build-container-debian:
