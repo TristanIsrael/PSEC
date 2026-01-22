@@ -404,9 +404,7 @@ jobs:
   build-alpine-virt:
     needs: [ prepare ]
     if: | 
-      needs.prepare.outputs.check-psec-alpine-virt == 'true' ||
-      needs.prepare.outputs.check-psec-sys-gui == 'true' ||
-      needs.prepare.outputs.check-psec-sys-usb == 'true'
+      needs.prepare.outputs.check-psec-alpine-virt == 'true'
     runs-on: ubuntu-latest
  
     container:
