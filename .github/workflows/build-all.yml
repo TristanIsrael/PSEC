@@ -477,7 +477,7 @@ jobs:
     steps:      
       - name: Install dependencies
         shell: sh
-        run: 
+        run: |
           sudo apt update
           sudo apt install lxc lxc-templates liblxc-common iptables
       - name: Create generic Debian container 
