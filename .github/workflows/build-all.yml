@@ -482,7 +482,7 @@ jobs:
       - name: Create generic Debian container 
         env:
           pkgname: lxc-container-debian
-          srcdir: ${{ GITHUB_WORKSPACE }}/src
+          srcdir: ${{ github.workspace }}/src
           distro: debian
           release: buster
           arch: amd64
