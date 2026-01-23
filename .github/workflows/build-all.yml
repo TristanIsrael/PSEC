@@ -308,7 +308,8 @@ jobs:
       needs.prepare.outputs.check-psec-lib == 'true' ||
       needs.prepare.outputs.check-psec-core == 'true' ||
       needs.prepare.outputs.check-psec-sys-gui == 'true' ||
-      needs.prepare.outputs.check-psec-sys-usb == 'true'
+      needs.prepare.outputs.check-psec-sys-usb == 'true' ||
+      needs.prepare.outputs.check-psec-app-tests == 'true'
     runs-on: ubuntu-latest
  
     container:
@@ -342,7 +343,8 @@ jobs:
       needs.prepare.outputs.check-psec-core == 'true' ||     
       needs.prepare.outputs.check-psec-sys-gui == 'true' ||
       needs.prepare.outputs.check-psec-sys-usb == 'true' ||
-      needs.prepare.outputs.check-psec-gui-base == 'true'
+      needs.prepare.outputs.check-psec-gui-base == 'true' ||
+      needs.prepare.outputs.check-psec-app-tests == 'true'
     runs-on: ubuntu-latest
  
     container:
@@ -511,7 +513,9 @@ jobs:
 
   build-psec-core:
     needs: [ prepare, build-psec-lib ]
-    if: needs.prepare.outputs.check-psec-core == 'true'
+    if: |
+      needs.prepare.outputs.check-psec-core == 'true' ||
+      needs.prepare.outputs.check-psec-app-tests == 'true'
     runs-on: ubuntu-latest
  
     container:
@@ -540,7 +544,9 @@ jobs:
 
   build-psec-sys-gui:
     needs: [ prepare, build-psec-lib ]
-    if: needs.prepare.outputs.check-psec-sys-gui == 'true'
+    if: |
+      needs.prepare.outputs.check-psec-sys-gui == 'true' ||
+      needs.prepare.outputs.check-psec-app-tests == 'true'
     runs-on: ubuntu-latest
  
     container:
@@ -569,7 +575,9 @@ jobs:
 
   build-psec-sys-usb:
     needs: [ prepare, build-psec-lib ]
-    if: needs.prepare.outputs.check-psec-sys-usb == 'true'
+    if: |
+      needs.prepare.outputs.check-psec-sys-usb == 'true' ||
+      needs.prepare.outputs.check-psec-app-tests == 'true'
     runs-on: ubuntu-latest
  
     container:
@@ -598,7 +606,9 @@ jobs:
 
   build-psec-gui-base:
     needs: [ prepare, build-psec-lib ]
-    if: needs.prepare.outputs.check-psec-gui-base == 'true'
+    if: |
+      needs.prepare.outputs.check-psec-gui-base == 'true' ||
+      needs.prepare.outputs.check-psec-app-tests == 'true'
     runs-on: ubuntu-latest
  
     container:
