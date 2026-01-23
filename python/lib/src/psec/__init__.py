@@ -41,6 +41,7 @@ from ._mqtt_factory import MqttFactory
 from ._api import Api
 from ._mock_sys_usb_controller import MockSysUsbController
 from ._debugging import Debugging
+from ._api_helper import ApiHelper
 
 import logging
 from logging import NullHandler
@@ -67,7 +68,7 @@ __all__ = [
     "Dom0Controller", "SysUsbController", "Api",
     "ComponentsHelper",
     "MockSysUsbController",
-    "System", "Debugging"
+    "System", "Debugging", "ApiHelper"
 ]
 
 logging.getLogger(__name__).addHandler(NullHandler())

@@ -9,4 +9,3 @@ PSEC documentation
    :caption: Contents:
 
    psec
-   markdown/index

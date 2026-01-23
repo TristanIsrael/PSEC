@@ -19,6 +19,9 @@ class Api(metaclass=SingletonMeta):
 
     To use the API, simply instantiate the Api class and open the socket by calling the start() function. Then, the other functions allow for sending and receiving messages and notifications.
 
+    .. seealso::
+        :class:`ApiHelper` - The API helper class
+
     Asynchronous
     ============
 
@@ -636,7 +639,7 @@ class Api(metaclass=SingletonMeta):
     def __on_mqtt_connected(self):
         Logger().setup("Api", mqtt_client=self.__mqtt_client, recording=self.__recording, filename=self.__logfile)
 
-        # Automatically subscribe to ping topic
+        # Automatically subscribe to some topics
         self.subscribe(f"{Topics.PING}/{System.domain_name()}/request")
         self.subscribe(f"{Topics.SHUTDOWN}/response")
         self.subscribe(f"{Topics.RESTART_DOMAIN}/response")

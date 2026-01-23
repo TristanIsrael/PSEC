@@ -7,7 +7,7 @@ QtObject {
 
     /* Bindings */
     property bool handheld: true
-    property bool ready: true
+    property bool ready: AppController.ready
     property bool running: false
     property int batteryLevel: 100
     property bool plugged: true

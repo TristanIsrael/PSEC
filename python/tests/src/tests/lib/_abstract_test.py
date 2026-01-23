@@ -20,6 +20,7 @@ class AbstractTest(QObject):
     parallelizable = True
     progress = 0 # From 0 to 100
     messages = []
+    success = False
 
     #### Private properties ####
     
@@ -30,7 +31,9 @@ class AbstractTest(QObject):
  
     def start(self) -> None:
         """ Called when the test is started """
-        raise NotImplementedError
+        self._set_progress(100)
+        self._send_message(self.tr("Test not implemented"), MessageLevel.Warning)
+        self.finished.emit()
 
     def stop(self) -> None:
         """ Called when the test must be stopped """
@@ -48,6 +51,17 @@ class AbstractTest(QObject):
         self.progress = progress
         self.progressChanged.emit()
 
+    def _set_finished(self, success:bool):
+        self._set_progress(100)
+        self.success = success
+        self.finished.emit()
+
+    def _set_waiting(self, waiting:bool):
+        if waiting:
+            self.waiting.emit()
+        else:
+            self.resumed.emit()
+
     #################
     #### Signals ####
     #################
@@ -56,4 +70,5 @@ class AbstractTest(QObject):
     stopped = Signal()
     finished = Signal()
     waiting = Signal()
+    resumed = Signal()
     message = Signal(str, MessageLevel)

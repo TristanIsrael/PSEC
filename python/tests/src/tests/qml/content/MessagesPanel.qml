@@ -26,7 +26,7 @@ PanelBase {
             model: bindings.messagesModel
 
             onCountChanged: {
-                const txt = itemAtIndex(count -1)
+                //const txt = itemAtIndex(count -1)
                 listView.positionViewAtIndex(count-1, ListView.Contain)
                 /*console.debug(txt.y, listView.height, txt.text, count)
                 if(txt !== null && txt.y > listView.height) {

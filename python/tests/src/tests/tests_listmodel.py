@@ -1,9 +1,6 @@
-import pkgutil
-import importlib
-import inspect
-from pathlib import Path
 from PySide6.QtCore import QObject, QAbstractListModel, QModelIndex, Signal
 from enums import Roles, MessageLevel
+from tests_helper import TestsHelper
 
 class TestsListModel(QAbstractListModel):
 
@@ -16,44 +13,8 @@ class TestsListModel(QAbstractListModel):
 
     def update_cache(self):
         """ The cache contains all tests automatically discovered """
-        app_root_path = Path(__file__).parent
-        packages_path = app_root_path / "TestPackages"
-        # print(f"Look for test packages into {packages_path}")
-
-        self.addMessage.emit(self.tr("Looking into test packages"), MessageLevel.Information)
-
-        for _, package_name, _ in pkgutil.iter_modules([packages_path]):
-            # print(f"Module {package_name} discovered")
-
-            package = importlib.import_module(f"TestPackages.{package_name}")
-
-            if not any(d.get("name") == package_name for d in self.__cache):
-                self.addMessage.emit(self.tr(f"Found package {package_name}"), MessageLevel.Information)
-
-                self.__cache.append({
-                    "name": package_name,
-                    "success": False,
-                    "is_test": False
-                })
-
-            for _, module_name, _ in pkgutil.walk_packages(package.__path__, package.__name__ + "."):                                
-                module = importlib.import_module(module_name)
-
-                for _, cls in inspect.getmembers(module, inspect.isclass):
-                    if cls.__module__ == module_name:
-                        self.addMessage.emit(self.tr(f"Found test {cls.name}"), MessageLevel.Information)
-                        # print(f"Test class {module_name} discovered")
-
-                        self.__cache.append({
-                            "name": cls.name,
-                            "package": package_name,
-                            "progress": 0,
-                            "success": False,
-                            "is_test": True
-                        })
-
-        self.addMessage.emit(self.tr("Test discovery finished\n"), MessageLevel.Information)
-            
+        self.__cache = TestsHelper.get_tests_list()
+        
 
     def rowCount(self, parent=QModelIndex()):
         #return len(self.__cache.keys()) + len(self.__cache.values())
@@ -111,3 +72,8 @@ class TestsListModel(QAbstractListModel):
         }
 
         return roles
+
+    def on_progress_changed(self):
+        # TODO: improve the algorithm
+        self.beginResetModel()
+        self.endResetModel()

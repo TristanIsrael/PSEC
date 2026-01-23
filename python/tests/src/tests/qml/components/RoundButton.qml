@@ -100,6 +100,10 @@ Item {
     MouseArea {
         anchors.fill: parent
 
-        onClicked: root.clicked()
+        onClicked: {
+            if(!root.enabled)
+                return
+            root.clicked()
+        }
     }
 }

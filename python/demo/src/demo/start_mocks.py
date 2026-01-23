@@ -1,5 +1,5 @@
 from psec import MockSysUsbController
-from DevModeHelper import DevModeHelper
+from mocks.DevModeHelper import DevModeHelper
 import threading
 
 if __name__ == "__main__":
