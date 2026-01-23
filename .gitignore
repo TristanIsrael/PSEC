@@ -138,3 +138,6 @@ bin/*.*
 
 ### GitHub Workflows ###
 !.github/**
+
+### Xorg conf files ###
+!**/xorg.conf.d
