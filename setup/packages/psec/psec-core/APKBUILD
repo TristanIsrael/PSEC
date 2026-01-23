@@ -83,12 +83,13 @@ PSEC_BINDIR="$PSEC_ROOTDIR/bin"
 
 build() {
     echo "Create default overlay for User Domains"
-    cd "$builddir"/PSEC/domu_apkovl.tmpl
-    tar czf "$$builddir"/PSEC/domu.apkovl.tar.gz --exclude '.DS_Store' etc/ 
+    ls -lR
+    cd domu_apkovl.tmpl
+    tar czf "$$builddir"/domu.apkovl.tar.gz --exclude '.DS_Store' etc/ 
 }
 
 check() {
-    nb_fichiers=`tar tvzf $builddir/PSEC/domu.apkovl.tar.gz | wc -l`
+    nb_fichiers=`tar tvzf $builddir/domu.apkovl.tar.gz | wc -l`
     if [ $nb_fichiers != 32 ]; then 
         echo "Incorrect files count in the overlay."
         echo "... found=$nb_fichiers, expected=32"

@@ -305,8 +305,7 @@ jobs:
     needs: [ prepare ]
     if: |
       needs.prepare.outputs.check-py3-paho-mqtt2 == 'true' || 
-      needs.prepare.outputs.check-psec-lib == 'true' ||
-      needs.prepare.outputs.check-psec-core == 'true' ||
+      needs.prepare.outputs.check-psec-lib == 'true' ||      
       needs.prepare.outputs.check-psec-sys-gui == 'true' ||
       needs.prepare.outputs.check-psec-sys-usb == 'true'
     runs-on: ubuntu-latest
@@ -338,8 +337,7 @@ jobs:
   build-psec-lib:
     needs: [ prepare, build-py3-paho-mqtt2 ]
     if: | 
-      needs.prepare.outputs.check-psec-lib == 'true' ||
-      needs.prepare.outputs.check-psec-core == 'true' ||
+      needs.prepare.outputs.check-psec-lib == 'true' ||      
       needs.prepare.outputs.check-psec-sys-gui == 'true' ||
       needs.prepare.outputs.check-psec-sys-usb == 'true'
     runs-on: ubuntu-latest
