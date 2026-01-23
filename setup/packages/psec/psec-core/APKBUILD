@@ -76,18 +76,19 @@ scripts/create-tty-tunnel.sh
 scripts/create-tty-terminal.sh
 scripts/start-mqtt-logger.sh
 
-domu_apkovl.tmpl.tar.gz
+domu_apkovl.tmpl.tar.gz.bin
 "
 
 PSEC_CONFDIR="etc/psec"
 PSEC_ROOTDIR="usr/lib/psec"
 PSEC_BINDIR="$PSEC_ROOTDIR/bin"
 
-#build() {
-    #echo "Create default overlay for User Domains"
+build() {
+    echo "Create default overlay for User Domains"
+    mv "$srcdir"/domu.apkovl.tar.gz.bin "$srcdir"/domu.apkovl.tar.gz
     #cd domu_apkovl.tmpl
-    #tar czf "$$builddir"/domu.apkovl.tar.gz --exclude '.DS_Store' etc/ 
-#}
+    #tar czf "$builddir"/domu.apkovl.tar.gz --exclude '.DS_Store' etc/ 
+}
 
 check() {
     nb_fichiers=`tar tvzf $srcdir/domu.apkovl.tar.gz | wc -l`
