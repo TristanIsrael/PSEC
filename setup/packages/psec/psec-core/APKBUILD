@@ -75,21 +75,22 @@ misc/qemu-system-x86_64.cmd
 scripts/create-tty-tunnel.sh
 scripts/create-tty-terminal.sh
 scripts/start-mqtt-logger.sh
+
+domu_apkovl.tmpl.tar.gz
 "
 
 PSEC_CONFDIR="etc/psec"
 PSEC_ROOTDIR="usr/lib/psec"
 PSEC_BINDIR="$PSEC_ROOTDIR/bin"
 
-build() {
-    echo "Create default overlay for User Domains"
-    ls -lR
-    cd domu_apkovl.tmpl
-    tar czf "$$builddir"/domu.apkovl.tar.gz --exclude '.DS_Store' etc/ 
-}
+#build() {
+    #echo "Create default overlay for User Domains"
+    #cd domu_apkovl.tmpl
+    #tar czf "$$builddir"/domu.apkovl.tar.gz --exclude '.DS_Store' etc/ 
+#}
 
 check() {
-    nb_fichiers=`tar tvzf $builddir/domu.apkovl.tar.gz | wc -l`
+    nb_fichiers=`tar tvzf $srcdir/domu.apkovl.tar.gz | wc -l`
     if [ $nb_fichiers != 32 ]; then 
         echo "Incorrect files count in the overlay."
         echo "... found=$nb_fichiers, expected=32"
@@ -100,7 +101,7 @@ check() {
 
 package() {
     # Alpine overlay for DomUs
-    install -D -m644 "$builddir"/domu.apkovl.tar.gz "$pkgdir"/usr/lib/psec/system/domu.apkovl.tar.gz    
+    install -D -m644 "$srcdir"/domu.apkovl.tar.gz "$pkgdir"/usr/lib/psec/system/domu.apkovl.tar.gz    
 
     # Openrc
     install -D -m755 "$srcdir"/splash.initd "$pkgdir"/etc/init.d/splash

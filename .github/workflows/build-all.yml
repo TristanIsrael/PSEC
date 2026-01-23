@@ -341,7 +341,8 @@ jobs:
       needs.prepare.outputs.check-psec-lib == 'true' || 
       needs.prepare.outputs.check-psec-core == 'true' ||     
       needs.prepare.outputs.check-psec-sys-gui == 'true' ||
-      needs.prepare.outputs.check-psec-sys-usb == 'true'
+      needs.prepare.outputs.check-psec-sys-usb == 'true' ||
+      needs.prepare.outputs.check-psec-gui-base == 'true'
     runs-on: ubuntu-latest
  
     container:
