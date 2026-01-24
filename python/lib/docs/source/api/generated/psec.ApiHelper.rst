@@ -1,4 +1,4 @@
-﻿psec.ApiHelper
+psec.ApiHelper
 ==============
 
 .. currentmodule:: psec

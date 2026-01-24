@@ -1,4 +1,4 @@
-﻿psec.Debugging
+psec.Debugging
 ==============
 
 .. currentmodule:: psec

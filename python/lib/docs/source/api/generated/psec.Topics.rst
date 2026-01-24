@@ -1,4 +1,4 @@
-﻿psec.Topics
+psec.Topics
 ===========
 
 .. currentmodule:: psec

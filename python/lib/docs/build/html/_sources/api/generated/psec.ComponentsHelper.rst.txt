@@ -1,4 +1,4 @@
-﻿psec.ComponentsHelper
+psec.ComponentsHelper
 =====================
 
 .. currentmodule:: psec

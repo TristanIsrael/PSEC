@@ -1,4 +1,4 @@
-﻿psec.SingletonMeta
+psec.SingletonMeta
 ==================
 
 .. currentmodule:: psec

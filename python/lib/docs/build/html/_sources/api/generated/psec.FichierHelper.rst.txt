@@ -1,4 +1,4 @@
-﻿psec.FichierHelper
+psec.FichierHelper
 ==================
 
 .. currentmodule:: psec

@@ -1,4 +1,4 @@
-﻿psec.NotificationFactory
+psec.NotificationFactory
 ========================
 
 .. currentmodule:: psec

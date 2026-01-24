@@ -1,4 +1,4 @@
-﻿psec.Dom0Controller
+psec.Dom0Controller
 ===================
 
 .. currentmodule:: psec

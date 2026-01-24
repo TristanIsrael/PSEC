@@ -1,4 +1,4 @@
-﻿psec.Constantes
+psec.Constantes
 ===============
 
 .. currentmodule:: psec

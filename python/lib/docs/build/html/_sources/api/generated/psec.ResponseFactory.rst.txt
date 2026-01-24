@@ -1,4 +1,4 @@
-﻿psec.ResponseFactory
+psec.ResponseFactory
 ====================
 
 .. currentmodule:: psec

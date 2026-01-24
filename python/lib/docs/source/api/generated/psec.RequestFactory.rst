@@ -1,4 +1,4 @@
-﻿psec.RequestFactory
+psec.RequestFactory
 ===================
 
 .. currentmodule:: psec

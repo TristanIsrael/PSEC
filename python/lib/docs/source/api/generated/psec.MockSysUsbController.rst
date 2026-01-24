@@ -1,4 +1,4 @@
-﻿psec.MockSysUsbController
+psec.MockSysUsbController
 =========================
 
 .. currentmodule:: psec

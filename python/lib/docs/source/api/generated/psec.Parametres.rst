@@ -1,4 +1,4 @@
-﻿psec.Parametres
+psec.Parametres
 ===============
 
 .. currentmodule:: psec

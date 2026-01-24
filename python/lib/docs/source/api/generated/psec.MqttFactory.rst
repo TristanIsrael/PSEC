@@ -1,4 +1,4 @@
-﻿psec.MqttFactory
+psec.MqttFactory
 ================
 
 .. currentmodule:: psec

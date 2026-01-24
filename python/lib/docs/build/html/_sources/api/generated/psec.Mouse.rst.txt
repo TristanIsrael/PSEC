@@ -1,4 +1,4 @@
-﻿psec.Mouse
+psec.Mouse
 ==========
 
 .. currentmodule:: psec

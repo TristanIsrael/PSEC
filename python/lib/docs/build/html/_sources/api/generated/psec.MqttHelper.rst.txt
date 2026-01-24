@@ -1,4 +1,4 @@
-﻿psec.MqttHelper
+psec.MqttHelper
 ===============
 
 .. currentmodule:: psec

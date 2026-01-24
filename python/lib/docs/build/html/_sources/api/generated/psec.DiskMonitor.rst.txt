@@ -1,4 +1,4 @@
-﻿psec.DiskMonitor
+psec.DiskMonitor
 ================
 
 .. currentmodule:: psec

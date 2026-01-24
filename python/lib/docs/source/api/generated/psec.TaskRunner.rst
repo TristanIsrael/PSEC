@@ -1,4 +1,4 @@
-﻿psec.TaskRunner
+psec.TaskRunner
 ===============
 
 .. currentmodule:: psec

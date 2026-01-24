@@ -1,4 +1,4 @@
-﻿psec.Logger
+psec.Logger
 ===========
 
 .. currentmodule:: psec

@@ -1,4 +1,4 @@
-﻿psec.SysUsbController
+psec.SysUsbController
 =====================
 
 .. currentmodule:: psec
