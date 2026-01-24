@@ -13,6 +13,11 @@ Newcomers should begin with the [architecture documentation](python/lib/docs/sou
 
 API is documented in the [protocol documentation](python/lib/docs/source/markdown/protocol.md) for the Messages and in the [API documentation (HTML)](python/lib/docs/build/html/psec.html#psec.Api) for the *python API*.
 
+The documentation is also automatically generated:
+- [API documentation (HTML) on Github Pages](https://tristanisrael.github.io/PSEC/psec.html)
+- [Protocol documentation on Github Wiki](https://github.com/TristanIsrael/PSEC/wiki/Protocol)
+
+
 All python classes documentation (*docstrings*) is provided as HTML pages in the folder `python/lib/docs/build/html`.
 
 ## Project directory structure
