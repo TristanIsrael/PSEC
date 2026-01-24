@@ -317,6 +317,11 @@ provided in the <a class="reference internal" href="#psec.Topics" title="psec.To
 <dt class="sig sig-object py" id="psec.Api.add_message_callback">
 <span class="sig-name descname"><span class="pre">add_message_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">callback_fn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/psec/_api.html#Api.add_message_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.Api.add_message_callback" title="Link to this definition">¶</a></dt>
 <dd><p>Adds a callback for receiving messages</p>
+<p>The callback will receive the following arguments:</p>
+<ul class="simple">
+<li><p>topic:str The topic of the message</p></li>
+<li><p>payload:dict The payload as a JSON object</p></li>
+</ul>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>callback_fn</strong> (<em>Callable</em>) – A function which will be called by the API when a message arrives.</p>
@@ -328,6 +333,7 @@ provided in the <a class="reference internal" href="#psec.Topics" title="psec.To
 <dt class="sig sig-object py" id="psec.Api.add_ready_callback">
 <span class="sig-name descname"><span class="pre">add_ready_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">callback_fn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/psec/_api.html#Api.add_ready_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.Api.add_ready_callback" title="Link to this definition">¶</a></dt>
 <dd><p>Adds a callback to notify when the API is connected to the MQTT broker and ready.</p>
+<p>The callback won’t receive any argument</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>callback_fn</strong> (<em>Callable</em>) – A function which will be called by the API when it is connected to the MQTT broker.</p>
@@ -361,6 +367,10 @@ provided in the <a class="reference internal" href="#psec.Topics" title="psec.To
 <dt class="sig sig-object py" id="psec.Api.add_subscription_callback">
 <span class="sig-name descname"><span class="pre">add_subscription_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">callback_fn</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/psec/_api.html#Api.add_subscription_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.Api.add_subscription_callback" title="Link to this definition">¶</a></dt>
 <dd><p>Adds a callback to notify when a subscription has been acknowledged by the broker.</p>
+<p>The callback will receive the following arguments:</p>
+<ul class="simple">
+<li><p>topic:str The topic subscribed</p></li>
+</ul>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>callback_fn</strong> (<em>Callable</em>) – A function which will be called by the API when the subscription has been acknowledged.</p>

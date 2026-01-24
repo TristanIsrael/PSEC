@@ -15,8 +15,8 @@ QtObject {
     property int ambientLight: 0 // 0 (dark) - 100 (sunny)
     property int systemState: 0
     property int nbTestsTotal: AppController.nbTestsTotal
-    property int nbTestsFailed: 0
-    property int nbTestsSucceeded: 0
+    property int nbTestsFailed: AppController.nbTestsFailed
+    property int nbTestsSucceeded: AppController.nbTestsSucceeded
     property int nbCapacitiesTotal: AppController.nbCapacitiesTotal
     property int nbCapacitiesFailed: 0
     property int nbCapacitiesSucceeded: 0

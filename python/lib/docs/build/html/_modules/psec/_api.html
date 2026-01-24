@@ -381,6 +381,11 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a callback for receiving messages</span>
 
+<span class="sd">        The callback will receive the following arguments:</span>
+
+<span class="sd">        - topic:str The topic of the message</span>
+<span class="sd">        - payload:dict The payload as a JSON object</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            callback_fn(Callable): A function which will be called by the API when a message arrives.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -398,6 +403,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a callback to notify when the API is connected to the MQTT broker and ready.</span>
 
+<span class="sd">        The callback won&#39;t receive any argument</span>
+
 <span class="sd">        Args:</span>
 <span class="sd">            callback_fn(Callable): A function which will be called by the API when it is connected to the MQTT broker.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -413,6 +420,10 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">add_subscription_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback_fn</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a callback to notify when a subscription has been acknowledged by the broker.</span>
+
+<span class="sd">        The callback will receive the following arguments:</span>
+<span class="sd">        </span>
+<span class="sd">        - topic:str The topic subscribed</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            callback_fn(Callable): A function which will be called by the API when the subscription has been acknowledged.</span>

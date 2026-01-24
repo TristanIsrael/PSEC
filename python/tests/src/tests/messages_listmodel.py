@@ -27,11 +27,11 @@ class MessagesListModel(QAbstractListModel):
         elif role == Roles.RoleCriticity:
             return item.get("criticity")
         elif role == Roles.RoleDateTime:
-            return item.get("datetime")        
+            return item.get("datetime")
         
     @Slot(str, MessageLevel)
     def add_message(self, message:str, criticity:MessageLevel = MessageLevel.Information):
-        self.beginInsertRows(QModelIndex(), len(self.__messages), len(self.__messages)+1)
+        self.beginInsertRows(QModelIndex(), len(self.__messages), len(self.__messages))
         self.__messages.append({
             "datetime": datetime.now().strftime(self.tr("%Y-%m-%d %H:%M:%S")),
             "message": message,

@@ -141,6 +141,11 @@ class Api(metaclass=SingletonMeta):
         """
         Adds a callback for receiving messages
 
+        The callback will receive the following arguments:
+
+        - topic:str The topic of the message
+        - payload:dict The payload as a JSON object
+
         Args:
             callback_fn(Callable): A function which will be called by the API when a message arrives.
         """
@@ -155,6 +160,8 @@ class Api(metaclass=SingletonMeta):
         """
         Adds a callback to notify when the API is connected to the MQTT broker and ready.
 
+        The callback won't receive any argument
+
         Args:
             callback_fn(Callable): A function which will be called by the API when it is connected to the MQTT broker.
         """
@@ -167,6 +174,10 @@ class Api(metaclass=SingletonMeta):
     def add_subscription_callback(self, callback_fn):
         """
         Adds a callback to notify when a subscription has been acknowledged by the broker.
+
+        The callback will receive the following arguments:
+        
+        - topic:str The topic subscribed
 
         Args:
             callback_fn(Callable): A function which will be called by the API when the subscription has been acknowledged.

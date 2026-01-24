@@ -1,5 +1,5 @@
 import os
-from PySide6.QtCore import QObject, Property, Slot, Signal
+from PySide6.QtCore import QObject, Property, Slot, Signal, QTimer
 from tests_listmodel import TestsListModel
 from messages_listmodel import MessagesListModel
 from lib import AbstractTest
@@ -16,14 +16,14 @@ class AppController(QObject):
     __ready = False
     __running = False
     __tests_list = TestsHelper.get_tests_list()
+    __current_test_index = 0
 
     def __init__(self, parent:QObject):
         super().__init__(parent)
         
         self.__messages_model = MessagesListModel(self)        
-        self.__tests_listmodel = TestsListModel(self)
+        self.__tests_listmodel = TestsListModel(self.__tests_list, self)
         self.__tests_listmodel.addMessage.connect(self.__messages_model.add_message)
-        self.__tests_listmodel.update_cache()
         self.__messages_model.add_message(self.tr("PSEC tests app has started"))
 
         Api().add_ready_callback(self.__on_api_ready)        
@@ -54,33 +54,53 @@ class AppController(QObject):
             self.__messages_model.add_message(self.tr("Stop the whole test plan"))
 
     def __run_next_test(self):
-        self.__messages_model.add_message(self.tr("Run next test"))
-        for test in self.__tests_list:
-            if not test["is_test"]:
-                continue
-
-            if test.get("finished", False):
-                continue
-
-            test_name = test["name"]
-            test_class_name = test["class_name"]
-            test_class:AbstractTest = test["class"]
-            self.__messages_model.add_message(self.tr(f"Starting test {test_name}"))
-                
-            obj = test_class(self)
-            if obj is None:
-                self.__messages_model.add_message(self.tr(f"Could not start test {test_name}: Could not instanciate"))
-                continue
-
-            # Connect slots
-            obj.progressChanged.connect(self.__tests_listmodel.on_progress_changed)
-            obj.message.connect(self.__messages_model.add_message)
-            obj.finished.connect(self.__on_test_finished)
-
-            # Start the test
-            obj.start()
-
+        if self.__current_test_index >= len(self.__tests_list):
             return
+                
+        test = self.__tests_list[self.__current_test_index]
+        self.__current_test_index = self.__current_test_index+1
+
+        if not test["is_test"]:
+            QTimer.singleShot(1, self.__run_next_test)
+            return
+
+        if test.get("finished", False):
+            QTimer.singleShot(1, self.__run_next_test)
+            return
+
+        self.__messages_model.add_message(self.tr("Run next test"))
+        test_name = test["name"]
+        test_class_name = test["class_name"]
+        test_class:AbstractTest = test["class"]
+        self.__messages_model.add_message(self.tr(f"Starting test {test_name}"))
+            
+        obj = test_class(self)
+        if obj is None:
+            self.__messages_model.add_message(self.tr(f"Could not start test {test_name}: Could not instanciate"))
+            QTimer.singleShot(0, self.__run_next_test)
+            return
+
+        # Connect slots
+        obj.progressChanged.connect(self.__on_progress_changed)
+        obj.message.connect(self.__messages_model.add_message)
+        obj.finished.connect(self.__on_test_finished)
+
+        # Start the test
+        obj.start()
+
+    def __on_progress_changed(self):
+        sender = self.sender()
+
+        if sender is None:
+            self.__messages_model.add_message(self.tr("Error when receiving progress signal: no sender"))
+            return
+        else:
+            test = self.__get_test(sender.name)
+            if test is None:
+                self.__messages_model.add_message(self.tr(f"Error: the finished test has no name"))
+                return  
+            
+            test["progress"] = sender.progress
 
     def __on_test_finished(self):
         sender = self.sender()
@@ -94,10 +114,20 @@ class AppController(QObject):
 
             if test is None:
                 self.__messages_model.add_message(self.tr(f"Error: the finished test has no name"))
-                return
+                return            
 
-            # Set the test finished
-            test["finished"] = True
+            # Set the test finished            
+            test["finished"] = True          
+            test["success"] = sender.success
+            if test.get("success", False) == True:
+                self.nbTestsSucceededChanged.emit()
+            else:
+                self.nbTestsFailedChanged.emit()
+            
+            self.__tests_listmodel.on_data_changed()
+
+        # Destroy the object
+        #sender.deleteLater()
 
         self.__run_next_test()
 
@@ -113,6 +143,8 @@ class AppController(QObject):
     ###
     nbCapacitiesTotalChanged = Signal()
     nbTestsTotalChanged = Signal()
+    nbTestsFailedChanged = Signal()
+    nbTestsSucceededChanged = Signal()
     readyChanged = Signal()
     runningChanged = Signal()
 
@@ -142,3 +174,11 @@ class AppController(QObject):
     @Property(bool, notify= runningChanged)
     def running(self) -> bool:
         return self.__running
+    
+    @Property(int, notify= nbTestsFailedChanged)
+    def nbTestsFailed(self) -> int:
+        return sum(1 for d in self.__tests_list if d.get("finished", False) == True and d.get("success", False) == False)
+    
+    @Property(int, notify= nbTestsSucceededChanged)
+    def nbTestsSucceeded(self) -> int:
+        return sum(1 for d in self.__tests_list if d.get("finished", False) == True and d.get("success", False) == True)

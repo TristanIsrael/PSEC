@@ -44,7 +44,8 @@ PanelBase {
                         case Enums.MessageLevel.User: return Environment.colorUserMessage
                         default: Environment.colorText
                     }
-                }                
+                }
+                font.bold: criticity === Enums.MessageLevel.User
             }
 
             Behavior on contentY {

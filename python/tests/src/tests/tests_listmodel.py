@@ -1,33 +1,37 @@
-from PySide6.QtCore import QObject, QAbstractListModel, QModelIndex, Signal
+from PySide6.QtCore import QObject, QAbstractListModel, QModelIndex, Signal, Slot
 from enums import Roles, MessageLevel
 from tests_helper import TestsHelper
 
 class TestsListModel(QAbstractListModel):
 
-    __cache = [] # List of dicts
+    #__cache = [] # List of dicts
 
     addMessage = Signal(str, MessageLevel)
 
-    def __init__(self, parent:QObject):
-        super().__init__(parent)        
+    def __init__(self, tests_list:list, parent:QObject):
+        super().__init__(parent)
+        self.__tests_list = tests_list
 
-    def update_cache(self):
-        """ The cache contains all tests automatically discovered """
-        self.__cache = TestsHelper.get_tests_list()
+    #def update_cache(self):
+    #    """ The cache contains all tests automatically discovered """
+    #    self.__cache = TestsHelper.get_tests_list()
         
 
     def rowCount(self, parent=QModelIndex()):
-        #return len(self.__cache.keys()) + len(self.__cache.values())
-        return len(self.__cache)
+        #return len(self.__cache.keys()) + len(self.__cache.values())        
+        return len(self.__tests_list)
     
     def data(self, index, role):
         if not index.isValid():
             return None
         
-        if len(self.__cache) <= index.row():
+        if len(self.__tests_list) <= index.row():
             return
 
-        item = self.__cache[index.row()]
+        item = self.__tests_list[index.row()]
+
+        if item.get("name") == "Get storages list":
+            print(item)
 
         if role == Roles.RoleLabel:
             return item.get("name")
@@ -48,7 +52,7 @@ class TestsListModel(QAbstractListModel):
             the values for the package's tests 
         """
 
-        tests = [d for d in self.__cache if d.get("package") == package_name]
+        tests = [d for d in self.__tests_list if d.get("package") == package_name]
         sum_ = sum(d.get("progress") for d in tests)
         cnt_ = len(tests)
 
@@ -58,10 +62,10 @@ class TestsListModel(QAbstractListModel):
         
 
     def get_nb_capacities_total(self) -> int:
-        return sum(1 for d in self.__cache if d.get("is_test") is False)
+        return sum(1 for d in self.__tests_list if d.get("is_test") is False)
     
     def get_nb_tests_total(self) -> int:
-        return sum(1 for d in self.__cache if d.get("is_test"))
+        return sum(1 for d in self.__tests_list if d.get("is_test"))
 
     def roleNames(self) -> dict:
         roles = {
@@ -73,7 +77,8 @@ class TestsListModel(QAbstractListModel):
 
         return roles
 
-    def on_progress_changed(self):
+    @Slot()
+    def on_data_changed(self):
         # TODO: improve the algorithm
         self.beginResetModel()
         self.endResetModel()
