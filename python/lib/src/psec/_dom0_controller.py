@@ -12,8 +12,26 @@ from . import MqttClient, Topics, MqttHelper, NotificationFactory
 from . import System, EtatComposant
 
 class Dom0Controller():
-    """ Cette classe traite les commandes envoyées par les Domaines et qui concernent le dépôt local et le 
-    système en général (supervision, configuration, etc).
+    """ This class handles some of the commands sent by Domains that involve the repository and the system in general 
+    (supervision, configuration, etc)    
+
+    The capabilities of the Dom0 controller are:
+
+        - List the files of the repository (:attr:`Topics.LIST_FILES`).
+        - Delete a file in the repository (:attr:`Topics.DELETE_FILE`).
+        - Calculate a file footprint (:attr:`Topics.FILE_FOOTPRINT`).
+        - Shut the system down (:attr:`Topics.SHUTDOWN`).
+        - Restart a Domain (:attr:`Topics.RESTART_DOMAIN`). ** The Dom0 cannot be restarted **.
+        - Get the system information (:attr:`Topics.SYSTEM_INFO`).
+        - Get the energy state (:attr:`Topics.ENERGY_STATE`).
+        - Discover the components of the system (:attr:`Topics.DISCOVER_COMPONENTS`).
+        - Ping a Domain (:attr:`Topics.PING`).        
+        - Notify that the GUI is ready (:attr:`Topics.GUI_READY`).
+
+        All the function can be called using the API or the protocol.
+
+        .. seealso::
+            :class:`Api` - The API class
 
     """    
 
@@ -21,6 +39,12 @@ class Dom0Controller():
     __is_shutting_down = False
 
     def __init__(self, mqtt_client: MqttClient):
+        """ Instanciates the Dom0 controller.
+        
+        Args:
+            mqtt_client (MqttClient): The instance of the MqttClient class which handles the connexion to the MQTT broker.
+        
+        """
         self.mqtt_client = mqtt_client
 
         # Handle Mqtt messages
@@ -31,6 +55,24 @@ class Dom0Controller():
 
 
     def start(self):
+        """ Starts the Dom0 controller.
+
+        When the Dom0 controlelr starts it automatically subscribes to the following topics:
+
+        - :attr:`Topics.LIST_FILES`
+        - :attr:`Topics.FILE_FOOTPRINT`
+        - :attr:`Topics.SHUTDOWN`
+        - :attr:`Topics.RESTART_DOMAIN`
+        - :attr:`Topics.GUI_READY`
+        - :attr:`Topics.SYSTEM_INFO`
+        - :attr:`Topics.ENERGY_STATE`
+        - :attr:`Topics.DELETE_FILE`
+        - :attr:`Topics.DISCOVER_COMPONENTS`
+        - :attr:`Topics.PING`
+
+        After the Dom0 controller is started it is able to answer requests on these topics.
+        
+        """
         self.mqtt_client.start()
         self.__mqtt_lock.wait()
     

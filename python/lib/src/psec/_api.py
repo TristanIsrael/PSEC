@@ -10,28 +10,47 @@ import signal
 from datetime import datetime
 
 class Api(metaclass=SingletonMeta):
-    """ 
-    This class allows a third-party program to send commands or receive notifications without needing to use the socket directly.
+    """     
+    This class allows a third-party program to send commands or receive notifications without having to use the socket directly.
 
-    The API provides a simple set of instructions for sending commands and receiving notifications. However, it does not handle the formatting of commands, which is managed by the RequestFactory, ResponseFactory, or NotificationFactory classes.
+    The API provides a simple set of functions for sending commands and receiving notifications. However, it does not handle the formatting of commands, 
+    which is managed by the :class:`RequestFactory`, :class:`ResponseFactory`, :class:`NotificationFactory` or :class:`ApiHelper` classes.
 
-    The API can only be used within a user domain (Domain).
+    The API can only be used within a user Domain (DomU).
 
-    To use the API, simply instantiate the Api class and open the socket by calling the start() function. Then, the other functions allow for sending and receiving messages and notifications.
+    To use the API, simply instantiate the Api class and open the socket by calling the :func:`start()` function. Then, the other functions allow 
+    sending and receiving messages and notifications.
 
     .. seealso::
         :class:`ApiHelper` - The API helper class
 
+    Singleton
+    =========
+
+    This class is a singleton because it keeps information about the context. There is only one instance in an application.
+
+    Example of usage :
+
+    ::
+
+        Api().add_ready_callback(self.__on_ready)
+        Api().start()        
+
     Asynchronous
     ============
 
-    All commands operate asynchronously. The result of executing a command will only be communicated through a notification or a response. Therefore, a callback function must be provided to the API in order to receive responses. The internal topics
-    provided in the :class:`Topics` use the suffix `/request` and `/response` to differenciate the query and the answer. When an answer is expected on a topic, it will always be suffixed with `/response`.
+    All commands operate asynchronously. The result of executing a command will only be communicated through a notification or a response. 
+    Therefore, a callback function must be provided to the API in order to receive responses. The internal topics
+    provided in the :class:`Topics` use the suffix ``/request`` and ``/response`` to differenciate the query and the answer. 
+    When an answer is expected on a topic, it will always be suffixed with ``/response``.
 
     **The callbacks are**:
-    - API is ready  (see :func:`Api.add_ready_callback`)
-    - Message received  (see :func:`Api.add_message_callback`)
-    - The broker acknowledged a subscription (see :func:`Api.add_subscription_callback`)
+
+    - :func:`Api.add_message_callback` - A message has been received
+    - :func:`Api.add_ready_callback` - The API is ready    
+    - :func:`Api.add_restart_callback` - The restart has been accepted or refused by the core
+    - :func:`Api.add_shutdown_callback` - The shutdown has been accepted or refused by the core
+    - :func:`Api.add_subscription_callback` - The broker acknowledged a subscription
 
     Subscription
     ============
@@ -43,8 +62,9 @@ class Api(metaclass=SingletonMeta):
 
     How to use the API
     ==================
-
+    
     The sequence to correctly handle the connection and subscriptions on a broker is the following:
+
         1. start
         2. on ready
             - subscribe
@@ -55,16 +75,13 @@ class Api(metaclass=SingletonMeta):
 
     ::
 
-        import threading
-        from psec import MqttFactory, Api        
-        
-        event = threading.Event()
-        subscriptions = []
+        from psec import MqttFactory, Api
+                
+        subscriptions = [ "my-topic-1", "my-topic-2" ]
 
         def start():
             Api().start(domain_identifier="my-domain")
             Api().add_ready_callback(on_connected)
-            event.wait()
 
         def on_connected():
             Api().add_subscription_callback(on_subscribed)
@@ -176,7 +193,7 @@ class Api(metaclass=SingletonMeta):
         Adds a callback to notify when a subscription has been acknowledged by the broker.
 
         The callback will receive the following arguments:
-        
+
         - topic:str The topic subscribed
 
         Args:

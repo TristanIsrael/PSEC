@@ -1,6 +1,6 @@
 class ApiHelper:
     """
-    This class provides static functions to help getting information from the API.
+    This class provides static functions to help extracting information from the API.
 
     The functions extract data from the payload contained in the API messaged. 
     
@@ -30,6 +30,8 @@ class ApiHelper:
     def get_disk_state(payload:dict) -> str:        
         """
         Returns the state of the disk (= "connected")
+
+        Associated topics: :attr:`Topics.DISK_STATE`
         
         Args:
             payload: The payload received from the broker            
@@ -40,6 +42,8 @@ class ApiHelper:
     def is_disk_connected(payload:dict) -> str:
         """
         Returns true if the disk is connected
+
+        Associated topics: :attr:`Topics.DISK_STATE`
         
         Args:
             payload: The payload received from the broker            
