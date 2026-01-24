@@ -6,6 +6,5 @@ PSEC documentation
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
-   psec
+   api/index

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>psec.NotificationFactory &mdash; PSEC 1.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=292eb321"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="psec.Parametres" href="psec.Parametres.html" />
+    <link rel="prev" title="psec.MqttHelper" href="psec.MqttHelper.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            PSEC
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../psec.html">PSEC Package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../psec.html#classes">Classes</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="psec.Api.html">psec.Api</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.ApiHelper.html">psec.ApiHelper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.ComponentsHelper.html">psec.ComponentsHelper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.Constantes.html">psec.Constantes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.Debugging.html">psec.Debugging</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.DiskMonitor.html">psec.DiskMonitor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.Dom0Controller.html">psec.Dom0Controller</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.FichierHelper.html">psec.FichierHelper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.Logger.html">psec.Logger</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.MockSysUsbController.html">psec.MockSysUsbController</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.Mouse.html">psec.Mouse</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.MqttClient.html">psec.MqttClient</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.MqttFactory.html">psec.MqttFactory</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.MqttHelper.html">psec.MqttHelper</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">psec.NotificationFactory</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.Parametres.html">psec.Parametres</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.RequestFactory.html">psec.RequestFactory</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.ResponseFactory.html">psec.ResponseFactory</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.SingletonMeta.html">psec.SingletonMeta</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.SysUsbController.html">psec.SysUsbController</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.System.html">psec.System</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.TaskRunner.html">psec.TaskRunner</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.Topics.html">psec.Topics</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PSEC</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../psec.html">PSEC Package</a></li>
+      <li class="breadcrumb-item active">psec.NotificationFactory</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/generated/psec.NotificationFactory.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="psec-notificationfactory">
+<h1>psec.NotificationFactory<a class="headerlink" href="#psec-notificationfactory" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="psec.NotificationFactory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psec.</span></span><span class="sig-name descname"><span class="pre">NotificationFactory</span></span><a class="reference internal" href="../../_modules/psec/_notification_factory.html#NotificationFactory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.NotificationFactory" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Cette classe permet de créer des notifications simmplement.</p>
+<p>Les fonctions de cette classes sont statiques.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="psec.NotificationFactory.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psec.NotificationFactory.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#psec.NotificationFactory.__init__" title="psec.NotificationFactory.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#psec.NotificationFactory.create_notification_disk_state" title="psec.NotificationFactory.create_notification_disk_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_notification_disk_state</span></code></a>(disk, state)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#psec.NotificationFactory.create_notification_energy_state" title="psec.NotificationFactory.create_notification_energy_state"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_notification_energy_state</span></code></a>(battery)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#psec.NotificationFactory.create_notification_error" title="psec.NotificationFactory.create_notification_error"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_notification_error</span></code></a>(disk, filepath, error)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#psec.NotificationFactory.create_notification_new_file" title="psec.NotificationFactory.create_notification_new_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_notification_new_file</span></code></a>(disk, filepath, ...)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="psec.NotificationFactory.create_notification_disk_state">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_notification_disk_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">disk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/psec/_notification_factory.html#NotificationFactory.create_notification_disk_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.NotificationFactory.create_notification_disk_state" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="psec.NotificationFactory.create_notification_energy_state">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_notification_energy_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">battery</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">sbattery</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/psec/_notification_factory.html#NotificationFactory.create_notification_energy_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.NotificationFactory.create_notification_energy_state" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="psec.NotificationFactory.create_notification_error">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_notification_error</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">disk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/psec/_notification_factory.html#NotificationFactory.create_notification_error"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.NotificationFactory.create_notification_error" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="psec.NotificationFactory.create_notification_new_file">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_notification_new_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">disk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_footprint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest_footprint</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/psec/_notification_factory.html#NotificationFactory.create_notification_new_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.NotificationFactory.create_notification_new_file" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="psec.MqttHelper.html" class="btn btn-neutral float-left" title="psec.MqttHelper" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="psec.Parametres.html" class="btn btn-neutral float-right" title="psec.Parametres" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025-2026, Tristan Israël.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

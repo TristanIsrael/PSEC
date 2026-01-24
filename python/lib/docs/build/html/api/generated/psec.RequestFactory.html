@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>psec.RequestFactory &mdash; PSEC 1.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=292eb321"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="psec.ResponseFactory" href="psec.ResponseFactory.html" />
+    <link rel="prev" title="psec.Parametres" href="psec.Parametres.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            PSEC
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../psec.html">PSEC Package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../psec.html#classes">Classes</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="psec.Api.html">psec.Api</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.ApiHelper.html">psec.ApiHelper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.ComponentsHelper.html">psec.ComponentsHelper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.Constantes.html">psec.Constantes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.Debugging.html">psec.Debugging</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.DiskMonitor.html">psec.DiskMonitor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.Dom0Controller.html">psec.Dom0Controller</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.FichierHelper.html">psec.FichierHelper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.Logger.html">psec.Logger</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.MockSysUsbController.html">psec.MockSysUsbController</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.Mouse.html">psec.Mouse</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.MqttClient.html">psec.MqttClient</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.MqttFactory.html">psec.MqttFactory</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.MqttHelper.html">psec.MqttHelper</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.NotificationFactory.html">psec.NotificationFactory</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.Parametres.html">psec.Parametres</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">psec.RequestFactory</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.ResponseFactory.html">psec.ResponseFactory</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.SingletonMeta.html">psec.SingletonMeta</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.SysUsbController.html">psec.SysUsbController</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.System.html">psec.System</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.TaskRunner.html">psec.TaskRunner</a></li>
+<li class="toctree-l4"><a class="reference internal" href="psec.Topics.html">psec.Topics</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">PSEC</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="../psec.html">PSEC Package</a></li>
+      <li class="breadcrumb-item active">psec.RequestFactory</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/generated/psec.RequestFactory.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="psec-requestfactory">
+<h1>psec.RequestFactory<a class="headerlink" href="#psec-requestfactory" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="psec.RequestFactory">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">psec.</span></span><span class="sig-name descname"><span class="pre">RequestFactory</span></span><a class="reference internal" href="../../_modules/psec/_request_factory.html#RequestFactory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.RequestFactory" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The class MessageFactory generates notifications, commands and errors
+used in the communication between Domains.</p>
+<p>The emitter of the command is automatically added during the creation.</p>
+<p><strong>Reminder</strong> Domains involved in the foundation are:
+- sys-usb which manages USB devices</p>
+<p>Notification are:
+- A DomU notifies Dom0 he has started (DomU to Dom0)
+- sys-usb notifies Dom0 that a USB storage is connected (DomU to Dom0)
+- sys-usb notifies Dom0 that a USB storage is disconnected (DomU to Dom0)</p>
+<p>Commands are:
+- Logging</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>A Domain adds an entry in the log (DomU to Dom0)</p></li>
+<li><p>Dom0 records the log on a USB storage (DomU to Dom0)</p></li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li><p>System
+- A DomU asks for the debug status (DomU to Dom0)
+- A DomU asks for to reboot of the system (DomU to Dom0)
+- A DomU asks for to shut the system down (DomU to Dom0)
+- A DomU asks for the reset of another DomU (DomU to Dom0)
+- A DomU asks for the batery level (DomU to Dom0)
+- A DomU asks for the charging state (DomU to Dom0)</p></li>
+<li><p>Files
+- A DomU asks for the list of storages (DomU to Dom0 to sys-usb)
+- A DomU asks for the creation of a secure archive on a USB storage (DomU to Dom0 to sys-usb)
+- A DomU asks for adding a file to a secure archive (DomU to Dom0 to sys-usb)
+- A DomU asks for the copy of a file (DomU to Dom0 to sys-usb)</p></li>
+<li><p>Notifications
+- To do</p></li>
+</ul>
+<dl class="py method">
+<dt class="sig sig-object py" id="psec.RequestFactory.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#psec.RequestFactory.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#psec.RequestFactory.__init__" title="psec.RequestFactory.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">__init__</span></code></a>()</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#psec.RequestFactory.create_request_copy_file" title="psec.RequestFactory.create_request_copy_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_request_copy_file</span></code></a>(source_disk, ...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#psec.RequestFactory.create_request_create_file" title="psec.RequestFactory.create_request_create_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_request_create_file</span></code></a>(filepath, disk, ...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#psec.RequestFactory.create_request_delete_file" title="psec.RequestFactory.create_request_delete_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_request_delete_file</span></code></a>(filepath[, disk])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#psec.RequestFactory.create_request_files_list" title="psec.RequestFactory.create_request_files_list"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_request_files_list</span></code></a>(disk[, recursive, ...])</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#psec.RequestFactory.create_request_get_file_footprint" title="psec.RequestFactory.create_request_get_file_footprint"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_request_get_file_footprint</span></code></a>(filepath, disk)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#psec.RequestFactory.create_request_ping" title="psec.RequestFactory.create_request_ping"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_request_ping</span></code></a>(ping_id, source_name, ...)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#psec.RequestFactory.create_request_read_file" title="psec.RequestFactory.create_request_read_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_request_read_file</span></code></a>(disk, filepath)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#psec.RequestFactory.create_request_restart_domain" title="psec.RequestFactory.create_request_restart_domain"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_request_restart_domain</span></code></a>(domain_name)</p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#psec.RequestFactory.create_request_start_benchmark" title="psec.RequestFactory.create_request_start_benchmark"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_request_start_benchmark</span></code></a>(id_benchmark)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="psec.RequestFactory.create_request_copy_file">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_request_copy_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source_disk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">destination_disk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/psec/_request_factory.html#RequestFactory.create_request_copy_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.RequestFactory.create_request_copy_file" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="psec.RequestFactory.create_request_create_file">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_request_create_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contents</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bytes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compressed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/psec/_request_factory.html#RequestFactory.create_request_create_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.RequestFactory.create_request_create_file" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="psec.RequestFactory.create_request_delete_file">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_request_delete_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'depot_local'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/psec/_request_factory.html#RequestFactory.create_request_delete_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.RequestFactory.create_request_delete_file" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="psec.RequestFactory.create_request_files_list">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_request_files_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">disk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recursive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/psec/_request_factory.html#RequestFactory.create_request_files_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.RequestFactory.create_request_files_list" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="psec.RequestFactory.create_request_get_file_footprint">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_request_get_file_footprint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">disk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/psec/_request_factory.html#RequestFactory.create_request_get_file_footprint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.RequestFactory.create_request_get_file_footprint" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="psec.RequestFactory.create_request_ping">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_request_ping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ping_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datetime</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/psec/_request_factory.html#RequestFactory.create_request_ping"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.RequestFactory.create_request_ping" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="psec.RequestFactory.create_request_read_file">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_request_read_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">disk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dict</span></span></span><a class="reference internal" href="../../_modules/psec/_request_factory.html#RequestFactory.create_request_read_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.RequestFactory.create_request_read_file" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="psec.RequestFactory.create_request_restart_domain">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_request_restart_domain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">domain_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/psec/_request_factory.html#RequestFactory.create_request_restart_domain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.RequestFactory.create_request_restart_domain" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="psec.RequestFactory.create_request_start_benchmark">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_request_start_benchmark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">id_benchmark</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/psec/_request_factory.html#RequestFactory.create_request_start_benchmark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#psec.RequestFactory.create_request_start_benchmark" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="psec.Parametres.html" class="btn btn-neutral float-left" title="psec.Parametres" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="psec.ResponseFactory.html" class="btn btn-neutral float-right" title="psec.ResponseFactory" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025-2026, Tristan Israël.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

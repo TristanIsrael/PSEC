@@ -4,8 +4,8 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html">
 
-    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>psec._response_factory - PSEC 1.0.0 documentation</title>
+    <!-- Generated with Sphinx 7.4.7 and Furo 2025.12.19 -->
+        <title>psec._response_factory - PSEC 1.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -160,7 +160,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">PSEC 1.0.0 documentation</div></a>
+      <a href="../../index.html"><div class="brand">PSEC 1.0.1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -181,7 +181,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
-  <span class="sidebar-brand-text">PSEC 1.0.0 documentation</span>
+  <span class="sidebar-brand-text">PSEC 1.0.1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -189,9 +189,33 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../psec.html">PSEC python documentation</a></li>
+  <ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../api/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../api/psec.html">PSEC Package</a><input aria-label="Toggle navigation of PSEC Package" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.Api.html">psec.Api</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.ApiHelper.html">psec.ApiHelper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.ComponentsHelper.html">psec.ComponentsHelper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.Constantes.html">psec.Constantes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.Debugging.html">psec.Debugging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.Dom0Controller.html">psec.Dom0Controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.FichierHelper.html">psec.FichierHelper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.Logger.html">psec.Logger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.MockSysUsbController.html">psec.MockSysUsbController</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.Mouse.html">psec.Mouse</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.MqttClient.html">psec.MqttClient</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.MqttFactory.html">psec.MqttFactory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.MqttHelper.html">psec.MqttHelper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.NotificationFactory.html">psec.NotificationFactory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.Parametres.html">psec.Parametres</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.RequestFactory.html">psec.RequestFactory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.ResponseFactory.html">psec.ResponseFactory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.SysUsbController.html">psec.SysUsbController</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.System.html">psec.System</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.Topics.html">psec.Topics</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
 </div>
@@ -228,14 +252,14 @@
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">EtatComposant</span><span class="p">,</span> <span class="n">BenchmarkId</span><span class="p">,</span> <span class="n">Constantes</span>
 
 <div class="viewcode-block" id="ResponseFactory">
-<a class="viewcode-back" href="../../psec.html#psec.ResponseFactory">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.ResponseFactory.html#psec.ResponseFactory">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">ResponseFactory</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; La classe ResponseFactory permet de générer les messages en réponse à certaines commandes.    </span>
 <span class="sd">    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="ResponseFactory.create_response_disks_list">
-<a class="viewcode-back" href="../../psec.html#psec.ResponseFactory.create_response_disks_list">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.ResponseFactory.html#psec.ResponseFactory.create_response_disks_list">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">create_response_disks_list</span><span class="p">(</span><span class="n">disks_list</span><span class="p">:</span><span class="nb">list</span> <span class="o">=</span> <span class="p">[])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
@@ -245,7 +269,7 @@
 
     
 <div class="viewcode-block" id="ResponseFactory.create_response_list_files">
-<a class="viewcode-back" href="../../psec.html#psec.ResponseFactory.create_response_list_files">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.ResponseFactory.html#psec.ResponseFactory.create_response_list_files">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">create_response_list_files</span><span class="p">(</span><span class="n">disk</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">files</span><span class="p">:</span><span class="nb">list</span> <span class="o">=</span> <span class="p">[])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
@@ -256,7 +280,7 @@
 
 
 <div class="viewcode-block" id="ResponseFactory.cree_reponse_benchmark_inputs">
-<a class="viewcode-back" href="../../psec.html#psec.ResponseFactory.cree_reponse_benchmark_inputs">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.ResponseFactory.html#psec.ResponseFactory.cree_reponse_benchmark_inputs">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cree_reponse_benchmark_inputs</span><span class="p">(</span><span class="n">duree</span><span class="p">:</span><span class="nb">int</span><span class="p">,</span> <span class="n">iterations</span><span class="p">:</span><span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
@@ -268,7 +292,7 @@
 
 
 <div class="viewcode-block" id="ResponseFactory.cree_reponse_benchmark_fichiers_demarre">
-<a class="viewcode-back" href="../../psec.html#psec.ResponseFactory.cree_reponse_benchmark_fichiers_demarre">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.ResponseFactory.html#psec.ResponseFactory.cree_reponse_benchmark_fichiers_demarre">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cree_reponse_benchmark_fichiers_demarre</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
@@ -279,7 +303,7 @@
 
     
 <div class="viewcode-block" id="ResponseFactory.cree_reponse_benchmark_fichiers_termine">
-<a class="viewcode-back" href="../../psec.html#psec.ResponseFactory.cree_reponse_benchmark_fichiers_termine">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.ResponseFactory.html#psec.ResponseFactory.cree_reponse_benchmark_fichiers_termine">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cree_reponse_benchmark_fichiers_termine</span><span class="p">(</span><span class="n">metrics</span><span class="p">:</span><span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
@@ -291,7 +315,7 @@
 
 
 <div class="viewcode-block" id="ResponseFactory.cree_reponse_benchmark_fichiers_erreur">
-<a class="viewcode-back" href="../../psec.html#psec.ResponseFactory.cree_reponse_benchmark_fichiers_erreur">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.ResponseFactory.html#psec.ResponseFactory.cree_reponse_benchmark_fichiers_erreur">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">cree_reponse_benchmark_fichiers_erreur</span><span class="p">(</span><span class="n">erreur</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
@@ -303,7 +327,7 @@
 
     
 <div class="viewcode-block" id="ResponseFactory.create_response_file_footprint">
-<a class="viewcode-back" href="../../psec.html#psec.ResponseFactory.create_response_file_footprint">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.ResponseFactory.html#psec.ResponseFactory.create_response_file_footprint">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">create_response_file_footprint</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">disk</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">footprint</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
@@ -315,7 +339,7 @@
 
     
 <div class="viewcode-block" id="ResponseFactory.create_response_create_file">
-<a class="viewcode-back" href="../../psec.html#psec.ResponseFactory.create_response_create_file">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.ResponseFactory.html#psec.ResponseFactory.create_response_create_file">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">create_response_create_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">disk</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">footprint</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">success</span><span class="p">:</span><span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
@@ -328,7 +352,7 @@
 
 
 <div class="viewcode-block" id="ResponseFactory.create_response_component_state">
-<a class="viewcode-back" href="../../psec.html#psec.ResponseFactory.create_response_component_state">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.ResponseFactory.html#psec.ResponseFactory.create_response_component_state">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">create_response_component_state</span><span class="p">(</span><span class="n">component_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">component_label</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">domain_name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span><span class="n">EtatComposant</span><span class="p">,</span> <span class="n">component_type</span> <span class="o">=</span> <span class="s2">&quot;core&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
@@ -347,7 +371,7 @@
 
 
 <div class="viewcode-block" id="ResponseFactory.create_response_copy_file">
-<a class="viewcode-back" href="../../psec.html#psec.ResponseFactory.create_response_copy_file">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.ResponseFactory.html#psec.ResponseFactory.create_response_copy_file">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">create_response_copy_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">disk</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">success</span><span class="p">:</span><span class="nb">bool</span><span class="p">,</span> <span class="n">footprint</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
@@ -360,7 +384,7 @@
     
     
 <div class="viewcode-block" id="ResponseFactory.create_response_shutdown">
-<a class="viewcode-back" href="../../psec.html#psec.ResponseFactory.create_response_shutdown">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.ResponseFactory.html#psec.ResponseFactory.create_response_shutdown">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">create_response_shutdown</span><span class="p">(</span><span class="n">accepted</span><span class="p">:</span><span class="nb">bool</span><span class="p">):</span>
         <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
@@ -373,7 +397,7 @@
     
 
 <div class="viewcode-block" id="ResponseFactory.create_response_restart_domain">
-<a class="viewcode-back" href="../../psec.html#psec.ResponseFactory.create_response_restart_domain">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.ResponseFactory.html#psec.ResponseFactory.create_response_restart_domain">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">create_response_restart_domain</span><span class="p">(</span><span class="n">domain_name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">accepted</span><span class="p">:</span><span class="nb">bool</span><span class="p">):</span>
         <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
@@ -386,7 +410,7 @@
 
     
 <div class="viewcode-block" id="ResponseFactory.create_response_ping">
-<a class="viewcode-back" href="../../psec.html#psec.ResponseFactory.create_response_ping">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.ResponseFactory.html#psec.ResponseFactory.create_response_ping">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">create_response_ping</span><span class="p">(</span><span class="n">ping_id</span><span class="p">,</span> <span class="n">source_name</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">sent_at</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span>
@@ -409,7 +433,7 @@
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2025, Tristan Israël
+                Copyright &#169; 2025-2026, Tristan Israël
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
@@ -429,9 +453,9 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=8d563738"></script>
-    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
-    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+</div><script src="../../_static/documentation_options.js?v=292eb321"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
     </body>
 </html>

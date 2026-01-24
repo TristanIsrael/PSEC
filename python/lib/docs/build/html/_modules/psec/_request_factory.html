@@ -4,8 +4,8 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html">
 
-    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
-        <title>psec._request_factory - PSEC 1.0.0 documentation</title>
+    <!-- Generated with Sphinx 7.4.7 and Furo 2025.12.19 -->
+        <title>psec._request_factory - PSEC 1.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -160,7 +160,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">PSEC 1.0.0 documentation</div></a>
+      <a href="../../index.html"><div class="brand">PSEC 1.0.1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -181,7 +181,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
-  <span class="sidebar-brand-text">PSEC 1.0.0 documentation</span>
+  <span class="sidebar-brand-text">PSEC 1.0.1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -189,9 +189,33 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../psec.html">PSEC python documentation</a></li>
+  <ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../api/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../api/psec.html">PSEC Package</a><input aria-label="Toggle navigation of PSEC Package" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.Api.html">psec.Api</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.ApiHelper.html">psec.ApiHelper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.ComponentsHelper.html">psec.ComponentsHelper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.Constantes.html">psec.Constantes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.Debugging.html">psec.Debugging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.Dom0Controller.html">psec.Dom0Controller</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.FichierHelper.html">psec.FichierHelper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.Logger.html">psec.Logger</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.MockSysUsbController.html">psec.MockSysUsbController</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.Mouse.html">psec.Mouse</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.MqttClient.html">psec.MqttClient</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.MqttFactory.html">psec.MqttFactory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.MqttHelper.html">psec.MqttHelper</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.NotificationFactory.html">psec.NotificationFactory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.Parametres.html">psec.Parametres</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.RequestFactory.html">psec.RequestFactory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.ResponseFactory.html">psec.ResponseFactory</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.SysUsbController.html">psec.SysUsbController</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.System.html">psec.System</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.Topics.html">psec.Topics</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
 </div>
@@ -228,47 +252,47 @@
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">Constantes</span><span class="p">,</span> <span class="n">Parametres</span><span class="p">,</span> <span class="n">Cles</span>
 
 <div class="viewcode-block" id="RequestFactory">
-<a class="viewcode-back" href="../../psec.html#psec.RequestFactory">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.RequestFactory.html#psec.RequestFactory">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">RequestFactory</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39; La classe MessageFactory permet de générer les notification, commandes et</span>
-<span class="sd">    erreurs utilisées dans le cadre des échanges entre domaines.</span>
-
-<span class="sd">    L&#39;émetteur de la commande est automatiquement ajouté lors de sa création.</span>
-
-<span class="sd">    Pour rappel les domaines impliqués dans le socle sont :</span>
-<span class="sd">    - sys-usb qui gère les accès aux supports USB</span>
-
-<span class="sd">    Les notification sont les suivantes :</span>
-<span class="sd">    - Le DomU informe le Dom0 qu&#39;il a démarré (DomU -&gt; Dom0)</span>
-<span class="sd">    - La sys-usb informe le Dom0 qu&#39;un support USB a été connecté (DomU -&gt; Dom0)</span>
-<span class="sd">    - La sys-usb informe le Dom0 qu&#39;un support USB a été déconnecté (DomU -&gt; Dom0)</span>
-
-<span class="sd">    Les commandes sont les suivantes :</span>
-<span class="sd">    - Journalisation</span>
-<span class="sd">      - Un domaine ajoute une entrée dans le journal (Dom* -&gt; Dom0)</span>
-<span class="sd">      - Le Dom0 enregistre le journal sur le support USB de sortie (DomU -&gt; Dom0)</span>
-<span class="sd">    - Système</span>
-<span class="sd">      - Le DomU demande l&#39;état d&#39;activation du débogage (DomU -&gt; Dom0)</span>
-<span class="sd">      - Le DomU demande le redémarrage du système (DomU -&gt; Dom0)</span>
-<span class="sd">      - Le DomU demande l&#39;arrêt du système (DomU -&gt; Dom0)</span>
-<span class="sd">      - Le DomU demande la réinitialisation d&#39;un autre DomU (DomU -&gt; Dom0)</span>
-<span class="sd">      - Le DomU demande le niveau de charge de la batterie (DomU -&gt; Dom0)</span>
-<span class="sd">      - Le DomU demande l&#39;état de l&#39;alimentation secteur (DomU -&gt; Dom0)</span>
-<span class="sd">    - Fichiers</span>
-<span class="sd">      - Le DomU demande la liste des fichiers d&#39;un support USB (DomU -&gt; Dom0 ; Dom0 -&gt; sys-usb)</span>
-<span class="sd">      - Le DomU demande la création d&#39;une archive sécurisée sur le support USB de sortie (DomU -&gt; Dom0 ; Dom0 -&gt; sys-usb)</span>
-<span class="sd">      - Le DomU demande l&#39;ajout d&#39;un fichier à l&#39;archive sécurisée sur le support USB de sortie (DomU -&gt; Dom0 ; Dom0 -&gt; sys-usb)</span>
-<span class="sd">      - Le DomU demande la copie d&#39;un fichier (DomU -&gt; Dom0 ; Dom0 -&gt; sys-usb)      </span>
-<span class="sd">    - Notifications</span>
-<span class="sd">      - Le DomU notifie l&#39;appui sur une touche de clavier (DomU -&gt; Dom0 -&gt; *)</span>
-<span class="sd">      - Le DomU notifie l&#39;appui sur un bouton de souris (DomU -&gt; Dom0 -&gt; *)</span>
-<span class="sd">      - Le DomU notifie le déplacement de la souris (DomU -&gt; Dom0 -&gt; *)</span>
-<span class="sd">      - Le DomU informe le toucher de l&#39;écran tactile (DomU -&gt; Dom0 -&gt; *)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; The class MessageFactory generates notifications, commands and errors</span>
+<span class="sd">    used in the communication between Domains.</span>
 <span class="sd">    </span>
-<span class="sd">    &#39;&#39;&#39;</span>    
+<span class="sd">    The emitter of the command is automatically added during the creation.</span>
+
+<span class="sd">    **Reminder** Domains involved in the foundation are:</span>
+<span class="sd">    - sys-usb which manages USB devices</span>
+
+<span class="sd">    Notification are:</span>
+<span class="sd">    - A DomU notifies Dom0 he has started (DomU to Dom0)</span>
+<span class="sd">    - sys-usb notifies Dom0 that a USB storage is connected (DomU to Dom0)</span>
+<span class="sd">    - sys-usb notifies Dom0 that a USB storage is disconnected (DomU to Dom0)</span>
+
+<span class="sd">    Commands are:</span>
+<span class="sd">    - Logging</span>
+<span class="sd">      - A Domain adds an entry in the log (DomU to Dom0)</span>
+<span class="sd">      - Dom0 records the log on a USB storage (DomU to Dom0)</span>
+
+<span class="sd">    - System</span>
+<span class="sd">      - A DomU asks for the debug status (DomU to Dom0)</span>
+<span class="sd">      - A DomU asks for to reboot of the system (DomU to Dom0)</span>
+<span class="sd">      - A DomU asks for to shut the system down (DomU to Dom0)</span>
+<span class="sd">      - A DomU asks for the reset of another DomU (DomU to Dom0)</span>
+<span class="sd">      - A DomU asks for the batery level (DomU to Dom0)</span>
+<span class="sd">      - A DomU asks for the charging state (DomU to Dom0)</span>
+
+<span class="sd">    - Files</span>
+<span class="sd">      - A DomU asks for the list of storages (DomU to Dom0 to sys-usb)</span>
+<span class="sd">      - A DomU asks for the creation of a secure archive on a USB storage (DomU to Dom0 to sys-usb)</span>
+<span class="sd">      - A DomU asks for adding a file to a secure archive (DomU to Dom0 to sys-usb)</span>
+<span class="sd">      - A DomU asks for the copy of a file (DomU to Dom0 to sys-usb)    </span>
+<span class="sd">      </span>
+<span class="sd">    - Notifications</span>
+<span class="sd">      - To do</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>   
 
 <div class="viewcode-block" id="RequestFactory.create_request_files_list">
-<a class="viewcode-back" href="../../psec.html#psec.RequestFactory.create_request_files_list">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.RequestFactory.html#psec.RequestFactory.create_request_files_list">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">create_request_files_list</span><span class="p">(</span><span class="n">disk</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">recursive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">from_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{</span> 
@@ -279,7 +303,7 @@
 
     
 <div class="viewcode-block" id="RequestFactory.create_request_read_file">
-<a class="viewcode-back" href="../../psec.html#psec.RequestFactory.create_request_read_file">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.RequestFactory.html#psec.RequestFactory.create_request_read_file">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">create_request_read_file</span><span class="p">(</span><span class="n">disk</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">filepath</span> <span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{</span>
@@ -289,7 +313,7 @@
 
     
 <div class="viewcode-block" id="RequestFactory.create_request_copy_file">
-<a class="viewcode-back" href="../../psec.html#psec.RequestFactory.create_request_copy_file">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.RequestFactory.html#psec.RequestFactory.create_request_copy_file">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">create_request_copy_file</span><span class="p">(</span><span class="n">source_disk</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">destination_disk</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span> <span class="p">:</span>
         <span class="c1"># Exemple :</span>
@@ -302,7 +326,7 @@
 
     
 <div class="viewcode-block" id="RequestFactory.create_request_delete_file">
-<a class="viewcode-back" href="../../psec.html#psec.RequestFactory.create_request_delete_file">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.RequestFactory.html#psec.RequestFactory.create_request_delete_file">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">create_request_delete_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">disk</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Constantes</span><span class="p">()</span><span class="o">.</span><span class="n">constante</span><span class="p">(</span><span class="n">Cles</span><span class="o">.</span><span class="n">DEPOT_LOCAL</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{</span>
@@ -312,7 +336,7 @@
 
     
 <div class="viewcode-block" id="RequestFactory.create_request_start_benchmark">
-<a class="viewcode-back" href="../../psec.html#psec.RequestFactory.create_request_start_benchmark">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.RequestFactory.html#psec.RequestFactory.create_request_start_benchmark">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">create_request_start_benchmark</span><span class="p">(</span><span class="n">id_benchmark</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span>
@@ -321,7 +345,7 @@
 
 
 <div class="viewcode-block" id="RequestFactory.create_request_get_file_footprint">
-<a class="viewcode-back" href="../../psec.html#psec.RequestFactory.create_request_get_file_footprint">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.RequestFactory.html#psec.RequestFactory.create_request_get_file_footprint">[docs]</a>
     <span class="nd">@staticmethod</span> 
     <span class="k">def</span><span class="w"> </span><span class="nf">create_request_get_file_footprint</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">disk</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{</span>
@@ -331,7 +355,7 @@
 
     
 <div class="viewcode-block" id="RequestFactory.create_request_create_file">
-<a class="viewcode-back" href="../../psec.html#psec.RequestFactory.create_request_create_file">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.RequestFactory.html#psec.RequestFactory.create_request_create_file">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">create_request_create_file</span><span class="p">(</span><span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">disk</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">contents</span><span class="p">:</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">compressed</span><span class="p">:</span><span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">{</span>
@@ -343,7 +367,7 @@
 
 
 <div class="viewcode-block" id="RequestFactory.create_request_restart_domain">
-<a class="viewcode-back" href="../../psec.html#psec.RequestFactory.create_request_restart_domain">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.RequestFactory.html#psec.RequestFactory.create_request_restart_domain">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">create_request_restart_domain</span><span class="p">(</span><span class="n">domain_name</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span>
@@ -352,7 +376,7 @@
 
     
 <div class="viewcode-block" id="RequestFactory.create_request_ping">
-<a class="viewcode-back" href="../../psec.html#psec.RequestFactory.create_request_ping">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.RequestFactory.html#psec.RequestFactory.create_request_ping">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">create_request_ping</span><span class="p">(</span><span class="n">ping_id</span><span class="p">,</span> <span class="n">source_name</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">datetime</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">{</span>
@@ -376,7 +400,7 @@
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2025, Tristan Israël
+                Copyright &#169; 2025-2026, Tristan Israël
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
@@ -396,9 +420,9 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=8d563738"></script>
-    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
-    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+</div><script src="../../_static/documentation_options.js?v=292eb321"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
     </body>
 </html>

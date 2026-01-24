@@ -43,3 +43,12 @@ python = "^3.11"
 sphinx = "^7.0"
 sphinx-rtd-theme = "^2.0"
 sphinx-autobuild = "^2024.0"
+
+[tool.poetry]
+name = "psec"
+version = "1.2.0"
+description = "PSEC python package"
+authors = ["Tristan ISRAËL <tristan.israel@alefbet.net>"]
+packages = [
+    { include = "psec", from = "src" }
+]

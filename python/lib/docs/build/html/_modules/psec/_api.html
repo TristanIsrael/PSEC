@@ -4,7 +4,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html">
 
-    <!-- Generated with Sphinx 9.1.0 and Furo 2025.12.19 -->
+    <!-- Generated with Sphinx 7.4.7 and Furo 2025.12.19 -->
         <title>psec._api - PSEC 1.0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
@@ -189,9 +189,14 @@
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
-  <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../psec.html">PSEC python documentation</a></li>
+  <ul>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../api/index.html">API Reference</a><input aria-label="Toggle navigation of API Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../api/psec.html">PSEC Package</a><input aria-label="Toggle navigation of PSEC Package" class="toctree-checkbox" id="toctree-checkbox-2" name="toctree-checkbox-2" role="switch" type="checkbox"/><label for="toctree-checkbox-2"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/generated/psec.Api.html">psec.Api</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 
 </div>
@@ -237,7 +242,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
 
 <div class="viewcode-block" id="Api">
-<a class="viewcode-back" href="../../psec.html#psec.Api">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Api</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">SingletonMeta</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot; </span>
 <span class="sd">    This class allows a third-party program to send commands or receive notifications without needing to use the socket directly.</span>
@@ -324,7 +329,7 @@
 
 
 <div class="viewcode-block" id="Api.start">
-<a class="viewcode-back" href="../../psec.html#psec.Api.start">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.start">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mqtt_client</span><span class="p">:</span><span class="n">MqttClient</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">domain_identifier</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;undefined&quot;</span><span class="p">,</span> <span class="n">recording</span><span class="p">:</span><span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">logfile</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">(),</span> <span class="s2">&quot;psec.log&quot;</span><span class="p">)):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Starts the API by connecting to the MQTT broker and opening a log file if asked.</span>
@@ -355,7 +360,7 @@
 
 
 <div class="viewcode-block" id="Api.stop">
-<a class="viewcode-back" href="../../psec.html#psec.Api.stop">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.stop">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Stops the Api by disconnecting from the MQTT broker.        </span>
@@ -366,7 +371,7 @@
 
 
 <div class="viewcode-block" id="Api.get_mqtt_client">
-<a class="viewcode-back" href="../../psec.html#psec.Api.get_mqtt_client">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.get_mqtt_client">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_mqtt_client</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns the current MQTT client instance.</span>
@@ -376,7 +381,7 @@
 
 
 <div class="viewcode-block" id="Api.add_message_callback">
-<a class="viewcode-back" href="../../psec.html#psec.Api.add_message_callback">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.add_message_callback">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_message_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback_fn</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a callback for receiving messages</span>
@@ -398,7 +403,7 @@
 
 
 <div class="viewcode-block" id="Api.add_ready_callback">
-<a class="viewcode-back" href="../../psec.html#psec.Api.add_ready_callback">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.add_ready_callback">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_ready_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback_fn</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a callback to notify when the API is connected to the MQTT broker and ready.</span>
@@ -416,7 +421,7 @@
 
 
 <div class="viewcode-block" id="Api.add_subscription_callback">
-<a class="viewcode-back" href="../../psec.html#psec.Api.add_subscription_callback">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.add_subscription_callback">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_subscription_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback_fn</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a callback to notify when a subscription has been acknowledged by the broker.</span>
@@ -434,7 +439,7 @@
 
 
 <div class="viewcode-block" id="Api.add_shutdown_callback">
-<a class="viewcode-back" href="../../psec.html#psec.Api.add_shutdown_callback">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.add_shutdown_callback">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_shutdown_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback_fn</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a callback to notify when the system has started shutting down.</span>
@@ -451,7 +456,7 @@
 
 
 <div class="viewcode-block" id="Api.add_restart_callback">
-<a class="viewcode-back" href="../../psec.html#psec.Api.add_restart_callback">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.add_restart_callback">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">add_restart_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">callback_fn</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Adds a callback to notify when the system is restarting a component.</span>
@@ -468,7 +473,7 @@
 
 
 <div class="viewcode-block" id="Api.subscribe">
-<a class="viewcode-back" href="../../psec.html#psec.Api.subscribe">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.subscribe">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">subscribe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span><span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Subscribes to a topic on the broker.</span>
@@ -493,7 +498,7 @@
 
 
 <div class="viewcode-block" id="Api.publish">
-<a class="viewcode-back" href="../../psec.html#psec.Api.publish">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.publish">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">publish</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topic</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span><span class="nb">dict</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Publish a message on the MQTT broker.</span>
@@ -512,7 +517,7 @@
     <span class="c1"># Fonctions de journalisation</span>
     <span class="c1">#</span>
 <div class="viewcode-block" id="Api.debug">
-<a class="viewcode-back" href="../../psec.html#psec.Api.debug">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.debug">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">debug</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Publish a `debug` message.</span>
@@ -526,7 +531,7 @@
 
 
 <div class="viewcode-block" id="Api.info">
-<a class="viewcode-back" href="../../psec.html#psec.Api.info">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.info">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Publish a `info` message.</span>
@@ -540,7 +545,7 @@
 
 
 <div class="viewcode-block" id="Api.warn">
-<a class="viewcode-back" href="../../psec.html#psec.Api.warn">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.warn">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">warn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Publish a `warn` message.</span>
@@ -554,7 +559,7 @@
 
 
 <div class="viewcode-block" id="Api.error">
-<a class="viewcode-back" href="../../psec.html#psec.Api.error">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.error">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Publish an `error` message.</span>
@@ -568,7 +573,7 @@
 
 
 <div class="viewcode-block" id="Api.critical">
-<a class="viewcode-back" href="../../psec.html#psec.Api.critical">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.critical">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">critical</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">module</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Publish a `critical` message.</span>
@@ -585,7 +590,7 @@
     <span class="c1"># Fonctions de gestion des supports de stockage</span>
     <span class="c1">#</span>
 <div class="viewcode-block" id="Api.get_disks_list">
-<a class="viewcode-back" href="../../psec.html#psec.Api.get_disks_list">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.get_disks_list">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_disks_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Asks the system to provide the list of external disks connected.</span>
@@ -597,7 +602,7 @@
 
 
 <div class="viewcode-block" id="Api.get_files_list">
-<a class="viewcode-back" href="../../psec.html#psec.Api.get_files_list">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.get_files_list">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_files_list</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">disk</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">recursive</span><span class="p">:</span><span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">from_dir</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Asks the system to provide the list of files of an external disk or the repository.</span>
@@ -640,7 +645,7 @@
 
 
 <div class="viewcode-block" id="Api.read_file">
-<a class="viewcode-back" href="../../psec.html#psec.Api.read_file">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.read_file">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">read_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">disk</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Copies a file into the *repository*.</span>
@@ -657,7 +662,7 @@
 
 
 <div class="viewcode-block" id="Api.copy_file">
-<a class="viewcode-back" href="../../psec.html#psec.Api.copy_file">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.copy_file">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">copy_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source_disk</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">destination_disk</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Copies a file from a disk to another.</span>
@@ -675,7 +680,7 @@
 
 
 <div class="viewcode-block" id="Api.delete_file">
-<a class="viewcode-back" href="../../psec.html#psec.Api.delete_file">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.delete_file">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">delete_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">disk</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Removes a file from a disk (including the storage).</span>
@@ -690,7 +695,7 @@
 
 
 <div class="viewcode-block" id="Api.get_file_footprint">
-<a class="viewcode-back" href="../../psec.html#psec.Api.get_file_footprint">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.get_file_footprint">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_file_footprint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">disk</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Compute the fingerprint of a file.</span>
@@ -707,7 +712,7 @@
 
 
 <div class="viewcode-block" id="Api.create_file">
-<a class="viewcode-back" href="../../psec.html#psec.Api.create_file">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.create_file">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">create_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filepath</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">disk</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">contents</span><span class="p">:</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a new file on a disk by providing raw data.</span>
@@ -736,7 +741,7 @@
 
 
 <div class="viewcode-block" id="Api.discover_components">
-<a class="viewcode-back" href="../../psec.html#psec.Api.discover_components">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.discover_components">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">discover_components</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Asks all the components of the system to notify their state.</span>
@@ -748,7 +753,7 @@
 
 
 <div class="viewcode-block" id="Api.publish_components">
-<a class="viewcode-back" href="../../psec.html#psec.Api.publish_components">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.publish_components">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">publish_components</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">components</span><span class="p">:</span><span class="nb">list</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Publishes a list of components and their state.</span>
@@ -778,7 +783,7 @@
 
 
 <div class="viewcode-block" id="Api.request_energy_state">
-<a class="viewcode-back" href="../../psec.html#psec.Api.request_energy_state">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.request_energy_state">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">request_energy_state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Asks the system the state of the power supply.</span>
@@ -790,7 +795,7 @@
 
 
 <div class="viewcode-block" id="Api.request_system_info">
-<a class="viewcode-back" href="../../psec.html#psec.Api.request_system_info">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.request_system_info">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">request_system_info</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Asks the system to provide technical information.</span>
@@ -850,7 +855,7 @@
 
 
 <div class="viewcode-block" id="Api.clear_sys_usb_queues">
-<a class="viewcode-back" href="../../psec.html#psec.Api.clear_sys_usb_queues">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.clear_sys_usb_queues">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">clear_sys_usb_queues</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot; Queries sys-usb to clear its queues.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -862,7 +867,7 @@
     <span class="c1"># Fonctions de notification</span>
     <span class="c1">#</span>
 <div class="viewcode-block" id="Api.notify_disk_added">
-<a class="viewcode-back" href="../../psec.html#psec.Api.notify_disk_added">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.notify_disk_added">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">notify_disk_added</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">disk</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sends a notification to inform the other components an external storage has been added to the system.</span>
@@ -875,7 +880,7 @@
     
 
 <div class="viewcode-block" id="Api.notify_disk_removed">
-<a class="viewcode-back" href="../../psec.html#psec.Api.notify_disk_removed">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.notify_disk_removed">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">notify_disk_removed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">disk</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sends a notification to inform the other components an external storage has been removed from the system.</span>
@@ -888,7 +893,7 @@
 
 
 <div class="viewcode-block" id="Api.notify_gui_ready">
-<a class="viewcode-back" href="../../psec.html#psec.Api.notify_gui_ready">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.notify_gui_ready">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">notify_gui_ready</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sends a notification to inform the other components the Graphical User Interface is ready.</span>
@@ -904,7 +909,7 @@
     <span class="c1"># Workflow functions</span>
     <span class="c1">#</span>
 <div class="viewcode-block" id="Api.shutdown">
-<a class="viewcode-back" href="../../psec.html#psec.Api.shutdown">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.shutdown">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Makes the system shutdown.</span>
@@ -925,7 +930,7 @@
 
 
 <div class="viewcode-block" id="Api.restart_domain">
-<a class="viewcode-back" href="../../psec.html#psec.Api.restart_domain">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.restart_domain">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">restart_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">domain_name</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Makes a Domain restart.</span>
@@ -951,7 +956,7 @@
     <span class="c1"># Debugging functions</span>
     <span class="c1">#</span>
 <div class="viewcode-block" id="Api.ping">
-<a class="viewcode-back" href="../../psec.html#psec.Api.ping">[docs]</a>
+<a class="viewcode-back" href="../../api/generated/psec.Api.html#psec.Api.ping">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">ping</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_domain</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sends a ping request to a specific user Domain</span>
@@ -1061,7 +1066,7 @@
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2025, Tristan Israël
+                Copyright &#169; 2025-2026, Tristan Israël
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
@@ -1082,8 +1087,8 @@
     </aside>
   </div>
 </div><script src="../../_static/documentation_options.js?v=292eb321"></script>
-    <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
-    <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
     </body>
 </html>
