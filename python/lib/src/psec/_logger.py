@@ -254,7 +254,6 @@ class Logger(metaclass=SingletonMeta):
             Example:
             :: 
                 2025-01-25 13:12:31.123 - The system has started
-                
         """
         return f"{datetime.now():%Y-%m-%d %H:%M:%S.%f} - {message}"
     
