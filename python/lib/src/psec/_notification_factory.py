@@ -37,7 +37,7 @@ class NotificationFactory:
         return payload
     
     @staticmethod
-    def create_notification_energy_state(battery:psutil._common.sbattery) -> dict:
+    def create_notification_energy_state(battery) -> dict:
         payload = {
             "battery_level": battery.percent,
             "plugged": 1 if battery.power_plugged else 0
