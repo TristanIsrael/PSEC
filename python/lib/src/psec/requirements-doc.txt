@@ -2,4 +2,4 @@ sphinx
 sphinx-rtd-theme
 poetry
 furo
-myst_parser
+myst-parser
