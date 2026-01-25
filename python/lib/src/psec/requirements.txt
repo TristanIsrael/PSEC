@@ -5,3 +5,4 @@ paho-mqtt>=2.0.0
 pyudev
 msgpack
 psutil
+evdev
