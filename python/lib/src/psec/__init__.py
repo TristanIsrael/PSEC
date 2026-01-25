@@ -25,15 +25,8 @@ except Exception as e:
     print(e)
 from ._mouse import Mouse, MouseButton, MouseWheel, MouseMove
 from ._tasks_runner import TaskRunner
-try:
-    from ._demon_inputs import InputsDaemon
-except Exception as e:
-    print("The classes DemonInputs, ControleurVmSysUsb et ControleurBenchmark won't be available due to missing dependancy")
-    print(e)
-try:
-    from ._sys_usb_controller import SysUsbController
-except Exception as e:
-    print("The class SysUsbController won't be available due to missing dependancy")
+from ._inputs_daemon import InputsDaemon
+from ._sys_usb_controller import SysUsbController
 #from ._inputs_proxy import InputsProxy
 from ._dom0_controller import Dom0Controller
 from ._components_helper import ComponentsHelper

@@ -6,6 +6,9 @@ import logging
 from datetime import datetime
 
 class FileHandler:
+    """ The class FileHandler is an inner class for the class :class:`Logger`.
+    """
+
     def __init__(self, file_path, mode='w'):
         self.file_path = file_path
         self.mode = mode
@@ -34,12 +37,35 @@ class FileHandler:
             Logger().error("File not opened in read mode.")
 
 class Logger(metaclass=SingletonMeta):
+    """ This class provides mechanisms for logging and recording log files 
+    
+        The logging facility is intended to store messages and write them in a log file if asked. 
+        
+        For sending logging messages the best practice is to use the class :class:`Api` and the functions :func:`Api.info`, 
+        :func:`Api.debug`, :func:`Api.warning`, etc. The embedded core logger will handle all messages for a system.
+
+        This class can be used for an additionnal facility for a system based on PSEC.        
+    """
+
     __is_setup = False
     __is_recording = False
     __log_level = logging.INFO
     __logfile = None
 
     def setup(self, module_name:str, mqtt_client:MqttClient, log_level:int = logging.INFO, recording:bool=False, filename:str="/var/log/psec.log"):
+        """ Sets up the logging facility. 
+        
+            Args:
+                module_name (str): The module information is free. A module should be considered as a logical part of the product or of a component.
+                mqtt_client (str): The MQTT client that handles the connection to the broker.
+                log_level (int): The minimum logging level that this facility will take into account. When the log level of a message is lower that this, it is ignored.
+                recording (bool): If True, the logging messages received will be recorded in a file.
+                filename (str): The path of the file that will record all filtered messages.
+
+            .. seealso::
+                - :mod:`logging` - Standard Python logging facility
+        """
+
         if self.__is_setup:
             return
         
@@ -61,35 +87,50 @@ class Logger(metaclass=SingletonMeta):
         self.__is_setup = True
 
     def critical(self, description:str, module:str = ""):
+        """ Sends a critical message """
+
         if not self.__is_setup:
             return
         payload = self.__create_event(module, description)
         self.__mqtt_client.publish("system/events/critical", payload)
 
     def error(self, description:str, module:str = ""):
+        """ Sends an error message """
+
         if not self.__is_setup:
             return
         payload = self.__create_event(module, description)
         self.__mqtt_client.publish("system/events/error", payload)
 
     def warning(self, description:str, module:str = ""):
+        """ Sends a warning message """
+
         if not self.__is_setup:
             return
         payload = self.__create_event(module, description)
         self.__mqtt_client.publish("system/events/warning", payload)
 
     def warn(self, description:str, module:str = ""):
+        """ Sends a warning message 
+
+            Synonym of :func:`warning`.
+        """
+
         if not self.__is_setup:
             return
         self.warning(description, module)
 
     def info(self, description:str, module:str = ""):
+        """ Sends an information message """
+
         if not self.__is_setup:
             return
         payload = self.__create_event(module, description)
         self.__mqtt_client.publish("system/events/info", payload)
 
     def debug(self, description:str, module:str = ""):
+        """ Sends a debugging message """
+
         if not self.__is_setup:
             return
         payload = self.__create_event(module, description)
@@ -97,6 +138,8 @@ class Logger(metaclass=SingletonMeta):
 
     @staticmethod
     def loglevel_from_topic(topic:str) -> int:
+        """ Translates a string loglevel from a payload to a :mod:`logging` integer log level."""
+
         if not topic.startswith("{}".format(Topics.EVENTS)):
             return
         
@@ -204,8 +247,22 @@ class Logger(metaclass=SingletonMeta):
     
     @staticmethod
     def format_logline(message:str) -> str:
+        """ Formats a message in the log file 
+        
+            The default format is ``%y-%m-%d %H:%M:%S.%f - Message text``
+
+            Example:
+            :: 
+                2025-01-25 13:12:31.123 - The system has started
+                
+        """
         return f"{datetime.now():%Y-%m-%d %H:%M:%S.%f} - {message}"
     
     @staticmethod
     def print(message:str) -> None:
+        """ Prints a formatted log in the standard output 
+        
+            .. seealso::
+                - :func:`format_logline` - Log line format
+        """
         print(Logger.format_logline(message))

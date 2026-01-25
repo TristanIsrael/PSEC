@@ -9,6 +9,9 @@ class Debugging():
     This class provides facilities for product debugging.
 
     Before using the functions of this class you have to start the API.
+
+    .. seealso::
+        - :class:`Api` - API Documentation
     """
 
     __callback_benchmark_messaging = None

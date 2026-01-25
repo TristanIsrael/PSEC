@@ -131,6 +131,7 @@ Temporary Items
 .venv
 dist/*.tar.gz
 bin/*.*
+/python/lib/docs/build
 
 ### VisualStudioCode ###
 !.vscode/settings.json

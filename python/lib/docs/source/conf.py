@@ -71,3 +71,8 @@ autodoc_default_options = {
 }
 
 python_use_unqualified_type_names = True
+
+# Constants
+rst_epilog = f"""
+.. |URL_DOC_PROTOCOL| replace:: https://github.com/TristanIsrael/PSEC/wiki/Protocol
+"""

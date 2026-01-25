@@ -4,7 +4,12 @@ import serial
 import time
 import struct
 import msgpack
-from evdev import InputDevice, ecodes, InputEvent
+try:
+    from evdev import InputDevice, ecodes, InputEvent
+except ImportError as e:
+    print("The package evdev is not available. Functionalities will be missing.")
+    class InputDevice:
+        """ This is a fake InputDevice due to missing dependancy"""
 from . import Logger, Mouse, Parametres, Cles, SingletonMeta, InputType
 from . import MqttClient
 
@@ -12,14 +17,17 @@ INPUT_EVENT_FORMAT = "HHI"  # HH = type, code, I = value (unsigned int)
 INPUT_EVENT_SIZE = struct.calcsize(INPUT_EVENT_FORMAT)
 
 class InputsDaemon(metaclass=SingletonMeta):
-    """! This class monitors mouse, touch and keyboard inputs and serialize filtered information thru the XenBus
+    """ This class monitors mouse, touch device and keyboard inputs and serialize filtered information through the XenBus.
     
-    *inputs* communication channel is used between sys-usb and the Dom0.
+    The communication channel (pvchan) *inputs* is used between sys-usb and the Dom0.
+
+    **This class is not intended to be used in a project, it is directly managed by the core**.
     
     Mouse
-    ------
+    =====
+
     Information on mouse position and buttons are all transmitted each time an event occurs. It means that the 
-    information are sent as a data structure containing x and y position and the buttons state.    
+    information are sent as a data structure containing x and y position and the buttons state.
     
     """    
 
@@ -36,7 +44,12 @@ class InputsDaemon(metaclass=SingletonMeta):
     __mqtt_client = None
 
     def start(self, mqtt_client: MqttClient):
-        """ @brief Starts the inputs daemon """
+        """ Starts the inputs daemon 
+        
+            As soon as it starts, the daemon looks for mouses, touchscreens and keyboards.
+            When it finds a device it starts monitoring it in a thread and serializes all
+            input events on the pv channel ``inputs``.
+        """
 
         self.__mqtt_client = mqtt_client
         Logger().info("Starting input daemon", "Input daemon")
@@ -53,7 +66,7 @@ class InputsDaemon(metaclass=SingletonMeta):
         threading.Thread(target=self.__find_keyboard).start()
 
     def stop(self):
-        """ @brief Stops the inputs daemon """
+        """ Stops the inputs daemon """
 
         self.__can_run = False
         self.__disconnect_xenbus()

@@ -459,7 +459,7 @@ class Api(metaclass=SingletonMeta):
 
     def discover_components(self) -> None:
         """
-        Asks all the components of the system to notify their state.
+        Asks all the components of the system to notify their information and state.
 
         The response is provided on the topic :attr:`Topic.DISCOVER_COMPONENTS`
         """
