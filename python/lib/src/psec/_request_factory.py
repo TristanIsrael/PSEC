@@ -10,16 +10,20 @@ class RequestFactory():
     - sys-usb which manages USB devices
 
     Notification are:
+
     - A DomU notifies Dom0 he has started (DomU to Dom0)
     - sys-usb notifies Dom0 that a USB storage is connected (DomU to Dom0)
     - sys-usb notifies Dom0 that a USB storage is disconnected (DomU to Dom0)
 
     Commands are:
+
     - Logging
+
       - A Domain adds an entry in the log (DomU to Dom0)
       - Dom0 records the log on a USB storage (DomU to Dom0)
 
     - System
+
       - A DomU asks for the debug status (DomU to Dom0)
       - A DomU asks for to reboot of the system (DomU to Dom0)
       - A DomU asks for to shut the system down (DomU to Dom0)
@@ -28,12 +32,14 @@ class RequestFactory():
       - A DomU asks for the charging state (DomU to Dom0)
 
     - Files
+
       - A DomU asks for the list of storages (DomU to Dom0 to sys-usb)
       - A DomU asks for the creation of a secure archive on a USB storage (DomU to Dom0 to sys-usb)
       - A DomU asks for adding a file to a secure archive (DomU to Dom0 to sys-usb)
       - A DomU asks for the copy of a file (DomU to Dom0 to sys-usb)    
       
     - Notifications
+    
       - To do
     
     """   
