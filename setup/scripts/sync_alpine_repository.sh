@@ -21,12 +21,12 @@ echo "Downloading Alpine v$2 packages for the architecture $1 into $3"
 
 mkdir -p alpine/v$2/community/$1
 echo "URL $REPO_COMMUNITY_URL"
-rsync -avz --delete $REPO_COMMUNITY_URL/ $3/v$2/community/$1/
+rsync -avz --delete --progress $REPO_COMMUNITY_URL/ $3/v$2/community/$1/
 #wget $WGET_OPTS -P alpine/v$2/community/$1 $REPO_COMMUNITY_URL
 
 mkdir -p alpine/v$2/main/$1
 echo "URL $REPO_MAIN_URL"
-rsync -avz --delete $REPO_MAIN_URL/ $3/v$2/main/$1/
+rsync -avz --delete --progress $REPO_MAIN_URL/ $3/v$2/main/$1/
 #wget $WGET_OPTS -P alpine/v$2/main/$1 $REPO_MAIN_URL
 
 echo "Download finished"
