@@ -38,7 +38,7 @@ jobs:
       - name: Install dependencies
         shell: sh 
         run: |
-          sudo apt install python pip
+          sudo apt install python3 pip3
           cd python/lib/src/psec
           python3 -m pip install -r requirements-doc.txt
           cd ../..
