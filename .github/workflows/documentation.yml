@@ -44,7 +44,7 @@ jobs:
         shell: sh 
         run: |                    
           python3 -m venv venv 
-          source venv/bin/activate
+          . ./venv/bin/activate
           pip install --upgrade pip
           cd python/lib/src/psec
           pip install -r requirements-doc.txt
@@ -54,7 +54,7 @@ jobs:
       - name: Build doc
         shell: sh
         run: |
-          source venv/bin/activate
+          . ./venv/bin/activate
           cd python/lib/
           poetry run sphinx-build -b html docs/source docs/build/html
 
