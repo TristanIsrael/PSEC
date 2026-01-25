@@ -23,7 +23,7 @@ extensions = [
     'sphinx.ext.autosummary',
     'sphinx.ext.napoleon',    # Pour les docstrings Google/Numpy
     'sphinx.ext.viewcode',    # Lien vers le code source
-    "myst-parser",
+    "myst_parser",
 ]
 
 templates_path = ['_templates']
