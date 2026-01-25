@@ -729,7 +729,8 @@ class Api(metaclass=SingletonMeta):
 
     def __on_ping(self, payload: dict):        
         payload = ResponseFactory.create_response_ping(payload.get("id", ""), System.domain_name(), payload.get("data", ""), payload.get("sent_at", ""))
-        self.__mqtt_client.publish(f"{Topics.PING}/{payload.get("source", "")}/response", payload)
+        source = payload.get("source", "")
+        self.__mqtt_client.publish(f"{Topics.PING}/{source}/response", payload)
 
 def cleanup(*args, **kwargs):
     Api().stop()
