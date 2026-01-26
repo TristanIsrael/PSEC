@@ -1,4 +1,5 @@
 #!/bin/sh
 
+mkdir -p /var/lib/lxc/psec-container-debian
 tar xjf /var/lib/lxc/psec-container-debian.tar.bz2 -C /var/lib/lxc
 rm /var/lib/lxc/psec-container-debian.tar.bz2

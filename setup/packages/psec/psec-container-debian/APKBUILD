@@ -42,6 +42,7 @@ package() {
 
     # Tar container
     echo Create the package
+    mv "$srcdir/lxc-container-debian" "$srcdir/$pkgname"
     tar cjf "$pkgdir"/var/lib/lxc/"$pkgname".tar.bz2 -C "$srcdir" .
     #sudo chown $USER "$pkgdir"/var/lib/lxc/"$pkgname".tar
 
