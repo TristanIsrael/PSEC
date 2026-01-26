@@ -42,7 +42,7 @@ package() {
 
     # Tar container
     echo Create the package
-    tar czf "$pkgdir"/var/lib/lxc/"$pkgname".tar.bz2 -C "$srcdir" .
+    tar cjf "$pkgdir"/var/lib/lxc/"$pkgname".tar.bz2 -C "$srcdir" .
     #sudo chown $USER "$pkgdir"/var/lib/lxc/"$pkgname".tar
 
     # Compress archive
