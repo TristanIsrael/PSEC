@@ -433,7 +433,8 @@ jobs:
 
   build-lxc-container-debian:
     needs: [ prepare ]
-    if: | 
+    if: |
+      false &&
       needs.prepare.outputs.check-psec-container-debian == 'true'
     runs-on: ubuntu-latest
  

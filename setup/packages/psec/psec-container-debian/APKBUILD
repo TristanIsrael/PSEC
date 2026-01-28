@@ -43,34 +43,34 @@ build() {
     cp "$srcdir"/config "$builddir"/psec-container-debian
 
     echo "Create a rootfs"
-    debootstrap --variant=$_variant $_release $builddir/rootfs http://deb.debian.org/debian/
-    mount -t proc /proc "$builddir"/psec-container-debian/rootfs/proc
-    mount --rbind /sys "$builddir"/psec-container-debian/rootfs/sys
-    mount --rbind /dev "$builddir"/psec-container-debian/rootfs/dev
-    chroot "$builddir"/psec-container-debian/rootfs apt-get update
-    chroot "$builddir"/psec-container-debian/rootfs apt-get install -y systemd systemd-sysv dbus 
+    sudo debootstrap --variant=$_variant $_release $builddir/rootfs http://deb.debian.org/debian/
+    sudo mount -t proc /proc "$builddir"/psec-container-debian/rootfs/proc
+    sudo mount --rbind /sys "$builddir"/psec-container-debian/rootfs/sys
+    sudo mount --rbind /dev "$builddir"/psec-container-debian/rootfs/dev
+    sudo chroot "$builddir"/psec-container-debian/rootfs apt-get update
+    sudo chroot "$builddir"/psec-container-debian/rootfs apt-get install -y systemd systemd-sysv dbus 
     # To remove if not necessary in the product container
-    chroot "$builddir"/psec-container-debian/rootfs apt-get install -y isc-dhcp-client iproute2 iputils-ping dnsutils
-    umount -f "$builddir"/psec-container-debian/rootfs/proc || true
-    umount -f "$builddir"/psec-container-debian/rootfs/sys || true
-    umount -f "$builddir"/psec-container-debian/rootfs/dev || true
+    sudo chroot "$builddir"/psec-container-debian/rootfs apt-get install -y isc-dhcp-client iproute2 iputils-ping dnsutils
+    sudo umount -f "$builddir"/psec-container-debian/rootfs/proc || true
+    sudo umount -f "$builddir"/psec-container-debian/rootfs/sys || true
+    sudo umount -f "$builddir"/psec-container-debian/rootfs/dev || true
 
     echo "Clean the container"
-    chroot "$builddir"/psec-container-debian/rootfs apt-get clean
-    chroot "$builddir"/psec-container-debian/rootfs apt-get autoremove --purge -y
-    chroot "$builddir"/psec-container-debian/rootfs apt-get autoclean
-    chroot "$builddir"/psec-container-debian/rootfs rm -rf /tmp/*
-    chroot "$builddir"/psec-container-debian/rootfs rm -rf /var/tmp/*
-    chroot "$builddir"/psec-container-debian/rootfs rm -rf /usr/share/doc/*
-    chroot "$builddir"/psec-container-debian/rootfs rm -rf /usr/share/man/*
-    chroot "$builddir"/psec-container-debian/rootfs rm -rf /usr/share/info/*
-    chroot "$builddir"/psec-container-debian/rootfs rm -rf /usr/share/locale/*
+    sudo chroot "$builddir"/psec-container-debian/rootfs apt-get clean
+    sudo chroot "$builddir"/psec-container-debian/rootfs apt-get autoremove --purge -y
+    sudo chroot "$builddir"/psec-container-debian/rootfs apt-get autoclean
+    sudo chroot "$builddir"/psec-container-debian/rootfs rm -rf /tmp/*
+    sudo chroot "$builddir"/psec-container-debian/rootfs rm -rf /var/tmp/*
+    sudo chroot "$builddir"/psec-container-debian/rootfs rm -rf /usr/share/doc/*
+    sudo chroot "$builddir"/psec-container-debian/rootfs rm -rf /usr/share/man/*
+    sudo chroot "$builddir"/psec-container-debian/rootfs rm -rf /usr/share/info/*
+    sudo chroot "$builddir"/psec-container-debian/rootfs rm -rf /usr/share/locale/*
 
-    tar cjf -e "sys" "$builddir/$pkgname".tar.bz2 -C "$builddir"/psec-container-debian --exclude "rootfs/sys" --exclude "rootfs/proc" --exclude "rootfs/dev" .
+    sudo tar cjf -e "sys" "$builddir/$pkgname".tar.bz2 -C "$builddir"/psec-container-debian --exclude "rootfs/sys" --exclude "rootfs/proc" --exclude "rootfs/dev" .
 }
 
 package() {    
     # Tar container
     echo Create the package
-    mv "$pkgdir/$pkgname".tar.bz2 "$pkgdir"/
+    sudo mv "$builddir/$pkgname".tar.bz2 "$pkgdir"/
 }
