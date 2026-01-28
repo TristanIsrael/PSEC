@@ -44,16 +44,16 @@ build() {
 
     echo "Create a rootfs"
     sudo debootstrap --variant=$_variant $_release $builddir/rootfs http://deb.debian.org/debian/
-    sudo mount -t proc /proc "$builddir"/psec-container-debian/rootfs/proc
-    sudo mount --rbind /sys "$builddir"/psec-container-debian/rootfs/sys
-    sudo mount --rbind /dev "$builddir"/psec-container-debian/rootfs/dev
+    #sudo mount -t proc /proc "$builddir"/psec-container-debian/rootfs/proc
+    #sudo mount --rbind /sys "$builddir"/psec-container-debian/rootfs/sys
+    #sudo mount --rbind /dev "$builddir"/psec-container-debian/rootfs/dev
     sudo chroot "$builddir"/psec-container-debian/rootfs apt-get update
     sudo chroot "$builddir"/psec-container-debian/rootfs apt-get install -y systemd systemd-sysv dbus 
     # To remove if not necessary in the product container
     sudo chroot "$builddir"/psec-container-debian/rootfs apt-get install -y isc-dhcp-client iproute2 iputils-ping dnsutils
-    sudo umount -f "$builddir"/psec-container-debian/rootfs/proc || true
-    sudo umount -f "$builddir"/psec-container-debian/rootfs/sys || true
-    sudo umount -f "$builddir"/psec-container-debian/rootfs/dev || true
+    #sudo umount -f "$builddir"/psec-container-debian/rootfs/proc || true
+    #sudo umount -f "$builddir"/psec-container-debian/rootfs/sys || true
+    #sudo umount -f "$builddir"/psec-container-debian/rootfs/dev || true
 
     echo "Clean the container"
     sudo chroot "$builddir"/psec-container-debian/rootfs apt-get clean
