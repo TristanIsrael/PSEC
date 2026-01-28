@@ -454,7 +454,7 @@ jobs:
           distro: debian
           release: bookworm
           arch: amd64
-          variant: cloud
+          variant: default
         shell: sh         
         run: |
           # Create the container 

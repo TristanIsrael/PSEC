@@ -1,0 +1,9 @@
+lxc.include = /usr/share/lxc/config/common.conf
+lxc.arch = linux64
+
+lxc.rootfs.path = /usr/lib/lxc/psec-container-debian
+lxc.uts.name = psec-container-debian
+
+lxc.net.0.type = veth
+lxc.net.0.link = lxcbr0
+lxc.net.0.flags = up
