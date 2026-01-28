@@ -43,7 +43,7 @@ build() {
     cp "$srcdir"/config "$builddir"/psec-container-debian
 
     echo "Create a rootfs"
-    sudo debootstrap --variant=$_variant $_release $builddir/rootfs http://deb.debian.org/debian/
+    sudo debootstrap --variant=$_variant $_release $builddir/psec-container-debian/rootfs http://deb.debian.org/debian/
     #sudo mount -t proc /proc "$builddir"/psec-container-debian/rootfs/proc
     #sudo mount --rbind /sys "$builddir"/psec-container-debian/rootfs/sys
     #sudo mount --rbind /dev "$builddir"/psec-container-debian/rootfs/dev
