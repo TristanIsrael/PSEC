@@ -79,5 +79,5 @@ package() {
     # Tar container
     echo "Create the package"
     ls -l $srcdir
-    sudo mv "$srcdir/$pkgname".tar.bz2 "$pkgdir"/
+    install -D -m644 "$srcdir/$pkgname".tar.bz2 "$pkgdir"/var/lib/lxc/"$srcdir/$pkgname".tar.bz2
 }
