@@ -73,11 +73,13 @@ build() {
     sudo tar cjf "$srcdir/$pkgname".tar.bz2 -C "$builddir"/psec-container-debian --exclude "rootfs/sys" --exclude "rootfs/proc" --exclude "rootfs/dev" .
     echo "Archive size:"
     ls -l "$srcdir/$pkgname".tar.bz2
+
+    # Change permission for future cleaning
+    sudo chmod -R 777 "$srcdir"/*
 }
 
 package() {    
     # Tar container
     echo "Create the package"
-    ls -l $srcdir
     install -D -m644 "$srcdir/$pkgname".tar.bz2 "$pkgdir"/var/lib/lxc/"$srcdir/$pkgname".tar.bz2
 }
