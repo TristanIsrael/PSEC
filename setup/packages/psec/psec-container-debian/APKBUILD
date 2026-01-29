@@ -66,11 +66,14 @@ build() {
     sudo chroot "$builddir"/psec-container-debian/rootfs rm -rf /usr/share/info/*
     sudo chroot "$builddir"/psec-container-debian/rootfs rm -rf /usr/share/locale/*
 
-    sudo tar cjf "$builddir/$pkgname".tar.bz2 -C "$builddir"/psec-container-debian --exclude "rootfs/sys" --exclude "rootfs/proc" --exclude "rootfs/dev" .
+    echo "Create an archive"
+    ls "$builddir"
+    ls "$builddir"/psec-container-debian
+    sudo tar cvjf "$builddir/$pkgname".tar.bz2 -C "$builddir"/psec-container-debian --exclude "rootfs/sys" --exclude "rootfs/proc" --exclude "rootfs/dev" .
 }
 
 package() {    
     # Tar container
-    echo Create the package
+    echo "Create the package"
     sudo mv "$builddir/$pkgname".tar.bz2 "$pkgdir"/
 }
