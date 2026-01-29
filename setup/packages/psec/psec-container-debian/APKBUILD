@@ -78,5 +78,6 @@ build() {
 package() {    
     # Tar container
     echo "Create the package"
+    ls -l $srcdir
     sudo mv "$srcdir/$pkgname".tar.bz2 "$pkgdir"/
 }
