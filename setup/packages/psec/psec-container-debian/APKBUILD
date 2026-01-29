@@ -59,15 +59,20 @@ build() {
     sudo chroot "$builddir"/psec-container-debian/rootfs apt-get clean
     sudo chroot "$builddir"/psec-container-debian/rootfs apt-get autoremove --purge -y
     sudo chroot "$builddir"/psec-container-debian/rootfs apt-get autoclean
-    rm -rf "$builddir"/psec-container-debian/rootfs/tmp/*
-    rm -rf "$builddir"/psec-container-debian/rootfs/var/tmp/*
-    rm -rf "$builddir"/psec-container-debian/rootfs/usr/share/doc/*
-    rm -rf "$builddir"/psec-container-debian/rootfs/usr/share/man/*
-    rm -rf "$builddir"/psec-container-debian/rootfs/usr/share/info/*
-    rm -rf "$builddir"/psec-container-debian/rootfs/usr/share/locale/*
+    sudo rm -rf "$builddir"/psec-container-debian/rootfs/tmp/*
+    sudo rm -rf "$builddir"/psec-container-debian/rootfs/var/tmp/*
+    sudo rm -rf "$builddir"/psec-container-debian/rootfs/usr/share/doc/*
+    sudo rm -rf "$builddir"/psec-container-debian/rootfs/usr/share/man/*
+    sudo rm -rf "$builddir"/psec-container-debian/rootfs/usr/share/info/*
+    sudo rm -rf "$builddir"/psec-container-debian/rootfs/usr/share/locale/*
+
+    echo "Current rootfs size:"
+    sudo du -sk "$builddir"/psec-container-debian/rootfs
 
     echo "Create an archive"
     sudo tar cjf "$srcdir/$pkgname".tar.bz2 -C "$builddir"/psec-container-debian --exclude "rootfs/sys" --exclude "rootfs/proc" --exclude "rootfs/dev" .
+    echo "Archive size:"
+    ls -l "$srcdir/$pkgname".tar.bz2
 }
 
 package() {    
