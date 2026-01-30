@@ -3,12 +3,11 @@
 mkdir -p /var/log/psec
 
 chmod +x /usr/lib/psec/diag/src/diag/start.sh
-mkdir -p /var/log/psec
 
 rc-update add start-gui
 rc-service start-gui start
 
 # Remove unneeded big files
-rm /usr/lib/libQt6WebEngineCore*
+rm -rf /usr/lib/libQt6WebEngineCore*
 
 exit 0

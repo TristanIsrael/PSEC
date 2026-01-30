@@ -1,13 +1,13 @@
 #!/bin/sh
 
-rc-service udev start
-rc-service udev-trigger start
-rc-service xenstored start
-rc-update add udev
-rc-update add udev-trigger
-rc-update add xenstored 
+mkdir -p /var/log/psec
 
-rc-update add diag
-rc-service diag start
+chmod +x /usr/lib/psec/tests/src/tests/start.sh
+
+rc-update add tests
+rc-service tests start
+
+# Remove unneeded big files
+rm -rf /usr/lib/libQt6WebEngineCore*
 
 exit 0

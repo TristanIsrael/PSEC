@@ -7,7 +7,7 @@ pkgdesc="PSEC - Test tool GUI"
 url="https://www.alefbet.net/"
 arch="noarch"
 license="MIT"
-depends="python3 py3-pyside6 fontconfig freetype font-roboto"
+depends="python3 py3-pyside6 fontconfig freetype font-roboto psec-lib"
 makedepends="python3-dev py3-build py3-installer git"
 builddir="$srcdir/$pkgname-$pkgver"
 checkdepends=""
@@ -22,19 +22,17 @@ tests.initd
 "
 
 prepare() {
-    mkdir -p "$builddir"
-    echo "Uncompress source files"
-    unzip $pkgname.zip -d "$builddir"    
+    default_prepare   
 }
 
 build() {
-    cd "$builddir/PSEC/python/tests"
+    cd "$gitrepo-$gitbranch"/python/tests
     python3 -m build
 }
 
 package() {
-    cd "$builddir/python/tests/dist"
     mkdir -p "$pkgdir/usr/lib/psec"
+    cd "$srcdir/$gitrepo-$gitbranch/python/tests/dist"    
     tar xvzf *.tar.gz -C "$pkgdir/usr/lib/psec"
     cd "$pkgdir/usr/lib/psec"
     ln -s "tests-$pkgver" tests    

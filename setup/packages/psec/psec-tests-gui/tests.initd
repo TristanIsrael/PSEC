@@ -1,6 +1,6 @@
 #!/sbin/openrc-run
 
-name="psec-tests"
+name="tests"
 
 depend() {
     need xenstored udev-trigger
