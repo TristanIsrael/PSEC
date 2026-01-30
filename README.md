@@ -1,5 +1,13 @@
 # PSEC - Platform Security Enforced Core
 
+[![platform](https://img.shields.io/badge/platform-Alpine-Linux.svg)](https://gbatemp.net/forums/nintendo-switch.283/?prefix_id=44)
+[![language](https://img.shields.io/badge/language-Python-ba1632.svg)](https://github.com/topics/cpp)
+[![GPLv3 License](https://img.shields.io/badge/license-Proprietary-189c11.svg)](https://www.gnu.org/licenses/old-licenses/gpl-3.0.en.html)
+[![Latest Version](https://img.shields.io/github/v/release/TristanIsrael/PSEC?label=latest&color=blue)](https://github.com/TristanIsrael/PSEC/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/TristanIsrael/PSEC/total?color=6f42c1)](https://github.com/TristanIsrael/PSEC/graphs/traffic)
+[![GitHub issues](https://img.shields.io/github/issues/TristanIsrael/PSEC?color=222222)](https://github.com/TristanIsrael/PSEC/issues)
+[![GitHub stars](https://img.shields.io/github/stars/TristanIsrael/PSEC)](https://github.com/TristanIsrael/PSEC/stargazers)
+
 This project provides a software architecture for creating security products.
 
 > ⚠️ **Important Notice**
@@ -47,6 +55,15 @@ https://alefbet.net/repositories/PSEC
 ```
 
 The [public key file](https://alefbet.net/repositories/PGP/psec.rsa.pub) must be downloaded into `/etc/apk/keys`.
+
+## Compatibility
+
+| Alpine | Status |
+|--|--|
+| v3.20 | ![Working](https://img.shields.io/badge/Working-109900) |
+| v3.21 | ![Working](https://img.shields.io/badge/Working-109900) |
+| v3.22 | ![Not tested](https://img.shields.io/badge/Not%20tested-ffa500) |
+| v3.23 | ![Not tested](https://img.shields.io/badge/Not%20tested-ffa500) |
 
 ## First use
 
