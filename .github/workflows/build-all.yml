@@ -637,7 +637,8 @@ jobs:
           filepath: /home/builder/packages/psec/x86_64/
 
   build-app-tests:
-    needs: [ prepare, build-psec-lib, build-psec-core, build-psec-sys-gui, build-psec-sys-usb, build-psec-gui-base ]
+    #needs: [ prepare, build-psec-lib, build-psec-core, build-psec-sys-gui, build-psec-sys-usb, build-psec-gui-base ]
+    needs: [ prepare ]
     if: needs.prepare.outputs.check-app-tests == 'true'
     runs-on: ubuntu-latest
  
