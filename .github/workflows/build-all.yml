@@ -758,10 +758,12 @@ jobs:
 
           cd aports/scripts
           TMPDIR=~/tmp ./mkimage.sh --tag v$ALPINE_VERSION --outdir ~/iso --arch x86_64 --repository https://www.alefbet.net/github/psec --repository http://dl-cdn.alpinelinux.org/alpine/v3.21/main --repository http://dl-cdn.alpinelinux.org/alpine/v3.21/community --profile diag --hostkeys --workdir ~/tmp
+          mv ~/iso/alpine-diag-v$ALPINE_VERSION-x86_64.iso ~/iso/psec-diag-x86_64.iso
           rm -rf ~/tmp
       
       - name: Publish ISO
         uses: ./.github/actions/publish
         with:
           privkey: ${{ secrets.DEPLOY_KEY }}
-          filepath: /home/builder/packages/psec/x86_64/
+          filepath: ~/iso/psec-diag-x86_64.iso
+          is_package: false
