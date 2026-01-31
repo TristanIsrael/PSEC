@@ -11,6 +11,10 @@ inputs:
     description: Is this action running into an Alpine container
     required: false
     default: true
+  is_package:
+    description: True if Alpine packages must be published
+    required: false 
+    default: true
 
 runs:
   using: composite  
@@ -43,12 +47,20 @@ runs:
       run: |
         ssh-keyscan -4 -p 222 alefbet.net >> ssh/known_hosts
 
-    - name: Copy files to server
+    - name: Copy packages to the server
+      if: ${{ inputs.is_package == 'true' }}
       shell: sh
       run: |
         rsync -av -e 'ssh -p 222 -4 -i ssh/id_rsa -o StrictHostKeyChecking=no' ${{ inputs.filepath }} github-psec@alefbet.net:/var/www/www.alefbet.net/github/psec/x86_64/
 
+    - name: Copy files to the server
+      if: ${{ inputs.is_package != 'true' }}
+      shell: sh
+      run: |
+        rsync -av -e 'ssh -p 222 -4 -i ssh/id_rsa -o StrictHostKeyChecking=no' ${{ inputs.filepath }} github-psec@alefbet.net:/var/www/www.alefbet.net/github/psec/iso/
+
     - name: Recreate and sign APK index 
+      if: ${{ inputs.is_package == 'true' }}
       shell: sh
       run: |
         ssh -p 222 -4 -i ssh/id_rsa -o StrictHostKeyChecking=no github-psec@alefbet.net <<'EOF'
