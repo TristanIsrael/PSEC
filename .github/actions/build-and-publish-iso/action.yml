@@ -1,0 +1,46 @@
+name: Build and publish ISO
+
+inputs:
+  package-name:
+    description: The name of the package to create
+    required: true
+  alpine-version:
+    description: The version of Alpine Linux to package with
+    requierd: false
+    default: 3.22
+
+runs:
+  using: composite  
+
+  steps:
+  - name: Install build packages 
+    shell: sh 
+    run: |
+      sudo apk add abuild alpine-conf xorriso squashfs-tools grub alpine-sdk wget mtools
+
+  - name: Fetch aports git repository
+    shell: sh
+    run: |
+      git clone --depth=1 https://gitlab.alpinelinux.org/alpine/aports.git
+
+  - name: Build ISO 
+    shell: sh
+    env:
+      ALPINE_VERSION: ${{ inputs.alpine-version }}
+    run: |
+      # Copy scripts
+      cp setup/iso/${{ inputs.package-name }}/*.sh aports/scripts
+      sudo chmod +x aports/scripts/*.sh
+      mkdir -pv ~/tmp
+
+      cd aports/scripts
+      TMPDIR=~/tmp ./mkimage.sh --tag v$ALPINE_VERSION --outdir ~/iso --arch x86_64 --repository https://www.alefbet.net/github/psec --repository http://dl-cdn.alpinelinux.org/alpine/v3.21/main --repository http://dl-cdn.alpinelinux.org/alpine/v3.21/community --profile ${{ inputs.working-dir }} --hostkeys --workdir ~/tmp
+      mv ~/iso/alpine-${{ inputs.package-name }}-v$ALPINE_VERSION-x86_64.iso ~/iso/psec-${{ inputs.package-name }}-x86_64.iso
+      rm -rf ~/tmp
+  
+  - name: Publish ISO
+    uses: ./.github/actions/publish
+    with:
+      privkey: ${{ secrets.DEPLOY_KEY }}
+      filepath: ~/iso/psec-${{ inputs.package-name }}-x86_64.iso
+      is_package: false

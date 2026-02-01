@@ -58,6 +58,11 @@ on:
         required: false
         type: 'boolean'
         default: 'false'
+      force-psec-tests-iso:
+        description: "Build tests ISO"
+        required: false
+        type: 'boolean'
+        default: 'false'
       force-psec-gui-base:
         description: "Build gui-base"
         required: false
@@ -149,6 +154,7 @@ jobs:
       check-psec-sys-usb: ${{ steps.check-psec-sys-usb.outputs.do_build }}
       check-psec-gui-base: ${{ steps.check-psec-gui-base.outputs.do_build }}
       check-app-tests: ${{ steps.check-app-tests.outputs.do_build }}
+      check-iso-tests: ${{ steps.check-app-tests.outputs.do_build }}
       check-app-diag: ${{ steps.check-app-diag.outputs.do_build }}      
       check-iso-diag: ${{ steps.check-app-diag.outputs.do_build }}
     steps:
@@ -769,3 +775,27 @@ jobs:
           privkey: ${{ secrets.DEPLOY_KEY }}
           filepath: ~/iso/psec-diag-x86_64.iso
           is_package: false
+
+  build-iso-tests:
+    needs: [ prepare, build-app-tests ]
+    if: |
+      needs.prepare.outputs.check-app-tests == 'true' ||
+      needs.prepare.outputs.check-iso-tests == 'true'
+    runs-on: ubuntu-latest
+ 
+    container:
+      image: alpine:3.21
+ 
+    steps:      
+      - name: Checkout sources
+        uses: actions/checkout@v4
+ 
+      - name: Prepare build environment
+        uses: ./.github/actions/prepare-build-env
+        with:
+          abuild-key: ${{ secrets.ABUILD_PRIVATE_KEY }}
+
+      - name: Build and publish ISO
+        uses: ./.github/actions/build-and-publish-iso
+        with:
+          package-name: tests
