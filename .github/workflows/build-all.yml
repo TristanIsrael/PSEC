@@ -718,6 +718,7 @@ jobs:
         with:
           privkey: ${{ secrets.DEPLOY_KEY }}
           filepath: /home/builder/packages/psec/x86_64/
+
   build-iso-diag:
     needs: [ prepare, build-app-diag ]
     if: |
@@ -754,6 +755,7 @@ jobs:
         run: |
           # Copy scripts
           cp setup/iso/diag-iso/*.sh aports/scripts
+          sudo chmod +x aports/scripts/*.sh
           mkdir -pv ~/tmp
 
           cd aports/scripts
