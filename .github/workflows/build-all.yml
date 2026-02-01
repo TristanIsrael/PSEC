@@ -799,3 +799,4 @@ jobs:
         uses: ./.github/actions/build-and-publish-iso
         with:
           package-name: tests
+          privkey: ${{ secrets.DEPLOY_KEY }}

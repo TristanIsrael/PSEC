@@ -1,6 +1,9 @@
 name: Build and publish ISO
 
 inputs:
+  privkey:
+    description: Base64 encoded SSH private key
+    required: true
   package-name:
     description: The name of the package to create
     required: true
@@ -41,6 +44,6 @@ runs:
   - name: Publish ISO
     uses: ./.github/actions/publish
     with:
-      privkey: ${{ secrets.DEPLOY_KEY }}
+      privkey: ${{ inputs.privkey }}
       filepath: ~/iso/psec-${{ inputs.package-name }}-x86_64.iso
       is_package: false

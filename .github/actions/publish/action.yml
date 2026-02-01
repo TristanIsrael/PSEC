@@ -2,7 +2,7 @@ name: Publish to official repository
 
 inputs:
   privkey:
-    description: Base64 encoded private key
+    description: Base64 encoded SSH private key
     required: true
   filepath:
     description: The full path of the file to upload
