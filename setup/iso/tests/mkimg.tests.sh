@@ -1,4 +1,4 @@
-profile_diag() {
+profile_tests() {
     profile_xen
     kernel_cmdline="unionfs_size=512M console=tty0 console=ttyS0,115200"
     syslinux_serial="0 115200"
