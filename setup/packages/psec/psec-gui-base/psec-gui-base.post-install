@@ -8,5 +8,6 @@ rc-service udev-postmount start
 rc-service udev-trigger start
 
 /usr/lib/psec/bin/init-gui-base.sh
+/usr/lib/psec/bin/hardening.sh
 
 exit 0
