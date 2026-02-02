@@ -401,51 +401,51 @@ class System(metaclass=SingletonMeta):
 
             ::
 
-            {
-            "core": {
-                "version": "1.1", 
-                "debug_on": false
-            }, 
-            "system": {
-                "os": {
-                    "name": "Linux", 
-                    "release": "6.12.20-0-lts", 
-                    "version": "#1-Alpine SMP PREEMPT_DYNAMIC 2025-03-24 08:09:11"
+                {
+                "core": {
+                    "version": "1.1", 
+                    "debug_on": false
                 }, 
-                "machine": {
-                    "arch": "x86_64", 
-                    "processor": "", 
-                    "platform": "Linux-6.12.20-0-lts-x86_64-with", 
-                    "cpu": {
-                        "count": 12, 
-                        "freq_current": 1689.5960000000002, 
-                        "freq_min": 0.0, 
-                        "freq_max": 0.0, 
-                        "percent": 0.0
+                "system": {
+                    "os": {
+                        "name": "Linux", 
+                        "release": "6.12.20-0-lts", 
+                        "version": "#1-Alpine SMP PREEMPT_DYNAMIC 2025-03-24 08:09:11"
                     }, 
-                    "memory": {
-                        "total": 405987328, 
-                        "available": 96657408, 
-                        "percent": 76.2, 
-                        "used": 256733184, 
-                        "free": 12472320
+                    "machine": {
+                        "arch": "x86_64", 
+                        "processor": "", 
+                        "platform": "Linux-6.12.20-0-lts-x86_64-with", 
+                        "cpu": {
+                            "count": 12, 
+                            "freq_current": 1689.5960000000002, 
+                            "freq_min": 0.0, 
+                            "freq_max": 0.0, 
+                            "percent": 0.0
+                        }, 
+                        "memory": {
+                            "total": 405987328, 
+                            "available": 96657408, 
+                            "percent": 76.2, 
+                            "used": 256733184, 
+                            "free": 12472320
+                        }, 
+                        "load": {
+                            "1": 0.5244140625, 
+                            "5": 0.21875, 
+                            "15": 0.08154296875
+                        }
                     }, 
-                    "load": {
-                        "1": 0.5244140625, 
-                        "5": 0.21875, 
-                        "15": 0.08154296875
+                    "boot_time": 1748036696.0, 
+                    "uuid": "11ec0800-4fb9-11ef-bd38-ad993f2e7700"
+                    "storage": {
+                        "total": 12345678,
+                        "used": 0,
+                        "free": 12345678,
+                        "files_count": 0
                     }
-                }, 
-                "boot_time": 1748036696.0, 
-                "uuid": "11ec0800-4fb9-11ef-bd38-ad993f2e7700"
-                "storage": {
-                    "total": 12345678,
-                    "used": 0,
-                    "free": 12345678,
-                    "files_count": 0
                 }
             }
-        }
         """
         sysinfo = {
             "core": {
