@@ -1,0 +1,117 @@
+from typing import List
+from enums import Enum
+
+class DomainType(Enum):
+        Core = 1
+        Business = 2
+
+class Domain:
+    name = "NoName"
+    vcpu_group = "group1"
+    memory = 1000
+    vcpus = 1
+    cpu_affinity = (1) # Tuple (min, max)
+    package = ""
+    type = DomainType.Business
+    
+    def __init__(self, domain_name:str, domain_type:DomainType):
+        self.name = domain_name
+        self.type = domain_type
+
+class Screen:
+    width = 0
+    height = 0
+    rotation = 0
+
+class Gui:
+    use = False 
+    app_package = ""
+    memory = 1000
+
+class Topology:
+    
+    domains = List[Domain]
+    product_name = "No Name"
+    use_usb = False
+    use_gui = False
+    uuid = ""
+    gui: Gui
+    screen: Screen
+
+    def __init__(self):
+        self.domains = []
+        self.gui = Gui()
+        self.screen = Screen()
+        self.__colors = {}        
+        self.__initialized = False
+
+    def initialized(self) -> bool:
+        """ Returns whether the object is initialized """
+        
+        return self.__initialized
+    
+    def set_initialized(self, initialized:bool):
+        """ Sets the objet initialized """
+        
+        self.__initialized = initialized    
+    
+    def colors(self) -> dict:
+        """ Returns the RGBA colors list as a list of 8 bit tuples (r, g, b, a)
+        
+        .. seealso::
+            :func:`colors_as_hex`
+        """
+
+        vals = {}
+        for name, color in self.__colors:
+            vals[name] = self.color_as_rgba(color)
+
+        return vals
+
+    def colors_as_hex(self) -> dict:
+        """ Returns the colors list as hexadecimal values (#rrggbbaa)
+        
+        .. seealso::
+            :func:`colors`
+        """
+        
+        return self.__colors
+    
+    def color_as_hex(self, color_name:str) -> str:
+        """ Returns a named color as an hex value """
+        
+        return self.__colors.get(color_name, "#ffffff")
+    
+    def color_as_rgba(self, color_name:str) -> tuple[int, int, int, int]:
+        """ Returns an RGBA named color as a tuple value """
+        
+        color_hex = self.color_as_hex(color_name)
+        return self.__hex_to_rgba(color_hex)
+    
+    def add_color(self, color_name:str, color_value_as_hex:str):
+        """ Adds a named color to the list """
+        
+        self.__colors[color_name] = self.__hex_to_rgba(color_value_as_hex)
+    
+    def __hex_to_rgba(self, hex_color: str) -> tuple[int, int, int, int]:
+        """ Converts a color from hex to rgba tuple """
+        
+        hex_color = hex_color.lstrip("#")
+        return tuple(int(hex_color[i:i+2], 16) for i in range(0, len(hex_color), 2))
+    
+    def add_domain(self, domain:Domain):
+        """ Adds a Domain's definition to the list """
+        
+        self.domains.append(domain)
+
+    def domain_names(self):
+        """ Returns the list of Domain names """
+        
+        names = [d.name for d in self.domains]
+
+    def domain(self, domain_name:str) -> Domain:
+        """ Returns the Domain object with the specified name """
+
+        if domain_name in self.domain_names():
+            return [d for d in self.domains if d.name == domain_name]
+        

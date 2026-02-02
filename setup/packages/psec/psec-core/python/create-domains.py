@@ -3,51 +3,44 @@
 import subprocess
 import tempfile
 import os
-from psec import System
+from psec import System, topology, Domain, DomainType
 
 class DomainsFactory:
-    ''' @brief This class is designed to orchestrate the Domains creation during the
+    """ This class is designed to orchestrate the Domains creation during the
     setup process of a system based on PSEC.
     
     The Domains are defined in the file /etc/psec/topology.json.
-    '''
+    """
 
-    __topology:dict = {}
-
-    def __init__(self, topology:dict):
-        self.__topology = topology
-
-    def create_domains(self):
-        ''' @brief Creates all the Domains of a PSEC system '''
+    @staticmethod
+    def create_domains():
+        """ Creates all the Domains of a PSEC system """
 
         print("Start creating domains from topology")
 
-        system = self.__topology.get("system", {})
-        use_usb = system.get("use_usb", False)
-        use_gui = system.get("use_gui", False)
+        if topology.use_usb:
+            blacklist_conf = DomainsFactory.__create_blacklist_conf("sys-usb")
+            DomainsFactory.__provision_domain("sys-usb", "psec-sys-usb", "virt", blacklist_conf)
+            DomainsFactory.__create_domd_usb()
 
-        if use_usb:
-            blacklist_conf = self.__create_blacklist_conf("sys-usb")
-            self.__provision_domain("sys-usb", "psec-sys-usb", "virt", blacklist_conf)
-            self.__create_domd_usb()
-
-        if use_gui:
-            blacklist_conf = self.__create_blacklist_conf("sys-gui")
-            package = system.get("gui_app_package")
-            self.__provision_domain("sys-gui", "psec-sys-gui" if package is None else package, "virt", blacklist_conf)
-            self.__create_domd_gui()
-            self.__fetch_alpine_packages(package)
+        if topology.use_gui:
+            blacklist_conf = DomainsFactory.__create_blacklist_conf("sys-gui")
+            package = package = topology.gui.app_package
+            DomainsFactory.__provision_domain("sys-gui", "psec-sys-gui" if package is None else package, "virt", blacklist_conf)
+            DomainsFactory.__create_domd_gui()
+            DomainsFactory.__fetch_alpine_packages(package)
         
-        self.__create_business_domains()
+        DomainsFactory.__create_business_domains()
             
 
     ###
     # Private functions
     #
-    def __create_domd_usb(self):
+    @staticmethod
+    def __create_domd_usb():
         print("Create Driver Domain USB")
 
-        conf = self.__create_xl_conf_sys_usb()
+        conf = DomainsFactory.__create_xl_conf_sys_usb()
 
         if conf is not None:
             with open('/etc/psec/xen/sys-usb.conf', 'w') as f:
@@ -56,11 +49,11 @@ class DomainsFactory:
         print(">>> Domain sys-usb created successfully")
         print("")
 
-
-    def __create_domd_gui(self):
+    @staticmethod
+    def __create_domd_gui():
         print("Create Driver Domain GUI")
 
-        conf = self.__create_xl_conf_sys_gui()
+        conf = DomainsFactory.__create_xl_conf_sys_gui()
 
         if conf is not None:
             with open('/etc/psec/xen/sys-gui.conf', 'w') as f:
@@ -69,50 +62,50 @@ class DomainsFactory:
         print(">>> Domain sys-gui created successfully")
         print("")
     
-    def __create_business_domains(self):
-        domains = self.__topology.get("domains", {})
+    @staticmethod
+    def __create_business_domains():
+        """ Creates all the business Domains """
 
-        if domains:
-            for domain_name in domains.keys():
-                config = domains[domain_name]
-                domain_type = config.get("type")
+        if len(topology.domains) > 0:
+            for domain in topology.domains:
+                domain: Domain
 
-                if domain_type != "business":
+                if domain.type is not DomainType.Business:
                     continue
 
-                package = config.get("package")
+                package = domain.package
 
-                blacklist_conf = self.__create_blacklist_conf()
-                self.__provision_domain(domain_name, package, "virt", blacklist_conf)
-                conf = self.__create_xl_conf_domain(
-                    domain_name= domain_name,
-                    boot_iso_location= f"bootiso-{domain_name}.iso",
+                blacklist_conf = DomainsFactory.__create_blacklist_conf()
+                DomainsFactory.__provision_domain(domain.name, package, "virt", blacklist_conf)
+                conf = DomainsFactory.__create_xl_conf_domain(
+                    domain,
+                    boot_iso_location= f"bootiso-{domain.name}.iso",
                     share_packages= True,
                     share_storage= True,
                     share_system= False
                 )
 
-                with open(f"/etc/psec/xen/{domain_name}.conf", 'w') as f:
+                with open(f"/etc/psec/xen/{domain.name}.conf", 'w') as f:
                     f.write(conf)
 
-                self.__fetch_alpine_packages(package)
+                DomainsFactory.__fetch_alpine_packages(package)
 
-                print(f">>> Domain {domain_name} created successfully")
+                print(f">>> Domain {domain.name} created successfully")
                 print("")
         else:
             print("There are no business Domains to create")
 
-    def __create_xl_conf_sys_usb(self) -> None:
-        domains = self.__topology.get("domains", {})
-        sys_usb = domains.get("sys-usb", {})
+    @staticmethod
+    def __create_xl_conf_sys_usb() -> None:        
+        sys_usb = topology.domain("sys-usb")
 
         txt = f'''
 type = "hvm"
 name = "sys-usb"
 serial = "pty" 
-memory= { sys_usb.get("memory", 512) }
-vcpus = { sys_usb.get("vcpus", 1) }
-cpus = "{ self.__cpus_list_to_string(sys_usb.get("cpus", [])) }"
+memory= { sys_usb.memory }
+vcpus = { sys_usb.vcpus }
+cpus = "{ DomainsFactory.__cpus_affinity_to_string(sys_usb.vcpus) }"
 disk = [
 	'format=raw, vdev=xvdc, access=r, devtype=cdrom, target=/usr/lib/psec/system/bootiso-sys-usb.iso'
 ]
@@ -137,17 +130,17 @@ vif=[]
 
         return txt
 
-    def __create_xl_conf_sys_gui(self) -> None:
-        domains = self.__topology.get("domains", {})
-        sys_gui = domains.get("sys-gui", {})
+    @staticmethod
+    def __create_xl_conf_sys_gui() -> None:        
+        sys_gui = topology.domain("sys-gui")
 
         txt = f'''
 type = "hvm"
 name = "sys-gui"
 serial = "pty" 
-memory={ sys_gui.get("memory", 512 ) }
-vcpus = { sys_gui.get("vcpus", 1) }
-cpus = "{ self.__cpus_list_to_string(sys_gui.get("cpus", [])) }"
+memory={ sys_gui.memory }
+vcpus = { sys_gui.vcpus }
+cpus = "{ DomainsFactory.__cpus_affinity_to_string(sys_gui.cpu_affinity) }"
 disk = [
 	'format=raw, vdev=xvdc, access=r, devtype=cdrom, target=/usr/lib/psec/system/bootiso-sys-gui.iso'
 ]
@@ -178,19 +171,19 @@ vif=[]
 
         return txt
 
-    def __create_xl_conf_domain(self, domain_name:str, boot_iso_location:str, share_packages:bool=True, share_storage:bool=True, share_system:bool=False):
-        domains = self.__topology.get("domains", {})
-        dom = domains.get(domain_name, {})
+    @staticmethod
+    def __create_xl_conf_domain(domain:Domain, boot_iso_location:str, share_packages:bool=True, share_storage:bool=True, share_system:bool=False):        
+        dom = topology.domain(domain.name)
 
-        print("domain:", domain_name, "cpus=", dom.get("cpus"))
+        print("domain:", domain.name, "cpus=", domain.vcpus)
 
         txt = f'''
 type = "hvm"
 serial = "pty" 
-name = "{ domain_name }"
-memory = { dom.get("memory", 512) }
-vcpus = { dom.get("vcpus", 1) }
-cpus = "{ self.__cpus_list_to_string(dom.get("cpus", [])) }"
+name = "{ domain.name }"
+memory = { domain.memory }
+vcpus = { domain.vcpus }
+cpus = "{ DomainsFactory.__cpus_affinity_to_string(dom.vcpus) }"
 disk = [
 	'format=raw, vdev=xvdc, access=r, devtype=cdrom, target=/usr/lib/psec/system/{boot_iso_location}'
 ]
@@ -216,14 +209,15 @@ vif=[]
 
         # Add serial channels
         channels = []
-        channels.append(f"'name={domain_name}-msg, connection=socket, path=/var/run/{domain_name}-msg.sock'") # /dev/hvc1
+        channels.append(f"'name={domain.name}-msg, connection=socket, path=/var/run/{domain.name}-msg.sock'") # /dev/hvc1
         
         if len(channels) > 0:
             txt += "channel = [\n{}\n]\n".format(",\n".join(channels))
 
         return txt
 
-    def __provision_domain(self, domain_name:str, main_package:str, alpine_branch:str = "virt", blacklist_conf:str = None):
+    @staticmethod
+    def __provision_domain(domain_name:str, main_package:str, alpine_branch:str = "virt", blacklist_conf:str = None):
         cmd = "/usr/lib/psec/bin/provision-domain.sh"
 
         try:
@@ -235,7 +229,8 @@ vif=[]
             print("An error occured during domain provisioning")
             print(e)
 
-    def __fetch_alpine_packages(self, package):
+    @staticmethod
+    def __fetch_alpine_packages(package):
         # Fetch Alpine packages
         if package is None:
             print("Error: package is empty")
@@ -253,14 +248,16 @@ vif=[]
 
 ###
 ### Private functions
-    def __cpus_list_to_string(self, cpus:list) -> str:
-        if not cpus:
+    @staticmethod
+    def __cpus_affinity_to_string(cpu_affinity:tuple) -> str:
+        if not cpu_affinity:
             return "0"
-        elif len(cpus) == 1:
-            return str(cpus[0])
-        return f"{cpus[0]}-{cpus[-1]}"
+        elif len(cpu_affinity) == 1:
+            return str(cpu_affinity[0])
+        return f"{cpu_affinity[0]}-{cpu_affinity[-1]}"
 
-    def __create_blacklist_conf(self, domain_name:str = "") -> str:
+    @staticmethod
+    def __create_blacklist_conf(domain_name:str = "") -> str:
         print(f"Create blacklist.conf file for { domain_name if domain_name != "" else "standard Domain" }")
         print(">>> DISABLED")
 
@@ -300,10 +297,6 @@ vif=[]
 if __name__ == "__main__":
     print("Starting Domains creation process")
 
-    print("Decode topology file")
-    topology = System.get_topology()
-
     print("Start topology factory")
     #alpine_repo = sys.argv[1]
-    factory = DomainsFactory(topology)
-    factory.create_domains()
+    DomainsFactory.create_domains()

@@ -27,13 +27,13 @@ for f in `lspci | grep "$PCI_USB_LABEL" | cut -d " " -f 1`; do
         if [ -z "$present" ]; then
             pciusb="$f"
         else
-            echo "le bus PCI $pciusb est blacklisté"            
+            echo "The PCI bus $pciusb is in the blacklist"
         fi
     else 
         if [ -z "$present" ]; then
             pciusb="$pciusb $f"
         else
-            echo "le bus PCI $pciusb est blacklisté"            
+            echo "The PCI bus $pciusb is in the blacklist"
         fi
     fi
 done

@@ -4,7 +4,9 @@ import os
 import json
 import psutil
 import shutil
-from . import SingletonMeta, __version__, Constantes, Cles
+from . import SingletonMeta, __version__, Constantes, Cles, Topology, Domain, DomainType
+
+topology = Topology()
 
 class System(metaclass=SingletonMeta):
     """ The System class provides functions for querying or modifying the system's state. 
@@ -168,10 +170,56 @@ class System(metaclass=SingletonMeta):
     def domain_name():
         """ Returns the Domain name """
         return platform.node()
-    
 
     @staticmethod
-    def get_topology(override_topology_file:str = "") -> dict:
+    def get_topology() -> Topology:
+        """ Returns a \c Topology object initialized with the contents of the topology file """
+
+        if topology.initialized():
+            return topology
+        else:
+            # Initialize the topology object
+            # We use the abstract struct returned by get_topology_struct()
+            topo = System.get_topology_struct()
+
+            # Product information
+            topology.product_name = topo["product"]["name"]
+            topology.add_color("splash_bgcolor", topo["product"]["splash_bgcolor"])            
+
+            # System information
+            topology.use_usb = topo["use_usb"]
+            topology.use_gui = topo["use_gui"]
+            topology.screen.rotation = topo["screen_rotation"]
+            topology.screen.width = System().get_screen_width()
+            topology.screen.height = System().get_screen_height()
+            topology.uuid = System().get_system_uuid()
+            topology.gui.app_package = topo["gui_app_package"]
+            topology.gui.memory = topo["gui_memory"]            
+
+            # Domains information
+            for domain_name, domain_desc in topology["domains"]:
+                domain = Domain(domain_name, domain_desc["type"])
+                domain.vcpu_group = domain_desc["vcpu_group"]
+                domain.memory = domain_desc["memory"]
+                domain.vcpus = domain_desc["vcpus"]
+                domain.cpu_affinity = System.__parse_range(domain_desc["cpus"])
+                domain.package = domain_desc["package"]
+                
+                topology.add_domain(domain) 
+ 
+            topology.set_initialized(True)
+
+    @staticmethod
+    def __parse_range(value: str) -> tuple[int, ...]:
+        if "-" in value:
+            start, end = map(int, value.split("-", 1))
+            if start > end:
+                raise ValueError("Invalid range")
+            return tuple(range(start, end + 1))
+        return (int(value),)
+
+    @staticmethod
+    def get_topology_struct(override_topology_file:str = "") -> dict:
         """ Returns the topology of the current system
 
         The topology structure is different from the configuration file topology.json because the file will
@@ -205,6 +253,8 @@ class System(metaclass=SingletonMeta):
                     "name": "Safecor"
                 }
             }
+
+        All the keys are guaranteed to exist with a default value if necessary.
         """        
 
         topo_struct = {}
@@ -239,7 +289,7 @@ class System(metaclass=SingletonMeta):
         # sys-usb domain
         topo_domains["sys-usb"] = {
             "name": "sys-usb",
-            "type": "core",
+            "type": DomainType.Core,
             "memory": 300,
             "vcpus": System.compute_vcpus_for_group("sys-usb", vcpu_groups),
             "cpus": System().compute_cpus_for_group("sys-usb", vcpu_groups)
@@ -248,7 +298,7 @@ class System(metaclass=SingletonMeta):
         # sys-gui domain
         topo_domains["sys-gui"] = {
             "name": "sys-gui",
-            "type": "core",
+            "type": DomainType.Core,
             "memory": gui.get("memory"),
             "vcpus": System.compute_vcpus_for_group("sys-gui", vcpu_groups),
             "cpus": System().compute_cpus_for_group("sys-gui", vcpu_groups),            
@@ -260,7 +310,7 @@ class System(metaclass=SingletonMeta):
             group_name = domain.get("vcpu_group", domain_name) # If there is no group we will create a default configuration
             topo_domains[domain_name] = {
                 "name": domain.get("name", "unknown"),
-                "type": "business",
+                "type": DomainType.Business,
                 "memory": domain.get("memory", 0),
                 "package": domain.get("app-package", ""),
                 "vcpus": System.compute_vcpus_for_group(group_name, vcpu_groups),
@@ -269,10 +319,11 @@ class System(metaclass=SingletonMeta):
 
         topo_struct["domains"] = topo_domains        
 
-        # Get product information
-        topo_struct["product"] = {}
+        # Get product information (copy)
         json_product = topo_data.get("product", {})
-        topo_struct["product"] = json_product.get("name", "Product based on Safecor")
+        topo_product = topo_struct["product"]
+        topo_product["name"] = json_product.get("name", "No Name")
+        topo_product["splash_bgcolor"] = json_product.get("splash_bgcolor", "#1ca9f7")
 
         return topo_struct
 
@@ -495,6 +546,15 @@ class System(metaclass=SingletonMeta):
     
     @staticmethod
     def __get_storage_info() -> dict:
+        """ Returns information about the storage 
+        
+        The fields are:
+        - total - The total size of the storage in bytes
+        - used - The used space of the storage in bytes
+        - free - The free space of the storage in bytes
+        - files - The number of files in the storage
+        """
+
         info = {
             "total": 0,
             "used": 0,

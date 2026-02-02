@@ -1,4 +1,4 @@
-# Safecore - an operating system for security products
+# Safecor - an operating system for security products
 
 [![platform](https://img.shields.io/badge/platform-Alpine-Linux.svg)](https://gbatemp.net/forums/nintendo-switch.283/?prefix_id=44)
 [![language](https://img.shields.io/badge/language-Python-ba1632.svg)](https://github.com/topics/cpp)

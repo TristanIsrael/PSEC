@@ -1,9 +1,10 @@
 __author__ = "Tristan Israël (tristan.israel@alefbet.net)"
 __version__ = '1.2.0'
 
+from ._topology import Topology, Domain, Screen, DomainType
 from ._singleton import SingletonMeta
 from ._constantes import Constantes, Cles, BoutonSouris, InputType, BenchmarkId, EtatComposant
-from ._system import System
+from ._system import System, topology
 try:
     from ._keymap_fr import KeymapFR
 except Exception as e:
@@ -41,16 +42,18 @@ from logging import NullHandler
 
 __all__ = [
     "__version__",
+    "SingletonMeta",
+    "Topology", "Domain", "DomainType",
+    "Constantes", "Parametres", "Cles", "System", "topology", "Screen",
     "KeymapFR",
-    "InputType", "BoutonSouris", "Constantes", "EtatComposant", "MouseMove",     
+    "InputType", "BoutonSouris", "EtatComposant", "MouseMove",     
     "RequestFactory",
     #"Journal", "JournalProxy", "DemonProxyJournal",
     "Logger",
     "NotificationFactory", "BoutonSouris",
-    "Parametres", "Cles", "ResponseFactory",    
+    "ResponseFactory",
     "DiskMonitor",
     "FichierHelper",    
-    "SingletonMeta",
     "InputsDaemon",
     "Mouse", "MouseButton", "MouseWheel", #"InputsProxy",
     #"ControleurBenchmark", 
@@ -61,7 +64,7 @@ __all__ = [
     "Dom0Controller", "SysUsbController", "Api",
     "ComponentsHelper",
     "MockSysUsbController",
-    "System", "Debugging", "ApiHelper"
+    "Debugging", "ApiHelper"
 ]
 
 logging.getLogger(__name__).addHandler(NullHandler())
