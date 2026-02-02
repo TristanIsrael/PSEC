@@ -84,4 +84,7 @@ mv /etc/apparmor.d/usr.sbin.smbldap-useradd /etc/apparmor.d/disable
 mv /etc/apparmor.d/usr.sbin.traceroute /etc/apparmor.d/disable
 mv /etc/apparmor.d/usr.sbin.winbindd /etc/apparmor.d/disable
 
+echo Setup system integrity
+/usr/lib/psec/bin/integrity-setup.sh
+
 exit 0
