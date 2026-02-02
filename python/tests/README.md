@@ -1,4 +1,4 @@
-# PSEC testing application
+# Safecor testing application
 
 ## Dependencies
 

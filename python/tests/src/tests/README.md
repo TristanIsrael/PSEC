@@ -1,3 +1,3 @@
-# PSEC Tests
+# Safecor Tests
 
-PSEC Tests is the host application for all the tests of PSEC.
+Safecor Tests is the host application for all the tests of Safecor.

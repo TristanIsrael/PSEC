@@ -1,0 +1,86 @@
+# Contributor:
+# Maintainer: Tristan Israël <tristan.israel@alefbet.net>
+pkgname=safecor-container-debian
+pkgver=1.0
+pkgrel=1
+pkgdesc="Safecor - LXC Container based on Debian"
+url="https://www.alefbet.net/"
+arch="x86_64"
+license="MIT"
+#depends="lxc lxc-download lxc-templates lxc-bridge iptables"
+makedepends="debootstrap"
+builddir="$srcdir/$pkgname-$pkgver"
+checkdepends=""
+install="$pkgname.post-install $pkgname.pre-deinstall"
+subpackages=""
+replaces=""
+options="!check"  # no tests provided
+_release="trixie"
+_variant="minbase"
+#_arch="amd64"
+source="
+config
+"
+#https://www.alefbet.net/github/safecor/x86_64/lxc-container-debian.tar.bz2
+
+#build() {     
+    # The container has been previously created
+    # Create a new container
+    # sudo lxc-create -n "$pkgname" -t download -P "$srcdir" -- --dist $_distro --release $_release --arch $_arch
+
+    # Disable networking in the container
+    # sudo sed -i 's/^lxc\.net/#&/' "$srcdir/$pkgname"/config
+
+    # sudo lxc-stop "$pkgname"
+#}
+
+prepare() {
+    default_prepare
+}
+
+build() {
+    mkdir -p "$builddir"/safecor-container-debian/rootfs
+    cp "$srcdir"/config "$builddir"/safecor-container-debian
+
+    echo "Create a rootfs with debootstrap"
+    echo "Release: $_release. Variant= $_variant"
+    sudo debootstrap --variant=$_variant $_release $builddir/safecor-container-debian/rootfs http://deb.debian.org/debian/
+    #sudo mount -t proc /proc "$builddir"/safecor-container-debian/rootfs/proc
+    #sudo mount --rbind /sys "$builddir"/safecor-container-debian/rootfs/sys
+    #sudo mount --rbind /dev "$builddir"/safecor-container-debian/rootfs/dev
+    sudo chroot "$builddir"/safecor-container-debian/rootfs apt-get update
+    sudo chroot "$builddir"/safecor-container-debian/rootfs apt-get install -y systemd systemd-sysv dbus 
+    # To remove if not necessary in the product container
+    sudo chroot "$builddir"/safecor-container-debian/rootfs apt-get install -y isc-dhcp-client iproute2 iputils-ping dnsutils
+    #sudo umount -f "$builddir"/safecor-container-debian/rootfs/proc || true
+    #sudo umount -f "$builddir"/safecor-container-debian/rootfs/sys || true
+    #sudo umount -f "$builddir"/safecor-container-debian/rootfs/dev || true
+
+    echo "Clean the container"
+    sudo chroot "$builddir"/safecor-container-debian/rootfs apt-get clean
+    sudo chroot "$builddir"/safecor-container-debian/rootfs apt-get autoremove --purge -y
+    sudo chroot "$builddir"/safecor-container-debian/rootfs apt-get autoclean
+    sudo rm -rf "$builddir"/safecor-container-debian/rootfs/tmp/*
+    sudo rm -rf "$builddir"/safecor-container-debian/rootfs/var/tmp/*
+    sudo rm -rf "$builddir"/safecor-container-debian/rootfs/usr/share/doc/*
+    sudo rm -rf "$builddir"/safecor-container-debian/rootfs/usr/share/man/*
+    sudo rm -rf "$builddir"/safecor-container-debian/rootfs/usr/share/info/*
+    sudo rm -rf "$builddir"/safecor-container-debian/rootfs/usr/share/locale/*
+
+    echo "Current rootfs size:"
+    sudo du -sk "$builddir"/safecor-container-debian/rootfs
+
+    echo "Create an archive"
+    sudo tar cjf "$srcdir/$pkgname".tar.bz2 -C "$builddir"/safecor-container-debian --exclude "rootfs/sys" --exclude "rootfs/proc" --exclude "rootfs/dev" .
+    echo "Archive size:"
+    ls -l "$srcdir/$pkgname".tar.bz2
+
+    # Change permission for future cleaning
+    sudo chmod -R 777 "$srcdir"/*
+}
+
+package() {    
+    # Tar container
+    echo "Create the package"
+    install -D -m644 "$srcdir/$pkgname".tar.bz2 "$pkgdir"/var/lib/lxc/"$pkgname".tar.bz2
+}

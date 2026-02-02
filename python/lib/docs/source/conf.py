@@ -10,10 +10,10 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../.
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'PSEC'
+project = 'Safecor'
 copyright = '2025-2026, Tristan Israël'
 author = 'Tristan Israël'
-release = '1.0.1'
+release = '1.2.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -74,5 +74,5 @@ python_use_unqualified_type_names = True
 
 # Constants
 rst_epilog = f"""
-.. |URL_DOC_PROTOCOL| replace:: https://github.com/TristanIsrael/PSEC/wiki/Protocol
+.. |URL_DOC_PROTOCOL| replace:: https://github.com/TristanIsrael/Safecor/wiki/Protocol
 """

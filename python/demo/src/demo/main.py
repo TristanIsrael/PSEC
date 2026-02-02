@@ -12,7 +12,7 @@ from PySide6.QtGui import QGuiApplication, QCursor, QMouseEvent
 from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterType, qmlRegisterSingletonType, qmlRegisterUncreatableType, qmlRegisterSingletonInstance
 from PySide6.QtCore import QObject, QCoreApplication, Qt, QEvent, QThread, QPoint, QSize
 from PySide6.QtQuickControls2 import QQuickStyle
-from psec import Api, System
+from safecor import Api, System
 from ControleurBenchmark import ControleurBenchmark
 
 from InterfaceSocle import InterfaceSocle
@@ -23,7 +23,7 @@ from DiskModel import DiskModel
 api_ready = threading.Event()
 
 def on_ready():
-    print("PSEC API is ready")
+    print("Safecor API is ready")
     api_ready.set()
     ControleurBenchmark().setup(Api().get_mqtt_client())
 

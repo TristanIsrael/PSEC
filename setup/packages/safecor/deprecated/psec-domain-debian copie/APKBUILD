@@ -1,0 +1,95 @@
+# Contributor:
+# Maintainer: Tristan Israël <tristan.israel@alefbet.net>
+pkgname=safecor-domain-debian
+pkgver=1.0
+pkgrel=1
+pkgdesc="Safecor - Base package for user domain based on Debian"
+url="https://www.alefbet.net/"
+arch="x86_64"
+license="MIT"
+depends="lxc lxc-download lxc-templates lxc-bridge iptables"
+makedepends="git python3-dev py3-build py3-installer"
+builddir="$srcdir/$pkgname-$pkgver"
+checkdepends=""
+install=""
+subpackages=""
+replaces=""
+options="!check"  # no tests provided
+_distro="debian"
+_release="bookworm"
+_arch="amd64"
+giturl="https://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@github.com/tibsys/psec"
+gitbranch=""
+paho_mqtt_ver="2.1.0"
+paho_mqtt_source="paho-mqtt-$paho_mqtt_ver.tar.gz::https://github.com/eclipse/paho.mqtt.python/archive/v$paho_mqtt_ver.tar.gz"
+
+clean() {
+    sudo rm -rf "$srcdir" 
+    sudo rm -rf "$pkgdir"
+    sudo rm -rf "$builddir"
+}
+
+prepare() {
+    # Fetch Safecor lib
+    mkdir -p "$builddir"/safecor
+    cd "$builddir"/safecor
+
+    if [ -z "$gitbranch" ]; then
+        echo Using main branch
+        git clone "$giturl" .    
+    else
+        echo Using branch "$gitbranch"
+        git clone --branch "$gitbranch" "$giturl" .
+    fi
+
+    # Fetch Paho Mqtt python module
+    mkdir -p "$builddir"/paho-mqtt
+    cd "$builddir"/paho-mqtt
+    wget https://github.com/eclipse/paho.mqtt.python/archive/v$paho_mqtt_ver.tar.gz -O paho-mqtt-$paho_mqtt_ver.tar.gz
+}
+
+build() {     
+    # Create a new container
+    sudo lxc-create -n "$pkgname" -t download -P "$srcdir" -- --dist $_distro --release $_release --arch $_arch
+
+    # Inject python into the container
+    sudo service dnsmasq.lxcbr0 start
+    sudo lxc-start -P "$srcdir" -n "$pkgname"
+    sudo lxc-attach -P "$srcdir" -n "$pkgname" -- apt update && apt upgrade
+    sudo lxc-attach -P "$srcdir" -n "$pkgname" -- apt install -y python3 python3-installer python3-evdev python3-serial python3-pyudev python3-msgpack
+    
+    # Build and inject py3-paho-mqtt2     
+    cd "$builddir"/paho-mqtt
+    tar xvzf paho-mqtt-$paho_mqtt_ver.tar.gz
+    cd "$builddir"/paho-mqtt/paho-mqtt-$paho_mqtt_ver
+    python3 -m build
+    cp "$builddir"/paho-mqtt/paho-mqtt-$paho_mqtt_ver/dist/paho_mqtt-$paho_mqtt_ver-py3-none-any.whl "$srcdir"/rootfs/tmp
+    sudo lxc-attach -P "$srcdir" -n "$pkgname" -- python3 -m installer /tmp/paho_mqtt-$paho_mqtt_ver-py3-none-any.whl
+
+    # Build Safecor lib
+    cd "$builddir/psec/python/lib"
+    python3 -m build
+
+    # Inject Safecor lib into the container
+    cd "$builddir/psec/python/lib/dist"
+    cp *.whl "$srcdir"/rootfs/tmp
+    sudo lxc-attach -P "$srcdir" -n "$pkgname" -- python3 -m installer /tmp/psec-*-py3-none-any.whl
+
+    # Stop the container
+    sudo lxc-stop -P "$srcdir" -n "$pkgname"
+
+    # Disable networking in the container
+    sed -i 's/^lxc\.net/#&/' "$srcdir"/psec-domain-debian/config    
+}
+
+package() {
+    mkdir "$pkgdir"/var/lib/lxc/
+    
+
+    # Tar container
+    sudo tar cf "$pkgdir"/var/lib/lxc/"$pkgname".tar -C "$srcdir" .
+    sudo chown $USER "$pkgdir"/var/lib/lxc/"$pkgname".tar
+
+    # Compress archive
+    bzip2 "$pkgdir"/var/lib/lxc/"$pkgname".tar
+}

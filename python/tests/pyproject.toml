@@ -8,7 +8,7 @@ version = "1.0"
 authors = [ 
     { name="Tristan Israël", email="tristan.israel@alefbet.net" }, 
 ]
-description = "Test application for PSEC"
+description = "Test application for Safecor"
 readme = "README.md"
 requires-python = ">=3.9"
 classifiers = [
@@ -18,5 +18,5 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/TristanIsrael/PSEC"
-Issues = "https://github.com/TristanIsrael/PSEC/issues"
+Homepage = "https://github.com/TristanIsrael/Safecor"
+Issues = "https://github.com/TristanIsrael/Safecor/issues"

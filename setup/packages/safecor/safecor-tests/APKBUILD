@@ -1,0 +1,23 @@
+# Contributor:
+# Maintainer: Tristan Israël <tristan.israel@alefbet.net>
+pkgname=safecor-tests
+pkgver=1.0
+pkgrel=1
+pkgdesc="Safecor - Test app"
+url="https://www.alefbet.net/"
+arch="noarch"
+license="MIT"
+depends="safecor-core safecor-sys-gui"
+makedepends="python3-dev py3-build py3-installer git"
+builddir="$srcdir/$pkgname-$pkgver"
+checkdepends=""
+install="$pkgname.post-install"
+subpackages=""
+replaces="safecor-core"
+options="!check"  # no tests provided
+source="topology.json"
+
+package() {        
+    install -D -m644 "$srcdir"/topology.json "$pkgdir/etc/safecor/topology.json"
+}
+

@@ -1,4 +1,4 @@
-# PSEC Licence
+# Safecor Licence
 
 This product is licensed under a dual licensing model. 
 

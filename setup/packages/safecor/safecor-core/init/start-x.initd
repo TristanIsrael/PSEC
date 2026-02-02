@@ -1,0 +1,31 @@
+#!/sbin/openrc-run
+
+name="start-x"
+
+depend() {
+    after sysctl
+}
+
+start() {
+    ebegin "Starting X server"    
+
+    # Generate X config files
+    X -configure
+    mv /xorg.conf.new /etc/X11/xorg.conf
+    /usr/bin/python3 /usr/lib/safecor/bin/generate-x-config.py
+
+    start-stop-daemon --start --make-pidfile --exec X --pidfile /var/run/$name.pid --background -- -config /etc/X11/xorg.conf
+
+    # Show splash
+    DISPLAY=:0 feh --fullscreen --zoom fill /boot/Splash.png &
+
+    eend $?
+}
+
+stop() {
+    ebegin "Stopping X server"
+
+    kill -9 $(cat /var/run/$name.pid)
+
+    eend $?
+}

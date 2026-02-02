@@ -1,4 +1,4 @@
-from psec import Api, MqttFactory, Topics, MqttHelper
+from safecor import Api, MqttFactory, Topics, MqttHelper
 import tempfile
 import os
 import queue

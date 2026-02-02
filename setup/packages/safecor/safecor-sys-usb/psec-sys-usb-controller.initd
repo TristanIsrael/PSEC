@@ -1,0 +1,24 @@
+#!/sbin/openrc-run
+
+name="safecor-sys-usb-controller"
+user="svc-sys-usb-controller"
+
+depend() {
+    before udev
+}
+
+start() {
+    ebegin "Starting Safecor sys-usb controller"
+
+    start-stop-daemon --start --make-pidfile --exec /usr/bin/python3 --pidfile /var/run/$name.pid --background --user "$user" -- /usr/lib/safecor/bin/safecor-sys-usb-controller.py
+
+    eend $?
+}
+
+stop() {
+    ebegin "Stopping Safecor sys-usb controller"
+
+    kill -9 $(cat /var/run/$name.pid)
+
+    eend $?
+}

@@ -51,7 +51,7 @@ mkdir -p "$tmp"/etc/apk
 
 makefile root:root 0644 "$tmp"/etc/apk/world <<EOF
 xen
-psec-diag
+safecor-diag
 EOF
 
 rc_add devfs sysinit

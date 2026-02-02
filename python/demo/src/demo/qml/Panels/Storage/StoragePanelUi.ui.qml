@@ -20,7 +20,7 @@ Rectangle {
                 anchors.centerIn: parent
                 font.pixelSize: 20
 
-                text: qsTr("This panel offers a file browser to test PSEC storage capabilities.")
+                text: qsTr("This panel offers a file browser to test Safecor storage capabilities.")
             }
         }
 

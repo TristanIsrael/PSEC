@@ -1,0 +1,24 @@
+# Contributor:
+# Maintainer: Tristan Israël <tristan.israel@alefbet.net>
+pkgname=safecor-hardening
+pkgver=1.0
+pkgrel=0
+pkgdesc="Safecor - Hardening for business Domains"
+url="https://www.alefbet.net/"
+arch="noarch"
+license="MIT"
+depends=""
+makedepends=""
+builddir="$srcdir/$pkgname-$pkgver"
+checkdepends=""
+install="$pkgname.post-install"
+subpackages=""
+replaces=""
+options="!check"  # no tests provided
+source="
+hardening.initd
+"
+
+package() {
+    install -D -m755 "$srcdir"/hardening.sh "$pkgdir"/usr/lib/safecor/bin/hardening.sh
+}

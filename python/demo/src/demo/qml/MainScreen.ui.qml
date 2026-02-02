@@ -41,7 +41,7 @@ Rectangle {
         anchors {
             horizontalCenter: parent.horizontalCenter
         }
-        text: qsTr("PSEC Diagnostics")
+        text: qsTr("Safecor Diagnostics")
         font.pixelSize: 18
     }
 

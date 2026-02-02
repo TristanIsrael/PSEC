@@ -1,0 +1,185 @@
+# Contributor:
+# Maintainer: Tristan Israël <tristan.israel@alefbet.net>
+pkgname=safecor-core
+pkgver=1.2
+pkgrel=0
+pkgdesc="Safecor - Core of the system"
+url="https://www.alefbet.net/"
+arch="noarch"
+license="MIT"
+depends="openrc xorriso safecor-lib xen xen-hypervisor qemu-system-x86_64 qemu-ui-gtk seabios abuild pciutils xorg-server xrandr font-terminus 
+gtk+3.0 sdl2 sdl2_image mosquitto mosquitto-openrc mosquitto-clients socat py3-evdev py3-udev feh jq safecor-alpine-virt xdotool 
+qemu-hw-display-virtio-gpu-pci qemu-hw-display-virtio-gpu agetty apparmor apparmor-profiles py3-pillow fsverity-utils
+"
+makedepends=""
+builddir="$srcdir/$pkgname-$pkgver"
+install="$pkgname.pre-install $pkgname.post-install $pkgname.pre-deinstall $pkgname.post-deinstall"
+checkdepends=""
+subpackages=""
+replaces="alpine-baselayout alpine-baselayout-data mosquitto grub openrc qemu-system-x86_64"
+options="!check"  # no tests provided
+
+source="
+init/safecor-core-controller.initd
+init/splash.initd
+init/orchestrator.initd
+init/start-x.initd
+init/create-mqtt-tunnels.initd
+init/debug.initd
+init/hardening.initd
+
+scripts/create-local-alpine-repository.sh
+scripts/finish-core-init.sh
+scripts/generate-pgp-keys.sh
+scripts/provision-domain.sh
+scripts/reindex-and-sign-repository.sh
+scripts/setup-alpine-repositories.sh
+scripts/setup-xen-environment.sh
+scripts/get-sys-gui-domid.sh
+scripts/post-install.sh
+scripts/show-logs.sh
+scripts/show-messages.sh
+scripts/start-sys-gui.sh
+scripts/start-sys-usb.sh
+scripts/start-business-domain.sh
+scripts/set-xenstore-permissions.sh
+scripts/integrity-setup.sh
+
+conf/constants.sh
+conf/safecor.conf
+conf/10-energy-saving.conf
+conf/topology.json
+conf/mosquitto.conf
+conf/rc.conf
+conf/motd
+conf/grub/grub.default
+conf/grub/grub.cfg-durabook-r8
+conf/10-stty.sh
+conf/color_prompt.sh
+conf/inittab
+
+python/rotate-screen.py
+python/create-domains.py
+python/start-safecor-core-controller.py
+python/write-screen-information-to-xenstore.py
+python/generate-x-config.py
+python/get-total-memory.py
+python/create-mqtt-tunnels.py
+python/orchestrator.py
+python/create-splash.py
+
+#boot/Splash_800_1280.ppm
+#boot/Splash_800_1280.png
+#boot/Splash_1024_768.ppm
+#boot/Splash_1024_768.png
+misc/splash_ng.png
+
+misc/qemu-system-x86_64.cmd
+
+scripts/create-tty-tunnel.sh
+scripts/create-tty-terminal.sh
+scripts/start-mqtt-logger.sh
+
+domu.apkovl.tar.gz.tmpl
+"
+
+CONFDIR="etc/safecor"
+ROOTDIR="usr/lib/safecor"
+BINDIR="$ROOTDIR/bin"
+
+build() {
+    echo "Create default overlay for User Domains"
+    mv "$srcdir"/domu.apkovl.tar.gz.tmpl "$srcdir"/domu.apkovl.tar.gz
+    #cd domu_apkovl.tmpl
+    #tar czf "$builddir"/domu.apkovl.tar.gz --exclude '.DS_Store' etc/ 
+}
+
+check() {
+    nb_fichiers=`tar tvzf $srcdir/domu.apkovl.tar.gz | wc -l`
+    if [ $nb_fichiers != 32 ]; then 
+        echo "Incorrect files count in the overlay."
+        echo "... found=$nb_fichiers, expected=32"
+        echo "Please verify the folder domu_apkvol.tmpl"
+        return 1
+    fi
+}
+
+package() {
+    # Alpine overlay for DomUs
+    install -D -m640 "$builddir"/domu.apkovl.tar.gz "$pkgdir"/usr/lib/safecor/system/domu.apkovl.tar.gz    
+
+    # Openrc
+    install -D -m755 "$srcdir"/splash.initd "$pkgdir"/etc/init.d/splash
+    install -D -m755 "$srcdir"/safecor-core-controller.initd "$pkgdir"/etc/init.d/safecor-core-controller
+    install -D -m755 "$srcdir"/start-x.initd "$pkgdir"/etc/init.d/start-x
+    install -D -m755 "$srcdir"/orchestrator.initd "$pkgdir"/etc/init.d/orchestrator
+    
+    # Configuration
+    install -D -m640 "$srcdir"/topology.json "$pkgdir/$CONFDIR"/topology.json
+    install -D -m644 "$srcdir"/safecor.conf "$pkgdir"/etc/modules-load.d/safecor.conf
+    install -D -m644 "$srcdir"/10-energy-saving.conf "$pkgdir"/etc/X11/xorg.conf.d/10-energy-saving.conf
+    install -D -m644 "$srcdir"/grub.default "$pkgdir"/etc/default/grub
+    #install -D -m644 "$srcdir"/grub.cfg-durabook-r8 "$pkgdir"/boot/grub/grub.cfg
+    install -D -m644 "$srcdir"/rc.conf "$pkgdir/etc/rc.conf"
+    install -D -m640 "$srcdir"/constants.sh "$pkgdir/$CONFDIR"/constants.sh
+    install -D -m644 "$srcdir"/10-stty.sh "$pkgdir"/etc/profile.d/10-stty.sh
+    install -D -m644 "$srcdir"/color_prompt.sh "$pkgdir"/etc/profile.d/color_prompt.sh
+    install -D -m644 "$srcdir"/inittab "$pkgdir"/etc/inittab
+        
+    #install -D -m755 "$srcdir"/connect-to-gui.initd "$pkgdir"/etc/init.d/connect-to-gui
+    #install -D -m644 "$srcdir"/sys-usb.conf "$pkgdir/$CONFDIR/xen/sys-usb.conf"
+
+    # Shell scripts
+    install -D -m750 "$srcdir"/post-install.sh "$pkgdir/$BINDIR"/post-install.sh
+    install -D -m750 "$srcdir"/get-sys-gui-domid.sh "$pkgdir/$BINDIR"/get-sys-gui-domid.sh    
+    install -D -m750 "$srcdir"/show-logs.sh "$pkgdir/$BINDIR"/show-logs.sh
+    install -D -m750 "$srcdir"/show-messages.sh "$pkgdir/$BINDIR"/show-messages.sh
+    install -D -m750 "$srcdir"/start-sys-usb.sh "$pkgdir/$BINDIR"/start-sys-usb.sh
+    install -D -m750 "$srcdir"/start-sys-gui.sh "$pkgdir/$BINDIR"/start-sys-gui.sh
+    install -D -m750 "$srcdir"/start-business-domain.sh "$pkgdir/$BINDIR"/start-business-domain.sh
+    install -D -m750 "$srcdir"/provision-domain.sh "$pkgdir/$BINDIR"/provision-domain.sh
+    install -D -m750 "$srcdir"/create-local-alpine-repository.sh "$pkgdir/$BINDIR"/create-local-alpine-repository.sh
+    install -D -m750 "$srcdir"/generate-pgp-keys.sh "$pkgdir/$BINDIR"/generate-pgp-keys.sh    
+    install -D -m750 "$srcdir"/reindex-and-sign-repository.sh "$pkgdir/$BINDIR"/reindex-and-sign-repository.sh
+    install -D -m750 "$srcdir"/setup-alpine-repositories.sh "$pkgdir/$BINDIR"/setup-alpine-repositories.sh        
+    #install -D -m755 "$srcdir"/setup-pci-usb-controllers.sh "$pkgdir/$BINDIR"/setup-pci-usb-controllers.sh 
+    #install -D -m755 "$srcdir"/setup-pci-vga-controller.sh "$pkgdir/$BINDIR"/setup-pci-vga-controller.sh
+    install -D -m750 "$srcdir"/setup-xen-environment.sh "$pkgdir/$BINDIR"/setup-xen-environment.sh
+    install -D -m750 "$srcdir"/finish-core-init.sh "$pkgdir/$BINDIR"/finish-core-init.sh
+    install -D -m750 "$srcdir"/set-xenstore-permissions.sh "$pkgdir/$BINDIR"/set-xenstore-permissions.sh
+    install -D -m755 "$srcdir"/integrity-setup.sh "$pkgdir/$BINDIR"/integrity-setup.sh
+
+    # Python scripts
+    install -D -m640 "$srcdir"/write-screen-information-to-xenstore.py "$pkgdir/$BINDIR"/write-screen-information-to-xenstore.py
+    install -D -m640 "$srcdir"/get-total-memory.py "$pkgdir/$BINDIR"/get-total-memory.py    
+    install -D -m640 "$srcdir"/orchestrator.py "$pkgdir/$BINDIR"/orchestrator.py
+    install -D -m640 "$srcdir"/rotate-screen.py "$pkgdir/$BINDIR"/rotate-screen.py
+    install -D -m640 "$srcdir"/generate-x-config.py "$pkgdir/$BINDIR"/generate-x-config.py
+    install -D -m640 "$srcdir"/create-domains.py "$pkgdir/$BINDIR"/create-domains.py
+    install -D -m750 "$srcdir"/start-safecor-core-controller.py "$pkgdir/$BINDIR"/start-safecor-core-controller.py 
+    install -D -m750 "$srcdir"/create-mqtt-tunnels.py "$pkgdir/$BINDIR"/create-mqtt-tunnels.py 
+    install -D -m755 "$srcdir"/create-splash.py "$pkgdir/$BINDIR"/create-splash.py 
+
+    # Misc
+    #install -D -m644 "$srcdir"/Splash_800_1280.ppm "$pkgdir"/boot/Splash_800_1280.ppm
+    #install -D -m644 "$srcdir"/Splash_800_1280.png "$pkgdir"/boot/Splash_800_1280.png
+    #install -D -m644 "$srcdir"/Splash_1024_768.ppm "$pkgdir"/boot/Splash_1024_768.ppm
+    #install -D -m644 "$srcdir"/Splash_1024_768.png "$pkgdir"/boot/Splash_1024_768.png
+    #install -D -m644 "$srcdir"/boot/splash_ng.png "$pkgdir"/boot/splash_ng.png
+    install -D -m644 "$srcdir"/misc/splash_ng.png "$pkgdir"/boot/splash.png
+    install -D -m755 "$srcdir"/qemu-system-x86_64.cmd "$pkgdir"/usr/bin/qemu-system-x86_64.cmd
+
+    # Mosquitto
+    install -D -m644 "$srcdir"/mosquitto.conf "$pkgdir"/etc/mosquitto/mosquitto.conf
+    install -D -m755 "$srcdir"/create-mqtt-tunnels.initd "$pkgdir"/etc/init.d/create-mqtt-tunnels        
+
+    # Debugging
+    install -D -m755 "$srcdir"/debug.initd "$pkgdir"/etc/init.d/debug
+    install -D -m750 "$srcdir"/create-tty-tunnel.sh "$pkgdir/$BINDIR"/create-tty-tunnel.sh
+    install -D -m750 "$srcdir"/create-tty-terminal.sh "$pkgdir/$BINDIR"/create-tty-terminal.sh
+    install -D -m750 "$srcdir"/start-mqtt-logger.sh "$pkgdir/$BINDIR"/start-mqtt-logger.sh
+    install -D -m755 "$srcdir"/motd "$pkgdir/etc/motd"
+
+    # Security
+    install -D -m755 "$srcdir"/hardening.initd "$pkgdir"/etc/init.d/hardening
+}

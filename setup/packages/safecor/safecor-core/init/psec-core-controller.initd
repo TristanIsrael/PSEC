@@ -1,0 +1,24 @@
+#!/sbin/openrc-run
+
+name="safecor-core-controller"
+user="svc-safecor-controller"
+
+depend() {
+    after mosquitto
+}
+
+start() {
+    ebegin "Starting Safecor core controller"
+
+    start-stop-daemon --start --make-pidfile --exec /usr/bin/python3 --pidfile /var/run/$name.pid --background --user "$user" -- /usr/lib/safecor/bin/start-safecor-core-controller.py
+
+    eend $?
+}
+
+stop() {
+    ebegin "Stopping Safecor core controller"
+
+    kill -9 $(cat /var/run/$name.pid)
+
+    eend $?
+}

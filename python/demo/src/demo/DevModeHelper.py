@@ -1,5 +1,5 @@
 import os
-from psec import MqttClient, ConnectionType
+from safecor import MqttClient, ConnectionType
 from pathlib import Path
 
 class DevModeHelper():

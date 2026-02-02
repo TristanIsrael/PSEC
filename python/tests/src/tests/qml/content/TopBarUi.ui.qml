@@ -106,7 +106,7 @@ Item {
 
         Text {
             Layout.alignment: Qt.AlignVCenter
-            text: "PSEC Tests"
+            text: "Safecor Tests"
             font.family: "LED Dot-Matrix"
             font.pixelSize: parent.height * 0.8
             color: "#fafdfa"

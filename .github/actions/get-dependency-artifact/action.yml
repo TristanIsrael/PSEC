@@ -25,20 +25,20 @@ runs:
         if [ -d "$FILENAME" ]; then
           cd "$FILENAME"
         fi
-        mkdir -p /home/builder/packages/psec/x86_64
-        cp *.apk /home/builder/packages/psec/x86_64
+        mkdir -p /home/builder/packages/safecor/x86_64
+        cp *.apk /home/builder/packages/safecor/x86_64
 
     - name: Rebuild and sign the APK index
       shell: sh
       run: |        
-        cd /home/builder/packages/psec/x86_64/
-        apk index -d PSEC -o APKINDEX.tar.gz *.apk
-        abuild-sign -k /home/builder/.abuild/psec.rsa -p /etc/apk/keys/psec.rsa.pub APKINDEX.tar.gz            
+        cd /home/builder/packages/safecor/x86_64/
+        apk index -d Safecor -o APKINDEX.tar.gz *.apk
+        abuild-sign -k /home/builder/.abuild/safecor.rsa -p /etc/apk/keys/safecor.rsa.pub APKINDEX.tar.gz            
 
     - name: Update repository configuration
       shell: sh
       run: |
-        LINE="/home/builder/packages/psec"
+        LINE="/home/builder/packages/safecor"
         FILE="/etc/apk/repositories"
         if grep -q "^$LINE\$" "$FILE"; then
           echo "Local repository is already set"
@@ -47,6 +47,6 @@ runs:
           echo "$LINE" | sudo tee -a $FILE
         fi
 
-        cd /home/builder/packages/psec
+        cd /home/builder/packages/safecor
         ln -s x86_64 noarch
         sudo apk update

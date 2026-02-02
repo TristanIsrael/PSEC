@@ -1,0 +1,32 @@
+#!/bin/sh
+
+mount -o remount,size=2M /dev/shm
+
+mkdir -p /var/log/safecor
+
+modprobe exfat
+modprobe vfat
+modprobe ntfs3
+modprobe ext4
+
+echo "**** Creating service accounts"
+addgroup safecor
+adduser -H -D -s /sbin/nologin -G safecor svc-sys-usb-controller
+adduser -H -D -s /sbin/nologin -G safecor svc-tty-tunnel
+
+rc-update add safecor-sys-usb-controller
+rc-service safecor-sys-usb-controller start
+
+echo Start udev service
+#rc-service mdev stop
+#rc-update del mdev sysinit
+rc-update add udev boot
+rc-service udev start
+udevadm control --reload-rules
+
+rc-update add tty-tunnel
+rc-service tty-tunnel start
+
+/usr/lib/safecor/bin/hardening.sh
+
+exit 0

@@ -1,0 +1,37 @@
+#!/sbin/openrc-run
+
+name="splash"
+
+depend() {
+    before *
+}
+
+start() {
+    if grep -qw "nosplash" /proc/cmdline; then
+        ewarn "Splash explicitely disabled on kernel command line"
+        return 0
+    fi
+
+    width=`cat /sys/class/graphics/fb0/virtual_size | cut -d, -f1`
+    height=`cat /sys/class/graphics/fb0/virtual_size | cut -d, -f2`
+    splash_source="/boot/splash.png"
+    splash_file="/boot/splash_${width}_${height}.ppm"
+
+    if [ ! -f $splash_source ]
+    then 
+        echo "No splash file provided"
+        return 0
+    fi 
+
+    echo "Create splash files for the device"
+    python3 /usr/lib/safecor/bin/create-splash.py $width $height /boot
+
+    ebegin "Loading splash file"
+    fbsplash -s $splash_file -T 2
+    eend $?
+}
+
+stop() {
+    ebegin ""
+    eend $?
+}

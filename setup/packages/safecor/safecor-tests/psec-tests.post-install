@@ -1,0 +1,12 @@
+#!/bin/sh
+
+echo
+echo --------------------------------------------
+echo -------      Safecor Tests Installation       -------
+echo ---        script post-install.sh        ---
+echo --------------------------------------------
+echo
+
+/usr/lib/safecor/bin/post-install.sh
+
+exit 0

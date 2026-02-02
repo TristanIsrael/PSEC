@@ -1,6 +1,6 @@
 from lib import AbstractTest
 from enums import MessageLevel
-from psec import Api, Topics, ApiHelper
+from safecor import Api, Topics, ApiHelper
 
 class TestGetStoragesList(AbstractTest):
 

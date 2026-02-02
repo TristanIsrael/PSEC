@@ -1,0 +1,22 @@
+#!/sbin/openrc-run
+
+name="safecor-core-init"
+
+depend() {
+    after syslog
+}
+
+start() {
+    ebegin "Finalizing Safecor initialization"
+
+    apk update
+    apk upgrade
+    apk add
+
+    eend $?
+}
+
+stop() {
+    ebegin ""
+    eend $?
+}

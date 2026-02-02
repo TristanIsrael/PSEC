@@ -2,10 +2,10 @@ from PySide6.QtCore import QObject, Signal, Slot
 from PySide6.QtWidgets import QWidget
 from InterfaceSocle import InterfaceSocle
 from hashlib import md5
-from psec import Api, Parametres, Cles
+from safecor import Api, Parametres, Cles
 import os
 try:
-    from psec import ControleurBenchmark
+    from safecor import ControleurBenchmark
 except:
     print("Le contrôleur de benchmark n'est pas disponible")
 

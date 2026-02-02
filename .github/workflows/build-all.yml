@@ -23,62 +23,62 @@ on:
         required: false
         type: 'boolean'
         default: 'false'
-      force-psec-alpine-iso:
+      force-safecor-alpine-iso:
         description: "Build alpine-iso"
         required: false
         type: 'boolean'
         default: 'false'
-      force-psec-alpine-virt:
+      force-safecor-alpine-virt:
         description: "Build alpine-virt"
         required: false
         type: 'boolean'
         default: 'false'
-      force-psec-container-debian:
+      force-safecor-container-debian:
         description: "Build container-debian"
         required: false
         type: 'boolean'
         default: 'false'
-      force-psec-core:
+      force-safecor-core:
         description: "Build core"
         required: false
         type: 'boolean'
         default: 'false'      
-      force-psec-diag:
+      force-safecor-diag:
         description: "Build diag"
         required: false
         type: 'boolean'
         default: 'false'
-      force-psec-diag-iso:
+      force-safecor-diag-iso:
         description: "Build diag ISO"
         required: false
         type: 'boolean'
         default: 'false'
-      force-psec-tests:
+      force-safecor-tests:
         description: "Build tests"
         required: false
         type: 'boolean'
         default: 'false'
-      force-psec-tests-iso:
+      force-safecor-tests-iso:
         description: "Build tests ISO"
         required: false
         type: 'boolean'
         default: 'false'
-      force-psec-gui-base:
+      force-safecor-gui-base:
         description: "Build gui-base"
         required: false
         type: 'boolean'
         default: 'false'
-      force-psec-lib:
+      force-safecor-lib:
         description: "Build lib"
         required: false
         type: 'boolean'
         default: 'false'
-      force-psec-sys-gui:
+      force-safecor-sys-gui:
         description: "Build sys-gui"
         required: false
         type: 'boolean'
         default: 'false'
-      force-psec-sys-usb:
+      force-safecor-sys-usb:
         description: "Build sys-usb"
         required: false
         type: 'boolean'
@@ -87,7 +87,7 @@ on:
     branches:
       - "**"
     paths:
-      - "setup/packages/psec/**"
+      - "setup/packages/safecor/**"
       - "python/**"
 
 jobs:  
@@ -96,15 +96,15 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       pkg-py3-paho-mqtt2: ${{ steps.detect.outputs.py3-paho-mqtt2 }}
-      pkg-psec-alpine-iso: ${{ steps.detect.outputs.psec-alpine-iso }}
-      pkg-psec-alpine-virt: ${{ steps.detect.outputs.psec-alpine-virt }}
-      pkg-psec-container-debian: ${{ steps.detect.outputs.psec-container-debian }}
-      pkg-psec-core: ${{ steps.detect.outputs.psec-core }}
-      pkg-psec-diag: ${{ steps.detect.outputs.psec-diag }}
-      pkg-psec-gui-base: ${{ steps.detect.outputs.psec-gui-base }}
-      pkg-psec-lib: ${{ steps.detect.outputs.psec-lib }}
-      pkg-psec-sys-gui: ${{ steps.detect.outputs.psec-sys-gui }}
-      pkg-psec-sys-usb: ${{ steps.detect.outputs.psec-sys-usb }}
+      pkg-safecor-alpine-iso: ${{ steps.detect.outputs.safecor-alpine-iso }}
+      pkg-safecor-alpine-virt: ${{ steps.detect.outputs.safecor-alpine-virt }}
+      pkg-safecor-container-debian: ${{ steps.detect.outputs.safecor-container-debian }}
+      pkg-safecor-core: ${{ steps.detect.outputs.safecor-core }}
+      pkg-safecor-diag: ${{ steps.detect.outputs.safecor-diag }}
+      pkg-safecor-gui-base: ${{ steps.detect.outputs.safecor-gui-base }}
+      pkg-safecor-lib: ${{ steps.detect.outputs.safecor-lib }}
+      pkg-safecor-sys-gui: ${{ steps.detect.outputs.safecor-sys-gui }}
+      pkg-safecor-sys-usb: ${{ steps.detect.outputs.safecor-sys-usb }}
       app-diag: ${{ steps.detect.outputs.app-diag }}      
       app-lib: ${{ steps.detect.outputs.app-lib }}
       app-tests: ${{ steps.detect.outputs.app-tests }}
@@ -116,16 +116,16 @@ jobs:
         run: |
           echo "Detecting changes..."
           declare -A paths=(
-            [py3-paho-mqtt2]="setup/packages/psec/py3-paho-mqtt2/"
-            [psec-alpine-iso]="setup/packages/psec/py3-paho-mqtt2/"
-            [psec-alpine-virt]="setup/packages/psec/py3-paho-mqtt2/"
-            [psec-container-debian]="setup/packages/psec/py3-paho-mqtt2/"
-            [psec-core]="setup/packages/psec/psec-core/"
-            [psec-diag]="setup/packages/psec/psec-diag/"
-            [psec-gui-base]="setup/packages/psec/psec-gui-base/"
-            [psec-lib]="setup/packages/psec/psec-lib/"
-            [psec-sys-gui]="setup/packages/psec/psec-sys-gui/"
-            [psec-sys-usb]="setup/packages/psec/psec-sys-usb/"
+            [py3-paho-mqtt2]="setup/packages/safecor/py3-paho-mqtt2/"
+            [safecor-alpine-iso]="setup/packages/safecor/py3-paho-mqtt2/"
+            [safecor-alpine-virt]="setup/packages/safecor/py3-paho-mqtt2/"
+            [safecor-container-debian]="setup/packages/safecor/py3-paho-mqtt2/"
+            [safecor-core]="setup/packages/safecor/safecor-core/"
+            [safecor-diag]="setup/packages/safecor/safecor-diag/"
+            [safecor-gui-base]="setup/packages/safecor/safecor-gui-base/"
+            [safecor-lib]="setup/packages/safecor/safecor-lib/"
+            [safecor-sys-gui]="setup/packages/safecor/safecor-sys-gui/"
+            [safecor-sys-usb]="setup/packages/safecor/safecor-sys-usb/"
             [app-diag]="python/diag/"            
             [app-lib]="python/lib/"
             [app-tests]="python/tests/"
@@ -145,14 +145,14 @@ jobs:
     needs: detect-changes
     outputs:
       check-py3-paho-mqtt2: ${{ steps.check-py3-paho-mqtt2.outputs.do_build }}
-      check-psec-lib: ${{ steps.check-psec-lib.outputs.do_build }}
-      check-psec-alpine-virt: ${{ steps.check-psec-alpine-virt.outputs.do_build }}
-      check-psec-alpine-iso: ${{ steps.check-psec-alpine-iso.outputs.do_build }}
-      check-psec-container-debian: ${{ steps.check-psec-container-debian.outputs.do_build }}
-      check-psec-core: ${{ steps.check-psec-core.outputs.do_build }}
-      check-psec-sys-gui: ${{ steps.check-psec-sys-gui.outputs.do_build }}
-      check-psec-sys-usb: ${{ steps.check-psec-sys-usb.outputs.do_build }}
-      check-psec-gui-base: ${{ steps.check-psec-gui-base.outputs.do_build }}
+      check-safecor-lib: ${{ steps.check-safecor-lib.outputs.do_build }}
+      check-safecor-alpine-virt: ${{ steps.check-safecor-alpine-virt.outputs.do_build }}
+      check-safecor-alpine-iso: ${{ steps.check-safecor-alpine-iso.outputs.do_build }}
+      check-safecor-container-debian: ${{ steps.check-safecor-container-debian.outputs.do_build }}
+      check-safecor-core: ${{ steps.check-safecor-core.outputs.do_build }}
+      check-safecor-sys-gui: ${{ steps.check-safecor-sys-gui.outputs.do_build }}
+      check-safecor-sys-usb: ${{ steps.check-safecor-sys-usb.outputs.do_build }}
+      check-safecor-gui-base: ${{ steps.check-safecor-gui-base.outputs.do_build }}
       check-app-tests: ${{ steps.check-app-tests.outputs.do_build }}
       check-iso-tests: ${{ steps.check-app-tests.outputs.do_build }}
       check-app-diag: ${{ steps.check-app-diag.outputs.do_build }}      
@@ -172,11 +172,11 @@ jobs:
           else 
             echo "do_build=false" >> $GITHUB_OUTPUT
           fi
-      - id: check-psec-lib
-        name: check-psec-lib
+      - id: check-safecor-lib
+        name: check-safecor-lib
         env:
-          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-lib }}
-          FORCE: ${{ github.event.inputs.force-psec-lib }}
+          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-safecor-lib }}
+          FORCE: ${{ github.event.inputs.force-safecor-lib }}
           FORCE_ALL: ${{ github.event.inputs.force-all }}
           FORCE_APPS: ${{ github.event.inputs.force-apps }}
           FORCE_LIBS: ${{ github.event.inputs.force-libs }}
@@ -186,11 +186,11 @@ jobs:
           else 
             echo "do_build=false" >> $GITHUB_OUTPUT
           fi
-      - id: check-psec-alpine-virt
-        name: check-psec-alpine-virt
+      - id: check-safecor-alpine-virt
+        name: check-safecor-alpine-virt
         env:
-          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-alpine-virt }}
-          FORCE: ${{ github.event.inputs.force-psec-alpine-virt }}
+          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-safecor-alpine-virt }}
+          FORCE: ${{ github.event.inputs.force-safecor-alpine-virt }}
           FORCE_ALL: ${{ github.event.inputs.force-all }}
           FORCE_APPS: ${{ github.event.inputs.force-apps }}
           FORCE_LIBS: ${{ github.event.inputs.force-libs }}
@@ -200,11 +200,11 @@ jobs:
           else 
             echo "do_build=false" >> $GITHUB_OUTPUT
           fi
-      - id: check-psec-alpine-iso
-        name: check-psec-alpine-iso
+      - id: check-safecor-alpine-iso
+        name: check-safecor-alpine-iso
         env:
-          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-alpine-iso }}
-          FORCE: ${{ github.event.inputs.force-psec-alpine-iso }}
+          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-safecor-alpine-iso }}
+          FORCE: ${{ github.event.inputs.force-safecor-alpine-iso }}
           FORCE_ALL: ${{ github.event.inputs.force-all }}
           FORCE_APPS: ${{ github.event.inputs.force-apps }}
           FORCE_LIBS: ${{ github.event.inputs.force-libs }}
@@ -214,11 +214,11 @@ jobs:
           else 
             echo "do_build=false" >> $GITHUB_OUTPUT
           fi
-      - id: check-psec-container-debian
-        name: check-psec-container-debian
+      - id: check-safecor-container-debian
+        name: check-safecor-container-debian
         env:
-          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-container-debian }}
-          FORCE: ${{ github.event.inputs.force-psec-container-debian }}
+          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-safecor-container-debian }}
+          FORCE: ${{ github.event.inputs.force-safecor-container-debian }}
           FORCE_ALL: ${{ github.event.inputs.force-all }}
           FORCE_APPS: ${{ github.event.inputs.force-apps }}
           FORCE_LIBS: ${{ github.event.inputs.force-libs }}
@@ -228,11 +228,11 @@ jobs:
           else 
             echo "do_build=false" >> $GITHUB_OUTPUT
           fi
-      - id: check-psec-core
-        name: check-psec-core
+      - id: check-safecor-core
+        name: check-safecor-core
         env:
-          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-core }}
-          FORCE: ${{ github.event.inputs.force-psec-core }}
+          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-safecor-core }}
+          FORCE: ${{ github.event.inputs.force-safecor-core }}
           FORCE_ALL: ${{ github.event.inputs.force-all }}
           FORCE_APPS: ${{ github.event.inputs.force-apps }}
           FORCE_LIBS: ${{ github.event.inputs.force-libs }}
@@ -242,11 +242,11 @@ jobs:
           else 
             echo "do_build=false" >> $GITHUB_OUTPUT
           fi
-      - id: check-psec-sys-gui
-        name: check-psec-sys-gui
+      - id: check-safecor-sys-gui
+        name: check-safecor-sys-gui
         env:
-          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-sys-gui }}
-          FORCE: ${{ github.event.inputs.force-psec-sys-gui }}
+          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-safecor-sys-gui }}
+          FORCE: ${{ github.event.inputs.force-safecor-sys-gui }}
           FORCE_ALL: ${{ github.event.inputs.force-all }}
           FORCE_APPS: ${{ github.event.inputs.force-apps }}
           FORCE_LIBS: ${{ github.event.inputs.force-libs }}
@@ -256,11 +256,11 @@ jobs:
           else 
             echo "do_build=false" >> $GITHUB_OUTPUT
           fi
-      - id: check-psec-sys-usb
-        name: check-psec-sys-usb
+      - id: check-safecor-sys-usb
+        name: check-safecor-sys-usb
         env:
-          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-sys-usb }}
-          FORCE: ${{ github.event.inputs.force-psec-sys-usb }}
+          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-safecor-sys-usb }}
+          FORCE: ${{ github.event.inputs.force-safecor-sys-usb }}
           FORCE_ALL: ${{ github.event.inputs.force-all }}
           FORCE_APPS: ${{ github.event.inputs.force-apps }}
           FORCE_LIBS: ${{ github.event.inputs.force-libs }}
@@ -270,11 +270,11 @@ jobs:
           else 
             echo "do_build=false" >> $GITHUB_OUTPUT
           fi
-      - id: check-psec-gui-base
-        name: check-psec-gui-base
+      - id: check-safecor-gui-base
+        name: check-safecor-gui-base
         env:
-          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-psec-gui-base }}
-          FORCE: ${{ github.event.inputs.force-psec-gui-base }}
+          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-safecor-gui-base }}
+          FORCE: ${{ github.event.inputs.force-safecor-gui-base }}
           FORCE_ALL: ${{ github.event.inputs.force-all }}
           FORCE_APPS: ${{ github.event.inputs.force-apps }}
           FORCE_LIBS: ${{ github.event.inputs.force-libs }}
@@ -288,7 +288,7 @@ jobs:
         name: check-app-tests
         env:
           PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-app-tests }}
-          FORCE: ${{ github.event.inputs.force-psec-tests }}
+          FORCE: ${{ github.event.inputs.force-safecor-tests }}
           FORCE_ALL: ${{ github.event.inputs.force-all }}
           FORCE_APPS: ${{ github.event.inputs.force-apps }}
           FORCE_LIBS: ${{ github.event.inputs.force-libs }}
@@ -302,7 +302,7 @@ jobs:
         name: check-app-diag
         env:
           PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-app-diag }}
-          FORCE: ${{ github.event.inputs.force-psec-diag }}
+          FORCE: ${{ github.event.inputs.force-safecor-diag }}
           FORCE_ALL: ${{ github.event.inputs.force-all }}
           FORCE_APPS: ${{ github.event.inputs.force-apps }}
           FORCE_LIBS: ${{ github.event.inputs.force-libs }}
@@ -316,7 +316,7 @@ jobs:
         name: check-iso-diag
         env:
           PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-app-diag }}
-          FORCE: ${{ github.event.inputs.force-psec-diag }} || ${{ github.event.inputs.force-psec-diag-iso }}
+          FORCE: ${{ github.event.inputs.force-safecor-diag }} || ${{ github.event.inputs.force-safecor-diag-iso }}
           FORCE_ALL: ${{ github.event.inputs.force-all }}
         run: |          
           if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' || $FORCE_ALL == 'true' || $FORCE_APPS == 'true' ]]; then 
@@ -329,11 +329,11 @@ jobs:
     needs: [ prepare ]
     if: |
       needs.prepare.outputs.check-py3-paho-mqtt2 == 'true' ||
-      needs.prepare.outputs.check-psec-lib == 'true' ||
-      needs.prepare.outputs.check-psec-core == 'true' ||
-      needs.prepare.outputs.check-psec-sys-gui == 'true' ||
-      needs.prepare.outputs.check-psec-sys-usb == 'true' ||
-      needs.prepare.outputs.check-psec-app-tests == 'true'
+      needs.prepare.outputs.check-safecor-lib == 'true' ||
+      needs.prepare.outputs.check-safecor-core == 'true' ||
+      needs.prepare.outputs.check-safecor-sys-gui == 'true' ||
+      needs.prepare.outputs.check-safecor-sys-usb == 'true' ||
+      needs.prepare.outputs.check-safecor-app-tests == 'true'
     runs-on: ubuntu-latest
  
     container:
@@ -351,24 +351,24 @@ jobs:
       - name: Build APK
         uses: ./.github/actions/build-apk
         with:
-          working-dir: setup/packages/psec/py3-paho-mqtt2
+          working-dir: setup/packages/safecor/py3-paho-mqtt2
           artifact-name: py3-paho-mqtt2
 
       - name: Publish package
         uses: ./.github/actions/publish
         with:
           privkey: ${{ secrets.DEPLOY_KEY }}
-          filepath: /home/builder/packages/psec/x86_64/
+          filepath: /home/builder/packages/safecor/x86_64/
           
-  build-psec-lib:
+  build-safecor-lib:
     needs: [ prepare, build-py3-paho-mqtt2 ]
     if: | 
-      needs.prepare.outputs.check-psec-lib == 'true' || 
-      needs.prepare.outputs.check-psec-core == 'true' ||     
-      needs.prepare.outputs.check-psec-sys-gui == 'true' ||
-      needs.prepare.outputs.check-psec-sys-usb == 'true' ||
-      needs.prepare.outputs.check-psec-gui-base == 'true' ||
-      needs.prepare.outputs.check-psec-app-tests == 'true'
+      needs.prepare.outputs.check-safecor-lib == 'true' || 
+      needs.prepare.outputs.check-safecor-core == 'true' ||     
+      needs.prepare.outputs.check-safecor-sys-gui == 'true' ||
+      needs.prepare.outputs.check-safecor-sys-usb == 'true' ||
+      needs.prepare.outputs.check-safecor-gui-base == 'true' ||
+      needs.prepare.outputs.check-safecor-app-tests == 'true'
     runs-on: ubuntu-latest
  
     container:
@@ -386,19 +386,19 @@ jobs:
       - name: Build APK
         uses: ./.github/actions/build-apk
         with:
-          working-dir: setup/packages/psec/psec-lib
-          artifact-name: psec-lib
+          working-dir: setup/packages/safecor/safecor-lib
+          artifact-name: safecor-lib
 
       - name: Publish package
         uses: ./.github/actions/publish
         with:
           privkey: ${{ secrets.DEPLOY_KEY }}
-          filepath: /home/builder/packages/psec/x86_64/
+          filepath: /home/builder/packages/safecor/x86_64/
 
   build-alpine-virt:
     needs: [ prepare ]
     if: | 
-      needs.prepare.outputs.check-psec-alpine-virt == 'true'
+      needs.prepare.outputs.check-safecor-alpine-virt == 'true'
     runs-on: ubuntu-latest
  
     container:
@@ -416,19 +416,19 @@ jobs:
       - name: Build APK
         uses: ./.github/actions/build-apk
         with:
-          working-dir: setup/packages/psec/psec-alpine-virt
-          artifact-name: psec-alpine-virt
+          working-dir: setup/packages/safecor/safecor-alpine-virt
+          artifact-name: safecor-alpine-virt
 
       - name: Publish package
         uses: ./.github/actions/publish
         with:
           privkey: ${{ secrets.DEPLOY_KEY }}
-          filepath: /home/builder/packages/psec/x86_64/
+          filepath: /home/builder/packages/safecor/x86_64/
 
   build-alpine-iso:
     needs: [ prepare ]
     if: | 
-      needs.prepare.outputs.check-psec-alpine-iso == 'true'
+      needs.prepare.outputs.check-safecor-alpine-iso == 'true'
     runs-on: ubuntu-latest
  
     container:
@@ -446,20 +446,20 @@ jobs:
       - name: Build APK
         uses: ./.github/actions/build-apk
         with:
-          working-dir: setup/packages/psec/psec-alpine-iso
-          artifact-name: psec-alpine-iso
+          working-dir: setup/packages/safecor/safecor-alpine-iso
+          artifact-name: safecor-alpine-iso
 
       - name: Publish package
         uses: ./.github/actions/publish
         with:
           privkey: ${{ secrets.DEPLOY_KEY }}
-          filepath: /home/builder/packages/psec/x86_64/  
+          filepath: /home/builder/packages/safecor/x86_64/  
 
   build-lxc-container-debian:
     needs: [ prepare ]
     if: |
       false &&
-      needs.prepare.outputs.check-psec-container-debian == 'true'
+      needs.prepare.outputs.check-safecor-container-debian == 'true'
     runs-on: ubuntu-latest
  
     steps:
@@ -509,7 +509,7 @@ jobs:
   build-container-debian:
     needs: [ prepare ]
     if: | 
-      needs.prepare.outputs.check-psec-container-debian == 'true'
+      needs.prepare.outputs.check-safecor-container-debian == 'true'
     runs-on: ubuntu-latest
  
     container:
@@ -527,20 +527,20 @@ jobs:
       - name: Build APK
         uses: ./.github/actions/build-apk
         with:
-          working-dir: setup/packages/psec/psec-container-debian
-          artifact-name: psec-container-debian
+          working-dir: setup/packages/safecor/safecor-container-debian
+          artifact-name: safecor-container-debian
 
       - name: Publish package
         uses: ./.github/actions/publish
         with:
           privkey: ${{ secrets.DEPLOY_KEY }}
-          filepath: /home/builder/packages/psec/x86_64/
+          filepath: /home/builder/packages/safecor/x86_64/
 
-  build-psec-core:
-    needs: [ prepare, build-psec-lib ]
+  build-safecor-core:
+    needs: [ prepare, build-safecor-lib ]
     if: |
-      needs.prepare.outputs.check-psec-core == 'true' ||
-      needs.prepare.outputs.check-psec-app-tests == 'true'
+      needs.prepare.outputs.check-safecor-core == 'true' ||
+      needs.prepare.outputs.check-safecor-app-tests == 'true'
     runs-on: ubuntu-latest
  
     container:
@@ -558,20 +558,20 @@ jobs:
       - name: Build APK
         uses: ./.github/actions/build-apk
         with:
-          working-dir: setup/packages/psec/psec-core
-          artifact-name: psec-core
+          working-dir: setup/packages/safecor/safecor-core
+          artifact-name: safecor-core
 
       - name: Publish package
         uses: ./.github/actions/publish
         with:
           privkey: ${{ secrets.DEPLOY_KEY }}
-          filepath: /home/builder/packages/psec/x86_64/
+          filepath: /home/builder/packages/safecor/x86_64/
 
-  build-psec-sys-gui:
-    needs: [ prepare, build-psec-lib ]
+  build-safecor-sys-gui:
+    needs: [ prepare, build-safecor-lib ]
     if: |
-      needs.prepare.outputs.check-psec-sys-gui == 'true' ||
-      needs.prepare.outputs.check-psec-app-tests == 'true'
+      needs.prepare.outputs.check-safecor-sys-gui == 'true' ||
+      needs.prepare.outputs.check-safecor-app-tests == 'true'
     runs-on: ubuntu-latest
  
     container:
@@ -589,20 +589,20 @@ jobs:
       - name: Build APK
         uses: ./.github/actions/build-apk
         with:
-          working-dir: setup/packages/psec/psec-sys-gui
-          artifact-name: psec-sys-gui
+          working-dir: setup/packages/safecor/safecor-sys-gui
+          artifact-name: safecor-sys-gui
 
       - name: Publish package
         uses: ./.github/actions/publish
         with:
           privkey: ${{ secrets.DEPLOY_KEY }}
-          filepath: /home/builder/packages/psec/x86_64/
+          filepath: /home/builder/packages/safecor/x86_64/
 
-  build-psec-sys-usb:
-    needs: [ prepare, build-psec-lib ]
+  build-safecor-sys-usb:
+    needs: [ prepare, build-safecor-lib ]
     if: |
-      needs.prepare.outputs.check-psec-sys-usb == 'true' ||
-      needs.prepare.outputs.check-psec-app-tests == 'true'
+      needs.prepare.outputs.check-safecor-sys-usb == 'true' ||
+      needs.prepare.outputs.check-safecor-app-tests == 'true'
     runs-on: ubuntu-latest
  
     container:
@@ -620,20 +620,20 @@ jobs:
       - name: Build APK
         uses: ./.github/actions/build-apk
         with:
-          working-dir: setup/packages/psec/psec-sys-usb
-          artifact-name: psec-sys-usb
+          working-dir: setup/packages/safecor/safecor-sys-usb
+          artifact-name: safecor-sys-usb
 
       - name: Publish package
         uses: ./.github/actions/publish
         with:
           privkey: ${{ secrets.DEPLOY_KEY }}
-          filepath: /home/builder/packages/psec/x86_64/
+          filepath: /home/builder/packages/safecor/x86_64/
 
-  build-psec-gui-base:
-    needs: [ prepare, build-psec-lib ]
+  build-safecor-gui-base:
+    needs: [ prepare, build-safecor-lib ]
     if: |
-      needs.prepare.outputs.check-psec-gui-base == 'true' ||
-      needs.prepare.outputs.check-psec-app-tests == 'true'
+      needs.prepare.outputs.check-safecor-gui-base == 'true' ||
+      needs.prepare.outputs.check-safecor-app-tests == 'true'
     runs-on: ubuntu-latest
  
     container:
@@ -651,17 +651,17 @@ jobs:
       - name: Build APK
         uses: ./.github/actions/build-apk
         with:
-          working-dir: setup/packages/psec/psec-gui-base
-          artifact-name: psec-gui-base
+          working-dir: setup/packages/safecor/safecor-gui-base
+          artifact-name: safecor-gui-base
 
       - name: Publish package
         uses: ./.github/actions/publish
         with:
           privkey: ${{ secrets.DEPLOY_KEY }}
-          filepath: /home/builder/packages/psec/x86_64/
+          filepath: /home/builder/packages/safecor/x86_64/
 
   build-app-tests:
-    #needs: [ prepare, build-psec-lib, build-psec-core, build-psec-sys-gui, build-psec-sys-usb, build-psec-gui-base ]
+    #needs: [ prepare, build-safecor-lib, build-safecor-core, build-safecor-sys-gui, build-safecor-sys-usb, build-safecor-gui-base ]
     needs: [ prepare ]
     if: needs.prepare.outputs.check-app-tests == 'true'
     runs-on: ubuntu-latest
@@ -681,20 +681,20 @@ jobs:
       - name: Build APK
         uses: ./.github/actions/build-apk
         with:
-          working-dir: setup/packages/psec/psec-tests-gui
-          artifact-name: psec-tests-gui
+          working-dir: setup/packages/safecor/safecor-tests-gui
+          artifact-name: safecor-tests-gui
 
       - name: Build APK
         uses: ./.github/actions/build-apk
         with:
-          working-dir: setup/packages/psec/psec-tests
-          artifact-name: psec-tests
+          working-dir: setup/packages/safecor/safecor-tests
+          artifact-name: safecor-tests
 
       - name: Publish package
         uses: ./.github/actions/publish
         with:
           privkey: ${{ secrets.DEPLOY_KEY }}
-          filepath: /home/builder/packages/psec/x86_64/
+          filepath: /home/builder/packages/safecor/x86_64/
 
   build-app-diag:
     needs: [ prepare ]
@@ -716,14 +716,14 @@ jobs:
       - name: Build APK
         uses: ./.github/actions/build-apk
         with:
-          working-dir: setup/packages/psec/psec-diag
-          artifact-name: psec-diag
+          working-dir: setup/packages/safecor/safecor-diag
+          artifact-name: safecor-diag
 
       - name: Publish package
         uses: ./.github/actions/publish
         with:
           privkey: ${{ secrets.DEPLOY_KEY }}
-          filepath: /home/builder/packages/psec/x86_64/
+          filepath: /home/builder/packages/safecor/x86_64/
 
   build-iso-diag:
     needs: [ prepare, build-app-diag ]

@@ -1,7 +1,7 @@
 import os, pty
 from serial import Serial
 import threading, uuid, socket, tempfile
-from psec import Api
+from safecor import Api
 
 class MockXenbus():
     """ Classe MockXenbus

@@ -11,7 +11,7 @@ from PySide6.QtQml import QQmlApplicationEngine, qmlRegisterSingletonInstance
 from AppController import AppController
 from Composant1 import Composant1
 from Composant2 import Composant2
-from psec import MqttFactory
+from safecor import MqttFactory
 
 app = QGuiApplication(sys.argv)
 

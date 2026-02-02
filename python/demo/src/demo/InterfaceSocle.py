@@ -2,7 +2,7 @@ from PySide6.QtCore import QObject, Signal
 from PySide6.QtCore import QProcess, QTimer, QDir, Property, Slot, QPoint, QCoreApplication, Qt, QEvent, QSize
 from PySide6.QtGui import QMouseEvent, QCursor
 from PySide6.QtWidgets import QWidget
-from psec import Api, Constants, Topics, BenchmarkId, MqttClient, MqttFactory
+from safecor import Api, Constants, Topics, BenchmarkId, MqttClient, MqttFactory
 import os
 
 class InterfaceSocle(QObject):

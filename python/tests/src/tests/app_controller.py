@@ -4,7 +4,7 @@ from tests_listmodel import TestsListModel
 from messages_listmodel import MessagesListModel
 from lib import AbstractTest
 from enums import MessageLevel
-from psec import Api, MqttFactory
+from safecor import Api, MqttFactory
 from tests_helper import TestsHelper
 DEVMODE = os.environ.get("DEVMODE")
 if DEVMODE:
@@ -24,7 +24,7 @@ class AppController(QObject):
         self.__messages_model = MessagesListModel(self)        
         self.__tests_listmodel = TestsListModel(self.__tests_list, self)
         self.__tests_listmodel.addMessage.connect(self.__messages_model.add_message)
-        self.__messages_model.add_message(self.tr("PSEC tests app has started"))
+        self.__messages_model.add_message(self.tr("Safecor tests app has started"))
 
         Api().add_ready_callback(self.__on_api_ready)        
 
@@ -36,7 +36,7 @@ class AppController(QObject):
         Api().start(domain_identifier="tests", mqtt_client=self.__mqtt_client)
 
     def __on_api_ready(self):
-        self.__messages_model.add_message(self.tr("PSEC API is ready"))
+        self.__messages_model.add_message(self.tr("Safecor API is ready"))
         self.__ready = True
         self.readyChanged.emit()
         self.__messages_model.add_message(self.tr("Waiting for user action..."), MessageLevel.User)

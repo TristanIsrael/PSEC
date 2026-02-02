@@ -1,0 +1,43 @@
+# Contributor:
+# Maintainer: Tristan Israël <tristan.israel@alefbet.net>
+pkgname=safecor-demo-gui
+pkgver=1.0
+pkgrel=1
+pkgdesc="Safecor - Demonstration application GUI"
+url="https://www.alefbet.net/"
+arch="noarch"
+license="MIT"
+depends="safecor-lib safecor-gui-base python3 py3-pyside6 py3-psutil py3-humanize fontconfig freetype font-roboto"
+makedepends="python3-dev py3-build py3-installer git"
+builddir="$srcdir/$pkgname-$pkgver"
+checkdepends=""
+install="$pkgname.post-install"
+subpackages=""
+replaces=""
+options="!check"  # no tests provided
+gitbranch="main"
+source="
+$pkgname.zip::https://github.com/TristanIsrael/Safecor/archive/refs/heads/$gitbranch.zip
+start-gui.initd
+"
+
+prepare() {
+    mkdir -p "$builddir"
+    echo "Uncompress source files"
+    unzip $pkgname.zip -d "$builddir"    
+}
+
+build() {
+    cd "$builddir/Safecor/python/demo"
+    python3 -m build
+}
+
+package() {
+    cd "$builddir/Safecor/python/demo/dist"
+    mkdir -p "$pkgdir/usr/lib/safecor"
+    tar xvzf *.tar.gz -C "$pkgdir/usr/lib/safecor"
+    cd "$pkgdir/usr/lib/safecor"
+    ln -s "demo-$pkgver" demo
+
+    install -D -m755 "$srcdir"/start-gui.initd "$pkgdir"/etc/init.d/start-gui
+}

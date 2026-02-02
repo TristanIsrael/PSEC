@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Components
-import PSEC
+import Safecor
 
 Item {
     width: implicitWidth

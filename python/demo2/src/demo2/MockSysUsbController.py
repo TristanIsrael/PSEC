@@ -1,4 +1,4 @@
-from psec import MockSysUsbController
+from safecor import MockSysUsbController
 import threading
 
 SOURCE_DISK = "/Applications" # Modifier avec C:\ par exemple sous Windows

@@ -1,5 +1,5 @@
 import os
-from psec import MqttClient, ConnectionType
+from safecor import MqttClient, ConnectionType
 from pathlib import Path
 
 class DevModeHelper():
@@ -26,8 +26,8 @@ class DevModeHelper():
     
     @staticmethod
     def get_mocked_destination_disk_path() -> str:
-        return "/tmp/psec/OUT"
+        return "/tmp/safecor/OUT"
     
     @staticmethod
     def get_storage_path() -> str:
-        return "/tmp/psec/repository"
+        return "/tmp/safecor/repository"

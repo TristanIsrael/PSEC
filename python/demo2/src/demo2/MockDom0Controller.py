@@ -1,4 +1,4 @@
-from psec import Dom0Controller, MqttFactory
+from safecor import Dom0Controller, MqttFactory
 
 if __name__ == "__main__":
     mqtt_client = MqttFactory.create_mqtt_network_dev("Dom0")

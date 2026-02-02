@@ -1,9 +1,9 @@
-from psec import SingletonMeta, Logger, RequestFactory, BenchmarkId, Parametres, Cles
+from safecor import SingletonMeta, Logger, RequestFactory, BenchmarkId
 try:
-    from psec import InputsDaemon
+    from safecor import InputsDaemon
 except:
     print("DemonInputs not available")
-from psec import Mouse, MouseButton, ResponseFactory, FileHelper, MqttClient, Topics
+from safecor import Mouse, MouseButton, ResponseFactory, FileHelper, MqttClient, Topics
 import random, time
 
 class ControleurBenchmark(metaclass=SingletonMeta):

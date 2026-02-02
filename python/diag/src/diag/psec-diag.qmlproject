@@ -75,7 +75,7 @@ Project {
     importPaths: [ ".", "qml" ]
 
     /* Required for deployment */
-    targetDirectory: "/opt/psec-diag"
+    targetDirectory: "/opt/safecor-diag"
 
 
     qdsVersion: "4.7"

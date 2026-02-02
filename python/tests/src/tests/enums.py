@@ -2,7 +2,7 @@ from enum import Enum
 from PySide6.QtCore import QEnum, QObject, Qt
 from PySide6.QtQml import QmlElement
 
-QML_IMPORT_NAME = "PSEC"
+QML_IMPORT_NAME = "Safecor"
 QML_IMPORT_MAJOR_VERSION = 1
 
 class MessageLevel(Enum):

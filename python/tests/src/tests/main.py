@@ -28,7 +28,7 @@ def main():
     signal.signal(signal.SIGINT, lambda *_: app.quit())
     
     # Expose QML Types
-    qmlRegisterSingletonInstance(AppController, "PSEC", 1, 0, 'AppController', AppController(app))
+    qmlRegisterSingletonInstance(AppController, "Safecor", 1, 0, 'AppController', AppController(app))
 
     # Install font
     #font = QFont("Roboto", 18)

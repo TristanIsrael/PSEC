@@ -1,2 +1,2 @@
-# End user licence for PSEC
+# End user licence for Safecor
 

@@ -1,4 +1,4 @@
-from psec import MockSysUsbController
+from safecor import MockSysUsbController
 from mocks.DevModeHelper import DevModeHelper
 import threading
 

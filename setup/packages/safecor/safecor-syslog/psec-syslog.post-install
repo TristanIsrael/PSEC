@@ -1,0 +1,8 @@
+#!/bin/sh
+
+rc-update add safecor-logger-daemon
+rc-service syslog stop
+rc-service safecor-logger-daemon start
+rc-service rsyslog start
+
+exit 0

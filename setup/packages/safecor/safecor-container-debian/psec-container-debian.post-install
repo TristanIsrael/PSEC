@@ -1,0 +1,5 @@
+#!/bin/sh
+
+mkdir -p /var/lib/lxc/safecor-container-debian
+tar xjf /var/lib/lxc/safecor-container-debian.tar.bz2 -C /var/lib/lxc/safecor-container-debian
+rm /var/lib/lxc/safecor-container-debian.tar.bz2

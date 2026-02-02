@@ -1,1 +1,0 @@
-SUBSYSTEM=="block", ENV{DEVTYPE}=="partition", ENV{ID_FS_USAGE}=="filesystem", RUN+="/usr/lib/psec/bin/mdev-usb-storage.sh"

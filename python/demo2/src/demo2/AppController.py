@@ -1,5 +1,5 @@
 from PySide6.QtCore import QObject, Property, Slot, Signal
-from psec import Api, MqttFactory
+from safecor import Api, MqttFactory
 import os
 import tempfile
 from Topics import TOPIC_REQUEST, TOPIC_RESPONSE, TOPIC_STEP
@@ -37,7 +37,7 @@ class AppController(QObject):
     #    Private fonctions
     ###
     def __on_api_ready(self):
-        print("PSEC API is ready")
+        print("Safecor API is ready")
 
         # We subscribe to necessary topics
         Api().subscribe(f"{TOPIC_STEP}/#")

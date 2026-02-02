@@ -1,8 +1,8 @@
-# PSEC Demonstration application
+# Safecor Demonstration application
 
 ## Fonctionnement
 
-Ce projet de démonstration permet de mettre en évidence les mécanismes de communication inter-domaines au sein du socle PSEC.
+Ce projet de démonstration permet de mettre en évidence les mécanismes de communication inter-domaines au sein du socle Safecor.
 
 L'interface graphique fournit un champ de saisie qui permet à l'utilisateur d'entrer un message. Le message sera ensuite envoyé au travers du broker puis reçu par un premier composant qui l'enrichira avant d'émettre une réponse. Cette réponse sera ensuite captée par un deuxième composant qui l'enrichira à son tour.
 

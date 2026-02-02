@@ -1,7 +1,7 @@
-PSEC documentation
+Safecor documentation
 ==================
 
-**PSEC** stands for Plaform Secure Enhanced Core. It is a software architecture to make security products.
+**Safecor** is a software architecture to make security products.
 
 
 .. toctree::

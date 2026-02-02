@@ -1,4 +1,4 @@
-# PSEC Diagnostic tool
+# Safecor Diagnostic tool
 
 ## Dépendances
 

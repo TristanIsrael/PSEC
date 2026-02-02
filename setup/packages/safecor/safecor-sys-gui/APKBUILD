@@ -1,0 +1,22 @@
+# Contributor:
+# Maintainer: Tristan Israël <tristan.israel@alefbet.net>
+pkgname=safecor-sys-gui
+pkgver=1.0
+pkgrel=2
+pkgdesc="Safecor - GUI virtual machine"
+url="https://www.alefbet.net/"
+arch="noarch"
+license="MIT"
+depends="safecor-lib socat"
+makedepends=""
+builddir="$srcdir/$pkgname-$pkgver"
+checkdepends=""
+install=""
+subpackages=""
+replaces="safecor-core alpine-baselayout alpine-baselayout-data"
+options="!check"  # no tests provided
+source="modules"
+
+package() {  
+    install -D -m644 "$srcdir"/modules "$pkgdir/etc/modules"    
+}

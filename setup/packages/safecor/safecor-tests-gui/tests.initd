@@ -1,0 +1,24 @@
+#!/sbin/openrc-run
+
+name="tests"
+
+depend() {
+    need xenstored udev-trigger
+    after *
+}
+
+start() {
+    ebegin "Start test tool"
+
+    start-stop-daemon --start --make-pidfile --exec /usr/lib/safecor/tests/src/tests/start.sh --pidfile /var/run/$name.pid --background    
+
+    eend $?
+}
+
+stop() {
+    ebegin "Stop test tool"
+
+    kill -9 $(cat /var/run/$name.pid)
+
+    eend $?
+}

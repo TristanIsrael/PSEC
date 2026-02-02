@@ -3,7 +3,7 @@ import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Effects
 import Components
-import PSEC
+import Safecor
 
 Item {
     id: mainWindow

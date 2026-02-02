@@ -1,4 +1,4 @@
-# PSEC Demonstration application
+# Safecor Demonstration application
 
 ## Dépendances
 

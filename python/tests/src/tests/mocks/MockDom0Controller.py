@@ -1,4 +1,4 @@
-from psec import Api, Topics, Constants, MqttClient, ConnectionType, System
+from safecor import Api, Topics, Constants, MqttClient, ConnectionType, System
 from pathlib import Path
 from threading import Event
 

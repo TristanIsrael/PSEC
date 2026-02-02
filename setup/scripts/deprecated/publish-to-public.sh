@@ -8,7 +8,7 @@ if [ $# -ne 1 ]; then
 fi
 
 cd $1
-scp -P222 *.apk APKINDEX.tar.gz tristan@www.alefbet.net:~/PSEC/bin
+scp -P222 *.apk APKINDEX.tar.gz tristan@www.alefbet.net:~/Safecor/bin
 cd -
 
 echo Copîe terminée

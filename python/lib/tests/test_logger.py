@@ -1,4 +1,4 @@
-from psec import Logger, MqttFactory, Topics
+from safecor import Logger, MqttFactory, Topics
 import unittest, time, os, threading, logging
 
 class TestLogger(unittest.TestCase):       
@@ -7,11 +7,11 @@ class TestLogger(unittest.TestCase):
     messages = list()
 
     def __on_mqtt_connected(self):
-        Logger().setup("test_logger", self.mqtt_client, logging.INFO, True, "/tmp/psec.log")
+        Logger().setup("test_logger", self.mqtt_client, logging.INFO, True, "/tmp/safecor.log")
         self.setup_lock.set()
 
     def test_logfile(self):
-        os.remove("/tmp/psec.log")
+        os.remove("/tmp/safecor.log")
 
         self.mqtt_client = MqttFactory.create_mqtt_network_dev("test_logger")
         self.mqtt_client.add_connected_callback(self.__on_mqtt_connected)
@@ -20,9 +20,9 @@ class TestLogger(unittest.TestCase):
         Logger().info("TEST")
         Logger().info("TEST2")
         time.sleep(0.2)
-        self.assertTrue(os.path.exists("/tmp/psec.log"))
+        self.assertTrue(os.path.exists("/tmp/safecor.log"))
 
-        with open("/tmp/psec.log", "r") as logfile:
+        with open("/tmp/safecor.log", "r") as logfile:
             log = logfile.read()
             self.assertTrue(len(log.split("\n")), 3)
             self.assertTrue(log.endswith("[info] test_logger - TEST2\n"))

@@ -3,14 +3,14 @@
 [![platform](https://img.shields.io/badge/platform-Alpine-Linux.svg)](https://gbatemp.net/forums/nintendo-switch.283/?prefix_id=44)
 [![language](https://img.shields.io/badge/language-Python-ba1632.svg)](https://github.com/topics/cpp)
 [![GPLv3 License](https://img.shields.io/badge/license-Proprietary-189c11.svg)](https://www.gnu.org/licenses/old-licenses/gpl-3.0.en.html)
-[![Latest Version](https://img.shields.io/github/v/release/TristanIsrael/PSEC?label=latest&color=blue)](https://github.com/TristanIsrael/PSEC/releases/latest)
-[![Downloads](https://img.shields.io/github/downloads/TristanIsrael/PSEC/total?color=6f42c1)](https://github.com/TristanIsrael/PSEC/graphs/traffic)
-[![GitHub issues](https://img.shields.io/github/issues/TristanIsrael/PSEC?color=222222)](https://github.com/TristanIsrael/PSEC/issues)
-[![GitHub stars](https://img.shields.io/github/stars/TristanIsrael/PSEC)](https://github.com/TristanIsrael/PSEC/stargazers)
+[![Latest Version](https://img.shields.io/github/v/release/TristanIsrael/Safecor?label=latest&color=blue)](https://github.com/TristanIsrael/Safecor/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/TristanIsrael/Safecor/total?color=6f42c1)](https://github.com/TristanIsrael/Safecor/graphs/traffic)
+[![GitHub issues](https://img.shields.io/github/issues/TristanIsrael/Safecor?color=222222)](https://github.com/TristanIsrael/Safecor/issues)
+[![GitHub stars](https://img.shields.io/github/stars/TristanIsrael/Safecor)](https://github.com/TristanIsrael/Safecor/stargazers)
 
 This project provides a software architecture for creating security products.
 
-**PSEC is being renamed Safecor. During the transition you will find both names in the source code and the documentation**
+**Safecor is being renamed Safecor. During the transition you will find both names in the source code and the documentation**
 
 > ⚠️ **Important Notice**
 
@@ -24,7 +24,7 @@ Newcomers should begin with the [architecture documentation](wiki/Architecture.m
 The main documentation is available in the [Github Wiki](wiki/).
 
 API automatically generated documentation:
-- [Python API documentation on Github Pages](https://tristanisrael.github.io/PSEC)
+- [Python API documentation on Github Pages](https://tristanisrael.github.io/Safecor)
 - [Protocol documentation on Github Wiki](wiki/Protocol)
 
 ## Project directory structure
@@ -46,14 +46,14 @@ Please read the [licence](python/lib/LICENCE.md) carefully before using this pro
 
 *Please notice that only x86_64 packages are available*
 
-The releases are available in the [official repository](https://alefbet.net/repositories/PSEC).
+The releases are available in the [official repository](https://alefbet.net/repositories/Safecor).
 
 Add the following in `/etc/apk/repositories`:
 ```
-https://alefbet.net/repositories/PSEC
+https://alefbet.net/repositories/Safecor
 ```
 
-The [public key file](https://alefbet.net/repositories/PGP/psec.rsa.pub) must be downloaded into `/etc/apk/keys`.
+The [public key file](https://alefbet.net/repositories/PGP/Safecor.rsa.pub) must be downloaded into `/etc/apk/keys`.
 
 ## Compatibility
 
@@ -66,7 +66,7 @@ The [public key file](https://alefbet.net/repositories/PGP/psec.rsa.pub) must be
 
 ## First use
 
-When you use PSEC for the first time we suggest you start with the [demonstration app](python/demo/README.md) or the [diagnostic app](python/diag/README.md).
+When you use Safecor for the first time we suggest you start with the [demonstration app](python/demo/README.md) or the [diagnostic app](python/diag/README.md).
 
 Follow the instruction in the [provisioning](python/lib/docs/source/markdown/provisioning.md) documentation.
 

@@ -1,4 +1,4 @@
-from psec import MqttClient, ConnectionType, Topics, ResponseFactory
+from safecor import MqttClient, ConnectionType, Topics, ResponseFactory
 import unittest, time, threading
 
 class TestMqttClient(unittest.TestCase):    

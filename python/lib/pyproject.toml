@@ -3,12 +3,12 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "psec"
+name = "safecor"
 version = "1.2.0"
 authors = [ 
     { name="Tristan Israël", email="tristan.israel@alefbet.net" }, 
 ]
-description = "PSEC python library"
+description = "Safecor python library"
 readme = "README.md"
 requires-python = ">=3.9"
 classifiers = [
@@ -26,8 +26,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/tibsys/psec"
-Issues = "https://github.com/tibsys/psec/issues"
+Homepage = "https://github.com/TristanIsrael/Safecor"
+Issues = "https://github.com/TristanIsrael/Safecor/issues"
 
 [tool.sphinx]
 extensions = [
@@ -45,10 +45,10 @@ sphinx-rtd-theme = "^2.0"
 sphinx-autobuild = "^2024.0"
 
 [tool.poetry]
-name = "psec"
+name = "safecor"
 version = "1.2.0"
-description = "PSEC python package"
+description = "Safecor python package"
 authors = ["Tristan ISRAËL <tristan.israel@alefbet.net>"]
 packages = [
-    { include = "psec", from = "src" }
+    { include = "safecor", from = "src" }
 ]

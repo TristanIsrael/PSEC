@@ -42,7 +42,7 @@ Rectangle {
         anchors {
             horizontalCenter: parent.horizontalCenter
         }
-        text: qsTr("PSEC Diagnostics")
+        text: qsTr("Safecor Diagnostics")
         font.pixelSize: 18
     }
 
@@ -76,7 +76,7 @@ Rectangle {
                 font.pixelSize: 20
                 wrapMode: Text.WordWrap
                 padding: 10
-                text: qsTr("This tool diagnoses the hardware and verifies whether it allows a product based on PSEC to run with different levels of capabilities and security.")
+                text: qsTr("This tool diagnoses the hardware and verifies whether it allows a product based on Safecor to run with different levels of capabilities and security.")
             }
         }
 

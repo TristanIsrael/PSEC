@@ -1,4 +1,4 @@
-from psec import MqttFactory, Api, Debugging, System
+from safecor import MqttFactory, Api, Debugging, System
 import threading
 
 class TestDebugger():

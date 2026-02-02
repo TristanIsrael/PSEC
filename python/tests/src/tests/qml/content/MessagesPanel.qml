@@ -1,6 +1,6 @@
 import QtQuick
 import Components
-import PSEC
+import Safecor
 
 PanelBase {
     id: root

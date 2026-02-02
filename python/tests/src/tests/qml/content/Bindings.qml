@@ -1,5 +1,5 @@
 import QtQuick
-import PSEC
+import Safecor
 import Components
 
 QtObject {

@@ -1,0 +1,29 @@
+# Contributor:
+# Maintainer: Tristan Israël <tristan.israel@alefbet.net>
+pkgname=safecor-syslog
+pkgver=1.0
+pkgrel=1
+pkgdesc="Safecor - syslog facility for business Domains"
+url="https://www.alefbet.net/"
+arch="noarch"
+license="MIT"
+depends="rsyslog rsyslog-uxsock safecor-lib"
+makedepends=""
+builddir="$srcdir/$pkgname-$pkgver"
+checkdepends=""
+install="$pkgname.post-install"
+subpackages=""
+replaces=""
+options="!check"  # no tests provided
+source="
+safecor-syslog.conf
+safecor-logger-daemon.py
+safecor-logger-daemon.initd
+"
+
+package() {    
+    install -D -m755 "$srcdir"/safecor-logger-daemon.initd "$pkgdir"/etc/init.d/safecor-logger-daemon
+
+    install -D -m755 "$srcdir"/safecor-syslog.conf "$pkgdir"/etc/rsyslog.d/safecor.conf
+    install -D -m755 "$srcdir"/safecor-logger-daemon.py "$pkgdir"/usr/lib/safecor/bin/safecor-logger-daemon.py
+}
