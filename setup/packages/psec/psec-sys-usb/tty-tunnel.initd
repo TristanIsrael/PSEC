@@ -1,6 +1,7 @@
 #!/sbin/openrc-run
 
 name="tty-tunnel"
+user="svc-tty-tunnel"
 
 depend() {
     after udev
@@ -9,7 +10,7 @@ depend() {
 start() {
     ebegin "Create TTY tunnel(s)"
 
-    start-stop-daemon --start --make-pidfile --exec /usr/lib/psec/bin/create-tty-tunnel.sh --pidfile /var/run/$name.pid --background
+    start-stop-daemon --start --make-pidfile --exec /usr/lib/psec/bin/create-tty-tunnel.sh --pidfile /var/run/$name.pid --background --user "$user"
 
     eend $?
 }
