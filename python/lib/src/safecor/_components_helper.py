@@ -1,3 +1,5 @@
+""" \author Tristan Israël """
+
 from . import ComponentState
 
 class ComponentsHelper():
@@ -20,6 +22,7 @@ class ComponentsHelper():
         .. seealso::
             - Protocol documentation <|URL_DOC_PROTOCOL|> chapter Discover the components of the system            
         """
+
         components_dict = {comp["id"]: comp for comp in self.__components}
     
         for update in updates:
@@ -33,16 +36,18 @@ class ComponentsHelper():
                 update["state"] = ComponentState(state) # On traduit le str en énumération
                 self.__components.append(update)
 
-    def get_by_id(self, id:str) -> dict:
+    def get_by_id(self, component_id:str) -> dict:
         """ Returns a component by its ID """
+
         for comp in self.__components:
-            if comp.get("id") is not None and comp.get("id") == id:
+            if comp.get("id") is not None and comp.get("id") == component_id:
                 return comp
             
         return {}
 
     def get_ids(self) -> list[str]:
         """ Returns a list of all components IDs """
+
         return [d["id"] for d in self.__components if "id" in d]
     
     def get_states(self) -> dict:
@@ -59,6 +64,7 @@ class ComponentsHelper():
             .. seealso::
                 - :class:`EtatComposant`
         """
+
         return {comp["id"]: comp["state"] for comp in self.__components if "id" in comp and "state" in comp}
     
     def get_state(self, id:str) -> ComponentState:
@@ -67,26 +73,28 @@ class ComponentsHelper():
             .. seealso::
                 - :class:`EtatComposant`
         """
+
         for comp in self.__components:
             if comp.get("id") == id:
                 return comp.get("state", ComponentState.UNKNOWN)
             
         return ComponentState.UNKNOWN
     
-    def get_type(self, id:str) -> str:
+    def get_type(self, component_id:str) -> str:
         """ Returns the type of a component 
         
             The types of components are free for the products based on Safecor, but for the components
             of the Safecor core the value is ``core``.
 
         """
+
         for comp in self.__components:
-            if comp.get("id") == id:
+            if comp.get("id") == component_id:
                 return comp.get("type", "")
             
         return ""
     
-    def get_ids_by_type(self, type:str) -> list[str]:
+    def get_ids_by_type(self, component_type:str) -> list[str]:
         """ Returns all components IDs that match a specific type
         
             For exemple, to query all the core components:
@@ -101,14 +109,16 @@ class ComponentsHelper():
                         hlp.update(payload)
                         core_components = hlp.get_ids_by_type("core")
         """
-        ids = list()
+        
+        ids = []
 
         for comp in self.__components:
-            if comp.get("type") is not None and comp.get("type") == type:
+            if comp.get("type") is not None and comp.get("type") == component_type:
                 ids.append(comp.get("id", ""))
             
         return ids
     
     def get_components(self):
         """ Returns all the components stored by this instance """
+
         return self.__components

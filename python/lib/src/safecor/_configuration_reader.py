@@ -1,3 +1,5 @@
+""" \author Tristan Israël """
+
 import json
 import os
 from . import SingletonMeta
@@ -49,8 +51,11 @@ class ConfigurationReaderPrivate(metaclass=SingletonMeta):
 
     def get_configurations(self):
         return self.__configurations
-    
+
+
 class ConfigurationReader():
+    """ This class handles different sets of parameters defined for hardware configurations.
+    """
 
     @staticmethod
     def get_configuration(name:str) -> dict:

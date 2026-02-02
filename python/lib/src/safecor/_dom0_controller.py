@@ -1,9 +1,11 @@
+""" \author Tristan Israël """
+
 import threading
 import subprocess
 import time
 import psutil
 from . import Constants, __version__
-from . import Logger, FileHelper, Parametres, Cles
+from . import Logger, FileHelper
 from . import ResponseFactory
 from . import MqttClient, Topics, MqttHelper, NotificationFactory
 from . import System, ComponentState
@@ -128,10 +130,10 @@ class Dom0Controller():
             return 
 
         # Récupère la liste des fichiers                    
-        fichiers = FileHelper.get_files_list(Constants.REPOSITORY, True)
+        fichiers = FileHelper.get_files_list(Constants.STR_REPOSITORY, True)
 
         # Génère la réponse
-        response = ResponseFactory.create_response_list_files(Constants.REPOSITORY, fichiers)
+        response = ResponseFactory.create_response_list_files(Constants.STR_REPOSITORY, fichiers)
         self.mqtt_client.publish(f"{Topics.LIST_FILES}/response", response)
 
 
@@ -148,7 +150,7 @@ class Dom0Controller():
             return
         
         # Calcule l'empreinte
-        repository_path = Parametres().parametre(Cles.CHEMIN_DEPOT_DOM0)
+        repository_path = Constants.DOM0_REPOSITORY_PATH
         fingerprint = FileHelper.calculate_fingerprint(f"{repository_path}/{filepath}")
 
         Logger().info(f"Fingerprint = {fingerprint}")
@@ -194,7 +196,7 @@ class Dom0Controller():
 
     def __is_storage_request(self, payload:dict) -> bool:
         if payload.get("disk") is not None:
-            return payload.get("disk") == Constants.REPOSITORY
+            return payload.get("disk") == Constants.STR_REPOSITORY
         else:
             return False
 
@@ -242,12 +244,12 @@ class Dom0Controller():
 
         disk = payload["disk"]
 
-        if disk != Constants.REPOSITORY:
+        if disk != Constants.STR_REPOSITORY:
             # This file is not stored in the repository so we ignore it
             return
 
         filepath = payload["filepath"]
-        repository_path = Parametres().parametre(Cles.CHEMIN_DEPOT_DOM0)
+        repository_path = Constants.DOM0_REPOSITORY_PATH
         storage_filepath = f"{repository_path}/{filepath}"
 
         if not FileHelper().remove_file(storage_filepath):

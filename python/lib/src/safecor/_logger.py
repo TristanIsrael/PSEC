@@ -1,9 +1,11 @@
-from . import MqttClient, SingletonMeta, Topics, MqttHelper, RequestFactory
-from . import System, Constants
+""" \author Tristan Israël """
+
 import zlib
 import base64
 import logging
 from datetime import datetime
+from . import MqttClient, SingletonMeta, Topics, MqttHelper, RequestFactory
+from . import System, Constants
 
 class FileHandler:
     """ The class FileHandler is an inner class for the class :class:`Logger`.

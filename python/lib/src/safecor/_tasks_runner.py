@@ -1,3 +1,5 @@
+""" \author Tristan Israël """
+
 import time
 import os
 from threading import Thread
@@ -42,7 +44,7 @@ class TaskRunner:
                 self.__threads.append(thread)
                 thread.start()
 
-                print("Running threads : {}".format(len(self.__threads)))
+                print(f"Running threads : {len(self.__threads)}")
 
             # Then we join oldest thread
             if len(self.__threads) > 0:

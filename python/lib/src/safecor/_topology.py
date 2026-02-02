@@ -1,35 +1,48 @@
+""" \author Tristan Israël """
+
 from typing import List
 from enums import Enum
 
 class DomainType(Enum):
-        Core = 1
-        Business = 2
+    """ This enumeration defines a Domain"s type """
+    CORE = 1
+    BUSINESS = 2
 
 class Domain:
+    """ This class encapsulates information about a Domain """
+
     name = "NoName"
     vcpu_group = "group1"
     memory = 1000
     vcpus = 1
     cpu_affinity = (1) # Tuple (min, max)
     package = ""
-    type = DomainType.Business
+    type = DomainType.BUSINESS
     
     def __init__(self, domain_name:str, domain_type:DomainType):
         self.name = domain_name
         self.type = domain_type
 
 class Screen:
+    """ This class encapsulates information about a screen """
+
     width = 0
     height = 0
     rotation = 0
 
 class Gui:
+    """ This class encapsulates information about the GUI of a product """
+    
     use = False 
     app_package = ""
     memory = 1000
 
 class Topology:
+    """ This class encapsulates and handles information about the topology of a product 
     
+    The topology is usually defined in the file /etc/safecor/topology.json
+    """
+
     domains = List[Domain]
     product_name = "No Name"
     use_usb = False
@@ -104,10 +117,10 @@ class Topology:
         
         self.domains.append(domain)
 
-    def domain_names(self):
+    def domain_names(self) -> list:
         """ Returns the list of Domain names """
         
-        names = [d.name for d in self.domains]
+        return [d.name for d in self.domains]
 
     def domain(self, domain_name:str) -> Domain:
         """ Returns the Domain object with the specified name """

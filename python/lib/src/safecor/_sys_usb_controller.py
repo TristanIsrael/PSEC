@@ -1,3 +1,5 @@
+""" \author Tristan Israël """
+
 import time
 import threading
 import os
@@ -5,18 +7,19 @@ import base64
 import zlib
 from pathlib import Path
 from queue import Queue
-from . import Constants, Parametres, MqttClient, Topics, MqttHelper
+from . import Constants, MqttClient, Topics, MqttHelper
 from . import FileHelper, ResponseFactory, ComponentState
-from . import Logger, Cles, DiskMonitor, NotificationFactory
+from . import Logger, DiskMonitor, NotificationFactory
 try:
     from . import InputsDaemon
     NO_INPUTS_MONITORING = False
-except:
+except ImportError:
     NO_INPUTS_MONITORING = True
     print("Importing ControleurVmSysUsb without inputs monitoring nor benchmarking capacity")
 
+
 class SysUsbController():
-    """ Cette classe traite les messages échangés par la sys-usb avec le Dom0 ou les autres domaines. """
+    """ This class handles messages exchanged between sys-usb and the Dom0 or the other Domains"""
 
     __nb_mqtt_conn = 0
     __can_run = True
@@ -77,7 +80,7 @@ class SysUsbController():
         self.__thread_copy_files.start()
         self.__thread_messages.start()
 
-        self.__disk_monitor = DiskMonitor(Constants().constante(Cles.CHEMIN_MONTAGE_USB), self.mqtt_client)
+        self.__disk_monitor = DiskMonitor(Constants.USB_MOUNT_POINT, self.mqtt_client)
         threading.Thread(target=self.__disk_monitor.start).start()
 
         payload = ResponseFactory.create_response_component_state(
@@ -167,7 +170,7 @@ class SysUsbController():
         recursive = payload.get("recursive", False)
         from_dir = payload.get("from_dir", "")
 
-        if disk == Constants.REPOSITORY:
+        if disk == Constants.STR_REPOSITORY:
             return
 
         # Récupère la liste des fichiers
@@ -193,9 +196,9 @@ class SysUsbController():
         
         source_disk = payload.get("disk", "")
         filepath = payload.get("filepath", "")
-        repository_path:str = Parametres().parametre(Cles.STORAGE_PATH_DOMU)
+        repository_path:str = Constants.DOMU_REPOSITORY_PATH
     
-        source_location = f"{Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)}/{source_disk}"
+        source_location = f"{Constants.USB_MOUNT_POINT}/{source_disk}"
         source_fingerprint = FileHelper.calculate_fingerprint(f"{source_location}/{filepath}")
 
         dest_parent_path = Path(f"{repository_path}/{filepath}").parent
@@ -228,8 +231,8 @@ class SysUsbController():
         filepath = payload.get("filepath", "")
         target_disk = payload.get("destination", "")
         
-        source_location = f"{Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)}/{source_disk}"        
-        destination_location = f"{Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)}/{target_disk}"
+        source_location = f"{Constants.USB_MOUNT_POINT}/{source_disk}"        
+        destination_location = f"{Constants.USB_MOUNT_POINT}/{target_disk}"
 
         try:
             self.__copy_files_queue.put(
@@ -259,7 +262,7 @@ class SysUsbController():
         disk = payload.get("disk")
         filepath = payload.get("filepath")
         
-        if disk is not None and disk == Constants.REPOSITORY:
+        if disk is not None and disk == Constants.STR_REPOSITORY:
             # Ignored
             return
 
@@ -273,7 +276,7 @@ class SysUsbController():
         
         Logger().debug(f"Calculate fingerprint of the file {filepath} on the disk {disk}")
 
-        mount_point = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)
+        mount_point = Constants.USB_MOUNT_POINT
         fingerprint = FileHelper.calculate_fingerprint(f"{mount_point}/{disk}/{filepath}")
 
         Logger().info(f"The fingerprint of the file {disk} on the disk {filepath} is {fingerprint}")
@@ -291,7 +294,7 @@ class SysUsbController():
             Logger().error("Missing argument in the create_file command")
             return
 
-        if disk == Constants.REPOSITORY:
+        if disk == Constants.STR_REPOSITORY:
             # Ignored
             return
 
@@ -304,7 +307,7 @@ class SysUsbController():
         else:
             data = decoded
 
-        mount_point = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)
+        mount_point = Constants.USB_MOUNT_POINT
         complete_filepath = f"{mount_point}/{disk}/{filepath}"
         
         Logger().debug(f"Create a file {filepath} of size {len(data)} octets on disk {disk}")
@@ -344,12 +347,12 @@ class SysUsbController():
 
         disk = payload["disk"]
 
-        if disk == Constants.REPOSITORY:
+        if disk == Constants.STR_REPOSITORY:
             # This file is the repository so we ignore it
             return
 
         filepath = payload["filepath"]
-        mount_point = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)
+        mount_point = Constants.USB_MOUNT_POINT
         storage_filepath = f"{mount_point}/{disk}/{filepath}"
 
         if not FileHelper().remove_file(storage_filepath):
@@ -396,7 +399,7 @@ class SysUsbController():
 
         dest_fingerprint = FileHelper.copy_file(source_location, filepath, repository_path, source_fingerprint)
         if dest_fingerprint != "":
-            notif = NotificationFactory.create_notification_new_file(Constants.REPOSITORY, filepath, source_fingerprint, dest_fingerprint)
+            notif = NotificationFactory.create_notification_new_file(Constants.STR_REPOSITORY, filepath, source_fingerprint, dest_fingerprint)
             self.mqtt_client.publish(Topics.NEW_FILE, notif)
         else:
             notif = NotificationFactory.create_notification_error(source_disk, filepath, "The file could not be copied")

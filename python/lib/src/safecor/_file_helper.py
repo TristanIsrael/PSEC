@@ -1,3 +1,5 @@
+""" \author Tristan Israël """
+
 from . import Constants, Logger
 from pathlib import Path
 import os
@@ -17,7 +19,7 @@ class FileHelper():
         """
 
         disques = []
-        point_montage = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)
+        point_montage = Constants.USB_MOUNT_POINT
         #print("Recherche de disques USB dans {}".format(point_montage))                
         with os.scandir(point_montage) as dossiers:
             for dossier in dossiers:
@@ -42,10 +44,10 @@ class FileHelper():
         """
 
         chemin:str = ""
-        if disk == Constants.REPOSITORY:
-            chemin = Parametres().parametre(Cles.CHEMIN_DEPOT_DOM0)
+        if disk == Constants.STR_REPOSITORY:
+            chemin = Constants.DOM0_REPOSITORY_PATH
         else:
-            chemin_montage = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)
+            chemin_montage = Constants.USB_MOUNT_POINT
             if chemin_montage is None:
                 print("No mount point defined. Aborting.")
                 return []
@@ -59,7 +61,7 @@ class FileHelper():
        
     @staticmethod
     def get_folder_contents(chemin:str, liste:list, decoupage:int = 0, recursif:bool = False, from_dir:str = ""):
-        _real_filepath = "{}{}".format(chemin, from_dir)
+        _real_filepath = f"{chemin}{from_dir}"
 
         #print("get_folder_contents : {} ({})".format(from_dir, _real_filepath))
         with os.scandir(_real_filepath) as entrees:
@@ -67,7 +69,7 @@ class FileHelper():
                 if entree.is_symlink():
                     continue
                 
-                filepath = "{}{}".format(chemin[decoupage:], from_dir)
+                filepath = f"{chemin[decoupage:]}{from_dir}"
                 filename = entree.name
                 if entree.is_file():
                     entryDict = {
@@ -102,7 +104,7 @@ class FileHelper():
 
     @staticmethod
     def make_filepath(disk_name:str, file_name:str) -> str:
-        return "{}:{}".format("" if disk_name == None else disk_name, file_name)
+        return f"{"" if disk_name is None else disk_name}:{file_name}"
 
     @staticmethod
     def calculate_fingerprint(filepath:str) -> str:
@@ -151,7 +153,7 @@ class FileHelper():
 
     @staticmethod
     def copy_file_to_repository(source_location:str, filepath:str, fingerprint:str):
-        repository_path = str(Parametres().parametre(Cles.STORAGE_PATH_DOMU))
+        repository_path = Constants.DOMU_REPOSITORY_PATH
         FileHelper.copy_file(source_location, filepath, repository_path, fingerprint)
 
     @staticmethod

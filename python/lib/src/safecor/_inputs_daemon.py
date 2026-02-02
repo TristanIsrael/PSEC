@@ -1,3 +1,5 @@
+""" \author Tristan Israël """
+
 import glob
 import threading
 import serial
@@ -10,8 +12,8 @@ except ImportError as e:
     print("The package evdev is not available. Functionalities will be missing.")
     class InputDevice:
         """ This is a fake InputDevice due to missing dependancy"""
-from . import Logger, Mouse, Parametres, Cles, SingletonMeta, InputType
-from . import MqttClient
+from . import Logger, Mouse, SingletonMeta, InputType
+from . import MqttClient, Constants
 
 INPUT_EVENT_FORMAT = "HHI"  # HH = type, code, I = value (unsigned int)
 INPUT_EVENT_SIZE = struct.calcsize(INPUT_EVENT_FORMAT)
@@ -56,7 +58,7 @@ class InputsDaemon(metaclass=SingletonMeta):
         self.__can_run = True
 
         # Start XenBus messaging
-        self.__xenbus_socket_path = Parametres().parametre(Cles.CHEMIN_SOCKET_INPUT_DOMU)
+        self.__xenbus_socket_path = Constants.DOMU_INPUT_SOCKET_FILEPATH
         if not self.__connect_xenbus():
             return
 

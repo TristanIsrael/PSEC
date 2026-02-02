@@ -1,3 +1,5 @@
+""" \author Tristan Israël """
+
 import evdev
 from evdev import ecodes
 

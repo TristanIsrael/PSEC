@@ -1,3 +1,5 @@
+""" \author Tristan Israël """
+
 class MouseButton():
     UNKNOWN   = 0 # b0000
     LEFT      = 1 # b0001
@@ -19,9 +21,6 @@ class Mouse():
     y:int = 0
     move = MouseMove.RELATIVE
     wheel = MouseWheel.NO_MOVE
-
-    def __init__(self, move:MouseMove=MouseMove.RELATIVE):
-        self.move = move
 
     def __init__(self, move:MouseMove=MouseMove.RELATIVE, x:int=0, y:int=0, buttons:int=0, wheel:int=0):
         self.x = x

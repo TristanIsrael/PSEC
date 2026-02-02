@@ -1,5 +1,6 @@
+""" \author Tristan Israël """
+
 import libvirt
-from . import SingletonMeta
 
 class LibvirtHelper():
 

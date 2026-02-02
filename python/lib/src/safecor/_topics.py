@@ -1,4 +1,8 @@
+""" \author Tristan Israël """
+
 class Topics():
+    """ This class defines MQTT topics for the API """
+
     # Groups
     SYSTEM = "system"
     DISKS = f"{SYSTEM}/disks"

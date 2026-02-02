@@ -45,7 +45,7 @@ class ControleurBenchmark(metaclass=SingletonMeta):
 
         end_ms = time.time()*1000
         duration = int(end_ms-start_ms)
-        response = ResponseFactory.cree_reponse_benchmark_inputs(duration, iterations)
+        response = ResponseFactory.create_reponse_benchmark_inputs(duration, iterations)
         self.mqtt_client.publish("{}/response".format(Topics.BENCHMARK), response)
 
     def execute_benchmark_fichiers(self):
@@ -54,7 +54,7 @@ class ControleurBenchmark(metaclass=SingletonMeta):
         start_ms = time.time()*1000
 
         # Informe le demandeur que le benchmark vient de démarrer
-        response = ResponseFactory.cree_reponse_benchmark_fichiers_demarre()
+        response = ResponseFactory.create_reponse_benchmark_fichiers_demarre()
         self.mqtt_client.publish("{}/response".format(Topics.BENCHMARK), response)
 
         # Le scénario de benchmark est le suivant :
@@ -101,7 +101,7 @@ class ControleurBenchmark(metaclass=SingletonMeta):
         #self.__execute_benchmark_fichiers(disque= disque, taille_fichier_ko= 1024*1024, quantite_fichiers= 1, emetteur= emetteur, metrics= metrics)
 
         # Informe le demandeur que le benchmark vient de se terminer
-        response = ResponseFactory.cree_reponse_benchmark_fichiers_termine(metrics)
+        response = ResponseFactory.create_reponse_benchmark_fichiers_termine(metrics)
         self.mqtt_client.publish("{}/response".format(Topics.BENCHMARK), response)
     
     def __execute_benchmark_fichiers(self, disque:str, taille_fichier_ko:int, quantite_fichiers:int, metrics:list):

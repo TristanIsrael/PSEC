@@ -1,13 +1,17 @@
+""" \author Tristan Israël """
+
 import psutil
 
 class NotificationFactory:
-    """ Cette classe permet de créer des notifications simmplement.
+    """ This class helps creating notifications
 
-    Les fonctions de cette classes sont statiques.
+    All functions of this class are static.
     """
 
     @staticmethod
     def create_notification_disk_state(disk:str, state:str) -> dict:
+        """ Creates a notification for a disk's state """
+
         payload = {
             "disk": disk, 
             "state": state
@@ -17,6 +21,8 @@ class NotificationFactory:
 
     @staticmethod
     def create_notification_new_file(disk:str, filepath:str, source_fingerprint:str, dest_fingerprint:str) -> dict:
+        """ Create a notification for a new file """
+
         payload = {            
             "disk": disk,
             "filepath": filepath,
@@ -28,6 +34,8 @@ class NotificationFactory:
      
     @staticmethod
     def create_notification_error(disk:str, filepath:str, error:str) -> dict:
+        """ Create a notification for an error """
+
         payload = {
             "disk": disk,
             "filepath": filepath,
@@ -38,6 +46,8 @@ class NotificationFactory:
     
     @staticmethod
     def create_notification_energy_state(battery) -> dict:
+        """ Create a notification for the energy state """
+        
         payload = {
             "battery_level": battery.percent,
             "plugged": 1 if battery.power_plugged else 0

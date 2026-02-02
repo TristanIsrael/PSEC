@@ -1,7 +1,9 @@
-from . import ComponentState, BenchmarkId, Constants
+""" \author Tristan Israël """
+
+from . import ComponentState, BenchmarkId
 
 class ResponseFactory():
-    """ La classe ResponseFactory permet de générer les messages en réponse à certaines commandes.    
+    """ This class helps generating commands for API reponses.   
     
     """
 
@@ -21,7 +23,7 @@ class ResponseFactory():
         return payload
 
     @staticmethod
-    def cree_reponse_benchmark_inputs(duree:int, iterations:int) -> dict:
+    def create_reponse_benchmark_inputs(duree:int, iterations:int) -> dict:
         payload = {
             "id": BenchmarkId.INPUTS,
             "duration": duree,
@@ -30,7 +32,7 @@ class ResponseFactory():
         return payload
 
     @staticmethod
-    def cree_reponse_benchmark_fichiers_demarre() -> dict:
+    def create_reponse_benchmark_fichiers_demarre() -> dict:
         payload = {
             "id": BenchmarkId.FILES,
             "state": "started"
@@ -38,7 +40,7 @@ class ResponseFactory():
         return payload
     
     @staticmethod
-    def cree_reponse_benchmark_fichiers_termine(metrics:list) -> dict:
+    def create_reponse_benchmark_fichiers_termine(metrics:list) -> dict:
         payload = {
             "id": BenchmarkId.FILES,
             "estatetat": "finished",
@@ -47,7 +49,7 @@ class ResponseFactory():
         return payload
 
     @staticmethod
-    def cree_reponse_benchmark_fichiers_erreur(erreur:str) -> dict:
+    def create_reponse_benchmark_fichiers_erreur(erreur:str) -> dict:
         payload = {
             "id": BenchmarkId.FILES,
             "state": "error",

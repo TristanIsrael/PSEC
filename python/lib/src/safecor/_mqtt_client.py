@@ -1,5 +1,5 @@
-''' \author Tristan Israël
-'''
+""" \author Tristan Israël """
+
 from enum import StrEnum
 import json
 import threading

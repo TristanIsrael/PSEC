@@ -1,8 +1,10 @@
-from . import Api, Topics, System
+""" \author Tristan Israël """
+
 import random
 import string
 import threading
 from datetime import datetime
+from . import Api, Topics, System
 
 class Debugging():
     """

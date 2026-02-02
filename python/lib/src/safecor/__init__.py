@@ -1,9 +1,12 @@
 __author__ = "Tristan Israël (tristan.israel@alefbet.net)"
 __version__ = '1.2.0'
 
+import logging
+from logging import NullHandler
+
 from ._topology import Topology, Domain, Screen, DomainType
 from ._singleton import SingletonMeta
-from ._constants import Constants, MouseButton, InputType, BenchmarkId, ComponentState
+from ._constants import Constants, InputType, BenchmarkId, ComponentState
 from ._libvirt_helper import LibvirtHelper
 from ._system import System, topology
 try:
@@ -21,7 +24,7 @@ from ._file_helper import FileHelper
 from ._response_factory import ResponseFactory
 try:
     from ._disk_monitor import DiskMonitor
-except Exception as e:
+except ImportError as e:
     print("The class DiskMonitor won't be available due to missing dependancy")
     print(e)
 from ._mouse import Mouse, MouseButton, MouseWheel, MouseMove
@@ -37,9 +40,6 @@ from ._mock_sys_usb_controller import MockSysUsbController
 from ._debugging import Debugging
 from ._api_helper import ApiHelper
 from ._configuration_reader import Configuration, ConfigurationReader
-
-import logging
-from logging import NullHandler
 
 __all__ = [
     "__version__",

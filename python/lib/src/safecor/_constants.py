@@ -1,3 +1,5 @@
+""" \author Tristan Israël """
+
 from enum import Enum
 
 class InputType:

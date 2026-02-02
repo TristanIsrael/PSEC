@@ -1,3 +1,5 @@
+""" \author Tristan Israël """
+
 class ApiHelper:
     """
     This class provides static functions to help extracting information from the API.
@@ -27,7 +29,7 @@ class ApiHelper:
         return payload.get("disk", "")        
         
     @staticmethod
-    def get_disk_state(payload:dict) -> str:        
+    def get_disk_state(payload:dict) -> str:
         """
         Returns the state of the disk (= "connected")
 

@@ -1,10 +1,12 @@
+""" \author Tristan Israël """
+
 import subprocess
 import platform
 import os
 import json
 import psutil
 import shutil
-from . import SingletonMeta, __version__, Constants, Cles, Topology, Domain, DomainType, LibvirtHelper
+from . import SingletonMeta, __version__, Constants, Topology, Domain, DomainType, LibvirtHelper
 
 topology = Topology()
 
@@ -176,9 +178,7 @@ class System(metaclass=SingletonMeta):
     def get_topology() -> Topology:
         """ Returns a \c Topology object initialized with the contents of the topology file """
 
-        if topology.initialized():
-            return topology
-        else:
+        if not topology.initialized():
             # Initialize the topology object
             # We use the abstract struct returned by get_topology_struct()
             topo = System.get_topology_struct()
@@ -205,10 +205,12 @@ class System(metaclass=SingletonMeta):
                 domain.vcpus = domain_desc["vcpus"]
                 domain.cpu_affinity = System.__parse_range(domain_desc["cpus"])
                 domain.package = domain_desc["package"]
-                
-                topology.add_domain(domain) 
- 
+
+                topology.add_domain(domain)
+
             topology.set_initialized(True)
+
+        return topology
 
     @staticmethod
     def __parse_range(value: str) -> tuple[int, ...]:
@@ -256,7 +258,7 @@ class System(metaclass=SingletonMeta):
             }
 
         All the keys are guaranteed to exist with a default value if necessary.
-        """        
+        """
 
         topo_struct = {}
         topo_data = System.get_topology_data(override_topology_file)
@@ -290,7 +292,7 @@ class System(metaclass=SingletonMeta):
         # sys-usb domain
         topo_domains["sys-usb"] = {
             "name": "sys-usb",
-            "type": DomainType.Core,
+            "type": DomainType.CORE,
             "memory": 300,
             "vcpus": System.compute_vcpus_for_group("sys-usb", vcpu_groups),
             "cpus": System().compute_cpus_for_group("sys-usb", vcpu_groups)
@@ -299,7 +301,7 @@ class System(metaclass=SingletonMeta):
         # sys-gui domain
         topo_domains["sys-gui"] = {
             "name": "sys-gui",
-            "type": DomainType.Core,
+            "type": DomainType.CORE,
             "memory": gui.get("memory"),
             "vcpus": System.compute_vcpus_for_group("sys-gui", vcpu_groups),
             "cpus": System().compute_cpus_for_group("sys-gui", vcpu_groups),            
@@ -311,7 +313,7 @@ class System(metaclass=SingletonMeta):
             group_name = domain.get("vcpu_group", domain_name) # If there is no group we will create a default configuration
             topo_domains[domain_name] = {
                 "name": domain.get("name", "unknown"),
-                "type": DomainType.Business,
+                "type": DomainType.BUSINESS,
                 "memory": domain.get("memory", 0),
                 "package": domain.get("app-package", ""),
                 "vcpus": System.compute_vcpus_for_group(group_name, vcpu_groups),
@@ -563,8 +565,8 @@ class System(metaclass=SingletonMeta):
             "free": 0,
             "files": 0
         }
-        
-        storage_path = Constants().constante(Cles.CHEMIN_DEPOT_DOM0)
+
+        storage_path = Constants.DOM0_REPOSITORY_PATH
         print(f"Looking for storage information into {storage_path}")
 
         # Get information about the disk
@@ -583,7 +585,7 @@ class System(metaclass=SingletonMeta):
                 info["files"] += len(files)
 
         return info
-    
+
     def get_cpu_allocation(self) -> dict:
         """ @brief Provides information about CPU allocation for all the Domains """
 

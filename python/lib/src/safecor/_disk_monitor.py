@@ -1,4 +1,7 @@
-import os, pyudev
+""" \author Tristan Israël """
+
+import os
+import pyudev
 from . import Logger, MqttClient, Topics, NotificationFactory
 
 class DiskMonitor():

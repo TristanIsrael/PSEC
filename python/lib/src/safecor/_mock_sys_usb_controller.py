@@ -1,3 +1,5 @@
+""" \author Tristan Israël """
+
 import os, shutil
 from safecor import MqttClient, ConnectionType, Topics, ResponseFactory, FileHelper, MqttHelper, NotificationFactory, Constants
 from concurrent.futures import ThreadPoolExecutor
@@ -76,7 +78,7 @@ class MockSysUsbController():
                 source_fingerprint = FileHelper.calculate_fingerprint(source_path)
                 dest_fingerprint = FileHelper.calculate_fingerprint(dest_filepath)
 
-                notif = NotificationFactory.create_notification_new_file(Constants.REPOSITORY, filepath, source_fingerprint, dest_fingerprint)
+                notif = NotificationFactory.create_notification_new_file(Constants.STR_REPOSITORY, filepath, source_fingerprint, dest_fingerprint)
                 self.mqtt_client.publish(Topics.NEW_FILE, notif)
             except Exception as e:
                 self.__debug("Error during copy: {}".format(e))
@@ -168,7 +170,7 @@ class MockSysUsbController():
             self.__debug("Missing argument in the create_file command")
             return
 
-        if disk == Constants.REPOSITORY:
+        if disk == Constants.STR_REPOSITORY:
             # Ignored
             return
 
@@ -208,4 +210,4 @@ class MockSysUsbController():
         self.mqtt_client.publish(Topics.DISK_STATE, notif)
 
     def __debug(self, message:str):
-        print("[SYS-USB] {}".format(message))
+        print(f"[SYS-USB] {message}")

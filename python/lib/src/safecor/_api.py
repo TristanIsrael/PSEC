@@ -1,5 +1,5 @@
-from . import RequestFactory, Topics, NotificationFactory, ResponseFactory
-from . import Logger, MqttClient, System, SingletonMeta, MqttFactory
+""" \author Tristan Israël """
+
 from paho.mqtt.enums import MQTTErrorCode
 import tempfile
 import os
@@ -8,6 +8,9 @@ import base64
 import atexit
 import signal
 from datetime import datetime
+
+from . import RequestFactory, Topics, NotificationFactory, ResponseFactory
+from . import Logger, MqttClient, System, SingletonMeta, MqttFactory, Constants
 
 class Api(metaclass=SingletonMeta):
     """     
@@ -111,7 +114,7 @@ class Api(metaclass=SingletonMeta):
     __logfile = "/var/log/safecor.log"
 
 
-    def start(self, mqtt_client:MqttClient = None, domain_identifier:str = "undefined", recording:bool = False, logfile:str = os.path.join(tempfile.gettempdir(), "safecor.log")):
+    def start(self, mqtt_client:MqttClient = None, domain_identifier:str = "undefined", recording:bool = False, logfile:str = Constants.LOCAL_LOG_FILEPATH):
         """
         Starts the API by connecting to the MQTT broker and opening a log file if asked.
 

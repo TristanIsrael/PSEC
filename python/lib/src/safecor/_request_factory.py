@@ -1,4 +1,6 @@
-from . import Constants, Parametres, Cles
+""" \author Tristan Israël """
+
+from . import Constants
 
 class RequestFactory():
     """ The class MessageFactory generates notifications, commands and errors
@@ -46,6 +48,8 @@ class RequestFactory():
 
     @staticmethod
     def create_request_files_list(disk: str, recursive: bool = False, from_dir: str = "") -> dict:
+        """ Creates a request to receive the files list of a storage """
+
         return { 
             "disk": disk,
             "recursive": recursive,
@@ -54,6 +58,8 @@ class RequestFactory():
     
     @staticmethod
     def create_request_read_file(disk : str, filepath : str) -> dict:
+        """ Creates a request to read a file's content """
+
         return {
             "disk": disk,
             "filepath": filepath
@@ -61,8 +67,15 @@ class RequestFactory():
     
     @staticmethod
     def create_request_copy_file(source_disk:str, filepath:str, destination_disk:str) -> dict :
-        # Exemple :
-        # { filepath: "Mon Disque:/répertoire/fichier", disk_destination: "Autre disque" }
+        """ Create a request to copy a file from a storage to another, including the repository.
+            
+            Example :
+            
+            ::
+                
+                { filepath: "External storage:/a path/a filename", disk_destination: "Another storage" }
+        """
+
         return {
             "disk": source_disk,
             "filepath": filepath,
@@ -70,7 +83,15 @@ class RequestFactory():
         }        
     
     @staticmethod
-    def create_request_delete_file(filepath: str, disk: str = Constants().constante(Cles.DEPOT_LOCAL)) -> dict:
+    def create_request_delete_file(filepath: str, disk: str = Constants.STR_REPOSITORY) -> dict:
+        """ Create a request to delete a file from a storage 
+        
+            :param filepath: The filepath of the file to delete
+            :type a: str
+            :param disk: The storage name - Default value is the local repository
+            :type disk: str
+        """
+
         return {
             "filepath": filepath,
             "disk": disk
@@ -78,12 +99,16 @@ class RequestFactory():
     
     @staticmethod
     def create_request_start_benchmark(id_benchmark: str):
+        """ Create a request to start the benchmark """
+
         return {
             "module": id_benchmark
         }        
 
     @staticmethod 
     def create_request_get_file_fingerprint(filepath:str, disk:str) -> dict:
+        """ Create a request to get a file's fingerprint """
+
         return {
             "filepath": filepath,
             "disk": disk
@@ -91,6 +116,18 @@ class RequestFactory():
     
     @staticmethod
     def create_request_create_file(filepath:str, disk:str, contents:bytes, compressed:bool=False) -> dict:
+        """ Create a request to create a new file on a storage 
+        
+            :param filepath: The filepath of file to create
+            :type filepath: str
+            :param disk: The storage on which the file should be created
+            :type disk: str
+            :param contents: The data to write in the file as a byte array
+            :type contents: bytes
+            :param compressed: Indicates whether the data should be compressed - Default is False
+            :type compressed: bool
+        """
+
         return {
             "filepath": filepath,
             "disk": disk,
@@ -100,12 +137,19 @@ class RequestFactory():
 
     @staticmethod
     def create_request_restart_domain(domain_name:str):
+        """ Create a request to restart a Domain """
+
         return {
             "domain_name": domain_name
         }
     
     @staticmethod
     def create_request_ping(ping_id, source_name, data, datetime):
+        """ Create a request to ping a Domain 
+        
+            When a Domain is pinged it should answer automatically with a ping response.
+        """
+
         return {
             "id": ping_id,
             "source": source_name,
