@@ -83,7 +83,7 @@ class RequestFactory():
         }        
 
     @staticmethod 
-    def create_request_get_file_footprint(filepath:str, disk:str) -> dict:
+    def create_request_get_file_fingerprint(filepath:str, disk:str) -> dict:
         return {
             "filepath": filepath,
             "disk": disk

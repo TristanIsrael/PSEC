@@ -73,10 +73,10 @@ class MockSysUsbController():
             try:
                 shutil.copy(source_path, dest_path)
 
-                source_footprint = FichierHelper.calculate_footprint(source_path)
-                dest_footprint = FichierHelper.calculate_footprint(dest_filepath)
+                source_fingerprint = FichierHelper.calculate_fingerprint(source_path)
+                dest_fingerprint = FichierHelper.calculate_fingerprint(dest_filepath)
 
-                notif = NotificationFactory.create_notification_new_file(Constantes.REPOSITORY, filepath, source_footprint, dest_footprint)
+                notif = NotificationFactory.create_notification_new_file(Constantes.REPOSITORY, filepath, source_fingerprint, dest_fingerprint)
                 self.mqtt_client.publish(Topics.NEW_FILE, notif)
             except Exception as e:
                 self.__debug("Error during copy: {}".format(e))
@@ -107,19 +107,19 @@ class MockSysUsbController():
             try:
                 shutil.copy(source_path, dest_path)
 
-                source_footprint = FichierHelper.calculate_footprint(source_path)
-                dest_footprint = FichierHelper.calculate_footprint(dest_filepath)                
+                source_fingerprint = FichierHelper.calculate_fingerprint(source_path)
+                dest_fingerprint = FichierHelper.calculate_fingerprint(dest_filepath)                
 
-                if source_footprint != dest_footprint:
-                    self.__debug("ERROR: Footprints are not equal")
+                if source_fingerprint != dest_fingerprint:
+                    self.__debug("ERROR: fingerprints are not equal")
 
-                response = ResponseFactory.create_response_copy_file(filepath, disk, source_footprint == dest_footprint, source_footprint)
+                response = ResponseFactory.create_response_copy_file(filepath, disk, source_fingerprint == dest_fingerprint, source_fingerprint)
                 self.mqtt_client.publish("{}/response".format(Topics.COPY_FILE), response)
             except: 
                 notif = NotificationFactory.create_notification_error(disk, filepath, "The file could not be copied")
                 self.mqtt_client.publish(Topics.ERROR, notif)
 
-            source_footprint = FichierHelper.calculate_footprint(source_path)
+            source_fingerprint = FichierHelper.calculate_fingerprint(source_path)
             
         elif topic == f"{Topics.CREATE_FILE}/request":
             self.__handle_create_file(topic, payload)
@@ -198,8 +198,8 @@ class MockSysUsbController():
             return
 
         # On envoie la notification de succès
-        footprint = FichierHelper.calculate_footprint(complete_filepath)
-        response = ResponseFactory.create_response_create_file(complete_filepath, disk, footprint, True)
+        fingerprint = FichierHelper.calculate_fingerprint(complete_filepath)
+        response = ResponseFactory.create_response_create_file(complete_filepath, disk, fingerprint, True)
         self.mqtt_client.publish(f"{Topics.CREATE_FILE}/response", response)
 
 

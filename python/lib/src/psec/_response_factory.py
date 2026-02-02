@@ -56,20 +56,20 @@ class ResponseFactory():
         return payload
     
     @staticmethod
-    def create_response_file_footprint(filepath:str, disk:str, footprint:str) -> dict:
+    def create_response_file_fingerprint(filepath:str, disk:str, fingerprint:str) -> dict:
         payload = {
             "filepath": filepath,
             "disk": disk,
-            "footprint": footprint
+            "fingerprint": fingerprint
         }
         return payload
     
     @staticmethod
-    def create_response_create_file(filepath:str, disk:str, footprint:str, success:bool) -> dict:
+    def create_response_create_file(filepath:str, disk:str, fingerprint:str, success:bool) -> dict:
         payload = {
             "filepath": filepath,
             "disk": disk,
-            "footprint": footprint,
+            "fingerprint": fingerprint,
             "success": success
         }
         return payload
@@ -91,11 +91,11 @@ class ResponseFactory():
         return payload
 
     @staticmethod
-    def create_response_copy_file(filepath:str, disk:str, success:bool, footprint:str) -> dict:
+    def create_response_copy_file(filepath:str, disk:str, success:bool, fingerprint:str) -> dict:
         payload = {
             "filepath": filepath,
             "status": "ok" if success else "error",
-            "footprint": footprint
+            "fingerprint": fingerprint
         }
         return payload
     

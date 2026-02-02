@@ -16,12 +16,12 @@ class NotificationFactory:
         return payload
 
     @staticmethod
-    def create_notification_new_file(disk:str, filepath:str, source_footprint:str, dest_footprint:str) -> dict:
+    def create_notification_new_file(disk:str, filepath:str, source_fingerprint:str, dest_fingerprint:str) -> dict:
         payload = {            
             "disk": disk,
             "filepath": filepath,
-            "source_footprint": source_footprint,
-            "dest_footprint": dest_footprint
+            "source_fingerprint": source_fingerprint,
+            "dest_fingerprint": dest_fingerprint
         }
         
         return payload

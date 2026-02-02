@@ -18,7 +18,7 @@ class AppController(QObject):
     testFinished = Signal(bool, str) # success, error    
     workerThread = None
     test_step = 0
-    testfile_footprint = ""
+    testfile_fingerprint = ""
 
     def __init__(self, parent = QObject()):
         QObject.__init__(self, parent)
@@ -84,7 +84,7 @@ class AppController(QObject):
 
             h = md5()
             h.update(contents)
-            self.testfile_footprint = h.hexdigest()
+            self.testfile_fingerprint = h.hexdigest()
 
             self.interface_socle.api.create_file(filepath, disk, contents)
 
@@ -95,7 +95,7 @@ class AppController(QObject):
             Api().info("Démarrage de l'étape 2", "AppController")
 
             # Vérification de l'étape précédente
-            if self.testfile_footprint != args.get("footprint"):
+            if self.testfile_fingerprint != args.get("fingerprint"):
                 error = "L'empreinte du fichier est incorrecte"
                 Api().error(error, "AppController")
                 self.testFinished(False, error)
@@ -112,7 +112,7 @@ class AppController(QObject):
             Api().info("Démarrage de l'étape 3", "AppController")
 
             # Vérification de l'étape précédente
-            if self.testfile_footprint != args.get("footprint"):
+            if self.testfile_fingerprint != args.get("fingerprint"):
                 error = "L'empreinte du fichier est incorrecte"
                 Api().error(error, "AppController")
                 self.testFinished(False, error)
@@ -129,7 +129,7 @@ class AppController(QObject):
             Api().info("Démarrage de l'étape 4", "AppController")
 
             # Vérification de l'étape précédente
-            if self.testfile_footprint != args.get("footprint"):
+            if self.testfile_fingerprint != args.get("fingerprint"):
                 error = "L'empreinte du fichier est incorrecte"
                 Api().error(error, "AppController")
                 self.testFinished(False, error)
@@ -140,16 +140,16 @@ class AppController(QObject):
 
 
     @Slot(str, str, str)
-    def __on_file_created(self, filepath, disk, footprint):
+    def __on_file_created(self, filepath, disk, fingerprint):
         Api().info("Le fichier {} a bien été créé sur le disque {}".format(filepath, disk), "AppController")
 
         if self.test_step == 1:
             Api().debug("Réponse étape 1 reçue")
-            self.start_test(2, { "filepath": filepath, "disk": disk, "footprint": footprint }, "AppController")
+            self.start_test(2, { "filepath": filepath, "disk": disk, "fingerprint": fingerprint }, "AppController")
         elif self.test_step == 2:
             Api().debug("Réponse étape 2 reçue")
-            self.start_test(3, { "filepath": filepath, "disk": disk, "footprint": footprint }, "AppController")
+            self.start_test(3, { "filepath": filepath, "disk": disk, "fingerprint": fingerprint }, "AppController")
         elif self.test_step == 3:
             Api().debug("Réponse étape 3 reçue")
-            self.start_test(4, { "filepath": filepath, "disk": disk, "footprint": footprint }, "AppController")
+            self.start_test(4, { "filepath": filepath, "disk": disk, "fingerprint": footfingerprintprint }, "AppController")
    

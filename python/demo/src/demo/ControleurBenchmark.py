@@ -145,11 +145,11 @@ class ControleurBenchmark(metaclass=SingletonMeta):
         # Step 3 : copy files to repository  
         for n_fichier in range(1, quantite_fichiers+1):
             filepath = "{}/{}/benchfile_{}ko_{}".format(point_montage, disque, taille_fichier_ko, n_fichier)
-            footprint = ""
+            fingerprint = ""
             Logger().info("Etape 2 : Copie du fichier dans le dépôt", "BenchmarkController")
             try:
                 start_ms = time.time()*1000
-                FichierHelper.copy_file_to_repository(filepath, footprint)
+                FichierHelper.copy_file_to_repository(filepath, fingerprint)
                 end_ms = time.time()*1000
                 metrics.append({"step": "copy_to_repository", "size": taille_fichier_ko, "iteration": n_fichier, "duration_ms": end_ms-start_ms})                                
             except Exception as e:

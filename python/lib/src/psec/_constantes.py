@@ -99,7 +99,7 @@ class Constantes(metaclass=SingletonMeta):
             return None
         
     REPOSITORY = "__repository__"
-    FOOTPRINT_METHOD = "md5"
+    FINGERPRINT_METHOD = "md5"
     PSEC_DISK_CONTROLLER = "psec_disk_controller"
     PSEC_INPUT_CONTROLLER = "psec_input_controller"
     PSEC_IO_BENCHMARK = "psec_io_benchmark"

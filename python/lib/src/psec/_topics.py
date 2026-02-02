@@ -17,7 +17,7 @@ class Topics():
     READ_FILE = f"{DISKS}/read_file"
     COPY_FILE = f"{DISKS}/copy_file"
     DELETE_FILE = f"{DISKS}/delete_file"
-    FILE_FOOTPRINT = f"{DISKS}/file_footprint"
+    FILE_FINGERPRINT = f"{DISKS}/file_fingerprint"
     CREATE_FILE = f"{DISKS}/create_file"
     NEW_FILE = f"{DISKS}/new_file"
     DISK_STATE = f"{DISKS}/state"

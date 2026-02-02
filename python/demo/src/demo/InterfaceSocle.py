@@ -21,7 +21,7 @@ class InterfaceSocle(QObject):
     filesListReceived = Signal(list)
     #filesChanged = Signal()
     #benchmarkDataChanged = Signal()
-    #fileCreated = Signal(str, str, str) # filepath, disk, footprint
+    #fileCreated = Signal(str, str, str) # filepath, disk, fingerprint
     error = Signal(str)
 
     def __init__(self, parent=None):

@@ -78,7 +78,7 @@ class Dom0Controller():
     def __on_mqtt_connected(self):
         Logger().debug("Starting Dom0 controller")
         self.mqtt_client.subscribe(f"{Topics.LIST_FILES}/request")
-        self.mqtt_client.subscribe(f"{Topics.FILE_FOOTPRINT}/request")
+        self.mqtt_client.subscribe(f"{Topics.FILE_FINGERPRINT}/request")
         self.mqtt_client.subscribe(f"{Topics.SHUTDOWN}/request")
         self.mqtt_client.subscribe(f"{Topics.RESTART_DOMAIN}/request")
         self.mqtt_client.subscribe(Topics.GUI_READY)
@@ -100,8 +100,8 @@ class Dom0Controller():
         try:
             if topic == f"{Topics.LIST_FILES}/request":
                 self.__handle_list_files(payload)
-            elif topic == f"{Topics.FILE_FOOTPRINT}/request":
-                self.__handle_file_footprint(payload)
+            elif topic == f"{Topics.FILE_FINGERPRINT}/request":
+                self.__handle_file_fingerprint(payload)
             elif topic == f"{Topics.SHUTDOWN}/request":
                 self.__handle_shutdown(payload)
             elif topic == f"{Topics.RESTART_DOMAIN}/request":
@@ -135,7 +135,7 @@ class Dom0Controller():
         self.mqtt_client.publish(f"{Topics.LIST_FILES}/response", response)
 
 
-    def __handle_file_footprint(self, payload:dict) -> None:
+    def __handle_file_fingerprint(self, payload:dict) -> None:
         if not self.__is_storage_request(payload):
             return
                     
@@ -149,13 +149,13 @@ class Dom0Controller():
         
         # Calcule l'empreinte
         repository_path = Parametres().parametre(Cles.CHEMIN_DEPOT_DOM0)
-        footprint = FichierHelper.calculate_footprint(f"{repository_path}/{filepath}")
+        fingerprint = FichierHelper.calculate_fingerprint(f"{repository_path}/{filepath}")
 
-        Logger().info(f"Footprint = {footprint}")
+        Logger().info(f"Fingerprint = {fingerprint}")
         
         # Génère la réponse
-        response = ResponseFactory.create_response_file_footprint(filepath, disk, footprint)
-        self.mqtt_client.publish(f"{Topics.FILE_FOOTPRINT}/response", response)
+        response = ResponseFactory.create_response_file_fingerprint(filepath, disk, fingerprint)
+        self.mqtt_client.publish(f"{Topics.FILE_FINGERPRINT}/response", response)
 
 
     def __handle_shutdown(self, payload:dict):
