@@ -14,14 +14,19 @@ start() {
 
     width=`cat /sys/class/graphics/fb0/virtual_size | cut -d, -f1`
     height=`cat /sys/class/graphics/fb0/virtual_size | cut -d, -f2`
-    splash_file="/boot/Splash_${width}_${height}.ppm"
+    splash_source="/boot/splash.png"
+    splash_file="/boot/splash_${width}_${height}.ppm"
 
-    if [ ! -f $splash_file ]
+    if [ ! -f $splash_source ]
     then 
-        splash_file="/boot/Splash_1024_768.ppm"
+        echo "No splash file provided"
+        return 0
     fi 
 
-    ebegin "Loading splash file ($splash_file)"
+    echo "Create splash files for the device"
+    python3 /usr/lib/psec/bin/create-splash.py $width $height /boot
+
+    ebegin "Loading splash file"
     fbsplash -s $splash_file -T 2
     eend $?
 }
