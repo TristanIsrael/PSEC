@@ -4,6 +4,7 @@ __version__ = '1.2.0'
 from ._topology import Topology, Domain, Screen, DomainType
 from ._singleton import SingletonMeta
 from ._constantes import Constantes, Cles, BoutonSouris, InputType, BenchmarkId, EtatComposant
+from ._libvirt_helper import LibvirtHelper
 from ._system import System, topology
 try:
     from ._keymap_fr import KeymapFR
@@ -48,6 +49,7 @@ __all__ = [
     "KeymapFR",
     "InputType", "BoutonSouris", "EtatComposant", "MouseMove",     
     "RequestFactory",
+    "LibvirtHelper",
     #"Journal", "JournalProxy", "DemonProxyJournal",
     "Logger",
     "NotificationFactory", "BoutonSouris",
