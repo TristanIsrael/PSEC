@@ -1,8 +1,12 @@
 {
     "usb": {
-        "use": 1
+        "use": 0
     },
     "gui": {
         "use": 0
-    }    
+    },
+    "product": {
+        "name": "Safecor",
+        "splash_bgcolor": "#1ca9f7"
+    }
 }
