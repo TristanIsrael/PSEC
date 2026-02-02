@@ -8,7 +8,7 @@ import json
 import msgpack
 import evdev
 from evdev import InputDevice, ecodes, UInput
-from psec import MqttFactory, Logger, InputType, Topics, MqttHelper, ResponseFactory
+from psec import MqttFactory, Logger, InputType, Topics, MqttHelper, ResponseFactory, ConfigurationReader
 
 mqtt_lock = threading.Event()
 mqtt = MqttFactory.create_mqtt_client_dom0("Orchestrator")
@@ -24,11 +24,11 @@ CREATE_DOMAINS=True
 
 def find_touchscreen() -> InputDevice:
     inputs = glob.glob("/dev/input/event*")
-    for input in inputs:
+    for inputdev in inputs:
         #print("Fichier {}".format(input))
         
-        try:          
-            dev = InputDevice(input)
+        try:
+            dev = InputDevice(inputdev)
             caps = dev.capabilities()
             #print(caps)
             
@@ -142,14 +142,17 @@ def wait_for_file(filepath):
 
 
 def get_blacklisted_devices():
-    with open("/etc/psec/topology.json", 'r') as file:
-        data = json.load(file)
+    #with open("/etc/psec/topology.json", 'r') as file:
+    #    data = json.load(file)
+    #
+    #    pci = data.get("pci", {})
+    #    blacklist = pci.get("blacklist", "")
+    #    return blacklist.split(",")
+    config = ConfigurationReader.get_configuration_for_system()
 
-        pci = data.get("pci", {})
-        blacklist = pci.get("blacklist", "")
-        return blacklist.split(",")
-
-    return []
+    pci = config.get("pci", {})
+    blacklist = pci.get("blacklist", "")
+    return blacklist.split(",")
 
 
 def get_pci_usb_devices():
@@ -219,11 +222,12 @@ def patch_sys_usb_conf(usb_devs:list):
 
 def start_business_domains():
     try:
-        with open('/etc/psec/topology.json', 'r') as f:
-            data = json.loads(f.read())
-            f.close()
+        #with open('/etc/psec/topology.json', 'r') as f:
+        #    data = json.loads(f.read())
+        #    f.close()
+        config = ConfigurationReader.get_configuration_for_system()
             
-        json_business = data.get("business", {})
+        json_business = config.get("business", {})
         json_domains = json_business.get("domains", [])
         for domain in json_domains:
             domain_name = domain.get("name", "")

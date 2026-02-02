@@ -37,6 +37,7 @@ from ._api import Api
 from ._mock_sys_usb_controller import MockSysUsbController
 from ._debugging import Debugging
 from ._api_helper import ApiHelper
+from ._configuration_reader import Configuration, ConfigurationReader
 
 import logging
 from logging import NullHandler
@@ -48,6 +49,7 @@ __all__ = [
     "Constantes", "Parametres", "Cles", "System", "topology", "Screen",
     "KeymapFR",
     "InputType", "BoutonSouris", "EtatComposant", "MouseMove",     
+    "Configuration", "ConfigurationReader",
     "RequestFactory",
     "LibvirtHelper",
     #"Journal", "JournalProxy", "DemonProxyJournal",
