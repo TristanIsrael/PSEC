@@ -5,8 +5,8 @@ import base64
 import zlib
 from pathlib import Path
 from queue import Queue
-from . import Constantes, Parametres, MqttClient, Topics, MqttHelper
-from . import FichierHelper, ResponseFactory, EtatComposant
+from . import Constants, Parametres, MqttClient, Topics, MqttHelper
+from . import FileHelper, ResponseFactory, ComponentState
 from . import Logger, Cles, DiskMonitor, NotificationFactory
 try:
     from . import InputsDaemon
@@ -77,14 +77,14 @@ class SysUsbController():
         self.__thread_copy_files.start()
         self.__thread_messages.start()
 
-        self.__disk_monitor = DiskMonitor(Constantes().constante(Cles.CHEMIN_MONTAGE_USB), self.mqtt_client)
+        self.__disk_monitor = DiskMonitor(Constants().constante(Cles.CHEMIN_MONTAGE_USB), self.mqtt_client)
         threading.Thread(target=self.__disk_monitor.start).start()
 
         payload = ResponseFactory.create_response_component_state(
-            Constantes.PSEC_DISK_CONTROLLER,
+            Constants.STR_PSEC_DISK_CONTROLLER,
             "System Disk controller",
             "sys-usb",
-            EtatComposant.READY
+            ComponentState.READY
         )
         
         self.mqtt_client.publish(f"{Topics.DISCOVER_COMPONENTS}/response", payload)
@@ -149,7 +149,7 @@ class SysUsbController():
         Logger().debug("Disks list requested")
 
         # Get list of mount points
-        disks = FichierHelper.get_disks_list()
+        disks = FileHelper.get_disks_list()
         #print(disks)
 
         # Génère la réponse
@@ -167,11 +167,11 @@ class SysUsbController():
         recursive = payload.get("recursive", False)
         from_dir = payload.get("from_dir", "")
 
-        if disk == Constantes.REPOSITORY:
+        if disk == Constants.REPOSITORY:
             return
 
         # Récupère la liste des fichiers
-        fichiers = FichierHelper.get_files_list(disk, recursive, from_dir)
+        fichiers = FileHelper.get_files_list(disk, recursive, from_dir)
 
         # Génère la réponse
         response = ResponseFactory.create_response_list_files(disk, fichiers)
@@ -196,7 +196,7 @@ class SysUsbController():
         repository_path:str = Parametres().parametre(Cles.STORAGE_PATH_DOMU)
     
         source_location = f"{Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)}/{source_disk}"
-        source_fingerprint = FichierHelper.calculate_fingerprint(f"{source_location}/{filepath}")
+        source_fingerprint = FileHelper.calculate_fingerprint(f"{source_location}/{filepath}")
 
         dest_parent_path = Path(f"{repository_path}/{filepath}").parent
         if not dest_parent_path.exists():
@@ -259,7 +259,7 @@ class SysUsbController():
         disk = payload.get("disk")
         filepath = payload.get("filepath")
         
-        if disk is not None and disk == Constantes.REPOSITORY:
+        if disk is not None and disk == Constants.REPOSITORY:
             # Ignored
             return
 
@@ -274,7 +274,7 @@ class SysUsbController():
         Logger().debug(f"Calculate fingerprint of the file {filepath} on the disk {disk}")
 
         mount_point = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)
-        fingerprint = FichierHelper.calculate_fingerprint(f"{mount_point}/{disk}/{filepath}")
+        fingerprint = FileHelper.calculate_fingerprint(f"{mount_point}/{disk}/{filepath}")
 
         Logger().info(f"The fingerprint of the file {disk} on the disk {filepath} is {fingerprint}")
 
@@ -291,7 +291,7 @@ class SysUsbController():
             Logger().error("Missing argument in the create_file command")
             return
 
-        if disk == Constantes.REPOSITORY:
+        if disk == Constants.REPOSITORY:
             # Ignored
             return
 
@@ -322,16 +322,16 @@ class SysUsbController():
             return
 
         # On envoie la notification de succès
-        fingerprint = FichierHelper.calculate_fingerprint(complete_filepath)
+        fingerprint = FileHelper.calculate_fingerprint(complete_filepath)
         response = ResponseFactory.create_response_create_file(complete_filepath, disk, fingerprint, True)
         self.mqtt_client.publish(f"{topic}/response", response)
 
     def __handle_discover_components(self, topic:str, payload:dict) -> None:
         response = {
             "components": [
-                { "id": Constantes.PSEC_DISK_CONTROLLER, "domain_name": "sys-usb", "label": "System disk controller", "type": "core", "state": EtatComposant.READY },
-                { "id": Constantes.PSEC_INPUT_CONTROLLER, "domain_name": "sys-usb", "label": "Input controller", "type": "core", "state": EtatComposant.READY },
-                { "id": Constantes.PSEC_IO_BENCHMARK, "domain_name": "sys-usb", "label": "System I/O benchmark", "type": "core", "state": EtatComposant.READY }
+                { "id": Constants.STR_PSEC_DISK_CONTROLLER, "domain_name": "sys-usb", "label": "System disk controller", "type": "core", "state": ComponentState.READY },
+                { "id": Constants.STR_PSEC_INPUT_CONTROLLER, "domain_name": "sys-usb", "label": "Input controller", "type": "core", "state": ComponentState.READY },
+                { "id": Constants.STR_IO_BENCHMARK, "domain_name": "sys-usb", "label": "System I/O benchmark", "type": "core", "state": ComponentState.READY }
             ]
         }
 
@@ -344,7 +344,7 @@ class SysUsbController():
 
         disk = payload["disk"]
 
-        if disk == Constantes.REPOSITORY:
+        if disk == Constants.REPOSITORY:
             # This file is the repository so we ignore it
             return
 
@@ -352,7 +352,7 @@ class SysUsbController():
         mount_point = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)
         storage_filepath = f"{mount_point}/{disk}/{filepath}"
 
-        if not FichierHelper().remove_file(storage_filepath):
+        if not FileHelper().remove_file(storage_filepath):
             Logger().error(f"Removal of file {filepath} from the disk {disk} failed")
         else:
             Logger().info(f"Removed file {filepath} from the disk {disk}")
@@ -394,9 +394,9 @@ class SysUsbController():
     def __do_read_file(self, source_location:str, source_disk:str, filepath:str, repository_path:str, source_fingerprint:str):
         #self.__debug_threads()
 
-        dest_fingerprint = FichierHelper.copy_file(source_location, filepath, repository_path, source_fingerprint)
+        dest_fingerprint = FileHelper.copy_file(source_location, filepath, repository_path, source_fingerprint)
         if dest_fingerprint != "":
-            notif = NotificationFactory.create_notification_new_file(Constantes.REPOSITORY, filepath, source_fingerprint, dest_fingerprint)
+            notif = NotificationFactory.create_notification_new_file(Constants.REPOSITORY, filepath, source_fingerprint, dest_fingerprint)
             self.mqtt_client.publish(Topics.NEW_FILE, notif)
         else:
             notif = NotificationFactory.create_notification_error(source_disk, filepath, "The file could not be copied")
@@ -404,7 +404,7 @@ class SysUsbController():
 
     def __do_copy_file(self, source_location:str, filepath:str, target_disk: str, target_location:str):        
         #source_filepath = "{}/{}/{}".format(Parametres().parametre(Cles.CHEMIN_MONTAGE_USB), source_disk, filepath)        
-        source_fingerprint = FichierHelper.calculate_fingerprint("{}/{}".format(source_location, filepath))
+        source_fingerprint = FileHelper.calculate_fingerprint("{}/{}".format(source_location, filepath))
         
         # Création du répertoire de destination si nécessaire
         parent_path = Path(filepath).parent
@@ -412,7 +412,7 @@ class SysUsbController():
             print(f"Création du répertoire {parent_path} dans le dépôt")
             os.makedirs(f"{target_location}/{parent_path}", exist_ok= True)
 
-        dest_fingerprint = FichierHelper.copy_file(source_location, filepath, target_location, source_fingerprint)
+        dest_fingerprint = FileHelper.copy_file(source_location, filepath, target_location, source_fingerprint)
         if dest_fingerprint != "":
             Logger().debug(f"The file {filepath} has been copied to {target_location}. The fingerprint is {source_fingerprint}")
 

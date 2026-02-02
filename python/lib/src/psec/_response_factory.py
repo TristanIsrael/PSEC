@@ -1,4 +1,4 @@
-from . import EtatComposant, BenchmarkId, Constantes
+from . import ComponentState, BenchmarkId, Constants
 
 class ResponseFactory():
     """ La classe ResponseFactory permet de générer les messages en réponse à certaines commandes.    
@@ -75,7 +75,7 @@ class ResponseFactory():
         return payload
 
     @staticmethod
-    def create_response_component_state(component_id:str, component_label:str, domain_name:str, state:EtatComposant, component_type = "core") -> dict:
+    def create_response_component_state(component_id:str, component_label:str, domain_name:str, state:ComponentState, component_type = "core") -> dict:
         payload = {
             "components": [
                 {

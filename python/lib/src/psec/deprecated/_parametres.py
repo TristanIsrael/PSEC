@@ -1,5 +1,5 @@
 import os.path, logging, json
-from . import SingletonMeta, Constantes, Cles
+from . import SingletonMeta, Constants, Cles
 
 class Parametres(metaclass=SingletonMeta):
     """Classe permettant de gérer les paramètres du système"""    
@@ -9,7 +9,7 @@ class Parametres(metaclass=SingletonMeta):
     params = {}
 
     def __init__(self):
-        self.chemin_fichier_parametres = Constantes().constante("chemin_fichier_config_global")
+        self.chemin_fichier_parametres = Constants().constante("chemin_fichier_config_global")
         if self.__verifie_fichier_parametres(self.chemin_fichier_parametres):
             self.__lit_fichier()            
 
@@ -48,7 +48,7 @@ class Parametres(metaclass=SingletonMeta):
         if valeur:
             return valeur          
         else:
-            valeur = Constantes().constante(cle)
+            valeur = Constants().constante(cle)
             if valeur:
                 return valeur 
             else:

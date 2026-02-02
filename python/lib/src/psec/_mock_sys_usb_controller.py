@@ -1,5 +1,5 @@
 import os, shutil
-from psec import MqttClient, ConnectionType, Topics, ResponseFactory, FichierHelper, MqttHelper, NotificationFactory, Constantes
+from psec import MqttClient, ConnectionType, Topics, ResponseFactory, FileHelper, MqttHelper, NotificationFactory, Constants
 from concurrent.futures import ThreadPoolExecutor
 import base64, zlib
 from threading import Event
@@ -73,10 +73,10 @@ class MockSysUsbController():
             try:
                 shutil.copy(source_path, dest_path)
 
-                source_fingerprint = FichierHelper.calculate_fingerprint(source_path)
-                dest_fingerprint = FichierHelper.calculate_fingerprint(dest_filepath)
+                source_fingerprint = FileHelper.calculate_fingerprint(source_path)
+                dest_fingerprint = FileHelper.calculate_fingerprint(dest_filepath)
 
-                notif = NotificationFactory.create_notification_new_file(Constantes.REPOSITORY, filepath, source_fingerprint, dest_fingerprint)
+                notif = NotificationFactory.create_notification_new_file(Constants.REPOSITORY, filepath, source_fingerprint, dest_fingerprint)
                 self.mqtt_client.publish(Topics.NEW_FILE, notif)
             except Exception as e:
                 self.__debug("Error during copy: {}".format(e))
@@ -107,8 +107,8 @@ class MockSysUsbController():
             try:
                 shutil.copy(source_path, dest_path)
 
-                source_fingerprint = FichierHelper.calculate_fingerprint(source_path)
-                dest_fingerprint = FichierHelper.calculate_fingerprint(dest_filepath)                
+                source_fingerprint = FileHelper.calculate_fingerprint(source_path)
+                dest_fingerprint = FileHelper.calculate_fingerprint(dest_filepath)                
 
                 if source_fingerprint != dest_fingerprint:
                     self.__debug("ERROR: fingerprints are not equal")
@@ -119,7 +119,7 @@ class MockSysUsbController():
                 notif = NotificationFactory.create_notification_error(disk, filepath, "The file could not be copied")
                 self.mqtt_client.publish(Topics.ERROR, notif)
 
-            source_fingerprint = FichierHelper.calculate_fingerprint(source_path)
+            source_fingerprint = FileHelper.calculate_fingerprint(source_path)
             
         elif topic == f"{Topics.CREATE_FILE}/request":
             self.__handle_create_file(topic, payload)
@@ -127,9 +127,9 @@ class MockSysUsbController():
     def __handle_discover_components(self):
         response = {
             "components": [
-                { "id": Constantes.PSEC_DISK_CONTROLLER, "label": "System disk controller", "type": "core", "state": "ready" },
-                { "id": Constantes.PSEC_INPUT_CONTROLLER, "label": "Input controller", "type": "core", "state": "ready" },
-                { "id": Constantes.PSEC_IO_BENCHMARK, "label": "System I/O benchmark", "type": "core", "state": "ready" }
+                { "id": Constants.STR_PSEC_DISK_CONTROLLER, "label": "System disk controller", "type": "core", "state": "ready" },
+                { "id": Constants.STR_PSEC_INPUT_CONTROLLER, "label": "Input controller", "type": "core", "state": "ready" },
+                { "id": Constants.STR_IO_BENCHMARK, "label": "System I/O benchmark", "type": "core", "state": "ready" }
             ]
         }
 
@@ -154,7 +154,7 @@ class MockSysUsbController():
             return                
 
         files = list()
-        FichierHelper.get_folder_contents(root_path, files, len(root_path), recursive, from_dir)
+        FileHelper.get_folder_contents(root_path, files, len(root_path), recursive, from_dir)
 
         response = ResponseFactory.create_response_list_files("SAPHIR", files)
         self.mqtt_client.publish("{}/response".format(Topics.LIST_FILES), response)
@@ -168,7 +168,7 @@ class MockSysUsbController():
             self.__debug("Missing argument in the create_file command")
             return
 
-        if disk == Constantes.REPOSITORY:
+        if disk == Constants.REPOSITORY:
             # Ignored
             return
 
@@ -198,7 +198,7 @@ class MockSysUsbController():
             return
 
         # On envoie la notification de succès
-        fingerprint = FichierHelper.calculate_fingerprint(complete_filepath)
+        fingerprint = FileHelper.calculate_fingerprint(complete_filepath)
         response = ResponseFactory.create_response_create_file(complete_filepath, disk, fingerprint, True)
         self.mqtt_client.publish(f"{Topics.CREATE_FILE}/response", response)
 

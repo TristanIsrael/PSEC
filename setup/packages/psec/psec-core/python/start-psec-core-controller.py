@@ -1,4 +1,4 @@
-from psec import MqttClient, ConnectionType, Constantes, Cles, Dom0Controller, MqttFactory
+from psec import MqttClient, ConnectionType, Constants, Cles, Dom0Controller, MqttFactory
 import time
 
 if __name__ == "__main__":    

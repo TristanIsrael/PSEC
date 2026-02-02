@@ -1,4 +1,4 @@
-from psec import Api, Topics, Constantes, MqttClient, ConnectionType, System
+from psec import Api, Topics, Constants, MqttClient, ConnectionType, System
 from pathlib import Path
 from threading import Event
 
@@ -32,7 +32,7 @@ class MockDom0Controller:
     def __handle_delete_file(self, payload):
         disk = payload.get("disk", "")
 
-        if disk != Constantes.REPOSITORY:
+        if disk != Constants.REPOSITORY:
                 return
 
         filepath = payload.get("filepath", "")

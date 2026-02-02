@@ -3,7 +3,7 @@ __version__ = '1.2.0'
 
 from ._topology import Topology, Domain, Screen, DomainType
 from ._singleton import SingletonMeta
-from ._constantes import Constantes, Cles, BoutonSouris, InputType, BenchmarkId, EtatComposant
+from ._constants import Constants, MouseButton, InputType, BenchmarkId, ComponentState
 from ._libvirt_helper import LibvirtHelper
 from ._system import System, topology
 try:
@@ -14,11 +14,10 @@ except Exception as e:
 from ._topics import Topics
 from ._mqtt_helper import MqttHelper
 from ._mqtt_client import MqttClient, ConnectionType, SerialMQTTClient
-from ._parametres import Parametres
 from ._request_factory import RequestFactory
 from ._notification_factory import NotificationFactory
 from ._logger import Logger
-from ._fichier_helper import FichierHelper
+from ._file_helper import FileHelper
 from ._response_factory import ResponseFactory
 try:
     from ._disk_monitor import DiskMonitor
@@ -46,23 +45,20 @@ __all__ = [
     "__version__",
     "SingletonMeta",
     "Topology", "Domain", "DomainType",
-    "Constantes", "Parametres", "Cles", "System", "topology", "Screen",
+    "Constants", "System", "topology", "Screen", "Constants", "ComponentState",
     "KeymapFR",
-    "InputType", "BoutonSouris", "EtatComposant", "MouseMove",     
+    "InputType", 
     "Configuration", "ConfigurationReader",
     "RequestFactory",
     "LibvirtHelper",
-    #"Journal", "JournalProxy", "DemonProxyJournal",
     "Logger",
-    "NotificationFactory", "BoutonSouris",
+    "NotificationFactory", 
     "ResponseFactory",
     "DiskMonitor",
-    "FichierHelper",    
+    "FileHelper",    
     "InputsDaemon",
-    "Mouse", "MouseButton", "MouseWheel", #"InputsProxy",
-    #"ControleurBenchmark", 
+    "Mouse", "MouseButton", "MouseWheel", "MouseMove",
     "BenchmarkId",
-    #"MockXenbus",
     "TaskRunner",
     "MqttClient", "ConnectionType", "Topics", "MqttFactory", "SerialMQTTClient", "MqttHelper",
     "Dom0Controller", "SysUsbController", "Api",

@@ -1,4 +1,4 @@
-from . import Parametres, Cles, Constantes, Logger
+from . import Constants, Logger
 from pathlib import Path
 import os
 import hashlib
@@ -6,7 +6,7 @@ import subprocess
 import shutil
 
 
-class FichierHelper():   
+class FileHelper():   
 
     @staticmethod
     def get_disks_list() -> list:
@@ -42,7 +42,7 @@ class FichierHelper():
         """
 
         chemin:str = ""
-        if disk == Constantes.REPOSITORY:
+        if disk == Constants.REPOSITORY:
             chemin = Parametres().parametre(Cles.CHEMIN_DEPOT_DOM0)
         else:
             chemin_montage = Parametres().parametre(Cles.CHEMIN_MONTAGE_USB)
@@ -54,7 +54,7 @@ class FichierHelper():
 
         print(f"Getting files list for mount point {chemin}")
         fichiers = []
-        FichierHelper.get_folder_contents(chemin, fichiers, len(chemin), recursive, from_dir)
+        FileHelper.get_folder_contents(chemin, fichiers, len(chemin), recursive, from_dir)
         return fichiers
        
     @staticmethod
@@ -88,7 +88,7 @@ class FichierHelper():
                     liste.append(entryDict)
 
                     if recursif:
-                        FichierHelper.get_folder_contents(entree.path, liste, decoupage, recursif)
+                        FileHelper.get_folder_contents(entree.path, liste, decoupage, recursif)
 
 
     @staticmethod
@@ -108,7 +108,7 @@ class FichierHelper():
     def calculate_fingerprint(filepath:str) -> str:
         try:
             with open(filepath, "rb") as f:
-                h = hashlib.file_digest(f, Constantes.FINGERPRINT_METHOD)
+                h = hashlib.file_digest(f, Constants.FINGERPRINT_METHOD)
                 return h.hexdigest()
         except Exception as e:
             print(f"An error occured while calculating the fingerprint of the file {filepath}")
@@ -140,7 +140,7 @@ class FichierHelper():
 
         # Calculate the new file's fingerprint
         destination_file = f"{destination_folder}{filepath}"
-        dest_fingerprint = FichierHelper.calculate_fingerprint(destination_file)
+        dest_fingerprint = FileHelper.calculate_fingerprint(destination_file)
 
         if source_fingerprint == dest_fingerprint:
             return dest_fingerprint
@@ -152,7 +152,7 @@ class FichierHelper():
     @staticmethod
     def copy_file_to_repository(source_location:str, filepath:str, fingerprint:str):
         repository_path = str(Parametres().parametre(Cles.STORAGE_PATH_DOMU))
-        FichierHelper.copy_file(source_location, filepath, repository_path, fingerprint)
+        FileHelper.copy_file(source_location, filepath, repository_path, fingerprint)
 
     @staticmethod
     def create_file(filepath:str, size_ko:int):

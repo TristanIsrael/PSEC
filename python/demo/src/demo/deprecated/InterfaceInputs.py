@@ -2,7 +2,6 @@ from PySide6.QtCore import QObject, Signal, QTimer
 from PySide6.QtCore import  Slot, QPoint, QCoreApplication, Qt, QEvent, QPointF
 from PySide6.QtGui import QMouseEvent, QWheelEvent, QHoverEvent, QEnterEvent, QGuiApplication
 from PySide6.QtWidgets import QWidget
-from python.diag.src.diag.deprecated.MousePointer import MousePointer
 from psec import Parametres, Cles, Mouse, MouseButton, MouseWheel, MouseMove, Api
 import serial, subprocess #, threading
 

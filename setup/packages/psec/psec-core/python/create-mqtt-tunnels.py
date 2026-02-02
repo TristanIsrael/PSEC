@@ -3,9 +3,9 @@ import time
 import threading
 import select
 import socket
-from psec import Constantes, Cles, Logger
+from psec import Constants, Cles, Logger
 
-broker_msg_socket = Constantes().constante(Cles.MQTT_MSG_BROKER_SOCKETS)
+broker_msg_socket = Constants().constante(Cles.MQTT_MSG_BROKER_SOCKETS)
 
 BUFFER_SIZE = 4096
 DEBUG = False

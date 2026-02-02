@@ -3,7 +3,7 @@ try:
     from psec import InputsDaemon
 except:
     print("DemonInputs not available")
-from psec import Mouse, MouseButton, ResponseFactory, FichierHelper, MqttClient, Topics
+from psec import Mouse, MouseButton, ResponseFactory, FileHelper, MqttClient, Topics
 import random, time
 
 class ControleurBenchmark(metaclass=SingletonMeta):
@@ -68,7 +68,7 @@ class ControleurBenchmark(metaclass=SingletonMeta):
         # L'exécution du benchmark appelle des fonctions bloquantes.
         # La VM sys-usb sera bloquée pendant toute la durée du benchmark
         # Cela permet d'éviter d'être perturbé par des demandes sans rapport avec le benchmark
-        liste_disques = FichierHelper.get_disks_list()
+        liste_disques = FileHelper.get_disks_list()
         if len(liste_disques) == 0:
             Logger().error("The benchmark cannot start because no external storage is connected", "BenchmarkController")
             return #Fin 
@@ -116,7 +116,7 @@ class ControleurBenchmark(metaclass=SingletonMeta):
             try:
                 Logger().info("Etape 1 : Création du fichier {}".format(filepath), "BenchmarkController")
                 start_ms = time.time()*1000
-                FichierHelper.create_file(filepath, taille_fichier_ko)
+                FileHelper.create_file(filepath, taille_fichier_ko)
                 end_ms = time.time()*1000
                 metrics.append({"step": "write_on_disk", "size": taille_fichier_ko, "iteration": n_fichier, "duration_ms": end_ms-start_ms})                                
             except Exception as e:
@@ -149,7 +149,7 @@ class ControleurBenchmark(metaclass=SingletonMeta):
             Logger().info("Etape 2 : Copie du fichier dans le dépôt", "BenchmarkController")
             try:
                 start_ms = time.time()*1000
-                FichierHelper.copy_file_to_repository(filepath, fingerprint)
+                FileHelper.copy_file_to_repository(filepath, fingerprint)
                 end_ms = time.time()*1000
                 metrics.append({"step": "copy_to_repository", "size": taille_fichier_ko, "iteration": n_fichier, "duration_ms": end_ms-start_ms})                                
             except Exception as e:

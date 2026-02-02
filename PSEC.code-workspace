@@ -1,12 +1,5 @@
 {
-	"folders": [
-        {
-            "path": "."
-        },
-        {
-            "path": "../PSEC.wiki"
-        }
-    ],    
+	"folders": [],    
     "settings": {
         "launch": {
             "configurations": [],

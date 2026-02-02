@@ -1,4 +1,4 @@
-from . import EtatComposant
+from . import ComponentState
 
 class ComponentsHelper():
     """ This class helps extracting information about components
@@ -25,12 +25,12 @@ class ComponentsHelper():
         for update in updates:
             if update["id"] in components_dict:
                 # Si l'id existe, mettre à jour uniquement le champ 'state'
-                state = update.get("state", EtatComposant.UNKNOWN)
-                components_dict[update["id"]]["state"] = EtatComposant(state)
+                state = update.get("state", ComponentState.UNKNOWN)
+                components_dict[update["id"]]["state"] = ComponentState(state)
             else:
                 # Si l'id n'existe pas, ajouter l'entrée
-                state = update.get("state", EtatComposant.UNKNOWN)
-                update["state"] = EtatComposant(state) # On traduit le str en énumération
+                state = update.get("state", ComponentState.UNKNOWN)
+                update["state"] = ComponentState(state) # On traduit le str en énumération
                 self.__components.append(update)
 
     def get_by_id(self, id:str) -> dict:
@@ -61,7 +61,7 @@ class ComponentsHelper():
         """
         return {comp["id"]: comp["state"] for comp in self.__components if "id" in comp and "state" in comp}
     
-    def get_state(self, id:str) -> EtatComposant:
+    def get_state(self, id:str) -> ComponentState:
         """ Returns the state of a component 
         
             .. seealso::
@@ -69,9 +69,9 @@ class ComponentsHelper():
         """
         for comp in self.__components:
             if comp.get("id") == id:
-                return comp.get("state", EtatComposant.UNKNOWN)
+                return comp.get("state", ComponentState.UNKNOWN)
             
-        return EtatComposant.UNKNOWN
+        return ComponentState.UNKNOWN
     
     def get_type(self, id:str) -> str:
         """ Returns the type of a component 

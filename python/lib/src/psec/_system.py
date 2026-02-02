@@ -4,7 +4,7 @@ import os
 import json
 import psutil
 import shutil
-from . import SingletonMeta, __version__, Constantes, Cles, Topology, Domain, DomainType, LibvirtHelper
+from . import SingletonMeta, __version__, Constants, Cles, Topology, Domain, DomainType, LibvirtHelper
 
 topology = Topology()
 
@@ -564,7 +564,7 @@ class System(metaclass=SingletonMeta):
             "files": 0
         }
         
-        storage_path = Constantes().constante(Cles.CHEMIN_DEPOT_DOM0)
+        storage_path = Constants().constante(Cles.CHEMIN_DEPOT_DOM0)
         print(f"Looking for storage information into {storage_path}")
 
         # Get information about the disk

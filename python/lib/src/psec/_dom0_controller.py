@@ -2,11 +2,11 @@ import threading
 import subprocess
 import time
 import psutil
-from . import Constantes, __version__
-from . import Logger, FichierHelper, Parametres, Cles
+from . import Constants, __version__
+from . import Logger, FileHelper, Parametres, Cles
 from . import ResponseFactory
 from . import MqttClient, Topics, MqttHelper, NotificationFactory
-from . import System, EtatComposant
+from . import System, ComponentState
 from . import LibvirtHelper
 
 class Dom0Controller():
@@ -128,10 +128,10 @@ class Dom0Controller():
             return 
 
         # Récupère la liste des fichiers                    
-        fichiers = FichierHelper.get_files_list(Constantes.REPOSITORY, True)
+        fichiers = FileHelper.get_files_list(Constants.REPOSITORY, True)
 
         # Génère la réponse
-        response = ResponseFactory.create_response_list_files(Constantes.REPOSITORY, fichiers)
+        response = ResponseFactory.create_response_list_files(Constants.REPOSITORY, fichiers)
         self.mqtt_client.publish(f"{Topics.LIST_FILES}/response", response)
 
 
@@ -149,7 +149,7 @@ class Dom0Controller():
         
         # Calcule l'empreinte
         repository_path = Parametres().parametre(Cles.CHEMIN_DEPOT_DOM0)
-        fingerprint = FichierHelper.calculate_fingerprint(f"{repository_path}/{filepath}")
+        fingerprint = FileHelper.calculate_fingerprint(f"{repository_path}/{filepath}")
 
         Logger().info(f"Fingerprint = {fingerprint}")
         
@@ -194,7 +194,7 @@ class Dom0Controller():
 
     def __is_storage_request(self, payload:dict) -> bool:
         if payload.get("disk") is not None:
-            return payload.get("disk") == Constantes.REPOSITORY
+            return payload.get("disk") == Constants.REPOSITORY
         else:
             return False
 
@@ -242,7 +242,7 @@ class Dom0Controller():
 
         disk = payload["disk"]
 
-        if disk != Constantes.REPOSITORY:
+        if disk != Constants.REPOSITORY:
             # This file is not stored in the repository so we ignore it
             return
 
@@ -250,17 +250,17 @@ class Dom0Controller():
         repository_path = Parametres().parametre(Cles.CHEMIN_DEPOT_DOM0)
         storage_filepath = f"{repository_path}/{filepath}"
 
-        if not FichierHelper().remove_file(storage_filepath):
+        if not FileHelper().remove_file(storage_filepath):
             Logger().error(f"Removal of file {filepath} from repository failed")
         else:
             Logger().info(f"Removed file {filepath} from repository")
         
     def __handle_discover_components(self):
         payload = ResponseFactory.create_response_component_state(
-            Constantes.PSEC_SYSTEM_CONTROLLER,
+            Constants.STR_PSEC_SYSTEM_CONTROLLER,
             "System main controller",
             "Dom0",
-            EtatComposant.READY
+            ComponentState.READY
         )
 
         self.mqtt_client.publish(f"{Topics.DISCOVER_COMPONENTS}/response", payload)
