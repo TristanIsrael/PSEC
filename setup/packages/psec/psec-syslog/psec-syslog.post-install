@@ -1,0 +1,8 @@
+#!/bin/sh
+
+rc-update add psec-logger-daemon
+rc-service syslog stop
+rc-service psec-logger-daemon start
+rc-service rsyslog start
+
+exit 0
