@@ -19,6 +19,20 @@ echo "**** Resizing shared memory"
 # Note : non-persistent setting
 mount -o remount,size=16M /dev/shm
 
+echo "**** Creating service accounts"
+addgroup psec
+adduser -H -D -s /sbin/nologin -G psec svc-mqtt-tunnels
+adduser -H -D -s /sbin/nologin -G psec svc-tty-tunnels
+adduser -H -D -s /sbin/nologin -G psec svc-tty-terminal
+adduser -H -D -s /sbin/nologin -G psec svc-mqtt-logger
+adduser -H -D -s /sbin/nologin -G psec svc-orchestrator
+adduser -H -D -s /sbin/nologin -G psec svc-psec-controller
+
+echo "**** Settings permissions on files"
+mkdir -p /var/log/psec
+chown -R nobody:psec /var/log/psec
+chown -R nobody:psec /usr/lib/psec
+
 rc-update add splash boot
 rc-service splash start
 
@@ -34,6 +48,8 @@ rc-update add psec-core-controller
 rc-update add start-x
 rc-update add orchestrator
 rc-update add debug
+rc-update add hardening
+rc-update add apparmor boot
 
 # Install new Grub file
 mv /etc/default/grub /etc/default/grub.orig
@@ -44,5 +60,28 @@ fi
 
 # Re-enable colored prompt   
 #mv "/etc/profile.d/color_prompt.sh.disabled" "/etc/profile.d/color_prompt.sh"
+
+# Disable AppArmor unused profiles
+mv /etc/apparmor.d/bin.ping /etc/apparmor.d/disable
+mv /etc/apparmor.d/lsb_release /etc/apparmor.d/disable
+mv /etc/apparmor.d/php-fpm /etc/apparmor.d/disable
+mv /etc/apparmor.d/samba-* /etc/apparmor.d/disable
+mv /etc/apparmor.d/sbin.klogd /etc/apparmor.d/disable
+mv /etc/apparmor.d/sbin.syslog* /etc/apparmor.d/disable
+mv /etc/apparmor.d/usr.lib.apache2.mpm-prefork.apache2 /etc/apparmor.d/disable
+mv /etc/apparmor.d/usr.lib.dovecot.* /etc/apparmor.d/disable
+mv /etc/apparmor.d/usr.sbin.apache2 /etc/apparmor.d/disable
+mv /etc/apparmor.d/usr.sbin.avahi-daemon /etc/apparmor.d/disable
+mv /etc/apparmor.d/usr.sbin.dnsmasq /etc/apparmor.d/disable
+mv /etc/apparmor.d/usr.sbin.dovecot /etc/apparmor.d/disable
+mv /etc/apparmor.d/usr.sbin.identd /etc/apparmor.d/disable
+mv /etc/apparmor.d/usr.sbin.mdnsd /etc/apparmor.d/disable
+mv /etc/apparmor.d/usr.sbin.nmbd /etc/apparmor.d/disable
+mv /etc/apparmor.d/usr.sbin.nscd /etc/apparmor.d/disable
+mv /etc/apparmor.d/usr.sbin.ntpd /etc/apparmor.d/disable
+mv /etc/apparmor.d/usr.sbin.smbd /etc/apparmor.d/disable
+mv /etc/apparmor.d/usr.sbin.smbldap-useradd /etc/apparmor.d/disable
+mv /etc/apparmor.d/usr.sbin.traceroute /etc/apparmor.d/disable
+mv /etc/apparmor.d/usr.sbin.winbindd /etc/apparmor.d/disable
 
 exit 0

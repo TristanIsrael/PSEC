@@ -3,6 +3,7 @@
 name="orchestrator"
 command_background="yes"
 pidfile="/var/run/orchestrator.pid"
+user="svc-orchestrator"
 
 depend() {    
     after start-x
@@ -22,7 +23,7 @@ start() {
     /usr/lib/psec/bin/set-xenstore-permissions.sh
 
     ebegin "Starting PSEC orchestrator"
-    start-stop-daemon --start --make-pidfile --exec /usr/bin/python3 --pidfile /var/run/$name.pid --background -- /usr/lib/psec/bin/orchestrator.py
+    start-stop-daemon --start --make-pidfile --exec /usr/bin/python3 --pidfile /var/run/$name.pid --background --user "$user" -- /usr/lib/psec/bin/orchestrator.py
     eend $?
 }
 
