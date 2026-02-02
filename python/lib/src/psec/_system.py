@@ -7,6 +7,10 @@ import shutil
 from . import SingletonMeta, __version__, Constantes, Cles
 
 class System(metaclass=SingletonMeta):
+    """ The System class provides functions for querying or modifying the system's state. 
+    
+        Some of the functions belong to the main system (Dom0) and some other belong to the virtual machines (DomU)
+    """
 
     __DEFAULT_SCREEN_SIZE = "1100,750"
     __width = -1
@@ -17,6 +21,8 @@ class System(metaclass=SingletonMeta):
     __cpu_assignments = None
 
     def get_screen_width(self) -> int:
+        """ Returns the system main screen's resolution width """
+
         if self.__width > -1:
             return self.__width
         
@@ -34,6 +40,8 @@ class System(metaclass=SingletonMeta):
         return 1024
     
     def get_screen_height(self):
+        """ Returns the system main screen's resolution height """
+
         if self.__height > -1:
             return self.__height
         
@@ -51,6 +59,13 @@ class System(metaclass=SingletonMeta):
         return 768
 
     def get_screen_rotation(self) -> int:
+        """ Returns the Domain's screen rotation angle 
+        
+            The rotation angle is defined in the topology file in the setting ``gui.screen.rotation``.
+
+            Possible values are: 0, 90, 180, 270.
+        """
+
         if self.__rotation > -1:
             return self.__rotation
         
@@ -64,6 +79,11 @@ class System(metaclass=SingletonMeta):
         return 0
 
     def _get_screen_size(self) -> str:
+        """ Returns the Domain's screen size as a string.
+         
+            A typical value is: "1280x1024"
+        """
+
         try:
             res = subprocess.run(["xenstore-read", "/local/domain/system/screen_size"], capture_output=True, text=True, check=False)
             if res.returncode == 0:
@@ -74,6 +94,11 @@ class System(metaclass=SingletonMeta):
         return self.__DEFAULT_SCREEN_SIZE
     
     def get_system_uuid(self):
+        """ Returns the system's UUID 
+        
+            The UUID is queried from the Linux kernel's ``/sys/class/dmi/id/product_uuid``
+        """
+
         system = platform.system().lower()
 
         # If we have it in cache...
@@ -109,6 +134,11 @@ class System(metaclass=SingletonMeta):
         return self.__system_uuid
 
     def get_platform_cpu_count(self) -> int:
+        """ Returns the CPU count of the machine 
+        
+            The CPU count includes all cores.
+        """
+
         if self.__cpu_count is not None:
             return self.__cpu_count
         
@@ -125,6 +155,8 @@ class System(metaclass=SingletonMeta):
 
     @staticmethod
     def debug_activated():
+        """ Returns whether the debugging has been activated """
+
         try:
             fd = os.open("/proc/cmdline", os.O_RDONLY)
             data = os.read(fd, 4096)
@@ -134,6 +166,7 @@ class System(metaclass=SingletonMeta):
         
     @staticmethod
     def domain_name():
+        """ Returns the Domain name """
         return platform.node()
     
 
@@ -147,32 +180,37 @@ class System(metaclass=SingletonMeta):
 
         The topology is defined in the file `topology.json`. This function returns a data structure
         representing the topology as a dict. Instead of returning the JSON data as the function 
-        :func:`read_topology_file` does, it returns a structure representing the objects::
+        :func:`read_topology_file` does, it returns a structure representing the objects: 
+        
+        ::
 
-            >>> {
-            >>>     "domains": [
-            >>>         "my-domain": {
-            >>>             "vcpu_group": "group1",
-            >>>             "memory": 4000,
-            >>>             "vcpus": 2,
-            >>>             "cpus": "3-4",
-            >>>             "package": ""
-            >>>         }
-            >>>     ],
-            >>>     "system": {
-            >>>         "use_usb": 1,
-            >>>         "use_gui": 1,
-            >>>         "screen_rotation": 0,
-            >>>         "gui_app_package": "",
-            >>>         "gui_memory": 1000,
-            >>>     }
-            >>> }
+            {
+                "domains": [
+                    "my-domain": {
+                        "vcpu_group": "group1",
+                        "memory": 4000,
+                        "vcpus": 2,
+                        "cpus": "3-4",
+                        "package": ""
+                    }
+                ],
+                "system": {
+                    "use_usb": 1,
+                    "use_gui": 1,
+                    "screen_rotation": 0,
+                    "gui_app_package": "",
+                    "gui_memory": 1000,
+                },
+                "product": {
+                    "name": "Safecor"
+                }
+            }
         """        
 
         topo_struct = {}
         topo_data = System.get_topology_data(override_topology_file)
         if topo_data is None:
-            print("No topology data available. Aborting")
+            print("No topology data available. Aborting.")
             return {}
 
         usb = topo_data.get("usb", {})
@@ -229,13 +267,19 @@ class System(metaclass=SingletonMeta):
                 "cpus": System().compute_cpus_for_group(group_name, vcpu_groups)
             }
 
-        topo_struct["domains"] = topo_domains
+        topo_struct["domains"] = topo_domains        
+
+        # Get product information
+        topo_struct["product"] = {}
+        json_product = topo_data.get("product", {})
+        topo_struct["product"] = json_product.get("name", "Product based on Safecor")
 
         return topo_struct
 
 
     @staticmethod
     def read_topology_file(override_topology_file:str = "") -> str:
+        """ Reads the topology file describing the product """
         try:
             with open('/etc/psec/topology.json' if override_topology_file == "" else override_topology_file, 'r') as f:
                 topo = f.read()
@@ -248,6 +292,7 @@ class System(metaclass=SingletonMeta):
 
     @staticmethod
     def get_topology_data(override_topology_file:str = "") -> dict:
+        """ Interprets the topology file data as a JSON object """
         try:
             topo_data = System.read_topology_file(override_topology_file)
             data = json.loads(topo_data)
@@ -262,7 +307,7 @@ class System(metaclass=SingletonMeta):
     def compute_vcpus_for_group(group_name:str, groups:dict) -> int:
         """ Computes the number of vCPUs which will be pinned to each Domain of a group.
 
-        The number of vCPUs depends on the value of the parameter vcpu.groups defined in the file topology.json.
+        The number of vCPUs depends on the value of the parameter ``vcpu.groups`` defined in the file ``topology.json``.
         """
         vcpus = 1
         platform_cpus = System().get_platform_cpu_count()
@@ -300,7 +345,9 @@ class System(metaclass=SingletonMeta):
         """ Computes the CPUs (or cores) which will be pinned to the Domains of the group.
 
         The first CPU is assigned to Dom0 and sys-usb Domain. 
+        
         If there are at least 4 CPUs the second CPU is also assigned to Dom0 and sys-usb.
+        
         The other CPUs are assigned to sys-gui and the other groups by trying to avoid overlapping.
         """        
         cpu_count = System().get_platform_cpu_count()
@@ -348,6 +395,58 @@ class System(metaclass=SingletonMeta):
 
     @staticmethod
     def get_system_information() -> dict:
+        """ Returns a JSON struct containing the information on the system. 
+        
+            A typical struct is:
+
+            ::
+
+            {
+            "core": {
+                "version": "1.1", 
+                "debug_on": false
+            }, 
+            "system": {
+                "os": {
+                    "name": "Linux", 
+                    "release": "6.12.20-0-lts", 
+                    "version": "#1-Alpine SMP PREEMPT_DYNAMIC 2025-03-24 08:09:11"
+                }, 
+                "machine": {
+                    "arch": "x86_64", 
+                    "processor": "", 
+                    "platform": "Linux-6.12.20-0-lts-x86_64-with", 
+                    "cpu": {
+                        "count": 12, 
+                        "freq_current": 1689.5960000000002, 
+                        "freq_min": 0.0, 
+                        "freq_max": 0.0, 
+                        "percent": 0.0
+                    }, 
+                    "memory": {
+                        "total": 405987328, 
+                        "available": 96657408, 
+                        "percent": 76.2, 
+                        "used": 256733184, 
+                        "free": 12472320
+                    }, 
+                    "load": {
+                        "1": 0.5244140625, 
+                        "5": 0.21875, 
+                        "15": 0.08154296875
+                    }
+                }, 
+                "boot_time": 1748036696.0, 
+                "uuid": "11ec0800-4fb9-11ef-bd38-ad993f2e7700"
+                "storage": {
+                    "total": 12345678,
+                    "used": 0,
+                    "free": 12345678,
+                    "files_count": 0
+                }
+            }
+        }
+        """
         sysinfo = {
             "core": {
                 "version": __version__,

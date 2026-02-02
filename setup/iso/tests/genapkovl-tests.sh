@@ -33,7 +33,6 @@ $HOSTNAME
 EOF
 
 makefile root:root 0644 "$tmp"/etc/modules <<EOF
-xen_netback
 xen_blkback
 xenfs
 xen-platform-pci
@@ -57,6 +56,7 @@ EOF
 rc_add devfs sysinit
 rc_add dmesg sysinit
 rc_add udev sysinit
+rc_add splash sysinit
 
 rc_add hwclock boot
 rc_add modules boot

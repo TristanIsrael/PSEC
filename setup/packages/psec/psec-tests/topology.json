@@ -1,4 +1,7 @@
 {
+    "product": {
+        "name": "Safecor Tests"        
+    },
     "pci": {
         "blacklist": "00:0d.0"
     },

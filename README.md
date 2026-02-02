@@ -1,4 +1,4 @@
-# PSEC - Platform Security Enforced Core
+# Safecore - an operating system for security products
 
 [![platform](https://img.shields.io/badge/platform-Alpine-Linux.svg)](https://gbatemp.net/forums/nintendo-switch.283/?prefix_id=44)
 [![language](https://img.shields.io/badge/language-Python-ba1632.svg)](https://github.com/topics/cpp)
@@ -10,6 +10,8 @@
 
 This project provides a software architecture for creating security products.
 
+**PSEC is being renamed Safecor. During the transition you will find both names in the source code and the documentation**
+
 > ⚠️ **Important Notice**
 
 This repository is subject to a restrictive license.  
@@ -17,16 +19,13 @@ You are **not allowed to fork, copy, modify, or reuse** this code in any form, i
 
 ## Documentation
 
-Newcomers should begin with the [architecture documentation](python/lib/docs/source/markdown/architecture.md).
+Newcomers should begin with the [architecture documentation](wiki/Architecture.md).
 
-API is documented in the [protocol documentation](python/lib/docs/source/markdown/protocol.md) for the Messages and in the [API documentation (HTML)](python/lib/docs/build/html/psec.html#psec.Api) for the *python API*.
+The main documentation is available in the [Github Wiki](wiki/).
 
-The documentation is also automatically generated:
-- [API documentation (HTML) on Github Pages](https://tristanisrael.github.io/PSEC/psec.html)
-- [Protocol documentation on Github Wiki](https://github.com/TristanIsrael/PSEC/wiki/Protocol)
-
-
-All python classes documentation (*docstrings*) is provided as HTML pages in the folder `python/lib/docs/build/html`.
+API automatically generated documentation:
+- [Python API documentation on Github Pages](https://tristanisrael.github.io/PSEC)
+- [Protocol documentation on Github Wiki](wiki/Protocol)
 
 ## Project directory structure
 
