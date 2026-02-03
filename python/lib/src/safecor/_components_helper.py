@@ -14,8 +14,7 @@ class ComponentsHelper():
         - :class:`ComponentState` - Component state
     """
 
-    def __init__(self):
-        self.__components = []
+    __components = []
 
     def clear(self):
         """ Resets all components in the list """

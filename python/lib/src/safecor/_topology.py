@@ -17,11 +17,11 @@ class Domain:
     vcpus = 1
     cpu_affinity = (1) # Tuple (min, max)
     package = ""
-    type = DomainType.BUSINESS
+    domain_type = DomainType.BUSINESS
     
     def __init__(self, domain_name:str, domain_type:DomainType):
         self.name = domain_name
-        self.type = domain_type
+        self.domain_type = domain_type
 
 class Screen:
     """ This class encapsulates information about a screen """
@@ -55,7 +55,7 @@ class Topology:
         self.domains = []
         self.gui = Gui()
         self.screen = Screen()
-        self.__colors = {}        
+        self.__colors = {}
         self.__initialized = False
 
     def initialized(self) -> bool:
@@ -66,7 +66,7 @@ class Topology:
     def set_initialized(self, initialized:bool):
         """ Sets the objet initialized """
         
-        self.__initialized = initialized    
+        self.__initialized = initialized
     
     def colors(self) -> dict:
         """ Returns the RGBA colors list as a list of 8 bit tuples (r, g, b, a)
@@ -76,7 +76,7 @@ class Topology:
         """
 
         vals = {}
-        for name, color in self.__colors:
+        for name, color in self.__colors.items():
             vals[name] = self.color_as_rgba(color)
 
         return vals
@@ -88,18 +88,23 @@ class Topology:
             :func:`colors`
         """
         
-        return self.__colors
+        colors = []
+
+        for color in self.__colors:
+            colors.append(self.color_as_hex(color))
+
+        return colors
     
     def color_as_hex(self, color_name:str) -> str:
         """ Returns a named color as an hex value """
         
-        return self.__colors.get(color_name, "#ffffff")
+        color = self.__colors.get(color_name, (0,0,0,0))
+        return self.__rgba_to_hex(color)
     
     def color_as_rgba(self, color_name:str) -> tuple[int, int, int, int]:
         """ Returns an RGBA named color as a tuple value """
         
-        color_hex = self.color_as_hex(color_name)
-        return self.__hex_to_rgba(color_hex)
+        return self.__colors.get(color_name, (0,0,0,0))
     
     def add_color(self, color_name:str, color_value_as_hex:str):
         """ Adds a named color to the list """
@@ -110,8 +115,42 @@ class Topology:
         """ Converts a color from hex to rgba tuple """
         
         hex_color = hex_color.lstrip("#")
-        return tuple(int(hex_color[i:i+2], 16) for i in range(0, len(hex_color), 2))
+        r = 0
+        g = 0
+        b = 0
+        a = 0
+
+        if len(hex_color) == 3:
+            r = int(hex_color[0], 16) << 4 | int(hex_color[0], 16)
+            g = int(hex_color[1], 16) << 4 | int(hex_color[1], 16)
+            b = int(hex_color[2], 16) << 4 | int(hex_color[2], 16)
+            a = 255
+        elif len(hex_color) == 4:
+            r = int(hex_color[0], 16) << 4 | int(hex_color[0], 16)
+            g = int(hex_color[1], 16) << 4 | int(hex_color[1], 16)
+            b = int(hex_color[2], 16) << 4 | int(hex_color[2], 16)
+            a = int(hex_color[3], 16) << 4 | int(hex_color[3], 16)
+        elif len(hex_color) == 6:
+            r = int(hex_color[0:2], 16)
+            g = int(hex_color[2:4], 16)
+            b = int(hex_color[4:6], 16)
+            a = 255
+        elif len(hex_color) == 8:
+            r = int(hex_color[0:2], 16)
+            g = int(hex_color[2:4], 16)
+            b = int(hex_color[4:6], 16)
+            a = int(hex_color[6:8], 16)
+
+        return (r,g,b,a)
     
+    def __rgba_to_hex(self, color_as_rgba:tuple[int, int, int, int]) -> str:
+        r = color_as_rgba[0]
+        g = color_as_rgba[1]
+        b = color_as_rgba[2]
+        a = color_as_rgba[3]
+
+        return f"#{r:0{2}x}{g:0{2}x}{b:0{2}x}{a:0{2}x}"
+
     def add_domain(self, domain:Domain):
         """ Adds a Domain's definition to the list """
         
@@ -122,9 +161,12 @@ class Topology:
         
         return [d.name for d in self.domains]
 
-    def domain(self, domain_name:str) -> Domain:
+    def domain(self, domain_name:str) -> Domain|None:
         """ Returns the Domain object with the specified name """
 
         if domain_name in self.domain_names():
-            return [d for d in self.domains if d.name == domain_name]
+            result = [d for d in self.domains if d.name == domain_name]
+            if len(result) > 0:
+                return result[0]
         
+        return None

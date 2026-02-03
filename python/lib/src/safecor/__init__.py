@@ -6,7 +6,7 @@ from logging import NullHandler
 
 from ._topology import Topology, Domain, Screen, DomainType
 from ._singleton import SingletonMeta
-from ._constants import Constants, InputType, BenchmarkId, ComponentState
+from ._constants import Constants, InputType, BenchmarkId, ComponentState, DiskState
 from ._libvirt_helper import LibvirtHelper
 from ._system import System, topology
 try:
@@ -44,7 +44,7 @@ from ._configuration_reader import Configuration, ConfigurationReader
 __all__ = [
     "__version__",
     "SingletonMeta",
-    "Topology", "Domain", "DomainType",
+    "Topology", "Domain", "DomainType", "DiskState",
     "Constants", "System", "topology", "Screen", "Constants", "ComponentState",
     "KeymapFR",
     "InputType", 

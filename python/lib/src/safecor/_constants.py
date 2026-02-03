@@ -18,6 +18,11 @@ class ComponentState(Enum):
     READY = "ready"
     ERROR = "error"
 
+class DiskState(Enum):
+    UNKNOWN = "unknown"
+    CONNECTED = "connected"
+    DISCONNECTED = "disconnected"
+
 class Constants():
     """ This class defined constants for the whole system """        
 

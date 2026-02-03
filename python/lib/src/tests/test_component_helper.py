@@ -18,6 +18,7 @@ class TestComponentHelper(unittest.TestCase):
         self.helper = ComponentsHelper()
 
     def test_get_ids(self):
+        self.helper.clear()
         self.helper.update(self.components)
         self.assertEqual(len(self.components), 3)
         self.assertEqual(len(self.helper.get_ids()), len(self.components))
@@ -33,6 +34,7 @@ class TestComponentHelper(unittest.TestCase):
         self.assertEqual(states[Constants.IO_BENCHMARK], ComponentState.UNKNOWN)
 
     def test_update_state(self):
+        self.helper.clear()
         self.helper.update(self.components)
         self.helper.update(self.udpate_components)
         states = self.helper.get_states()
@@ -42,6 +44,7 @@ class TestComponentHelper(unittest.TestCase):
         self.assertEqual(states[Constants.IO_BENCHMARK], ComponentState.STARTING)
 
     def test_get_state(self):
+        self.helper.clear()
         self.helper.update(self.components)
         self.helper.update(self.udpate_components)
         self.assertEqual(self.helper.get_state(Constants.SAFECOR_INPUT_CONTROLLER), ComponentState.READY)
@@ -49,6 +52,7 @@ class TestComponentHelper(unittest.TestCase):
         self.assertEqual(self.helper.get_state("none"), ComponentState.UNKNOWN)
 
     def test_get_type(self):
+        self.helper.clear()
         self.helper.update(self.components)
         self.helper.update(self.udpate_components)
         self.assertEqual(self.helper.get_type(Constants.SAFECOR_DISK_CONTROLLER), "core")
@@ -57,6 +61,7 @@ class TestComponentHelper(unittest.TestCase):
         self.assertEqual(self.helper.get_type("none"), "")
 
     def test_get_by_type(self):
+        self.helper.clear()
         self.helper.update(self.components)
         self.helper.update(self.udpate_components)
         ids = self.helper.get_ids_by_type("test")
@@ -67,6 +72,7 @@ class TestComponentHelper(unittest.TestCase):
         self.assertEqual(len(ids), 1)
 
     def test_get_by_id(self):
+        self.helper.clear()
         self.helper.update(self.components)
         self.helper.update(self.udpate_components)
         ids = self.helper.get_by_id("none")
@@ -76,10 +82,12 @@ class TestComponentHelper(unittest.TestCase):
         self.assertEqual(len(ids), 4)
 
     def test_get_components(self):
+        self.helper.clear()
         self.helper.update(self.components)
         self.assertEqual(self.helper.get_components(), self.components)
 
     def test_clear(self):
+        self.helper.clear()
         self.helper.update(self.components)
         self.assertNotEqual(len(self.helper.get_components()), 0)
         self.helper.clear()

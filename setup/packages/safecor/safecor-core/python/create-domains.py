@@ -70,7 +70,7 @@ class DomainsFactory:
             for domain in topology.domains:
                 domain: Domain
 
-                if domain.type is not DomainType.BUSINESS:
+                if domain.domain_type is not DomainType.BUSINESS:
                     continue
 
                 package = domain.package

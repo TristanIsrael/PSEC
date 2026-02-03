@@ -1,5 +1,7 @@
 """ \author Tristan Israël """
 
+from . import DiskState
+
 class ApiHelper:
     """
     This class provides static functions to help extracting information from the API.
@@ -29,7 +31,7 @@ class ApiHelper:
         return payload.get("disk", "")
         
     @staticmethod
-    def get_disk_state(payload:dict) -> str:
+    def get_disk_state(payload:dict) -> DiskState:
         """
         Returns the state of the disk (= "connected")
 
@@ -38,10 +40,10 @@ class ApiHelper:
         Args:
             payload: The payload received from the broker            
         """
-        return payload.get("state", "")
+        return DiskState.CONNECTED if payload.get("state", "") == "connected" else DiskState.DISCONNECTED
         
     @staticmethod
-    def is_disk_connected(payload:dict) -> str:
+    def is_disk_connected(payload:dict) -> bool:
         """
         Returns true if the disk is connected
 
@@ -50,4 +52,4 @@ class ApiHelper:
         Args:
             payload: The payload received from the broker            
         """
-        return ApiHelper.get_disk_state(payload) == "connected"
+        return ApiHelper.get_disk_state(payload) == DiskState.CONNECTED
