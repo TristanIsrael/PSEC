@@ -6,8 +6,11 @@ import threading
 import select
 import traceback
 from typing import Literal, Callable, Optional
-import serial
-import paho.mqtt.client as mqtt
+try:
+    import serial
+except ImportError:
+    pass
+import paho.mqtt.client as mqtt 
 from paho.mqtt.reasoncodes import ReasonCode
 from paho.mqtt.properties import Properties
 from paho.mqtt.enums import CallbackAPIVersion, MQTTErrorCode

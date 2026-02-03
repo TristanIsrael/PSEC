@@ -44,7 +44,7 @@ class Topics():
     WARNING = f"{EVENTS}/warning"
     INFO = f"{EVENTS}/info"
     DEBUG = f"{EVENTS}/debug"
-    SET_LOGLEVEL = f"{EVENTS}/set_loglevel"
+    SET_LOG_LEVEL = f"{EVENTS}/set_loglevel"
     SAVE_LOG = f"{EVENTS}/save_log"
 
     # Debugging

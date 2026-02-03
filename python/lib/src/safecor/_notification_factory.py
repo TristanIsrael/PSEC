@@ -1,7 +1,5 @@
 """ \author Tristan Israël """
 
-import psutil
-
 class NotificationFactory:
     """ This class helps creating notifications
 

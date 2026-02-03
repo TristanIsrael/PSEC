@@ -5,14 +5,20 @@
         "${workspaceFolder}/python/tests/src/tests" 
     ],
     "python.testing.unittestArgs": [
-        "-s",
+        "-v", "-s", 
         "${workspaceFolder}/python/lib/src/tests",  // Répertoire contenant les tests
         "-p", "test_*.py"        // Pattern pour trouver les fichiers de test
     ],
-    "python.testing.pytestEnabled": false,
     "python.testing.unittestEnabled": true,
     "python.testing.cwd": "python/lib/src",
     "python.autoComplete.extraPaths": [
         "${workspaceFolder}/python/lib/src"             // Ajoute le dossier src au PYTHONPATH
+    ],
+    "python-envs.pythonProjects": [
+        {
+            "path": "",
+            "envManager": "ms-python.python:venv",
+            "packageManager": "ms-python.python:pip"
+        }
     ]
 }

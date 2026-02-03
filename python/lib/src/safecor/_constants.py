@@ -47,7 +47,9 @@ class Constants():
         
     STR_REPOSITORY = "__repository__"
     FINGERPRINT_METHOD = "md5"
-    STR_SAFECOR_DISK_CONTROLLER = "safecor_disk_controller"
-    STR_SAFECOR_INPUT_CONTROLLER = "safecor_input_controller"
-    STR_IO_BENCHMARK = "safecor_io_benchmark"
-    STR_SAFECOR_SYSTEM_CONTROLLER = "safecor_system_controller"
+
+    # System components
+    SAFECOR_DISK_CONTROLLER = "safecor_disk_controller"
+    SAFECOR_INPUT_CONTROLLER = "safecor_input_controller"
+    IO_BENCHMARK = "safecor_io_benchmark"
+    SAFECOR_SYSTEM_CONTROLLER = "safecor_system_controller"

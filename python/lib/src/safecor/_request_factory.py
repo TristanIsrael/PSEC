@@ -157,3 +157,13 @@ class RequestFactory():
             "sent_at": datetime
         }
         
+    @staticmethod
+    def create_request_set_log_level(log_level):
+        """ Create a request to set the log level 
+        
+        Log levels are defined in the default logging module.
+        """
+
+        return {
+            "level": log_level
+        }

@@ -84,7 +84,7 @@ class SysUsbController():
         threading.Thread(target=self.__disk_monitor.start).start()
 
         payload = ResponseFactory.create_response_component_state(
-            Constants.STR_SAFECOR_DISK_CONTROLLER,
+            Constants.SAFECOR_DISK_CONTROLLER,
             "System Disk controller",
             "sys-usb",
             ComponentState.READY
@@ -332,9 +332,9 @@ class SysUsbController():
     def __handle_discover_components(self, topic:str, payload:dict) -> None:
         response = {
             "components": [
-                { "id": Constants.STR_SAFECOR_DISK_CONTROLLER, "domain_name": "sys-usb", "label": "System disk controller", "type": "core", "state": ComponentState.READY },
-                { "id": Constants.STR_SAFECOR_INPUT_CONTROLLER, "domain_name": "sys-usb", "label": "Input controller", "type": "core", "state": ComponentState.READY },
-                { "id": Constants.STR_IO_BENCHMARK, "domain_name": "sys-usb", "label": "System I/O benchmark", "type": "core", "state": ComponentState.READY }
+                { "id": Constants.SAFECOR_DISK_CONTROLLER, "domain_name": "sys-usb", "label": "System disk controller", "type": "core", "state": ComponentState.READY },
+                { "id": Constants.SAFECOR_INPUT_CONTROLLER, "domain_name": "sys-usb", "label": "Input controller", "type": "core", "state": ComponentState.READY },
+                { "id": Constants.IO_BENCHMARK, "domain_name": "sys-usb", "label": "System I/O benchmark", "type": "core", "state": ComponentState.READY }
             ]
         }
 

@@ -26,7 +26,7 @@ class ApiHelper:
         Args:
             payload: The payload received from the broker            
         """
-        return payload.get("disk", "")        
+        return payload.get("disk", "")
         
     @staticmethod
     def get_disk_state(payload:dict) -> str:
@@ -38,7 +38,7 @@ class ApiHelper:
         Args:
             payload: The payload received from the broker            
         """
-        return payload.get("state", "")        
+        return payload.get("state", "")
         
     @staticmethod
     def is_disk_connected(payload:dict) -> str:

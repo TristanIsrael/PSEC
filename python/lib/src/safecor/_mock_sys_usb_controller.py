@@ -129,9 +129,9 @@ class MockSysUsbController():
     def __handle_discover_components(self):
         response = {
             "components": [
-                { "id": Constants.STR_SAFECOR_DISK_CONTROLLER, "label": "System disk controller", "type": "core", "state": "ready" },
-                { "id": Constants.STR_SAFECOR_INPUT_CONTROLLER, "label": "Input controller", "type": "core", "state": "ready" },
-                { "id": Constants.STR_IO_BENCHMARK, "label": "System I/O benchmark", "type": "core", "state": "ready" }
+                { "id": Constants.SAFECOR_DISK_CONTROLLER, "label": "System disk controller", "type": "core", "state": "ready" },
+                { "id": Constants.SAFECOR_INPUT_CONTROLLER, "label": "Input controller", "type": "core", "state": "ready" },
+                { "id": Constants.IO_BENCHMARK, "label": "System I/O benchmark", "type": "core", "state": "ready" }
             ]
         }
 

@@ -38,6 +38,10 @@ class FileHandler:
         else:
             Logger().error("File not opened in read mode.")
 
+    def close(self):
+        if self.file is not None:
+            self.file.close()
+
 class Logger(metaclass=SingletonMeta):
     """ This class provides mechanisms for logging and recording log files 
     
@@ -52,7 +56,7 @@ class Logger(metaclass=SingletonMeta):
     __is_setup = False
     __is_recording = False
     __log_level = logging.INFO
-    __logfile = None
+    __filename = "/var/log/safecor.log"
 
     def setup(self, module_name:str, mqtt_client:MqttClient, log_level:int = logging.INFO, recording:bool=False, filename:str=Constants.LOCAL_LOG_FILEPATH):
         """ Sets up the logging facility. 
@@ -81,9 +85,8 @@ class Logger(metaclass=SingletonMeta):
         self.__is_recording = recording
         self.__filename = filename
 
-        # We open the log file
-        if recording and self.__logfile is None:
-            self.__open_log_file()
+        if recording and self.__filename != "":
+            print(f"Recording logs into logfile: {self.__filename}")
             self.__mqtt_client.subscribe(f"{Topics.EVENTS}/#")
 
         self.__is_setup = True
@@ -136,27 +139,7 @@ class Logger(metaclass=SingletonMeta):
         if not self.__is_setup:
             return
         payload = self.__create_event(module, description)
-        self.__mqtt_client.publish("system/events/debug", payload)
-
-    @staticmethod
-    def loglevel_from_topic(topic:str) -> int:
-        """ Translates a string loglevel from a payload to a :mod:`logging` integer log level."""
-
-        if not topic.startswith("{}".format(Topics.EVENTS)):
-            return
-        
-        if topic.endswith("debug"):
-            return logging.DEBUG
-        elif topic.endswith("info"):
-            return logging.INFO
-        elif topic.endswith("warning"):
-            return logging.WARN
-        elif topic.endswith("error"):
-            return logging.ERROR
-        elif topic.endswith("critical"):
-            return logging.CRITICAL
-        
-        return logging.DEBUG    
+        self.__mqtt_client.publish("system/events/debug", payload)    
 
     def __create_event(self, module:str, description:str) -> dict :
         if not self.__is_setup:
@@ -175,7 +158,7 @@ class Logger(metaclass=SingletonMeta):
         return payload    
 
     def __on_message(self, topic:str, payload:dict):
-        if topic == Topics.SET_LOGLEVEL:
+        if topic == Topics.SET_LOG_LEVEL:
             self.__log_level = payload.get("level", "info")
         elif topic == Topics.SAVE_LOG and self.__is_recording:
             if not MqttHelper.check_payload(payload, ["disk", "filename"]):
@@ -188,7 +171,7 @@ class Logger(metaclass=SingletonMeta):
             if not filename.startswith("/"):
                 filename = "/"+filename
             
-            self.info("Copying the log file to {}:{}".format(disk, filename))
+            self.info(f"Copying the log file to {disk}:{filename}")
             
             # Read all the data
             with open(self.__filename, "rb") as file:
@@ -199,14 +182,13 @@ class Logger(metaclass=SingletonMeta):
 
             # Create the file
             request = RequestFactory.create_request_create_file(filename, disk, base64.b64encode(compressed_data), True)
-            self.__mqtt_client.publish("{}/request".format(Topics.CREATE_FILE), request)
-             
+            self.__mqtt_client.publish(f"{Topics.CREATE_FILE}/request", request)
         elif self.__is_recording:
             # Log message
             self.__write_log(topic, payload)
 
     def __write_log(self, topic:str, payload:dict):
-        if not self.__is_recording or self.__logfile is None:
+        if not self.__is_recording or self.__filename == "":
             return
         
         loglevel = "UNKNOWN"
@@ -215,7 +197,7 @@ class Logger(metaclass=SingletonMeta):
         # Extract the log level
         spl = topic.split("/")
         if len(spl) == 0:
-            return        
+            return
         spl.reverse()
         loglevel = spl[0]
 
@@ -224,14 +206,12 @@ class Logger(metaclass=SingletonMeta):
 
         # Craft the log text
         # Fields are: module, datetime, level, description
-        logtxt = "[{}] [{}] {} - {}\n".format(payload.get("datetime"), loglevel, payload.get("module"), payload.get("description"))
+        logtxt = f"[{payload.get("datetime")}] [{loglevel}] {payload.get("module")} - {payload.get("description")}\n"
         #print(logtxt)
-        self.__logfile.write(logtxt)        
-        self.__logfile.flush()
-        
-    def __open_log_file(self):
-        self.__logfile = FileHandler(self.__filename, 'a')
-        print(f"Le journal sera enregistré dans le fichier {self.__filename}")
+        logfile = FileHandler(self.__filename, 'a')
+        logfile.write(logtxt)
+        logfile.flush()
+        logfile.close()        
 
     def __loglevel_value(self, level:str) -> int:
         if level == "debug":
@@ -267,3 +247,24 @@ class Logger(metaclass=SingletonMeta):
                 - :func:`format_logline` - Log line format
         """
         print(Logger.format_logline(message))
+
+    def is_setup(self) -> bool:
+        return self.__is_setup
+    
+    def filename(self) -> str:
+        return self.__filename
+    
+    def domain_name(self) -> str:
+        return self.__domain_name
+    
+    def log_level(self):
+        return self.__log_level
+    
+    def set_log_level(self, log_level):
+        self.__log_level = log_level
+    
+    def is_recording(self):
+        return self.__is_recording
+    
+    def module_name(self):
+        return self.__module_name

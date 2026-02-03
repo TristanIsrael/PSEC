@@ -1,7 +1,7 @@
 """ \author Tristan Israël """
 
 from typing import List
-from enums import Enum
+from enum import Enum
 
 class DomainType(Enum):
     """ This enumeration defines a Domain"s type """

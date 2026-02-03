@@ -4,7 +4,10 @@ import subprocess
 import platform
 import os
 import json
-import psutil
+try:
+    import psutil
+except ImportError:
+    pass
 import shutil
 from . import SingletonMeta, __version__, Constants, Topology, Domain, DomainType, LibvirtHelper
 
@@ -176,7 +179,7 @@ class System(metaclass=SingletonMeta):
 
     @staticmethod
     def get_topology() -> Topology:
-        """ Returns a \c Topology object initialized with the contents of the topology file """
+        """ Returns a ``Topology`` object initialized with the contents of the topology file """
 
         if not topology.initialized():
             # Initialize the topology object
@@ -198,7 +201,7 @@ class System(metaclass=SingletonMeta):
             topology.gui.memory = topo["gui_memory"]            
 
             # Domains information
-            for domain_name, domain_desc in topology["domains"]:
+            for domain_name, domain_desc in topology.domains:
                 domain = Domain(domain_name, domain_desc["type"])
                 domain.vcpu_group = domain_desc["vcpu_group"]
                 domain.memory = domain_desc["memory"]

@@ -1,5 +1,6 @@
 """ \author Tristan Israël """
 
+import copy
 from . import ComponentState
 
 class ComponentsHelper():
@@ -10,11 +11,15 @@ class ComponentsHelper():
 
     .. seealso::
         - :func:`Api.discover_components` - Discover components with the API
-        - :class:`EtatComposant` - Component state
+        - :class:`ComponentState` - Component state
     """
 
     def __init__(self):
         self.__components = []
+
+    def clear(self):
+        """ Resets all components in the list """
+        self.__components.clear()
 
     def update(self, updates:list) -> None:
         """ Updates the components list with a new list
@@ -25,7 +30,7 @@ class ComponentsHelper():
 
         components_dict = {comp["id"]: comp for comp in self.__components}
     
-        for update in updates:
+        for update in copy.deepcopy(updates):
             if update["id"] in components_dict:
                 # Si l'id existe, mettre à jour uniquement le champ 'state'
                 state = update.get("state", ComponentState.UNKNOWN)
@@ -62,20 +67,20 @@ class ComponentsHelper():
                 }
 
             .. seealso::
-                - :class:`EtatComposant`
+                - :class:`ComponentState`
         """
 
         return {comp["id"]: comp["state"] for comp in self.__components if "id" in comp and "state" in comp}
     
-    def get_state(self, id:str) -> ComponentState:
+    def get_state(self, component_id:str) -> ComponentState:
         """ Returns the state of a component 
         
             .. seealso::
-                - :class:`EtatComposant`
+                - :class:`ComponentState`
         """
 
         for comp in self.__components:
-            if comp.get("id") == id:
+            if comp.get("id") == component_id:
                 return comp.get("state", ComponentState.UNKNOWN)
             
         return ComponentState.UNKNOWN
@@ -85,7 +90,6 @@ class ComponentsHelper():
         
             The types of components are free for the products based on Safecor, but for the components
             of the Safecor core the value is ``core``.
-
         """
 
         for comp in self.__components:

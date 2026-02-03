@@ -1,0 +1,19 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run unittest with coverage and open report",
+      "type": "shell",
+      "command": "${workspaceFolder}/venv/bin/python",
+      "args": [
+        "-c",
+        "import coverage, webbrowser, os; cov=coverage.Coverage(); cov.start(); import unittest; unittest.TextTestRunner().run(unittest.defaultTestLoader.discover('.')); cov.stop(); cov.save(); cov.html_report(directory='htmlcov'); webbrowser.open('file://' + os.path.abspath('htmlcov/index.html'))"
+      ],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    }
+  ]
+}

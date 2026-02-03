@@ -259,7 +259,7 @@ class Dom0Controller():
         
     def __handle_discover_components(self):
         payload = ResponseFactory.create_response_component_state(
-            Constants.STR_SAFECOR_SYSTEM_CONTROLLER,
+            Constants.SAFECOR_SYSTEM_CONTROLLER,
             "System main controller",
             "Dom0",
             ComponentState.READY
