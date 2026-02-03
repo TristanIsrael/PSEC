@@ -143,3 +143,4 @@ bin/*.*
 
 ### Xorg conf files ###
 !**/xorg.conf.d
+**/.coverage
