@@ -10,7 +10,7 @@
 
 This project provides a software architecture for creating security products.
 
-**Safecor is being renamed Safecor. During the transition you will find both names in the source code and the documentation**
+**PSEC is being renamed Safecor. During the transition you will find both names in the source code and the documentation**
 
 > ⚠️ **Important Notice**
 
