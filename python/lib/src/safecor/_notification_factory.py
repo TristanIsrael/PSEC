@@ -1,5 +1,7 @@
 """ \author Tristan Israël """
 
+from . import DiskState
+
 class NotificationFactory:
     """ This class helps creating notifications
 
@@ -7,7 +9,7 @@ class NotificationFactory:
     """
 
     @staticmethod
-    def create_notification_disk_state(disk:str, state:str) -> dict:
+    def create_notification_disk_state(disk:str, state:DiskState) -> dict:
         """ Creates a notification for a disk's state """
 
         payload = {

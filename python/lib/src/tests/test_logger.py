@@ -1,63 +1,20 @@
 import unittest
 import time
 import os
-import threading
 import logging
-import subprocess
-import psutil
 import io
 from datetime import datetime
 from contextlib import redirect_stdout
-from safecor import Logger, MqttFactory, Topics, System, RequestFactory
+from safecor import Logger, Topics, System, RequestFactory
+from _test_with_api import TestWithAPI
 
-def is_mosquitto_running():
-    for proc in psutil.process_iter(['name']):
-        if proc.info['name'] == "mosquitto":
-            return True
-    return False
-
-class TestLogger(unittest.TestCase):
+class TestLogger(TestWithAPI):
 
     @classmethod
     def setUpClass(cls):
-        # Verify Mosquitto
-        if not is_mosquitto_running():
-            cls.mosquitto_proc = subprocess.Popen(["mosquitto"])
-            time.sleep(1)
-
-            if not is_mosquitto_running():
-                raise RuntimeError("Mosquitto could not be started")
-        else:
-            cls.mosquitto_proc = None
-
-        # Start Safecor MQTT client
-        cls.setup_lock = threading.Event()
-        cls.messages = []
-        cls.mqtt_client = MqttFactory.create_mqtt_network_dev("test_logger")
-        cls.mqtt_client.add_connected_callback(cls.on_mqtt_connected)
-        cls.mqtt_client.add_message_callback(cls.on_message)
-        cls.mqtt_client.start()
-        if not cls.setup_lock.wait(1.0):
-            raise RuntimeError("Could not connect to Safecor API")
-
-    @classmethod
-    def tearDownClass(cls):
-        if cls.mosquitto_proc:
-            cls.mosquitto_proc.terminate()
-            cls.mosquitto_proc.wait()
-
-        if os.path.exists("/tmp/safecor.log"):
-            os.remove("/tmp/safecor.log")
-
-    @classmethod
-    def on_mqtt_connected(cls):
-        print("Connected to Safecor API")
+        Logger().reset()
+        super().setUpClass()
         Logger().setup("test_logger", cls.mqtt_client, logging.INFO, True, "/tmp/safecor.log")
-        cls.setup_lock.set()
-
-    @classmethod
-    def on_message(cls, topic:str, payload:dict):
-        cls.messages.append( { "topic": topic, "payload": payload} )
 
     def test_logfile(self):
         if os.path.exists("/tmp/safecor.log"):
@@ -74,15 +31,15 @@ class TestLogger(unittest.TestCase):
             self.assertTrue(log.endswith("[error] test_logger - TEST2\n"))
 
     def test_write_logfile(self):
-        cls = self.__class__
-        cls.mqtt_client.subscribe(f"{Topics.CREATE_FILE}/request")
-        cls.mqtt_client.publish(Topics.SAVE_LOG, { "disk": "out", "filename": "file.txt" })
-        time.sleep(1.0)
+        Logger().clear_log()
+        self.mqtt_client.subscribe(f"{Topics.CREATE_FILE}/request")
+        self.mqtt_client.publish(Topics.SAVE_LOG, RequestFactory.create_request_save_log("out", "file.txt"))
+        time.sleep(0.5)
 
-        save_log = [d for d in cls.messages if d["topic"] == "system/events/save_log" and d["payload"] == {'disk': 'out', 'filename': 'file.txt'}]
+        save_log = [d for d in self.messages if d["topic"] == "system/events/save_log" and d["payload"] == {'disk': 'out', 'filename': 'file.txt'}]
         self.assertNotEqual( save_log, [] )
 
-        create_file = [d for d in cls.messages if d["topic"] == "system/disks/create_file/request" and d["payload"] != {} ]
+        create_file = [d for d in self.messages if d["topic"] == "system/disks/create_file/request" and d["payload"] != {} ]
         self.assertNotEqual( create_file, [] )
         entry = create_file[0]
         self.assertEqual(entry["payload"]["filepath"], "/file.txt")
@@ -90,10 +47,8 @@ class TestLogger(unittest.TestCase):
         self.assertEqual(entry["payload"]["compressed"], True)
 
     def test_double_setup(self):
-        cls = self.__class__
-
         self.assertTrue(Logger().is_setup())
-        Logger().setup("another", cls.mqtt_client, logging.ERROR, False, "/tmp/another.log")
+        Logger().setup("another", self.mqtt_client, logging.ERROR, False, "/tmp/another.log")
 
         self.assertEqual(Logger().module_name(), "test_logger")
         self.assertEqual(Logger().domain_name(), System.domain_name())
@@ -131,6 +86,8 @@ class TestLogger(unittest.TestCase):
         time.sleep(0.5)
         
         n_line = 1
+
+        self.assertTrue(os.path.exists("/tmp/safecor.log"))
 
         with open("/tmp/safecor.log", "r") as f:
             data = f.readlines()

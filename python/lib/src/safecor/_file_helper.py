@@ -8,36 +8,38 @@ import subprocess
 import shutil
 
 
-class FileHelper():   
+class FileHelper():
+    """ This class defines helper function for querying the system about disks and files """
 
     @staticmethod
     def get_disks_list() -> list:
-        """ Cette fonction retourne la liste des disques externes rattachés au système 
-        
-            La liste des disques est obtenue à partie des dossiers contenus dans Constantes.CHEMIN_MONTAGE_USB 
-            en vérifiant s'il s'agit d'un point de montage.
+        """ This function returns the list of external disks connected to the system.
+
+            The list of disks is obtained from the directories contained in :attr:`Constants.USB_MOUNT_POINT`,
+            by checking whether they are mount points.
         """
 
-        disques = []
-        point_montage = Constants.USB_MOUNT_POINT
+        disks = []
+        mount_point = Constants.USB_MOUNT_POINT
         #print("Recherche de disques USB dans {}".format(point_montage))                
-        with os.scandir(point_montage) as dossiers:
-            for dossier in dossiers:
-                if dossier.is_dir():
+        with os.scandir(mount_point) as folders:
+            for folder in folders:
+                if folder.is_dir():
                     if True: #os.path.ismount(dossier.path):
                         #print("Disque trouvé : {}".format(dossier.name))
-                        disques.append(dossier.name)
+                        disks.append(folder.name)
 
-        return disques
+        return disks
 
     @staticmethod
     def get_files_list(disk:str, recursive:bool, from_dir:str="") -> list:
-        """ Cette fonction renvoie l'arborescence complète d'un point de montage
-        
-            Le chemin utilisé est constitué par la concaténation du paramètre CHEMIN_MONTAGE_USB et 
-            du nom passé en paramètre
+        """ 
+        This function returns the complete directory tree of a mount point.
 
-            Pour chaque fichier ou dossier, un dictionnaire est créé :
+        The path used is built by concatenating the :attr:`Constants.USB_MOUNT_POINT` constant
+        with the name passed as an argument.
+
+        For each file or folder, a dictionary is created:
             { "type": "folder", "path": "/", "name": "dossier 1" },
             { "type": "file", "path": "/dossier 1", "name": "fichier 1", "size": 333344 },
             { "type": "file", "path": "/dossier 1/dossier 2", "name": "fichier 4", "size": 12 }
@@ -60,54 +62,80 @@ class FileHelper():
         return fichiers
        
     @staticmethod
-    def get_folder_contents(chemin:str, liste:list, decoupage:int = 0, recursif:bool = False, from_dir:str = ""):
-        _real_filepath = f"{chemin}{from_dir}"
+    def get_folder_contents(path:str, contents_list:list, cutting:int = 0, recursive:bool = False, from_dir:str = ""):
+        """ 
+        Queries the contents of a folder 
+        
+        :param path: The path of the folder
+        :param type: str
+        :param contents_list: The list in which the new contents will be appended
+        :param type: list
+        :param cutting: If True the contents entry will be cut starting at this index
+        :param type: bool
+        :param recursive: If True the contents of each folder will by analyzed recursively
+        :param type: bool
+        :param from_dir: Specifies a start directory for the analysis. If not specified the analysis will start at the root of the disk.
+        :param type: str
+        """
+
+        _real_filepath = f"{path}{from_dir}"
 
         #print("get_folder_contents : {} ({})".format(from_dir, _real_filepath))
-        with os.scandir(_real_filepath) as entrees:
-            for entree in entrees:
-                if entree.is_symlink():
+        with os.scandir(_real_filepath) as entries:
+            for entry in entries:
+                if entry.is_symlink():
                     continue
                 
-                filepath = f"{chemin[decoupage:]}{from_dir}"
-                filename = entree.name
-                if entree.is_file():
+                filepath = f"{path[cutting:]}{from_dir}"
+                filename = entry.name
+                if entry.is_file():
                     entryDict = {
                         "type": "file",
                         "path": "/" if filepath == "" else filepath,
                         "name": filename,
-                        "size": entree.stat().st_size
+                        "size": entry.stat().st_size
                     }
 
-                    liste.append(entryDict)
-                elif entree.is_dir():
+                    contents_list.append(entryDict)
+                elif entry.is_dir():
                     entryDict = {
                         "type": "folder",
                         "path": "/" if filepath == "" else filepath,
                         "name": filename
                     }
 
-                    liste.append(entryDict)
+                    contents_list.append(entryDict)
 
-                    if recursif:
-                        FileHelper.get_folder_contents(entree.path, liste, decoupage, recursif)
+                    if recursive:
+                        FileHelper.get_folder_contents(entry.path, contents_list, cutting, recursive)
 
 
-    @staticmethod
-    def split_filepath(file_path:str) -> tuple[str, str]:
-        spl = str.split(":")
+    #@staticmethod
+    #def split_filepath(file_path:str) -> tuple[str, str]:
+    #    spl = str.split(":")
+    #
+    #    if len(spl) == 1:
+    #        return ("", spl[0])
+    #    else:
+    #        return (spl[0], spl[1])
 
-        if len(spl) == 1:
-            return ("", spl[0])
-        else:
-            return (spl[0], spl[1])
-
-    @staticmethod
-    def make_filepath(disk_name:str, file_name:str) -> str:
-        return f"{"" if disk_name is None else disk_name}:{file_name}"
+    #@staticmethod
+    #def make_filepath(disk_name:str, file_name:str) -> str:
+    #    return f"{"" if disk_name is None else disk_name}:{file_name}"
 
     @staticmethod
     def calculate_fingerprint(filepath:str) -> str:
+        """
+        Calculates the fingerprint of a file.
+        
+        :param filepath: The full path of the file of which the fingerprint must be calculated.
+        :type filepath: str
+        :return: A sha-512 encoded fingerprint
+        :rtype: str
+
+        .. seealso::
+            :func:`hashlib.file_digest`
+        """
         try:
             with open(filepath, "rb") as f:
                 h = hashlib.file_digest(f, Constants.FINGERPRINT_METHOD)
@@ -119,17 +147,27 @@ class FileHelper():
         return ""
         
     @staticmethod
-    def copy_file(source_location:str, filepath:str, destination_folder:str, source_fingerprint:str) -> str:
-        ''' Copie le fichier source_filepath dans le répertoire destination_folder
+    def copy_file(source_disk:str, filepath:str, destination_disk:str, source_fingerprint:str) -> str:
+        """
+        Copies a file to another place.
 
-        Le répertoire de destination doit exister.
+        The destination directory must exist.
 
-        L'empreinte du fichier source est comparée avec celle de la copie.
-
-        La fonction renvoie vrai si la copie s'est bien déroulée et que les empreintes coincident.
-        '''
+        The fingerprint of both files will compared at the end. The fingerprint is returned if they are identical.
         
-        cmd = ['cp', f"{source_location}{filepath}", f"{destination_folder}{filepath}"]
+        :param source_disk: The disk that contains the source file
+        :type source_disk: str
+        :param filepath: The path of the file on the source disk
+        :type filepath: str
+        :param destination_disk: The disk that will contain the copy
+        :type destination_disk: str
+        :param source_fingerprint: The fingerprint of the source file
+        :type source_fingerprint: str
+        :return: The fingerprint of the file if both fingerprints are equals, else an empty string
+        :rtype: str
+        """
+        
+        cmd = ['cp', f"{source_disk}{filepath}", f"{destination_disk}{filepath}"]
         #cmd = ['rsync', '-a', f"{source_location}{filepath}", f"{destination_folder}{filepath}"]
         #print(f"Run command {cmd}")
         
@@ -137,32 +175,60 @@ class FileHelper():
             subprocess.run(cmd, check= True, shell= False)
             #shutil.copy2(f"{source_location}{filepath}", f"{destination_folder}{filepath}")
         except subprocess.CalledProcessError as e:
-            Logger().debug(f"The file {filepath} could not be copied to {destination_folder}. Error: {e}")
+            Logger().debug(f"The file {filepath} could not be copied to {destination_disk}. Error: {e}")
             return ""
 
         # Calculate the new file's fingerprint
-        destination_file = f"{destination_folder}{filepath}"
+        destination_file = f"{destination_disk}{filepath}"
         dest_fingerprint = FileHelper.calculate_fingerprint(destination_file)
 
         if source_fingerprint == dest_fingerprint:
             return dest_fingerprint
         else:
-            Logger().debug(f"The file {filepath} has been copied to {destination_folder} but the fingerprints differ")
+            Logger().debug(f"The file {filepath} has been copied to {destination_disk} but the fingerprints differ")
             return ""
 
 
     @staticmethod
-    def copy_file_to_repository(source_location:str, filepath:str, fingerprint:str):
+    def copy_file_to_repository(source_disk:str, filepath:str, fingerprint:str):
+        """
+        Copies a file in the repository of the system.
+        
+        :param source_disk: The disk that contains the source file
+        :type source_location: str
+        :param filepath: The path of the sourc file
+        :type filepath: str
+        :param fingerprint: The fingerprint of the source file
+        :type fingerprint: str
+        """
         repository_path = Constants.DOMU_REPOSITORY_PATH
-        FileHelper.copy_file(source_location, filepath, repository_path, fingerprint)
+        FileHelper.copy_file(source_disk, filepath, repository_path, fingerprint)
 
     @staticmethod
     def create_file(filepath:str, size_ko:int):
+        """
+        Creates a new file on a disk
+
+        If ``size_ko`` is different from 0, the file will be filled with random data.
+        
+        :param filepath: The path of the file to create
+        :type filepath: str
+        :param size_ko: The initial size of the new file
+        :type size_ko: int
+        """
         with open(filepath, 'wb') as fout:
             fout.write(os.urandom(size_ko*1024))
 
     @staticmethod
     def remove_file(filepath:str) -> bool:
+        """
+        Removes a file
+        
+        :param filepath: The path of the file to remove
+        :type filepath: str
+        :return: True if the file has been removed, else False
+        :rtype: bool
+        """
         try:
             os.remove(filepath)
             return True

@@ -10,7 +10,7 @@ try:
     import serial
 except ImportError:
     pass
-import paho.mqtt.client as mqtt 
+import paho.mqtt.client as mqtt
 from paho.mqtt.reasoncodes import ReasonCode
 from paho.mqtt.properties import Properties
 from paho.mqtt.enums import CallbackAPIVersion, MQTTErrorCode
@@ -199,6 +199,7 @@ class MqttClient():
         self.connection_type = connection_type
         self.connection_string = connection_string
         self.__debugging = debugging
+        self.__subscriptions = []
 
     def __del__(self):
         self.stop()
@@ -271,9 +272,15 @@ class MqttClient():
     def add_message_callback(self, callback):
         self.__message_callbacks.append(callback)
 
+    def del_message_callback(self, callback):
+        self.__message_callbacks.remove(callback)
+
+    def reset_message_callbacks(self):
+        self.__message_callbacks.clear()
+
     def stop(self):
         if self.mqtt_client is not None:
-            print("Quit Mqtt client")
+            #print("Quit Mqtt client")
             try:
                 self.mqtt_client.disconnect()
                 self.mqtt_client.loop_stop()
@@ -287,8 +294,22 @@ class MqttClient():
                 self.is_starting = False
 
     def subscribe(self, topic:str) -> tuple[MQTTErrorCode, int | None]:
-        print(f"Subscribe to topic {topic}")
+        print(f"Subscribed to {topic}")
+        self.__subscriptions.append(topic)
         return self.mqtt_client.subscribe(topic)
+
+    def unsubscribe(self, topic:str):
+        """ Unsubscribes a client from a specific topic """
+
+        print(f"Unsubscribed from {topic}")
+        self.__subscriptions.remove(topic)
+        return self.mqtt_client.unsubscribe(topic)
+
+    def unsubscribe_all(self):
+        """ Unsubscribes a client from all topics """
+
+        for topic in self.__subscriptions:
+            self.unsubscribe(topic)
 
     def publish(self, topic:str, payload:dict):
         data = json.dumps(payload)

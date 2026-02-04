@@ -37,7 +37,7 @@ class Constants():
 
     # PV channel socket between DomU and Dom0
     DOMU_INPUT_SOCKET_FILEPATH = "/dev/hvc2"
-    FRAME_SIZE = 1024    
+    FRAME_SIZE = 1024
     LOCAL_LOG_FILEPATH = "/var/log/safecor/safecor.log"
     LOG_STRING_FORMAT_PRODUCTION = '%(asctime)s %(levelname)-8s %(domaine)-10s [%(entite)-20s] %(message)s'
     LOG_STRING_FORMAT_DEBUG = '%(asctime)s %(levelname)-8s %(domaine)-10s [%(entite)-20s] %(message)s'

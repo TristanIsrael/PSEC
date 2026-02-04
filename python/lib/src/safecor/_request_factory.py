@@ -167,3 +167,12 @@ class RequestFactory():
         return {
             "level": log_level
         }
+    
+    @staticmethod
+    def create_request_save_log(disk:str, filename:str):
+        """ Create a request to save the log file """
+
+        return {
+            "disk": disk,
+            "filename": filename
+        }

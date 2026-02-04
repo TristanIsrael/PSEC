@@ -3,6 +3,7 @@
 import zlib
 import base64
 import logging
+import os
 from datetime import datetime
 from . import MqttClient, SingletonMeta, Topics, MqttHelper, RequestFactory
 from . import System, Constants
@@ -14,7 +15,8 @@ class FileHandler:
     def __init__(self, file_path, mode='w'):
         self.file_path = file_path
         self.mode = mode
-        self.file = open(self.file_path, self.mode)
+        self.file = open(self.file_path, self.mode)        
+
         print(f"File {self.file_path} opened in {self.mode} mode.")
 
     def __del__(self):
@@ -58,6 +60,11 @@ class Logger(metaclass=SingletonMeta):
     __log_level = logging.INFO
     __filename = "/var/log/safecor.log"
 
+    def __init__(self):
+        self.__domain_name = ""
+        self.__module_name = ""
+        self.__mqtt_client = None
+
     def setup(self, module_name:str, mqtt_client:MqttClient, log_level:int = logging.INFO, recording:bool=False, filename:str=Constants.LOCAL_LOG_FILEPATH):
         """ Sets up the logging facility. 
         
@@ -90,6 +97,27 @@ class Logger(metaclass=SingletonMeta):
             self.__mqtt_client.subscribe(f"{Topics.EVENTS}/#")
 
         self.__is_setup = True
+
+    def reset(self):
+        """ Resets the logging instance """
+
+        if self.__is_setup and os.path.exists(self.__filename):
+            os.truncate(self.__filename, 0)
+
+        if self.__mqtt_client is not None:
+            self.__mqtt_client.unsubscribe_all()
+            self.__mqtt_client.del_message_callback(self.__on_message)
+
+        self.__is_recording = False
+        self.__log_level = logging.INFO
+        self.__filename = "/var/log/safecor.log"
+        self.__is_setup = False
+
+    def clear_log(self):
+        """ Clears the current log """
+
+        if os.path.exists(self.__filename):
+            os.truncate(self.__filename, 0)
 
     def critical(self, description:str, module:str = ""):
         """ Sends a critical message """
@@ -155,7 +183,7 @@ class Logger(metaclass=SingletonMeta):
             "description": description
         }
 
-        return payload    
+        return payload
 
     def __on_message(self, topic:str, payload:dict):
         if topic == Topics.SET_LOG_LEVEL:
@@ -211,7 +239,7 @@ class Logger(metaclass=SingletonMeta):
         logfile = FileHandler(self.__filename, 'a')
         logfile.write(logtxt)
         logfile.flush()
-        logfile.close()        
+        logfile.close()
 
     def __loglevel_value(self, level:str) -> int:
         if level == "debug":
