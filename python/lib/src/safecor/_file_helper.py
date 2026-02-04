@@ -9,7 +9,13 @@ import shutil
 
 
 class FileHelper():
-    """ This class defines helper function for querying the system about disks and files """
+    """ 
+    This class defines helper function for querying the system about disks and files 
+
+    Most of these functions are used on the sys-usb Domain by SysUsbController or on the Dom0
+    by Dom0Controller.
+    
+    """
 
     @staticmethod
     def get_disks_list() -> list:
@@ -21,12 +27,11 @@ class FileHelper():
 
         disks = []
         mount_point = Constants.USB_MOUNT_POINT
-        #print("Recherche de disques USB dans {}".format(point_montage))                
         with os.scandir(mount_point) as folders:
             for folder in folders:
                 if folder.is_dir():
-                    if True: #os.path.ismount(dossier.path):
-                        #print("Disque trouvé : {}".format(dossier.name))
+                    if True: #os.path.ismount(folder.path):
+                        #print(f"Disk found : {folder.name}")
                         disks.append(folder.name)
 
         return disks

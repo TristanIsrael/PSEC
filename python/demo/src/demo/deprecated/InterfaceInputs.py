@@ -73,7 +73,7 @@ class InterfaceInputs(QObject):
     def __traite_donnees_input(self, data:bytes):
         # On recoit une version sérialisée d'un objet
         # Pour l'instant on ne traite que la classe Mouse
-        mouse = Mouse.fromData(data)
+        mouse = Mouse.from_data(data)
         if mouse != None:
             self.__traite_donnees_souris(mouse)
 
