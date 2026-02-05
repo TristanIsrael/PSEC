@@ -28,18 +28,21 @@ class System(metaclass=SingletonMeta):
     __cpu_assignments = None
 
     def get_screen_width(self) -> int:
-        """ Returns the system main screen's resolution width """
+        """ Returns the system main screen's resolution width 
+
+        This function must be ran in a DomU.
+        """
 
         if self.__width > -1:
             return self.__width
         
         screen_size = self._get_screen_size()
 
-        if "," in screen_size:            
+        if "," in screen_size:
             rotation = self.get_screen_rotation()
             if rotation == 0 or rotation == 180:
                 self.__width = int(screen_size.split(',')[0])
-            else: 
+            else:
                 self.__width = int(screen_size.split(',')[1])
 
             return self.__width
@@ -47,7 +50,10 @@ class System(metaclass=SingletonMeta):
         return 1024
     
     def get_screen_height(self):
-        """ Returns the system main screen's resolution height """
+        """ Returns the system main screen's resolution height 
+            
+        This function must be ran in a DomU.
+        """
 
         if self.__height > -1:
             return self.__height
@@ -70,6 +76,8 @@ class System(metaclass=SingletonMeta):
         
             The rotation angle is defined in the topology file in the setting ``gui.screen.rotation``.
 
+            This function must be ran in a DomU.
+
             Possible values are: 0, 90, 180, 270.
         """
 
@@ -87,6 +95,8 @@ class System(metaclass=SingletonMeta):
 
     def _get_screen_size(self) -> str:
         """ Returns the Domain's screen size as a string.
+
+            This function must be ran in a DomU.
          
             A typical value is: "1280x1024"
         """
@@ -163,7 +173,10 @@ class System(metaclass=SingletonMeta):
 
     @staticmethod
     def debug_activated():
-        """ Returns whether the debugging has been activated """
+        """ Returns whether the debugging has been activated 
+        
+            This function must be ran in the Dom0.
+        """
 
         try:
             fd = os.open("/proc/cmdline", os.O_RDONLY)
@@ -174,12 +187,18 @@ class System(metaclass=SingletonMeta):
         
     @staticmethod
     def domain_name():
-        """ Returns the Domain name """
+        """ Returns the Domain's name 
+        
+            This function must be ran in a DomU.
+        """
         return platform.node()
 
     @staticmethod
     def get_topology() -> Topology:
-        """ Returns a ``Topology`` object initialized with the contents of the topology file """
+        """ Returns a ``Topology`` object initialized with the contents of the topology file 
+        
+            This function must be ran in the Dom0.
+        """
 
         if not topology.initialized():
             # Initialize the topology object
@@ -336,7 +355,10 @@ class System(metaclass=SingletonMeta):
 
     @staticmethod
     def read_topology_file(override_topology_file:str = "") -> str:
-        """ Reads the topology file describing the product """
+        """ Reads the topology file describing the product 
+        
+            This function must be ran in the Dom0.
+        """
         try:
             with open('/etc/safecor/topology.json' if override_topology_file == "" else override_topology_file, 'r') as f:
                 topo = f.read()
@@ -349,7 +371,10 @@ class System(metaclass=SingletonMeta):
 
     @staticmethod
     def get_topology_data(override_topology_file:str = "") -> dict:
-        """ Interprets the topology file data as a JSON object """
+        """ Interprets the topology file data as a JSON object 
+        
+            This function must be ran in the Dom0.
+        """
         try:
             topo_data = System.read_topology_file(override_topology_file)
             data = json.loads(topo_data)
@@ -365,6 +390,8 @@ class System(metaclass=SingletonMeta):
         """ Computes the number of vCPUs which will be pinned to each Domain of a group.
 
         The number of vCPUs depends on the value of the parameter ``vcpu.groups`` defined in the file ``topology.json``.
+
+        This function must be ran in the Dom0.
         """
         vcpus = 1
         platform_cpus = System().get_platform_cpu_count()
@@ -406,6 +433,8 @@ class System(metaclass=SingletonMeta):
         If there are at least 4 CPUs the second CPU is also assigned to Dom0 and sys-usb.
         
         The other CPUs are assigned to sys-gui and the other groups by trying to avoid overlapping.
+
+        This function must be ran in the Dom0.
         """        
         cpu_count = System().get_platform_cpu_count()
 
@@ -453,6 +482,8 @@ class System(metaclass=SingletonMeta):
     @staticmethod
     def get_system_information() -> dict:
         """ Returns a JSON struct containing the information on the system. 
+
+            This function must be ran in the Dom0.
         
             A typical struct is:
 
@@ -504,6 +535,7 @@ class System(metaclass=SingletonMeta):
                 }
             }
         """
+
         sysinfo = {
             "core": {
                 "version": __version__,
@@ -554,6 +586,8 @@ class System(metaclass=SingletonMeta):
     @staticmethod
     def __get_storage_info() -> dict:
         """ Returns information about the storage 
+
+        This function must be ran in the Dom0.
         
         The fields are:
         - total - The total size of the storage in bytes
@@ -590,7 +624,10 @@ class System(metaclass=SingletonMeta):
         return info
 
     def get_cpu_allocation(self) -> dict:
-        """ @brief Provides information about CPU allocation for all the Domains """
+        """ Provides information about CPU allocation for all the Domains 
+        
+            This function must be ran in the Dom0.
+        """
 
         # First get the list of domains
         subprocess.run("")
