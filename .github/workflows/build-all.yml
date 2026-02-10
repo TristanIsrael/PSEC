@@ -537,7 +537,7 @@ jobs:
           filepath: /home/builder/packages/safecor/x86_64/
 
   build-safecor-core:
-    needs: [ prepare, build-safecor-lib ]
+    needs: [ prepare ]
     if: |
       needs.prepare.outputs.check-safecor-core == 'true' ||
       needs.prepare.outputs.check-safecor-app-tests == 'true'
