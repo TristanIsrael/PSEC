@@ -53,6 +53,11 @@ on:
         required: false
         type: 'boolean'
         default: 'false'
+      force-safecor-hardening:
+        description: "Build hardening"
+        required: false
+        type: 'boolean'
+        default: 'false'  
       force-safecor-tests:
         description: "Build tests"
         required: false
@@ -102,6 +107,7 @@ jobs:
       pkg-safecor-core: ${{ steps.detect.outputs.safecor-core }}
       pkg-safecor-diag: ${{ steps.detect.outputs.safecor-diag }}
       pkg-safecor-gui-base: ${{ steps.detect.outputs.safecor-gui-base }}
+      pkg-safecor-hardening: ${{ steps.detect.outputs.safecor-hardening }}
       pkg-safecor-lib: ${{ steps.detect.outputs.safecor-lib }}
       pkg-safecor-sys-gui: ${{ steps.detect.outputs.safecor-sys-gui }}
       pkg-safecor-sys-usb: ${{ steps.detect.outputs.safecor-sys-usb }}
@@ -123,6 +129,7 @@ jobs:
             [safecor-core]="setup/packages/safecor/safecor-core/"
             [safecor-diag]="setup/packages/safecor/safecor-diag/"
             [safecor-gui-base]="setup/packages/safecor/safecor-gui-base/"
+            [safecor-hardening]="setup/packages/safecor/safecor-hardening/"
             [safecor-lib]="setup/packages/safecor/safecor-lib/"
             [safecor-sys-gui]="setup/packages/safecor/safecor-sys-gui/"
             [safecor-sys-usb]="setup/packages/safecor/safecor-sys-usb/"
@@ -150,6 +157,7 @@ jobs:
       check-safecor-alpine-iso: ${{ steps.check-safecor-alpine-iso.outputs.do_build }}
       check-safecor-container-debian: ${{ steps.check-safecor-container-debian.outputs.do_build }}
       check-safecor-core: ${{ steps.check-safecor-core.outputs.do_build }}
+      check-safecor-hardening: ${{ steps.check-safecor-hardening.outputs.do_build }}
       check-safecor-sys-gui: ${{ steps.check-safecor-sys-gui.outputs.do_build }}
       check-safecor-sys-usb: ${{ steps.check-safecor-sys-usb.outputs.do_build }}
       check-safecor-gui-base: ${{ steps.check-safecor-gui-base.outputs.do_build }}
@@ -242,6 +250,20 @@ jobs:
           else 
             echo "do_build=false" >> $GITHUB_OUTPUT
           fi
+      - id: check-safecor-hardening
+        name: check-safecor-hardening
+        env:
+          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-safecor-hardening }}
+          FORCE: ${{ github.event.inputs.force-safecor-hardening }}
+          FORCE_ALL: ${{ github.event.inputs.force-all }}             
+          FORCE_APPS: ${{ github.event.inputs.force-apps }}
+          FORCE_LIBS: ${{ github.event.inputs.force-libs }}       
+        run: |          
+          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' || $FORCE_ALL == 'true' ]]; then 
+            echo "do_build=true" >> $GITHUB_OUTPUT
+          else 
+            echo "do_build=false" >> $GITHUB_OUTPUT
+          fi
       - id: check-safecor-sys-gui
         name: check-safecor-sys-gui
         env:
@@ -255,7 +277,7 @@ jobs:
             echo "do_build=true" >> $GITHUB_OUTPUT
           else 
             echo "do_build=false" >> $GITHUB_OUTPUT
-          fi
+          fi        
       - id: check-safecor-sys-usb
         name: check-safecor-sys-usb
         env:
@@ -570,6 +592,7 @@ jobs:
   build-safecor-hardening:
     needs: [ prepare ]
     if: |
+      needs.prepare.outputs.check-safecor-hardening == 'true' ||
       needs.prepare.outputs.check-safecor-core == 'true' ||
       needs.prepare.outputs.check-safecor-app-tests == 'true'
     runs-on: ubuntu-latest
