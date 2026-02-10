@@ -684,13 +684,19 @@ jobs:
           working-dir: setup/packages/safecor/safecor-tests-gui
           artifact-name: safecor-tests-gui
 
+      - name: Publish GUI package
+        uses: ./.github/actions/publish
+        with:
+          privkey: ${{ secrets.DEPLOY_KEY }}
+          filepath: /home/builder/packages/safecor/x86_64/
+
       - name: Build APK
         uses: ./.github/actions/build-apk
         with:
           working-dir: setup/packages/safecor/safecor-tests
           artifact-name: safecor-tests
 
-      - name: Publish package
+      - name: Publish main package
         uses: ./.github/actions/publish
         with:
           privkey: ${{ secrets.DEPLOY_KEY }}
