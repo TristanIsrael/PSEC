@@ -26,7 +26,7 @@ xorg.conf.d/40-monitor.conf
 xorg.conf.d/50-card.conf
 xorg.conf.d/60-screen.conf
 init-gui-base.sh
-hardening.initd
+hardening.sh
 "
 
 package() {
