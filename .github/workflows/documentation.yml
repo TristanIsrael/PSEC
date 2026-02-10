@@ -43,7 +43,7 @@ jobs:
       - name: Install dependencies
         shell: sh 
         run: |                 
-          sudo apt-get install -y libvirt
+          sudo apt-get install -y libvirt-bin
           python3 -m venv venv 
           . ./venv/bin/activate
           pip install --upgrade pip
