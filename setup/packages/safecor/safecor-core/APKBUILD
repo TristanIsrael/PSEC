@@ -68,10 +68,6 @@ python/create-mqtt-tunnels.py
 python/orchestrator.py
 python/create-splash.py
 
-#boot/Splash_800_1280.ppm
-#boot/Splash_800_1280.png
-#boot/Splash_1024_768.ppm
-#boot/Splash_1024_768.png
 misc/splash_ng.png
 
 misc/qemu-system-x86_64.cmd
