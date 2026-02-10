@@ -559,9 +559,40 @@ jobs:
         uses: ./.github/actions/build-apk
         with:
           working-dir: setup/packages/safecor/safecor-core
-          artifact-name: safecor-core
+          artifact-name: safecor-core      
 
-      - name: Publish package
+      - name: Publish packages
+        uses: ./.github/actions/publish
+        with:
+          privkey: ${{ secrets.DEPLOY_KEY }}
+          filepath: /home/builder/packages/safecor/x86_64/
+
+  build-safecor-hardening:
+    needs: [ prepare ]
+    if: |
+      needs.prepare.outputs.check-safecor-core == 'true' ||
+      needs.prepare.outputs.check-safecor-app-tests == 'true'
+    runs-on: ubuntu-latest
+ 
+    container:
+      image: alpine:3.21
+ 
+    steps:      
+      - name: Checkout sources
+        uses: actions/checkout@v4
+ 
+      - name: Prepare build environment
+        uses: ./.github/actions/prepare-build-env
+        with:
+          abuild-key: ${{ secrets.ABUILD_PRIVATE_KEY }}
+ 
+      - name: Build APK
+        uses: ./.github/actions/build-apk
+        with:
+          working-dir: setup/packages/safecor/safecor-hardening
+          artifact-name: safecor-hardening
+
+      - name: Publish packages
         uses: ./.github/actions/publish
         with:
           privkey: ${{ secrets.DEPLOY_KEY }}
