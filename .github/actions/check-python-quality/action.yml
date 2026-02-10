@@ -18,7 +18,7 @@ runs:
     - name: Install dependencies
       shell: sh 
       run: |
-        apk add -y python3 py3-pip
+        apk add python3 py3-pip
         python3 -m pip install --upgrade pip
         cd ${{ github.event.inputs.project_path }}
         python3 -m pip install -r requirements.txt
