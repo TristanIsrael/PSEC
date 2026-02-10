@@ -234,7 +234,10 @@ class Logger(metaclass=SingletonMeta):
 
         # Craft the log text
         # Fields are: module, datetime, level, description
-        logtxt = f"[{payload.get("datetime")}] [{loglevel}] {payload.get("module")} - {payload.get("description")}\n"
+        _datetime = payload.get("datetime")
+        _module = payload.get("module")
+        _description = payload.get("description")
+        logtxt = f"[{_datetime}] [{loglevel}] {_module} - {_description}\n"
         #print(logtxt)
         logfile = FileHandler(self.__filename, 'a')
         logfile.write(logtxt)
