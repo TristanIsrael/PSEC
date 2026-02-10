@@ -162,7 +162,7 @@ package() {
     #install -D -m644 "$srcdir"/Splash_1024_768.ppm "$pkgdir"/boot/Splash_1024_768.ppm
     #install -D -m644 "$srcdir"/Splash_1024_768.png "$pkgdir"/boot/Splash_1024_768.png
     #install -D -m644 "$srcdir"/boot/splash_ng.png "$pkgdir"/boot/splash_ng.png
-    install -D -m644 "$srcdir"/misc/splash_ng.png "$pkgdir"/boot/splash.png
+    install -D -m644 "$srcdir"/splash_ng.png "$pkgdir"/boot/splash.png
     install -D -m755 "$srcdir"/qemu-system-x86_64.cmd "$pkgdir"/usr/bin/qemu-system-x86_64.cmd
 
     # Mosquitto
