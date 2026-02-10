@@ -18,7 +18,7 @@ runs:
     - name: Install python3 
       shell: sh
       run: |
-        apk add python3 py3-pip
+        sudo apk add python3 py3-pip
         python3 -m pip install --upgrade pip
         python3 -m venv .venv
 
