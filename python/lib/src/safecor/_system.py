@@ -9,7 +9,11 @@ try:
 except ImportError:
     pass
 import shutil
-from . import SingletonMeta, __version__, Constants, Topology, Domain, DomainType, LibvirtHelper
+from . import SingletonMeta, __version__, Constants, Topology, Domain, DomainType
+try:
+    from . import LibvirtHelper
+except ImportError:
+    print("Not using Libvirt")
 
 topology = Topology()
 

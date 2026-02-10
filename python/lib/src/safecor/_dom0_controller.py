@@ -9,7 +9,12 @@ from . import Logger, FileHelper
 from . import ResponseFactory
 from . import MqttClient, Topics, MqttHelper, NotificationFactory
 from . import System, ComponentState
-from . import LibvirtHelper
+LIBVIRT_UNAVAILABLE = False
+try:
+    from . import LibvirtHelper
+except ImportError:
+    LIBVIRT_UNAVAILABLE = True
+    print("Not using libvirt")
 
 class Dom0Controller():
     """ This class handles some of the commands sent by Domains that involve the repository and the system in general 
@@ -202,6 +207,10 @@ class Dom0Controller():
 
 
     def __reboot_domain(self, domain_name:str):
+        if LIBVIRT_UNAVAILABLE:
+            print("Libvirt is unavailable. Cannot reboot domain")
+            return
+        
         if LibvirtHelper.reboot_domain(domain_name):
             Logger().info(f"Rebooting domain {domain_name}")
             response = ResponseFactory.create_response_restart_domain(domain_name, True)
