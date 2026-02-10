@@ -1,0 +1,6 @@
+coverage
+black 
+ruff 
+mypy  
+bandit 
+pip-audit

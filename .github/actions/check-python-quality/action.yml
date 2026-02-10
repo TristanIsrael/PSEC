@@ -1,0 +1,61 @@
+name: Check python code quality
+
+inputs:
+  sources-path:
+    description: The directory where the Python sources are located
+    required: true
+  tests-path:
+    description: The directory that contains the 'tests' path with the unit tests
+    required: true
+  python_version:
+    required: false 
+    default: '3.12'
+
+runs:
+  using: composite  
+
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ github.event.inputs.python_version }}
+
+    - name: Install dependencies
+      shell: sh 
+      run: |      
+        python -m pip install --upgrade pip
+        cd ${{ github.event.inputs.project_path }}
+        python -m pip install -r requirements.txt
+        python -m pip install black ruff mypy pytest coverage bandit pip-audit
+
+    - name: Format check 
+      shell: sh
+      run: |
+        cd ${{ github.event.inputs.sources-path }}
+        black --check .
+    
+    - name: Lint
+      shell: sh
+      run: |
+        cd ${{ github.event.inputs.sources-path }}
+        ruff check .
+
+    - name: Type checking
+      shell: sh
+      run: |
+        cd ${{ github.event.inputs.sources-path }}
+        mypy .
+
+    - name: Tests
+      shell: sh
+      run: |
+        cd ${{ github.event.inputs.tests-path }}
+        coverage run --omit="tests/*,*/tests/*" -m unittest discover -s tests -v
+        coverage report --fail-under=50 >> $GITHUB_STEP_SUMMARY
+
+    - name: Security audit
+      shell: sh
+      run: |
+        cd ${{ github.event.inputs.sources-path }}
+        bandit -r .
+        pip-audit

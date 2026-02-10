@@ -1,12 +1,19 @@
 """ \author Tristan Israël """
-
-import zlib
+# ruff: noqa: I001
 import base64
+from datetime import datetime
 import logging
 import os
-from datetime import datetime
-from . import MqttClient, SingletonMeta, Topics, MqttHelper, RequestFactory
-from . import System, Constants
+import zlib
+from . import (
+    MqttClient,
+    SingletonMeta,
+    Topics,
+    MqttHelper,
+    RequestFactory,
+    System,
+    Constants
+)
 
 class FileHandler:
     """ The class FileHandler is an inner class for the class :class:`Logger`.
@@ -214,7 +221,7 @@ class Logger(metaclass=SingletonMeta):
         elif self.__is_recording:
             # Log message
             self.__write_log(topic, payload)
-
+ 
     def __write_log(self, topic:str, payload:dict):
         if not self.__is_recording or self.__filename == "":
             return

@@ -52,3 +52,9 @@ authors = ["Tristan ISRAËL <tristan.israel@alefbet.net>"]
 packages = [
     { include = "safecor", from = "src" }
 ]
+
+[tool.black]
+line-length = 88
+
+[tool.ruff]
+select = ["E", "F", "I", "B"]

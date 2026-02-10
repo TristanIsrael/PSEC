@@ -7,6 +7,7 @@
 [![Downloads](https://img.shields.io/github/downloads/TristanIsrael/Safecor/total?color=6f42c1)](https://github.com/TristanIsrael/Safecor/graphs/traffic)
 [![GitHub issues](https://img.shields.io/github/issues/TristanIsrael/Safecor?color=222222)](https://github.com/TristanIsrael/Safecor/issues)
 [![GitHub stars](https://img.shields.io/github/stars/TristanIsrael/Safecor)](https://github.com/TristanIsrael/Safecor/stargazers)
+![CI](https://github.com/TristanIsrael/Safecor/actions/workflows/build-all.yml/badge.svg)
 
 This project provides a software architecture for creating security products.
 
