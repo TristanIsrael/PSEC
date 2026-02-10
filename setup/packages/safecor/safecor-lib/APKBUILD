@@ -68,3 +68,4 @@ check() {
     coverage run --omit="tests/*,*/tests/*" -m unittest discover -s tests -v
     coverage report --fail-under=50
 }
+
