@@ -102,7 +102,7 @@ check() {
 
 package() {
     # Alpine overlay for DomUs
-    install -D -m640 "$builddir"/domu.apkovl.tar.gz "$pkgdir"/usr/lib/safecor/system/domu.apkovl.tar.gz    
+    install -D -m640 "$srcdir"/domu.apkovl.tar.gz "$pkgdir"/usr/lib/safecor/system/domu.apkovl.tar.gz
 
     # Openrc
     install -D -m755 "$srcdir"/splash.initd "$pkgdir"/etc/init.d/splash
