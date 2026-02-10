@@ -16,7 +16,7 @@ subpackages=""
 replaces=""
 options="!check"  # no tests provided
 source="
-hardening.initd
+boot/hardening.initd
 "
 
 package() {
