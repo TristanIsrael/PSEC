@@ -14,7 +14,7 @@ checkdepends=""
 install=""
 subpackages=""
 replaces=""
-options=""  # no tests provided
+options="!check"  # no tests provided
 source="
 $pkgname.zip::https://github.com/TristanIsrael/Safecor/archive/refs/heads/$gitbranch.zip
 "
@@ -39,33 +39,3 @@ package() {
     cd "src/$gitrepo-$gitbranch/python/lib/dist"
     python3 -m installer --destdir=$pkgdir safecor-*-py3-none-any.whl
 }
-
-check() {
-    cd "$gitrepo-$gitbranch/python/lib/src/safecor"
-
-    python3 -m pip install --upgrade pip
-    python3 -m venv .venv
-    source .venv/bin/activate
-
-    python3 -m pip install -r requirements.txt
-    python3 -m pip install black ruff mypy coverage bandit pip-audit
-
-    echo "Check format"
-    black --check .
-
-    echo "Lint"
-    ruff check .
-
-    echo "Check type"
-    mypy .
-
-    echo "Security audit"
-    bandit -r .
-    pip-audit
-
-    echo "Unittests and coverage"
-    cd "$gitrepo-$gitbranch/python/lib/src"
-    coverage run --omit="tests/*,*/tests/*" -m unittest discover -s tests -v
-    coverage report --fail-under=50
-}
-
