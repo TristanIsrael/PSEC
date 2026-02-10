@@ -9,20 +9,16 @@ inputs:
     required: true
   python_version:
     required: false 
-    default: '3.13'
+    default: '3.14'
 
 runs:
   using: composite  
 
-  steps:
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ github.event.inputs.python_version }}
-
+  steps:    
     - name: Install dependencies
       shell: sh 
-      run: |      
+      run: |
+        apt install -y python3 python3-pip python3-venv
         python3 -m pip install --upgrade pip
         cd ${{ github.event.inputs.project_path }}
         python3 -m pip install -r requirements.txt
