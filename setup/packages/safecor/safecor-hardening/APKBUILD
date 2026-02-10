@@ -16,7 +16,7 @@ subpackages=""
 replaces=""
 options="!check"  # no tests provided
 source="
-boot/hardening.sh
+hardening.sh
 "
 
 package() {
