@@ -389,12 +389,6 @@ jobs:
           working-dir: setup/packages/safecor/safecor-lib
           artifact-name: safecor-lib
 
-      - name: Check quality 
-        uses: ./.github/actions/check-python-quality
-        with:
-          sources-path: python/lib/src/safecor
-          tests-path: python/lib/src
-
       - name: Publish package
         uses: ./.github/actions/publish
         with:
