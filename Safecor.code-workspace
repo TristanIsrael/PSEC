@@ -5,6 +5,9 @@
         },
         {
             "path": "../Safecor.wiki"
+        },
+        {
+            "path": "../AlpineLinux.nosync/aports/scripts"
         }
     ],    
     "settings": {

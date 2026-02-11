@@ -37,7 +37,7 @@ runs:
       mkdir -pv ~/tmp
 
       cd aports/scripts
-      TMPDIR=~/tmp ./mkimage.sh --tag v$ALPINE_VERSION --outdir ~/iso --arch x86_64 --repository https://www.alefbet.net/github/safecor --repository http://dl-cdn.alpinelinux.org/alpine/v3.21/main --repository http://dl-cdn.alpinelinux.org/alpine/v3.21/community --profile ${{ inputs.package-name }} --hostkeys --workdir ~/tmp
+      TMPDIR=~/tmp ./mkimage.sh --tag v${{ inputs.alpine-version }} --outdir ~/iso --arch x86_64 --repository https://www.alefbet.net/github/safecor --repository http://dl-cdn.alpinelinux.org/alpine/v${{ inputs.alpine-version }}/main --repository http://dl-cdn.alpinelinux.org/alpine/v${{ inputs.alpine-version }}/community --profile ${{ inputs.package-name }} --hostkeys --workdir ~/tmp
       mv ~/iso/alpine-${{ inputs.package-name }}-v$ALPINE_VERSION-x86_64.iso ~/iso/safecor-${{ inputs.package-name }}-x86_64.iso
       rm -rf ~/tmp
   
