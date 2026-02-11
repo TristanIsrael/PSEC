@@ -3,13 +3,9 @@ profile_diag() {
     kernel_cmdline="$kernel_cmdline unionfs_size=512M console=tty0 console=ttyS0,115200"
     syslinux_serial="0 115200"
     kernel_addons=""
+    kernel_flavors="lts"
+    xen_params=""
     apks="$apks xen xen-hypervisor safecor-diag"
-    local _k _a
-    for _k in $kernel_flavors; do
-            apks="$apks linux-$_k"
-            for _a in $kernel_addons; do
-                    apks="$apks $_a-$_k"
-            done
-    done
+    arch="x86_64"    
     apkovl="genapkovl-diag.sh"
 }
