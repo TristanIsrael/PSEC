@@ -88,6 +88,11 @@ on:
         required: false
         type: 'boolean'
         default: 'false'
+      force-safecor-splash:
+        description: "Build splash"
+        required: false
+        type: 'boolean'
+        default: 'false'
       force-safecor-syslog:
         description: "Build syslog"
         required: false
@@ -117,6 +122,7 @@ jobs:
       pkg-safecor-sys-gui: ${{ steps.detect.outputs.safecor-sys-gui }}
       pkg-safecor-sys-usb: ${{ steps.detect.outputs.safecor-sys-usb }}
       pkg-safecor-syslog: ${{ steps.detect.outputs.safecor-syslog }}
+      pkg-safecor-splash: ${{ steps.detect.outputs.safecore-splash }}
       app-diag: ${{ steps.detect.outputs.app-diag }}      
       app-lib: ${{ steps.detect.outputs.app-lib }}
       app-tests: ${{ steps.detect.outputs.app-tests }}
@@ -140,6 +146,7 @@ jobs:
             [safecor-sys-gui]="setup/packages/safecor/safecor-sys-gui/"
             [safecor-sys-usb]="setup/packages/safecor/safecor-sys-usb/"
             [safecor-syslog]="setup/packages/safecor/safecor-syslog/"
+            [safecor-splash]="setup/packages/safecor/safecor-splash/"
             [app-diag]="python/diag/"            
             [app-lib]="python/lib/"
             [app-tests]="python/tests/"
@@ -169,6 +176,7 @@ jobs:
       check-safecor-sys-usb: ${{ steps.check-safecor-sys-usb.outputs.do_build }}
       check-safecor-gui-base: ${{ steps.check-safecor-gui-base.outputs.do_build }}
       check-safecor-syslog: ${{ steps.check-safecor-syslog.outputs.do_build }}
+      check-safecor-splash: ${{ steps.check-safecor-splash.outputs.do_build }}
       check-app-tests: ${{ steps.check-app-tests.outputs.do_build }}
       check-iso-tests: ${{ steps.check-app-tests.outputs.do_build }}
       check-app-diag: ${{ steps.check-app-diag.outputs.do_build }}      
@@ -324,6 +332,20 @@ jobs:
           FORCE_LIBS: ${{ github.event.inputs.force-libs }}
         run: |          
           if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' || $FORCE_ALL == 'true' || $FORCE_APPS == 'true' ]]; then 
+            echo "do_build=true" >> $GITHUB_OUTPUT
+          else 
+            echo "do_build=false" >> $GITHUB_OUTPUT
+          fi
+      - id: check-safecor-splash
+        name: check-safecor-splash
+        env:
+          PKG_CHANGED: ${{ needs.detect-changes.outputs.pkg-safecor-splash }}
+          FORCE: ${{ github.event.inputs.force-safecor-splash }}
+          FORCE_ALL: ${{ github.event.inputs.force-all }}
+          FORCE_APPS: ${{ github.event.inputs.force-apps }}
+          FORCE_LIBS: ${{ github.event.inputs.force-libs }}
+        run: |          
+          if [[ $PKG_CHANGED == 'true' || $FORCE == 'true' || $FORCE_ALL == 'true' ]]; then 
             echo "do_build=true" >> $GITHUB_OUTPUT
           else 
             echo "do_build=false" >> $GITHUB_OUTPUT
@@ -668,6 +690,36 @@ jobs:
         with:
           working-dir: setup/packages/safecor/safecor-syslog
           artifact-name: safecor-syslog
+
+      - name: Publish packages
+        uses: ./.github/actions/publish
+        with:
+          privkey: ${{ secrets.DEPLOY_KEY }}
+          filepath: /home/builder/packages/safecor/x86_64/
+
+  build-safecor-splash:
+    needs: [ prepare ]
+    if: |
+      needs.prepare.outputs.check-safecor-splash == 'true'
+    runs-on: ubuntu-latest
+ 
+    container:
+      image: alpine:3.21
+ 
+    steps:      
+      - name: Checkout sources
+        uses: actions/checkout@v4
+ 
+      - name: Prepare build environment
+        uses: ./.github/actions/prepare-build-env
+        with:
+          abuild-key: ${{ secrets.ABUILD_PRIVATE_KEY }}
+ 
+      - name: Build APK
+        uses: ./.github/actions/build-apk
+        with:
+          working-dir: setup/packages/safecor/safecor-splash
+          artifact-name: safecor-splash
 
       - name: Publish packages
         uses: ./.github/actions/publish
