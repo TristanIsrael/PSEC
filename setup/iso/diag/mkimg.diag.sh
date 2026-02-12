@@ -5,7 +5,7 @@ profile_diag() {
     kernel_addons=""
     kernel_flavors="lts"
     xen_params=""
-    apks="$apks xen xen-hypervisor safecor-diag"
+    apks="$apks safecor-splash xen xen-hypervisor safecor-diag"
     arch="x86_64"    
     apkovl="genapkovl-diag.sh"
 }
