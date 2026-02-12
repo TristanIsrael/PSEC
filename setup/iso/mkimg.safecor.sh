@@ -20,7 +20,7 @@ profile_safecor() {
     kernel_addons=""
     kernel_flavors="lts"
     xen_params=""
-    apks="$apks safecor-splash rng-tools xen xen-hypervisor syslinux"
+    apks="$apks rng-tools xen xen-hypervisor syslinux"
     arch="x86_64"    
     apkovl="genapkovl-safecor.sh"
 }
