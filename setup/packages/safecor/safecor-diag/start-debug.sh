@@ -4,16 +4,19 @@
 # Usage: ./start-debug.sh device-name
 # Example: ./start-debug.sh ttyUSB0
 
-FILE="/dev/$1"
-
 if [ -z "$1" ]; then
     echo "Usage: $0 <fichier>"
     exit 1
 fi
 
+FILE="/dev/$1"
+
 if [ -e "$FILE" ]; then
+    # Authorize root login on this port
+    echo $1 >> /etc/securetty
+
     while true; do
-        setsid agetty -h -t 60 -L $FILE vt100
+        setsid getty -h -t 60 -L 115200 $1 vt100
     done
 else
     echo "The device '$FILE' does not exist."

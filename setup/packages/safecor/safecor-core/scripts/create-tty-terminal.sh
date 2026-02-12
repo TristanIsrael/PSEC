@@ -5,5 +5,5 @@ while [ ! -e "/dev/tty-admin" ]; do
 done
 
 while true; do
-    setsid agetty -h -t 60 -L tty-admin vt100
+    setsid agetty -h -t 60 -L 115200 tty-admin vt100
 done

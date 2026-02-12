@@ -7,19 +7,20 @@ pkgdesc="Safecor - Diagnostic tool"
 url="https://www.alefbet.net/"
 arch="noarch"
 license="MIT"
-depends="agetty python3 py3-pyside6 py3-py-cpuinfo py3-psutil fontconfig freetype font-roboto udev udev-init-scripts xen xen-hypervisor"
+depends="python3 py3-pyside6 py3-py-cpuinfo py3-psutil fontconfig freetype font-roboto udev udev-init-scripts xen xen-hypervisor"
 makedepends="python3-dev py3-build py3-installer git"
 builddir="$srcdir/$pkgname-$pkgver"
 checkdepends=""
 install="$pkgname.post-install"
 subpackages=""
-replaces=""
+replaces="alpine-baselayout"
 options="!check"  # no tests provided
 gitbranch="main"
 source="
 $pkgname.zip::https://github.com/TristanIsrael/Safecor/archive/refs/heads/$gitbranch.zip
 diag.initd
 start-debug.sh
+motd
 "
 
 prepare() {
@@ -42,4 +43,5 @@ package() {
 
     install -D -m755 "$srcdir"/diag.initd "$pkgdir/etc/init.d/diag"
     install -D -m755 "$srcdir"/start-debug.sh "$pkgdir/usr/lib/safecor/bin/start-debug.sh"
+    install -D -m755 "$srcdir"/motd "$pkgdir/etc/motd"
 }

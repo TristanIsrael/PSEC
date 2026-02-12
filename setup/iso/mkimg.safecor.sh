@@ -21,6 +21,5 @@ profile_safecor() {
     kernel_flavors="lts"
     xen_params=""
     apks="$apks rng-tools xen xen-hypervisor syslinux"
-    arch="x86_64"    
-    apkovl="genapkovl-safecor.sh"
+    arch="x86_64"
 }
