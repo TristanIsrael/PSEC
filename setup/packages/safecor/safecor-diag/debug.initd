@@ -3,7 +3,7 @@
 name="debug"
 
 depend() {
-    before diag
+    after *
 }
 
 start() {
@@ -17,6 +17,6 @@ start() {
         eend $?
     else 
         echo "Debugging disabled"
-        eend 1
+        eend 0
     fi
 }
