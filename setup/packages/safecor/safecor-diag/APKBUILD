@@ -19,7 +19,6 @@ gitbranch="main"
 source="
 $pkgname.zip::https://github.com/TristanIsrael/Safecor/archive/refs/heads/$gitbranch.zip
 diag.initd
-debug.initd
 start-debug.sh
 "
 
