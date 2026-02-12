@@ -6,8 +6,27 @@ depend() {
     need modules
 }
 
-start() {
+start() {    
+
     if grep -q "serial-debug" "/proc/cmdline"; then 
+        PWD=""
+
+        for arg in $(cat /proc/cmdline); do
+            case "$arg" in
+                debug-passwd=*)
+                    PWD="${arg#debug-passwd=}"
+                    ;;
+            esac
+        done
+
+        if [ -n "$PWD" ]; then
+            echo "Set root's password"
+            printf "root:%s\n" "$PWD" | chpasswd 
+        else
+            echo "No password provided for debug TTY. Aborting"
+            exit 3
+        fi
+
         echo "Create TTY console on ttyS0"       
         nohup /usr/lib/safecor/bin/start-debug.sh ttyS0 &
         if [ $? -ne 0 ]; then
