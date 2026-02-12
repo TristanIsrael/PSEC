@@ -32,6 +32,7 @@ runs:
       ALPINE_VERSION: ${{ inputs.alpine-version }}
     run: |
       # Copy scripts
+      cp setup/apps/mkimg.safecor.sh /aports/scripts
       cp setup/iso/${{ inputs.package-name }}/*.sh aports/scripts
       sudo chmod +x aports/scripts/*.sh
       mkdir -pv ~/tmp
