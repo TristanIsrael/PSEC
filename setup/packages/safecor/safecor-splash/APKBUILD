@@ -1,0 +1,29 @@
+# Contributor:
+# Maintainer: Tristan Israël <tristan.israel@alefbet.net>
+pkgname=safecor-splash
+pkgver=1.0
+pkgrel=0
+pkgdesc="Safecor - Splash screen"
+url="https://www.alefbet.net/"
+arch="noarch"
+license="MIT"
+depends="fbida-fbi"
+makedepends=""
+builddir="$srcdir/$pkgname-$pkgver"
+install="$pkgname.pre-install $pkgname.post-install $pkgname.pre-deinstall $pkgname.post-deinstall"
+checkdepends=""
+subpackages=""
+replaces=""
+options="!check"  # no tests provided
+
+source="
+splash_ng_nobg.png
+"
+
+build() {
+    echo "Nothing to build"
+}
+
+package() {        
+    install -D -m644 "$srcdir"/splash_ng_nobg.png "$pkgdir"/boot/splash.png    
+}

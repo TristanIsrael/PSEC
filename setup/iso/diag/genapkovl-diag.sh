@@ -50,6 +50,7 @@ EOF
 mkdir -p "$tmp"/etc/apk
 
 makefile root:root 0644 "$tmp"/etc/apk/world <<EOF
+safecor-splash
 xen
 eudev
 udev-init-scripts
