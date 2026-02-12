@@ -1,3 +1,3 @@
 #!/bin/sh
 
-fbi -d /dev/fb0 -noverbose -a /boot/splash.png
+/usr/bin/safecor/bin/show-splash.sh

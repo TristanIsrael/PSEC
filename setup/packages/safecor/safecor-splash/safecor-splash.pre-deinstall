@@ -1,1 +1,3 @@
 #!/bin/sh
+
+/usr/bin/safecor/bin/hide-splash.sh

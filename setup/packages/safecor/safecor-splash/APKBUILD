@@ -18,6 +18,8 @@ options="!check"  # no tests provided
 
 source="
 splash_ng_nobg.png
+show-splash.sh
+hide-splash.sh
 "
 
 build() {
@@ -26,4 +28,6 @@ build() {
 
 package() {        
     install -D -m644 "$srcdir"/splash_ng_nobg.png "$pkgdir"/boot/splash.png    
+    install -D -m755 "$srcdir"/show-splash.sh "$pkgdir"/usr/lib/safecor/bin/show-splash.sh
+    install -D -m755 "$srcdir"/hide-splash.sh "$pkgdir"/usr/lib/safecor/bin/hide-splash.sh   
 }
