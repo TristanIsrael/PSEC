@@ -11,9 +11,9 @@ profile_safecor() {
     profile_standard
 
     profile_abbrev="safecor"
-	title="Safecor"
-	desc="ISO image for Safecor apps"
-	arch="x86_64"
+    title="Safecor"
+    desc="ISO image for Safecor apps"
+    arch="x86_64"
 		
     kernel_cmdline="$kernel_cmdline console=ttyS0,115200 console=ttyUSB0,115200"
     syslinux_serial="0 115200"

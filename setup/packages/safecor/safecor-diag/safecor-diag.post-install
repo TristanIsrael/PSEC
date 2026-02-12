@@ -1,9 +1,9 @@
 #!/bin/sh
 
-echo "Add debug service to default runlevel"
-rc-udpate add debug
+#echo "Add debug service to default runlevel"
+#rc-udpate add debug
 
-echo "Add diag app to default reunlevel"
-rc-update add diag
+#echo "Add diag app to default reunlevel"
+#rc-update add diag
 
 exit 0

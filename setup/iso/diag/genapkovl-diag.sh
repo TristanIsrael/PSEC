@@ -74,6 +74,7 @@ rc_add udev-trigger default
 rc_add xenstored default
 rc_add xenconsoled default
 rc_add diag default
+rc_add debug default
 
 rc_add mount-ro shutdown
 rc_add killprocs shutdown
