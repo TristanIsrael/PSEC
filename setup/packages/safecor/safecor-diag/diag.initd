@@ -7,6 +7,6 @@ pidfile="/var/run/$name.pid"
 command_background=true
 
 depend() {
-    need xenstored udev-trigger debug
+    need xenstored udev-trigger
     after *
 }

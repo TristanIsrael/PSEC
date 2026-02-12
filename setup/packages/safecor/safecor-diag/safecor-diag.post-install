@@ -1,6 +1,20 @@
 #!/bin/sh
 
-rc-update add debug
-rc-service debug start
+if grep -q "serial-debug" "/proc/cmdline"; then
+    echo "Create TTY console on ttyS0"       
+    /usr/lib/safecor/bin/start-debug.sh ttyS0 &
+    exit $?
+
+    echo "Create TTY console on ttyUSB0"       
+    /usr/lib/safecor/bin/start-debug.sh ttyUSB0 &
+    exit $?
+else 
+    echo "Debugging disabled"
+    exit 0
+fi
+
+echo "Start diag app"
+rc-update add diag
+rc-service diag start
 
 exit 0
