@@ -11,7 +11,7 @@ if grep -q "serial-debug" "/proc/cmdline"; then
         esac
     done
 
-    if [ -n "$DEBUG_PASSWD" ]; then
+    if [ -n "$PWD" ]; then
         echo "Set root's password"
         printf "root:%s\n" "$PWD" | chpasswd 
     else
@@ -19,26 +19,14 @@ if grep -q "serial-debug" "/proc/cmdline"; then
         exit 3
     fi
 
-    echo "Create TTY console on ttyS0"       
-    nohup /usr/lib/safecor/bin/start-debug.sh ttyS0 &
-    if [ $? -ne 0 ]; then
-        echo "... Error"
-        exit 1
-    fi
-
-    echo "Create TTY console on ttyUSB0"       
-    nohup /usr/lib/safecor/bin/start-debug.sh ttyUSB0 &
-    if [ $? -ne 0 ]; then
-        echo "... Error"
-        exit 2
-    fi
+    echo "Add debug service to boot runlevel"
+    rc-udpate add debug boot
 else 
     echo "Debugging disabled"
     exit 0
 fi
 
-echo "Start diag app"
+echo "Add diag app to default reunlevel"
 rc-update add diag
-rc-service diag start
 
 exit 0

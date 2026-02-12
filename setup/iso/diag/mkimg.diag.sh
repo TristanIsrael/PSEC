@@ -3,4 +3,5 @@ profile_diag() {
 
     apks="$apks safecor-diag"    
     apkovl="genapkovl-diag.sh"
+    hostname="safecor-diag"
 }

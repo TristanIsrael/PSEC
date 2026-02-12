@@ -1,0 +1,35 @@
+#!/sbin/openrc-run
+
+name="debug"
+
+depend() {
+    need modules
+}
+
+start() {
+    if grep -q "serial-debug" "/proc/cmdline"; then 
+        echo "Create TTY console on ttyS0"       
+        nohup /usr/lib/safecor/bin/start-debug.sh ttyS0 &
+        if [ $? -ne 0 ]; then
+            echo "... Error"
+            exit 1
+        fi
+
+        echo "Create TTY console on ttyUSB0"       
+        nohup /usr/lib/safecor/bin/start-debug.sh ttyUSB0 &
+        if [ $? -ne 0 ]; then
+            echo "... Error"
+            exit 2
+        fi
+
+        eend $?
+    else         
+        eend 0
+    fi
+}
+
+stop() {
+    ebegin ""    
+
+    eend $?
+}
