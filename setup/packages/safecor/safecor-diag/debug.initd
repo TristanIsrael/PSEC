@@ -1,0 +1,22 @@
+#!/sbin/openrc-run
+
+name="debug"
+
+depend() {
+    before diag
+}
+
+start() {
+    if grep -q "serial-debug" "/proc/cmdline"; then            
+        ebegin "Create TTY console on ttyS0"       
+        /usr/lib/safecor/bin/start-debug.sh ttyS0 &
+        eend $?
+
+        ebegin "Create TTY console on ttyUSB0"       
+        /usr/lib/safecor/bin/start-debug.sh ttyUSB0 &
+        eend $?
+    else 
+        echo "Debugging disabled"
+        eend 1
+    fi
+}
