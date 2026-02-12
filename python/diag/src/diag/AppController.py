@@ -13,9 +13,11 @@ class AppController(QObject):
         cpu = cpuinfo.get_cpu_info()
         return cpu
     
-    def has_vtd(self):        
+    def has_vtd(self):
         ''' AKA VT-d '''
         cmd = "dmesg | grep -i -e iommu -e dmar"
+
+        found = False
 
         try:
             result = subprocess.run(cmd, shell=True, capture_output=True, text=True, check=True)
@@ -26,11 +28,28 @@ class AppController(QObject):
             ]
 
             if result.returncode == 0 and any(sentence in result.stdout for sentence in sentences):
-                return True
+                found = True
         except subprocess.CalledProcessError:
-            return False
+            found = False
         
-        return False
+        if not found:
+            cmd = "xl dmesg | grep iommu"
+
+            try:
+                result = subprocess.run(cmd, shell=True, capture_output=True, text=True, check=True)
+
+                sentences = [
+                    "(XEN) Intel VT-d iommu 0 supported page sizes:",
+                    "(XEN) Intel VT-d iommu 1 supported page sizes:"
+                ]
+
+                if result.returncode == 0 and any(sentence in result.stdout for sentence in sentences):
+                    found = True
+            except subprocess.CalledProcessError:
+                found = False
+                
+
+        return found
         
     def has_ept(self):
         cmd = "xl dmesg | grep -i ept"

@@ -62,6 +62,7 @@ rc_add udev sysinit
 rc_add splash sysinit
 
 rc_add hwclock boot
+rc_add modloop boot
 rc_add modules boot
 rc_add sysctl boot
 rc_add hostname boot
