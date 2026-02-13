@@ -13,4 +13,4 @@
 # enable login on alternative console
 #hvc0::respawn:/sbin/getty -L 0 hvc0 vt100
 ::once:/bin/sh -c '/usr/lib/safecor/bin/start-debug.sh'
-tty1::once:/bin/sh -c '/usr/lib/safecor/diag/src/diag/start.sh'
+::once:/bin/sh -c '/usr/lib/safecor/diag/src/diag/start.sh'
