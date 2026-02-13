@@ -32,7 +32,7 @@ build() {
 
 package() {
     install -D -m644 "$srcdir/$splash_file" "$pkgdir"/boot/splash.png
-    install -D -m644 "$builddir"/fbsplash0.ppm "$pkgdir"/fbsplash0.ppm
+    install -D -m644 "$builddir"/fbsplash0.ppm "$pkgdir"/boot/fbsplash0.ppm
     install -D -m755 "$srcdir"/show-splash.sh "$pkgdir"/usr/lib/safecor/bin/show-splash.sh
     install -D -m755 "$srcdir"/hide-splash.sh "$pkgdir"/usr/lib/safecor/bin/hide-splash.sh   
 }
