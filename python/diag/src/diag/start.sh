@@ -17,4 +17,4 @@ MOUSE_EVDEV=$(readlink -f "$MOUSE")
 echo "Detected keyboard at: $KEYBOARD_EVDEV"
 echo "Detected mouse at: $MOUSE_EVDEV"
 
-/usr/bin/python3 /usr/lib/safecor/diag/src/diag/main.py -platform linuxfb:/dev/fb0 -plugin EvdevKeyboard:$KEYBOARD_EVDEV -plugin EvdevMouse:$MOUSE_EVDEV
+/usr/bin/python3 /usr/lib/safecor/diag/src/diag/main.py -platform linuxfb:/dev/fb0:nographicsmodeswitch:tty=/dev/tty6 -plugin EvdevKeyboard:$KEYBOARD_EVDEV -plugin EvdevMouse:$MOUSE_EVDEV
