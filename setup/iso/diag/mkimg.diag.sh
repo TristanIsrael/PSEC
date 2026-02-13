@@ -29,6 +29,7 @@ setup_inittab_console() {
 profile_diag() {
     profile_safecor
 
+    kernel_cmdline="$kernel_cmdline autodetect_serial=no"
     apks="$apks safecor-diag"
     apkovl="genapkovl-diag.sh"
     hostname="safecor-diag"
