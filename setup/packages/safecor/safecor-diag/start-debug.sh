@@ -1,23 +1,39 @@
 #!/bin/sh
 
-# Script: start-debug.sh
-# Usage: ./start-debug.sh device-name
-# Example: ./start-debug.sh ttyUSB0
+if grep -q "serial-debug" "/proc/cmdline"; then 
+    PWD=""
 
-if [ -z "$1" ]; then
-    echo "Usage: $0 <fichier>"
-    exit 1
-fi
-
-FILE="/dev/$1"
-
-if [ -e "$FILE" ]; then
-    # Authorize root login on this port
-    echo $1 >> /etc/securetty
-
-    while true; do
-        setsid getty -h -t 60 -L 115200 $1 vt100
+    for arg in $(cat /proc/cmdline); do
+        case "$arg" in
+            debug-passwd=*)
+                PWD="${arg#debug-passwd=}"
+                ;;
+        esac
     done
-else
-    echo "The device '$FILE' does not exist."
+
+    if [ -n "$PWD" ]; then
+        # Set root's password provided
+        printf "root:%s\n" "$PWD" | chpasswd   
+    else
+        # Define a random password for root
+        PWD=$(head -c 16 /dev/urandom | base64 | tr -dc 'A-Za-z0-9')
+        printf "root:%s\n" "$PWD" | chpasswd 
+        exit 0
+    fi    
+
+    # Create TTY console on ttyS0
+    nohup /usr/lib/safecor/bin/open-tty.sh ttyS0 &
+    if [ $? -ne 0 ]; then
+        echo "... Error"
+        exit 1
+    fi
+
+    # Create TTY console on ttyUSB0
+    nohup /usr/lib/safecor/bin/open-tty.sh ttyUSB0 &
+    if [ $? -ne 0 ]; then
+        echo "... Error"
+        exit 2
+    fi    
 fi
+
+exit 0

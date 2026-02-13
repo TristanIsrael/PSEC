@@ -19,6 +19,7 @@ gitbranch="main"
 source="
 $pkgname.zip::https://github.com/TristanIsrael/Safecor/archive/refs/heads/$gitbranch.zip
 start-debug.sh
+open-tty.sh
 motd
 rc.conf
 inittab
@@ -45,6 +46,7 @@ package() {
     #install -D -m755 "$srcdir"/diag.initd "$pkgdir/etc/init.d/diag"
     #install -D -m755 "$srcdir"/debug.initd "$pkgdir/etc/init.d/debug"
     install -D -m755 "$srcdir"/start-debug.sh "$pkgdir/usr/lib/safecor/bin/start-debug.sh"
+    install -D -m755 "$srcdir"/open-tty.sh "$pkgdir/usr/lib/safecor/bin/open-tty.sh"
     install -D -m755 "$srcdir"/motd "$pkgdir/etc/motd"
     install -D -m755 "$srcdir"/inittab "$pkgdir/etc/inittab"
     install -D -m644 "$srcdir"/rc.conf "$pkgdir/etc/rc.conf"
