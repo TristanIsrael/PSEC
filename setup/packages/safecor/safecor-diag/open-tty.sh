@@ -5,7 +5,7 @@
 # Example: ./open-tty.sh ttyUSB0
 
 if [ -z "$1" ]; then
-    echo "Usage: $0 <fichier>"
+    logger -t safecor/open-tty "Usage: $0 <fichier>"
     exit 1
 fi
 
@@ -19,5 +19,5 @@ if [ -e "$FILE" ]; then
         setsid getty -h -t 60 -L 115200 $1 vt100
     done
 else
-    echo "The device '$FILE' does not exist."
+    logger -t safecor/open-tty "The device '$FILE' does not exist."
 fi
