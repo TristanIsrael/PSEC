@@ -15,8 +15,8 @@ profile_safecor() {
     desc="ISO image for Safecor apps"
     arch="x86_64"
 		
-    kernel_cmdline="$kernel_cmdline console=ttyS0,115200 console=ttyUSB0,115200"
-    syslinux_serial="0 115200"
+    kernel_cmdline="$kernel_cmdline"
+    syslinux_serial=""
     kernel_addons=""
     kernel_flavors="lts"
     xen_params=""

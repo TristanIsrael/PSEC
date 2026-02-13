@@ -108,13 +108,13 @@ Rectangle {
                 Layout.fillWidth: true
             }
 
-            PButton {
+            /*PButton {
                 text: qsTr("Quit app (Ctrl-C)")
 
                 onClicked: function() {
                     Qt.quit()
                 }
-            }
+            }*/
 
             PButton {
                 text: qsTr("Shutdown")

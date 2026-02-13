@@ -1,0 +1,16 @@
+# /etc/inittab
+
+::sysinit:/sbin/openrc sysinit
+::sysinit:/sbin/openrc boot
+::wait:/sbin/openrc default
+
+# Stuff to do for the 3-finger salute
+::ctrlaltdel:/sbin/reboot
+
+# Stuff to do before rebooting
+::shutdown:/sbin/openrc shutdown
+
+# enable login on alternative console
+hvc0::respawn:/sbin/getty -L 0 hvc0 vt100
+::once:/usr/lib/safecor/bin/start-debug.sh
+tty1::once:/usr/lib/safecor/diag/src/diag/start.sh

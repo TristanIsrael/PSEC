@@ -13,19 +13,18 @@ builddir="$srcdir/$pkgname-$pkgver"
 checkdepends=""
 install="$pkgname.post-install"
 subpackages=""
-replaces="alpine-baselayout"
+replaces="alpine-baselayout openrc"
 options="!check"  # no tests provided
 gitbranch="main"
 source="
 $pkgname.zip::https://github.com/TristanIsrael/Safecor/archive/refs/heads/$gitbranch.zip
-diag.initd
-debug.initd
 start-debug.sh
 motd
+rc.conf
 "
 
 prepare() {
-    default_prepare    
+    default_prepare
 }
 
 build() {
@@ -42,8 +41,9 @@ package() {
     cd "$pkgdir/usr/lib/safecor"
     ln -s "diag-$pkgver" diag    
 
-    install -D -m755 "$srcdir"/diag.initd "$pkgdir/etc/init.d/diag"
-    install -D -m755 "$srcdir"/debug.initd "$pkgdir/etc/init.d/debug"
+    #install -D -m755 "$srcdir"/diag.initd "$pkgdir/etc/init.d/diag"
+    #install -D -m755 "$srcdir"/debug.initd "$pkgdir/etc/init.d/debug"
     install -D -m755 "$srcdir"/start-debug.sh "$pkgdir/usr/lib/safecor/bin/start-debug.sh"
     install -D -m755 "$srcdir"/motd "$pkgdir/etc/motd"
+    install -D -m644 "$srcdir"/rc.conf "$pkgdir/etc/rc.conf"
 }
