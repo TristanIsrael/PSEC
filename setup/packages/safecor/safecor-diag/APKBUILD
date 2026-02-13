@@ -13,7 +13,7 @@ builddir="$srcdir/$pkgname-$pkgver"
 checkdepends=""
 install="$pkgname.post-install"
 subpackages=""
-replaces="alpine-baselayout openrc"
+replaces="alpine-baselayout alpine-baselayout-data openrc"
 options="!check"  # no tests provided
 gitbranch="main"
 source="
@@ -21,6 +21,7 @@ $pkgname.zip::https://github.com/TristanIsrael/Safecor/archive/refs/heads/$gitbr
 start-debug.sh
 motd
 rc.conf
+inittab
 "
 
 prepare() {
@@ -45,5 +46,6 @@ package() {
     #install -D -m755 "$srcdir"/debug.initd "$pkgdir/etc/init.d/debug"
     install -D -m755 "$srcdir"/start-debug.sh "$pkgdir/usr/lib/safecor/bin/start-debug.sh"
     install -D -m755 "$srcdir"/motd "$pkgdir/etc/motd"
+    install -D -m755 "$srcdir"/inittab "$pkgdir/etc/inittab"
     install -D -m644 "$srcdir"/rc.conf "$pkgdir/etc/rc.conf"
 }

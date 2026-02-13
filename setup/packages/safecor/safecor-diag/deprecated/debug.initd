@@ -23,6 +23,7 @@ start() {
             echo "Set root's password"
             printf "root:%s\n" "$PWD" | chpasswd 
         else
+            # Define a random password for roor
             echo "No password provided for debug TTY. Aborting"
             exit 3
         fi
