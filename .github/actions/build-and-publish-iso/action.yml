@@ -35,6 +35,11 @@ runs:
       cp setup/iso/mkimg.safecor.sh aports/scripts
       cp setup/iso/${{ inputs.package-name }}/*.sh aports/scripts
       sudo chmod +x aports/scripts/*.sh
+
+      # Copy splash images
+      cp setup/iso/${{ inputs.package-name }}/*.ppm aports/scripts || true
+      cp setup/iso/${{ inputs.package-name }}/*.png aports/scripts || true
+
       mkdir -pv ~/tmp
 
       cd aports/scripts
