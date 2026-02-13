@@ -2,6 +2,7 @@
 
 import os
 import signal
+import subprocess
 from pathlib import Path
 import sys, threading
 
@@ -18,6 +19,7 @@ class MyView(QQuickView):
             # Ctrl+C has been pressed
             self.close()
             QGuiApplication.quit()
+            #subprocess.run("poweroff")
         else:
             super().keyPressEvent(event)
 

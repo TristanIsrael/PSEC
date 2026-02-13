@@ -117,7 +117,7 @@ Rectangle {
             }*/
 
             PButton {
-                text: qsTr("Shutdown")
+                text: qsTr("Shutdown (Ctrl-C)")
 
                 onClicked: function() {
                     AppController.shutdown()

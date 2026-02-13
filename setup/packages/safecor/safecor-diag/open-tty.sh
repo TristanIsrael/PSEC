@@ -20,3 +20,4 @@ if [ -e "$FILE" ]; then
     done
 else
     echo "The device '$FILE' does not exist."
+fi
