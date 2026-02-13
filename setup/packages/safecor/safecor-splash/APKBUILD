@@ -8,7 +8,7 @@ url="https://www.alefbet.net/"
 arch="noarch"
 license="MIT"
 depends="fbida-fbi"
-makedepends=""
+makedepends="imagemagick"
 builddir="$srcdir/$pkgname-$pkgver"
 install="$pkgname.pre-install $pkgname.post-install $pkgname.pre-deinstall $pkgname.post-deinstall"
 checkdepends=""
@@ -22,12 +22,17 @@ show-splash.sh
 hide-splash.sh
 "
 
+splash_file="splash_ng_nobg.png"
+
 build() {
-    echo "Nothing to build"
+    mkdir -p "$builddir"
+    echo "Convert splash to PPM"
+    magick convert "$srcdir/$splash_file" "$builddir/fbsplash0.ppm"
 }
 
-package() {        
-    install -D -m644 "$srcdir"/splash_ng_nobg.png "$pkgdir"/boot/splash.png    
+package() {
+    install -D -m644 "$srcdir/$splash_file" "$pkgdir"/boot/splash.png
+    install -D -m644 "$builddir"/fbsplash0.ppm "$pkgdir"/fbsplash0.ppm
     install -D -m755 "$srcdir"/show-splash.sh "$pkgdir"/usr/lib/safecor/bin/show-splash.sh
     install -D -m755 "$srcdir"/hide-splash.sh "$pkgdir"/usr/lib/safecor/bin/hide-splash.sh   
 }

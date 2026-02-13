@@ -1,37 +1,37 @@
 #!/bin/sh
 
 if grep -q "serial-debug" "/proc/cmdline"; then 
-    PWD=""
+    PASSWD=""
 
     for arg in $(cat /proc/cmdline); do
         case "$arg" in
             debug-passwd=*)
-                PWD="${arg#debug-passwd=}"
+                PASSWD="${arg#debug-passwd=}"
                 ;;
         esac
     done
 
-    if [ -n "$PWD" ]; then
+    if [ -n "$PASSWD" ]; then
         # Set root's password provided
-        printf "root:%s\n" "$PWD" | chpasswd   
+        printf "root:%s\n" "$PASSWD" | chpasswd   
     else
         # Define a random password for root
-        PWD=$(head -c 16 /dev/urandom | base64 | tr -dc 'A-Za-z0-9')
-        printf "root:%s\n" "$PWD" | chpasswd 
+        PASSWD=$(head -c 16 /dev/urandom | base64 | tr -dc 'A-Za-z0-9')
+        printf "root:%s\n" "$PASSWD" | chpasswd
         exit 0
     fi    
 
     # Create TTY console on ttyS0
     nohup /usr/lib/safecor/bin/open-tty.sh ttyS0 &
     if [ $? -ne 0 ]; then
-        echo "... Error"
+        echo "... Error when starting terminal on ttyS0"
         exit 1
     fi
 
     # Create TTY console on ttyUSB0
     nohup /usr/lib/safecor/bin/open-tty.sh ttyUSB0 &
     if [ $? -ne 0 ]; then
-        echo "... Error"
+        echo "... Error when starting terminal on ttyUSB0"
         exit 2
     fi    
 fi

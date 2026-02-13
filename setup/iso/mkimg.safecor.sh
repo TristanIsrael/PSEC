@@ -19,7 +19,7 @@ profile_safecor() {
     syslinux_serial=""
     kernel_addons=""
     kernel_flavors="lts"
-    xen_params=""
+    xen_params="quiet console=null loglevel=0"
     apks="$apks rng-tools xen xen-hypervisor syslinux"
     arch="x86_64"
 }
