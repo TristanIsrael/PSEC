@@ -33,8 +33,10 @@ section_splash() {
 
     if [ ! -f "$PWD/$_splash" ]; then 
         msg "Could not open $_splash in $PWD"
-        build_section splash "$PWD/$_splash"
+        return 0 # Fail silently
     fi
+
+    build_section splash "$PWD/$_splash"
 }
 
 profile_diag() {
