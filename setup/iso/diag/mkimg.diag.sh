@@ -19,9 +19,7 @@ build_splash() {
     fi
 
     msg "Adding splash image $file to ISO at ${DESTDIR}"
-    cp $file ${DESTDIR}/fbsplash0.ppm
-
-    kernel_cmdline="$kernel_cmdline splash"    
+    cp $file ${DESTDIR}/fbsplash.ppm    
 
     return $?
 }
@@ -38,6 +36,7 @@ section_splash() {
         return 0 # Fail silently
     fi
 
+    kernel_cmdline="$kernel_cmdline splash"
     build_section splash "$PWD/$_splash"
 }
 
@@ -47,12 +46,10 @@ profile_diag() {
     profile_abbrev="diag"
     title="Safecord Diag"
     desc="Diagnostic app for Safecor"
-    kernel_cmdline="$kernel_cmdline autodetect_serial=no"
+    kernel_cmdline="$kernel_cmdline autodetect_serial=no splash"
     apks="$apks safecor-diag"
     apkovl="genapkovl-diag.sh"
     hostname="safecor-diag"
     boot_addons=""
-    splash_file="splash.ppm"
-
-    msg "cmdline: $kernel_cmdline"
+    splash_file="splash.ppm"    
 }
