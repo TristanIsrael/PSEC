@@ -1,6 +1,7 @@
 build_xen() {
     # XEN section
 	apk fetch --root "$APKROOT" --stdout xen-hypervisor | tar -C "$DESTDIR" -xz boot
+}
 
 build_splash() {
     # Splash section 
