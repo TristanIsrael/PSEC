@@ -1,10 +1,14 @@
-section_splash() {
-    if [ -n "$splash_file" ]; then 
-        msg "No splash file provided"
+build_splash() {
+    for splash_file in ./splash.ppm ./splash.png; do
+        [ -f "$splash_file" ] && { msg "Splash file found: $splash_file"; break; }
+    done
+
+    if [ -e "$splash_file" ]; then 
+        msg "No splash file provided in $PWD"
         return 0 # Not blocking
     fi
 
-    msg "Starting section splash"
+    msg "Handling splash file $splash_file"
 
     local file="$splash_file"
     local ext="${file##*.}"

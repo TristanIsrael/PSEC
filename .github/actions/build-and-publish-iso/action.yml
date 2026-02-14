@@ -19,7 +19,7 @@ runs:
   - name: Install build packages 
     shell: sh 
     run: |
-      sudo apk add abuild alpine-conf xorriso squashfs-tools grub alpine-sdk wget mtools
+      sudo apk add abuild alpine-conf xorriso squashfs-tools grub alpine-sdk wget mtools imagemagick
 
   - name: Fetch aports git repository
     shell: sh
@@ -37,8 +37,8 @@ runs:
       sudo chmod +x aports/scripts/*.sh
 
       # Copy splash images
-      cp setup/iso/${{ inputs.package-name }}/*.ppm aports/scripts || true
-      cp setup/iso/${{ inputs.package-name }}/*.png aports/scripts || true
+      cp setup/iso/${{ inputs.package-name }}/splash.ppm aports/scripts || true
+      cp setup/iso/${{ inputs.package-name }}/splash.png aports/scripts || true
 
       mkdir -pv ~/tmp
 
