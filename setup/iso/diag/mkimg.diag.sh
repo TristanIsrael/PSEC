@@ -28,7 +28,7 @@ section_splash() {
     local $splash_file=""
 
     for file in ./splash.ppm ./splash.png; do
-        [ -f "$file" ] && { msg "Splash file found: $file"; $splash_file=$file break; }
+        [ -f "$file" ] && { msg "Splash file found: $file"; splash_file=$file break; }
     done
 
     if [ -f "$splash_file" ]; then 
