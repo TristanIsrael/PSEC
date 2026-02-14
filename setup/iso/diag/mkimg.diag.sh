@@ -33,8 +33,7 @@ section_splash() {
 
     if [ -f "$splash_file" ]; then 
         msg "Could not open $splash_file in $PWD"
-        build_section splash $splash_file
-        return 0 # Not blocking
+        build_section splash "$PWD/$splash_file"
     fi
 }
 
