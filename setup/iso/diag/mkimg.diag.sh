@@ -27,11 +27,11 @@ build_splash() {
 section_splash() {
     local $splash_file=""
 
-    for file in ./splash.ppm ./splash.png; do
+    for file in splash.ppm splash.png; do
         [ -f "$file" ] && { msg "Splash file found: $file"; splash_file=$file break; }
     done
 
-    if [ -f "$splash_file" ]; then 
+    if [ -f "$PWD/$splash_file" ]; then 
         msg "Could not open $splash_file in $PWD"
         build_section splash "$PWD/$splash_file"
     fi
