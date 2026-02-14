@@ -1,7 +1,8 @@
-build_safecor() {
+build_xen() {
     # XEN section
 	apk fetch --root "$APKROOT" --stdout xen-hypervisor | tar -C "$DESTDIR" -xz boot
 
+build_splash() {
     # Splash section 
     local file="$1"
     msg "Handling splash file $file"
@@ -28,11 +29,13 @@ build_safecor() {
     return $?
 }
 
-section_safecor() {
+section_xen() {
     # XEN section
 	[ -n "${xen_params+set}" ] || return 0
 	build_section xen $ARCH $(apk fetch --root "$APKROOT" --simulate xen-hypervisor | checksum)
+}
 
+section_splash() {
     # Splash section
     local _splash=""
 
