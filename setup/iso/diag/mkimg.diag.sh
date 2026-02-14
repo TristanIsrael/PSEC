@@ -18,8 +18,11 @@ build_splash() {
         file=$out
     fi
 
-    msg Adding splash image $file to ISO at ${DESTDIR}
+    msg "Adding splash image $file to ISO at ${DESTDIR}"
     cp $file ${DESTDIR}/fbsplash0.ppm
+
+    kernel_cmdline="$kernel_cmdline splash"
+    msg "$kernel_cmdline"
 
     return $?
 }
