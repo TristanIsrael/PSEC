@@ -1,15 +1,12 @@
-profile_tests() {
-    profile_xen
-    kernel_cmdline="unionfs_size=512M console=tty0 console=ttyS0,115200"
-    syslinux_serial="0 115200"
-    kernel_addons=""
-    apks="$apks xen xen-hypervisor safecor-tests"
-    local _k _a
-    for _k in $kernel_flavors; do
-            apks="$apks linux-$_k"
-            for _a in $kernel_addons; do
-                    apks="$apks $_a-$_k"
-            done
-    done
+profile_diag() {
+    profile_safecor
+
+    profile_abbrev="tests"
+    title="Safecor tests"
+    desc="Functional tests app for Safecor"
+    kernel_cmdline="$kernel_cmdline autodetect_serial=no"
+    apks="$apks safecor-tests"
     apkovl="genapkovl-tests.sh"
+    hostname="safecor-tests"
+    boot_addons=""   
 }
