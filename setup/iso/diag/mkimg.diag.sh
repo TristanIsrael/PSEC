@@ -31,7 +31,7 @@ section_splash() {
         [ -f "$file" ] && { msg "Splash file found: $file"; splash_file=$file break; }
     done
 
-    if [ -f "$PWD/$splash_file" ]; then 
+    if [ ! -f "$PWD/$splash_file" ]; then 
         msg "Could not open $splash_file in $PWD"
         build_section splash "$PWD/$splash_file"
     fi
