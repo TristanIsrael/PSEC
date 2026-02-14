@@ -1,16 +1,7 @@
-build_splash() {
-    for splash_file in ./splash.ppm ./splash.png; do
-        [ -f "$splash_file" ] && { msg "Splash file found: $splash_file"; break; }
-    done
-
-    if [ -e "$splash_file" ]; then 
-        msg "No splash file provided in $PWD"
-        return 0 # Not blocking
-    fi
-
-    msg "Handling splash file $splash_file"
-
-    local file="$splash_file"
+build_splash() {    
+    local file="$1"
+    msg "Handling splash file $file"
+    
     local ext="${file##*.}"
     ext=$(echo "$ext" | tr '[:upper:]' '[:lower:]')
 
@@ -31,6 +22,19 @@ build_splash() {
     cp $file ${DESTDIR}/fbsplash0.ppm
 
     return $?
+}
+
+section_splash() {
+    for splash_file in ./splash.ppm ./splash.png; do
+        [ -f "$splash_file" ] && { msg "Splash file found: $splash_file"; break; }
+    done
+
+    if [ -e "$splash_file" ]; then 
+        msg "No splash file provided in $PWD"
+        return 0 # Not blocking
+    fi
+
+    build_section splash $splash_file
 }
 
 profile_diag() {

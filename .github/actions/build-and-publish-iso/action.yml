@@ -37,8 +37,7 @@ runs:
       sudo chmod +x aports/scripts/*.sh
 
       # Copy splash images
-      cp setup/iso/${{ inputs.package-name }}/splash.ppm aports/scripts || true
-      cp setup/iso/${{ inputs.package-name }}/splash.png aports/scripts || true
+      cp setup/iso/${{ inputs.package-name }}/splash.* aports/scripts || true
 
       mkdir -pv ~/tmp
 
