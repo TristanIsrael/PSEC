@@ -17,8 +17,7 @@ MOUSE_EVDEV=$(readlink -f "$MOUSE")
 echo "Detected keyboard at: $KEYBOARD_EVDEV"
 echo "Detected mouse at: $MOUSE_EVDEV"
 
-killall fbsplash || true
+# Close the splash
+echo "exit" > /.splash.ctrl
 
-TTY="/dev/tty16" # fbsplash is ran on TTY 16
-
-/usr/bin/python3 /usr/lib/safecor/diag/src/diag/main.py -platform linuxfb:/dev/fb0:tty=$TTY -plugin EvdevKeyboard:$KEYBOARD_EVDEV -plugin EvdevMouse:$MOUSE_EVDEV
+/usr/bin/python3 /usr/lib/safecor/diag/src/diag/main.py -platform linuxfb -plugin EvdevKeyboard:$KEYBOARD_EVDEV -plugin EvdevMouse:$MOUSE_EVDEV
