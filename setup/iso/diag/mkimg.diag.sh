@@ -1,4 +1,4 @@
-add_splash() {
+section_splash() {
     local file="$1"
     local ext="${file##*.}"
     ext=$(echo "$ext" | tr '[:upper:]' '[:lower:]')
@@ -16,24 +16,21 @@ add_splash() {
         file=$out
     fi
 
+    msg Adding splash image $file to ISO at ${DESTDIR}
     cp $file ${DESTDIR}/fbsplash0.ppm
 
     return $?
 }
 
-setup_inittab_console() { 
-    # Prevent any console to be added by initramfs-init
-    return 0; 
-}
-
 profile_diag() {
     profile_safecor
 
+    profile_abbrev="diag"
+    title="Safecord Diag"
+    desc="Diagnostic app for Safecor"
     kernel_cmdline="$kernel_cmdline autodetect_serial=no"
     apks="$apks safecor-diag"
     apkovl="genapkovl-diag.sh"
     hostname="safecor-diag"
     boot_addons=""
-
-    add_splash "splash.ppm"
 }
