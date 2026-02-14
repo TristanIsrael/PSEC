@@ -1,7 +1,7 @@
 build_splash() {    
     local file="$1"
     msg "Handling splash file $file"
-    
+
     local ext="${file##*.}"
     ext=$(echo "$ext" | tr '[:upper:]' '[:lower:]')
 
@@ -25,16 +25,17 @@ build_splash() {
 }
 
 section_splash() {
-    for splash_file in ./splash.ppm ./splash.png; do
-        [ -f "$splash_file" ] && { msg "Splash file found: $splash_file"; break; }
+    local $splash_file=""
+
+    for file in ./splash.ppm ./splash.png; do
+        [ -f "$file" ] && { msg "Splash file found: $file"; $splash_file=$file break; }
     done
 
-    if [ -e "$splash_file" ]; then 
-        msg "No splash file provided in $PWD"
+    if [ -f "$splash_file" ]; then 
+        msg "Could not open $splash_file in $PWD"
+        build_section splash $splash_file
         return 0 # Not blocking
     fi
-
-    build_section splash $splash_file
 }
 
 profile_diag() {
