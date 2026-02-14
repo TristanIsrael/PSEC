@@ -21,8 +21,7 @@ build_splash() {
     msg "Adding splash image $file to ISO at ${DESTDIR}"
     cp $file ${DESTDIR}/fbsplash0.ppm
 
-    kernel_cmdline="$kernel_cmdline splash"
-    msg "$kernel_cmdline"
+    kernel_cmdline="$kernel_cmdline splash"    
 
     return $?
 }
@@ -54,4 +53,6 @@ profile_diag() {
     hostname="safecor-diag"
     boot_addons=""
     splash_file="splash.ppm"
+
+    msg "cmdline: $kernel_cmdline"
 }
