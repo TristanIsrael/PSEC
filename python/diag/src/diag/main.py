@@ -18,8 +18,8 @@ class MyView(QQuickView):
         if event.modifiers() == Qt.ControlModifier and event.key() == Qt.Key_C:
             # Ctrl+C has been pressed
             self.close()
-            QGuiApplication.quit()
-            #subprocess.run("poweroff")
+            #QGuiApplication.quit()
+            subprocess.run("poweroff")
         else:
             super().keyPressEvent(event)
 
